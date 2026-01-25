@@ -1,0 +1,199 @@
+/* Markdown content styles - 响应式优化 */
+/* 改进依据：使用CSS变量实现流式字体，提升大屏幕可读性 */
+.markdownContent {
+  /* 使用响应式内容字体（13px → 15px） */
+  font-size: var(--font-size-content);
+  line-height: var(--line-height-relaxed);
+  color: #1a1a1a;
+
+  /* 移除max-width限制，让内容自然填充父容器 */
+  width: 100%;
+}
+
+.markdownContent h1,
+.markdownContent h2,
+.markdownContent h3,
+.markdownContent h4,
+.markdownContent h5,
+.markdownContent h6 {
+  margin-top: 2em;
+  margin-bottom: 0.75em;
+  font-weight: 600;
+  color: #2c3e50;
+  line-height: var(--line-height-tight);
+}
+
+.markdownContent h1 {
+  font-size: 1.75em;  /* 相对于内容字体 */
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.4em;
+  margin-top: 2em;
+}
+
+.markdownContent h2 {
+  font-size: 1.5em;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.35em;
+  margin-top: 1.75em;
+}
+
+.markdownContent h3 {
+  font-size: 1.3em;
+  margin-top: 1.5em;
+}
+
+.markdownContent h4 {
+  font-size: 1.15em;
+  margin-top: 1.25em;
+}
+
+.markdownContent p {
+  margin-bottom: 1.25em;
+  line-height: var(--line-height-relaxed);
+}
+
+.markdownContent ul,
+.markdownContent ol {
+  margin: 1.25em 0;
+  padding-left: 2em;
+}
+
+.markdownContent li {
+  margin-bottom: 0.5em;
+  line-height: var(--line-height-normal);
+}
+
+.markdownContent blockquote {
+  margin: 1.5em 0;
+  padding: 1em 1.25em;
+  border-left: 4px solid #667eea;
+  background-color: #f8f9ff;
+  color: #555;
+  line-height: var(--line-height-relaxed);
+  border-radius: var(--border-radius-sm);
+}
+
+.markdownContent code {
+  background-color: #f1f3f4;
+  padding: 0.2em 0.5em;
+  border-radius: var(--border-radius-sm);
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+  font-size: 0.9em;
+  color: #d73a49;
+}
+
+.markdownContent pre {
+  background-color: #f6f8fa;
+  border-radius: var(--border-radius-md);
+  padding: 1.25em;
+  overflow-x: auto;
+  margin: 1.5em 0;
+  border: 1px solid #e8e8e8;
+  /* 移除max-width限制，让代码块自然填充 */
+  width: 100%;
+}
+
+.markdownContent pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+  font-size: 0.95em;
+}
+
+.markdownContent table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.5em 0;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  /* 移除max-width限制，让表格自然填充 */
+}
+
+.markdownContent th,
+.markdownContent td {
+  border: 1px solid #e2e8f0;
+  padding: 0.75em 1.25em;
+  text-align: left;
+  line-height: var(--line-height-normal);
+}
+
+.markdownContent th {
+  background-color: #667eea;
+  color: white;
+  font-weight: 600;
+  font-size: 0.95em;
+}
+
+.markdownContent tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+.markdownContent a {
+  color: #667eea;
+  text-decoration: none;
+}
+
+.markdownContent a:hover {
+  text-decoration: underline;
+}
+
+.markdownContent hr {
+  border: none;
+  border-top: 1px solid #eee;
+  margin: 2em 0;
+}
+
+/* 响应式设计 - 基于Material Design 3断点 */
+
+/* 小屏幕（手机）：0-599px */
+@media (max-width: 599px) {
+  .markdownContent h1 {
+    font-size: 1.5em;
+    margin-top: 1.5em;
+  }
+
+  .markdownContent h2 {
+    font-size: 1.3em;
+    margin-top: 1.25em;
+  }
+
+  .markdownContent h3 {
+    font-size: 1.15em;
+  }
+
+  .markdownContent p {
+    margin-bottom: 1em;
+  }
+
+  .markdownContent pre {
+    padding: 1em;
+    margin: 1.25em 0;
+    font-size: 0.9em;
+  }
+
+  .markdownContent ul,
+  .markdownContent ol {
+    padding-left: 1.5em;
+    margin: 1em 0;
+  }
+
+  .markdownContent th,
+  .markdownContent td {
+    padding: 0.5em 0.75em;
+    font-size: 0.9em;
+  }
+
+  .markdownContent blockquote {
+    padding: 0.75em 1em;
+    margin: 1.25em 0;
+  }
+}
+
+/* 大屏幕（1440px+）：略微增加padding */
+@media (min-width: 1440px) {
+  .markdownContent th,
+  .markdownContent td {
+    padding: 0.85em 1.35em;
+  }
+}

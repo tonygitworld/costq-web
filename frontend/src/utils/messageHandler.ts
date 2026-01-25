@@ -1,0 +1,1184 @@
+// Message handling system (used by both SSE and WebSocket)
+import { type WebSocketMessage, type StreamChunkMessage, type CompletionMessage, type TokenUsageMessage } from '../types/message';
+import { type ThinkingData, type ToolCallData, type ContentBlock, type Message, type TokenUsage } from '../types/chat';
+import { useChatStore } from '../stores/chatStore';
+import { notification } from 'antd';
+
+// 消息构建器状态类型
+interface MessageBuilderState {
+  thinking?: ThinkingData;
+  toolCalls?: Map<string, ToolCallData>;
+  content: string;
+  messageId?: string;
+  chatId?: string;
+  contentBlocks?: ContentBlock[];
+}
+
+// 消息更新类型
+type MessageUpdate = Partial<Message> & {
+  meta?: Partial<Message['meta']>;
+};
+
+export class MessageHandler {
+  // ❌ 删除静态缓存：private chatStore = useChatStore.getState();
+  // ✅ 改为每次都获取最新的 store state
+  private resetCurrentQuery: (() => void) | null = null;  // ✅ 新增：重置查询的回调
+
+  // ✅ 新增：已处理事件ID集合（防止重复）
+  private processedEventIds = new Set<string>();
+
+  // ✅ 新增：缓存待处理的 Token 统计（解决竞态条件）
+  private pendingTokenUsage: Map<string, TokenUsage> = new Map();
+
+  // ✨ 新增：当前消息的构建状态
+  private currentMessageBuilder: MessageBuilderState = {
+    thinking: undefined,
+    toolCalls: new Map(),
+    content: '',
+    messageId: undefined,  // ✅ 显式初始化为 undefined
+    contentBlocks: [],
+    chatId: undefined
+  };
+
+  // ✅ 移除 requestAnimationFrame 批处理机制，实现真正的流式输出
+  // 原因：RAF 批处理会合并多个 content_delta 事件，导致用户看不到流畅的逐字显示效果
+
+  // ✅ 新增：获取最新 store 的 getter
+  private get chatStore() {
+    return useChatStore.getState();
+  }
+
+  constructor() {
+    // ❌ 删除 subscribe 订阅（不需要了）
+  }
+
+  // ✅ 新增：设置重置查询的回调
+  setResetCurrentQuery(callback: () => void) {
+    this.resetCurrentQuery = callback;
+  }
+
+  // ✅ 新增：重置消息构建器（在发送新查询时调用）
+  resetMessageBuilder() {
+    console.log('🔄 [messageHandler] 重置消息构建器，准备新查询');
+    this.currentMessageBuilder = {
+      thinking: undefined,
+      toolCalls: new Map(),
+      content: '',
+      contentBlocks: [],
+      messageId: undefined,  // ✅ 重置 messageId，确保创建新消息
+      chatId: this.currentMessageBuilder.chatId  // ✅ 保留 chatId，因为可能在同一会话中
+    };
+    this.processedEventIds.clear();  // ✅ 清理事件去重集合
+  }
+
+  // ✅ 使用 requestAnimationFrame 实现丝滑更新（2025最佳实践）
+  // ✅ 已移除 scheduleUpdate 和 flushUpdates 方法
+  // 原因：RAF 批处理机制导致流式事件被合并，用户看不到流畅的逐字显示效果
+  // 现在直接调用 updateCurrentMessage 立即更新 UI
+
+  handleMessage = (message: WebSocketMessage) => {
+    try {
+      switch (message.type) {
+        // ========== 旧格式（向后兼容）==========
+        case 'stream_start':
+          this.handleStreamStart(message);
+          break;
+        case 'stream_chunk':
+        case 'chunk':  // ✅ 新增：支持后端的 chunk 类型
+          this.handleStreamChunk(message as StreamChunkMessage);
+          break;
+        case 'stream_end':
+          this.handleStreamEnd(message);
+          break;
+        case 'completion':
+        case 'complete':  // ✅ 新增：支持后端的 complete 类型
+          this.handleCompletion(message as CompletionMessage);
+          break;
+        case 'response':
+          this.handleResponse(message);
+          break;
+        case 'thinking':
+          this.handleThinking(message);
+          break;
+
+        // ========== 新格式（Agent 工作流程）==========
+        case 'message_start':  // ✅ 新增：处理消息开始事件
+          this.handleMessageStart(message);
+          break;
+        case 'thinking_start':
+          this.handleThinkingStart(message);
+          break;
+        case 'thinking_step':
+          this.handleThinkingStep(message);
+          break;
+        case 'thinking_end':
+          this.handleThinkingEnd(message);
+          break;
+        case 'tool_call_start':
+          this.handleToolCallStart(message);
+          break;
+        case 'tool_call_progress':
+          this.handleToolCallProgress(message);
+          break;
+        case 'tool_call_result':
+          this.handleToolCallResult(message);
+          break;
+        case 'tool_call_error':
+          this.handleToolCallError(message);
+          break;
+        case 'content_delta':
+          this.handleContentDelta(message);
+          break;
+        case 'message_complete':
+          this.handleMessageComplete(message);
+          break;
+        case 'error':
+          this.handleError(message);
+          break;
+
+        // ✅ 新增: 取消相关消息
+        case 'generation_cancelled':
+          this.handleGenerationCancelled(message);
+          break;
+        case 'cancellation_acknowledged':
+          this.handleCancellationAcknowledged(message);
+          break;
+
+        // ✅ 新增: 状态提示消息
+        case 'status':
+          this.handleStatusMessage(message);
+          break;
+
+        // ✅ P2修复：处理session续期事件
+        case 'session_renewed':
+          this.handleSessionRenewed(message);
+          break;
+
+        // ✅ 新增: 后端创建Session后返回session_id
+        case 'session_created':
+          this.handleSessionCreated(message);
+          break;
+
+        // ✅ 新增: Token 使用统计
+        case 'token_usage':
+          this.handleTokenUsage(message);
+          break;
+
+        // ✅ 新增: 系统消息（欢迎消息等）
+        case 'system':
+          // 系统消息通常只是通知，不需要特殊处理
+          console.log('📢 收到系统消息:', message.content || message);
+          break;
+
+        default:
+          console.warn('未知的消息类型:', message.type);
+      }
+    } catch (error) {
+      console.error('处理消息时出错:', error);
+      notification.error({
+        message: '消息处理错误',
+        description: '处理服务器消息时出现错误，请重试。'
+      });
+    }
+  };
+
+
+
+  private handleStreamStart = (_message: WebSocketMessage) => {
+    const messageId = this.getCurrentMessageId();
+    if (messageId) {
+      // 更新消息状态为流式输出
+      const currentChatId = this.chatStore.currentChatId;
+      if (currentChatId) {
+        const currentMessage = this.getCurrentMessage();
+        if (currentMessage) {
+          this.chatStore.updateMessage(currentChatId, messageId, {
+            meta: {
+              ...currentMessage.meta,
+              status: 'streaming',
+              isStreaming: true
+            }
+          });
+        }
+      }
+    }
+  };
+
+  private handleStreamChunk = (message: StreamChunkMessage & { session_id?: string }) => {
+    // 🔍 诊断：记录收到的chunk事件
+    console.log('📥 [前端] 收到 chunk 事件, content长度:', message.content?.length, '预览:', message.content?.substring(0, 50), 'session_id:', message.session_id);
+
+    const content = message.content || '';
+
+    // ✅ 确保当前消息存在（传递message以使用session_id）
+    this.ensureCurrentMessage(message);
+
+    // ✅ 更新当前消息构建器
+    this.currentMessageBuilder.content += content;
+
+    // ✅ 更新contentBlocks
+    if (!this.currentMessageBuilder.contentBlocks) {
+      this.currentMessageBuilder.contentBlocks = [];
+    }
+
+    // ✅ 查找或创建最后一个text块
+    if (this.currentMessageBuilder.contentBlocks.length > 0) {
+      const lastBlock = this.currentMessageBuilder.contentBlocks[this.currentMessageBuilder.contentBlocks.length - 1];
+      if (lastBlock.type === 'text') {
+        // 累积到现有text块
+        lastBlock.content += content;
+        console.log('📝 [前端] 累积到现有text块, 总长度:', lastBlock.content.length);
+      } else {
+        // 最后一个块不是text，创建新的text块
+        this.currentMessageBuilder.contentBlocks.push({
+          type: 'text',
+          content: content,
+          timestamp: Date.now()
+        });
+        console.log('➕ [前端] 创建新text块（最后一个不是text）, contentBlocks总数:', this.currentMessageBuilder.contentBlocks.length);
+      }
+    } else {
+      // 没有contentBlocks，创建第一个text块
+      this.currentMessageBuilder.contentBlocks.push({
+        type: 'text',
+        content: content,
+        timestamp: Date.now()
+      });
+      console.log('➕ [前端] 创建第一个text块, contentBlocks总数:', this.currentMessageBuilder.contentBlocks.length);
+    }
+
+    // ✅ 直接调用 updateCurrentMessage，不使用 RAF 批处理
+    // 这样可以实现真正的流式输出，每个 chunk 立即显示在 UI 上
+    this.updateCurrentMessage({
+      content: this.currentMessageBuilder.content,
+      contentBlocks: this.currentMessageBuilder.contentBlocks,
+      showStatus: false  // 隐藏状态卡片
+    }, message);
+  };
+
+  private handleStreamEnd = (_message: WebSocketMessage) => {
+    const messageId = this.getCurrentMessageId();
+    const currentChatId = this.chatStore.currentChatId;
+
+    if (messageId && currentChatId) {
+      const currentMessage = this.getCurrentMessage();
+      if (currentMessage) {
+        this.chatStore.updateMessage(currentChatId, messageId, {
+          meta: {
+            ...currentMessage.meta,
+            status: 'completed',
+            isStreaming: false,
+            streamingProgress: 100,
+            endTime: Date.now()
+          }
+        });
+      }
+    }
+  };
+
+  private handleCompletion = (message: CompletionMessage) => {
+    const { success, error } = message;
+    const messageId = this.getCurrentMessageId();
+
+    console.log('✅ [messageHandler.handleCompletion] 收到 complete 事件, success:', success, 'error:', error);
+
+    if (messageId) {
+      // 更新消息状态
+      const currentChatId = this.chatStore.currentChatId;
+      if (currentChatId) {
+        const currentMessage = this.getCurrentMessage();
+        if (currentMessage) {
+          // ✅ 如果失败，不将错误信息添加到消息内容中（由 Alert 统一显示，避免重复）
+          // 保持原有内容不变，错误信息通过 Alert 组件显示
+          const updatedContent = currentMessage.content;
+
+          this.chatStore.updateMessage(currentChatId, messageId, {
+            content: updatedContent,
+            meta: {
+              ...currentMessage.meta,
+              status: success ? 'completed' : 'failed',
+              isStreaming: false,  // ✅ 关键：停止流式状态
+              streamingProgress: 100,
+              endTime: Date.now(),
+              error: error ? {
+                message: error,
+                code: undefined,
+                retryable: true
+              } : undefined
+            },
+            // ✅ 清除状态卡片显示（避免继续显示"正在分析数据..."）
+            showStatus: false,
+            statusType: undefined,
+            statusMessage: undefined
+          });
+        }
+      }
+    }
+
+    // ✅ 处理错误情况：无论是否有 error 字段，只要 success 为 false 就显示错误
+    if (!success) {
+      const errorMessage = error || '请求处理失败，请重试或简化问题';
+      console.error('❌ [messageHandler.handleCompletion] 查询失败:', errorMessage);
+      notification.error({
+        message: '处理失败',
+        description: errorMessage,
+        duration: 5
+      });
+    }
+
+    // ✅ 调用重置查询回调，恢复输入框状态（无论成功或失败都要重置）
+    console.log('🔴 [messageHandler.handleCompletion] 调用 resetCurrentQuery()');
+    if (this.resetCurrentQuery) {
+      this.resetCurrentQuery();
+    } else {
+      console.error('❌ [messageHandler.handleCompletion] resetCurrentQuery 未设置！');
+    }
+
+    // ✅ 清理已处理事件ID集合（为下一次查询准备）
+    this.processedEventIds.clear();
+    console.log('🧹 [前端] 已清理事件去重集合');
+
+    // ✅ 修复：标记消息已完成，但不重置 messageId
+    // messageId 应该在下一次用户发送新查询时才重置
+    // 这样可以确保一个完整的对话（工具调用 + 最终回复）在同一个消息中
+    console.log('✅ [前端] 消息完成，保留 messageId 直到下次查询');
+  };
+
+  private handleThinking = (message: WebSocketMessage) => {
+    // ✅ 兼容后端发送的 thinking 事件，映射到 thinking_step
+    console.log('🧠 [前端] 收到 thinking 事件:', message.content);
+
+    // 确保有当前消息
+    this.ensureCurrentMessage();
+
+    // 如果还没有开始思考，初始化思考状态
+    if (!this.currentMessageBuilder.thinking) {
+      this.handleThinkingStart(message);
+    }
+
+    //作为思考步骤处理
+    this.handleThinkingStep({ content: message.content || '正在思考...' });
+  };
+
+  private handleMessageStart = (message: WebSocketMessage & { session_id?: string }) => {
+    console.log('🚀 [前端] 收到 message_start 事件, session_id:', message.session_id);
+    this.ensureCurrentMessage(message);
+
+    // 更新消息状态
+    this.updateCurrentMessage({
+      meta: {
+        status: 'streaming',
+        isStreaming: true
+      }
+    }, message);
+  };
+
+  private handleResponse = (message: WebSocketMessage) => {
+    // ✅ 处理 response 类型消息（用于错误提示、账号配置提示等）
+    const content = (message as any).content || '';
+
+    if (!content) {
+      console.warn('⚠️ [handleResponse] 收到空的 response 消息');
+      return;
+    }
+
+    console.log('📥 [handleResponse] 收到 response 消息，内容长度:', content.length);
+
+    // ✅ 确保当前消息存在（传递message以使用session_id）
+    this.ensureCurrentMessage(message);
+
+    // ✅ 更新当前消息构建器
+    this.currentMessageBuilder.content = content;
+
+    // ✅ 更新contentBlocks（创建text块）
+    if (!this.currentMessageBuilder.contentBlocks) {
+      this.currentMessageBuilder.contentBlocks = [];
+    }
+
+    // ✅ 创建或更新text块
+    if (this.currentMessageBuilder.contentBlocks.length > 0) {
+      const lastBlock = this.currentMessageBuilder.contentBlocks[this.currentMessageBuilder.contentBlocks.length - 1];
+      if (lastBlock.type === 'text') {
+        // 更新现有text块
+        lastBlock.content = content;
+      } else {
+        // 最后一个块不是text，创建新的text块
+        this.currentMessageBuilder.contentBlocks.push({
+          type: 'text',
+          content: content,
+          timestamp: Date.now()
+        });
+      }
+    } else {
+      // 没有contentBlocks，创建第一个text块
+      this.currentMessageBuilder.contentBlocks.push({
+        type: 'text',
+        content: content,
+        timestamp: Date.now()
+      });
+    }
+
+    // ✅ 直接调用 updateCurrentMessage，不使用 RAF 批处理
+    this.updateCurrentMessage({
+      content: this.currentMessageBuilder.content,
+      contentBlocks: this.currentMessageBuilder.contentBlocks,
+      showStatus: false  // 隐藏状态卡片
+    }, message);
+  };
+
+  private getCurrentMessageId = (): string | null => {
+    const currentChatId = this.chatStore.currentChatId;
+    if (!currentChatId) return null;
+
+    const messages = this.chatStore.messages[currentChatId] || [];
+    const lastMessage = messages[messages.length - 1];
+
+    return lastMessage?.type === 'assistant' ? lastMessage.id : null;
+  };
+
+  private getCurrentMessage = () => {
+    const messageId = this.getCurrentMessageId();
+    const currentChatId = this.chatStore.currentChatId;
+
+    if (!messageId || !currentChatId) return null;
+
+    const messages = this.chatStore.messages[currentChatId] || [];
+    return messages.find(m => m.id === messageId);
+  };
+
+  // ========== 新格式消息处理器 ==========
+
+  private handleThinkingStart = (_message: WebSocketMessage) => {
+    // 初始化思考数据
+    this.currentMessageBuilder.thinking = {
+      steps: [],
+      startTime: Date.now()
+    };
+
+    // 创建一个新的 Assistant 消息（如果还没有）
+    this.ensureCurrentMessage();
+
+    // ✨ 立即更新消息，显示空的思考过程（会显示加载状态）
+    this.updateCurrentMessage({
+      thinking: {
+        steps: [],
+        startTime: this.currentMessageBuilder.thinking.startTime
+      }
+    });
+  };
+
+  private handleThinkingStep = (message: { content?: string; session_id?: string }) => {
+    const { content } = message;
+
+    if (!this.currentMessageBuilder.thinking) {
+      this.currentMessageBuilder.thinking = { steps: [] };
+    }
+
+    if (!this.currentMessageBuilder.thinking.steps) {
+      this.currentMessageBuilder.thinking.steps = [];
+    }
+
+    this.currentMessageBuilder.thinking.steps.push(content);
+
+    // ✅ 实时更新 UI，不使用 RAF 批处理
+    this.updateCurrentMessage({
+      thinking: {
+        steps: this.currentMessageBuilder.thinking.steps,
+        startTime: this.currentMessageBuilder.thinking.startTime
+      }
+    }, message);
+  };
+
+  private handleThinkingEnd = (message: { duration?: number }) => {
+    const { duration } = message;
+
+    console.log(`🧠 [前端] 收到思考结束事件, duration:`, duration);
+
+    if (this.currentMessageBuilder.thinking) {
+      this.currentMessageBuilder.thinking.duration = duration;
+      this.currentMessageBuilder.thinking.endTime = Date.now();
+
+      // 更新消息
+      this.updateCurrentMessage({
+        thinking: {
+          steps: this.currentMessageBuilder.thinking.steps || [],
+          duration: duration,
+          startTime: this.currentMessageBuilder.thinking.startTime,
+          endTime: this.currentMessageBuilder.thinking.endTime
+        }
+      });
+
+      console.log(`🧠 [前端] 思考数据已更新:`, this.currentMessageBuilder.thinking);
+    }
+  };
+
+  private handleToolCallStart = (message: { tool_id?: string; tool_name?: string; description?: string; args?: Record<string, unknown>; update?: boolean; session_id?: string }) => {
+    const { tool_id, tool_name, description, args, update } = message;
+
+    // ✅ 添加详细时间戳日志（调试顺序问题）
+    const timestamp = new Date().toISOString();
+    console.log(`⏰ [${timestamp}] handleToolCallStart - tool_id: ${tool_id}, tool_name: ${tool_name}, session_id: ${message.session_id}`);
+
+    // 🔄 如果这是一个更新事件（包含额外参数）
+    if (update && tool_id) {
+      console.log(`⏰ [${timestamp}] 🔄 收到工具调用参数更新:`, tool_id, 'session_id:', message.session_id);
+
+      // 更新 toolCalls Map 中的参数
+      const existingToolCall = this.currentMessageBuilder.toolCalls?.get(tool_id);
+      if (existingToolCall) {
+        existingToolCall.args = args; // 更新为完整参数
+        console.log('✅ [前端] 已更新工具调用参数:', args);
+      }
+
+      // 更新 contentBlocks 中的参数
+      if (this.currentMessageBuilder.contentBlocks) {
+        const blockIndex = this.currentMessageBuilder.contentBlocks.findIndex(
+          block => block.type === 'tool_call' && block.toolCall.id === tool_id
+        );
+        if (blockIndex !== -1) {
+          this.currentMessageBuilder.contentBlocks[blockIndex].toolCall.args = args;
+        }
+      }
+
+      // ✅ 触发 UI 更新，不使用 RAF 批处理
+      this.updateCurrentMessage({
+        toolCalls: Array.from(this.currentMessageBuilder.toolCalls?.values() || []) as any[],
+        contentBlocks: this.currentMessageBuilder.contentBlocks
+      }, message);
+
+      return; // 更新事件处理完成，直接返回
+    }
+
+    // ✅ 去重检查：防止重复处理同一个工具调用
+    if (tool_id && this.processedEventIds.has(tool_id)) {
+      console.warn('⚠️ [前端去重] 检测到重复工具调用事件，已忽略:', tool_id);
+      return;
+    }
+
+    // ✅ 记录已处理的事件ID
+    if (tool_id) {
+      this.processedEventIds.add(tool_id);
+    }
+
+    // 🔍 详细诊断日志
+    console.log('📥 [前端] 收到 tool_call_start 事件:', {
+      tool_id,
+      tool_name,
+      description,
+      args,
+      argsType: typeof args,
+      argsKeys: args ? Object.keys(args) : []
+    });
+
+    if (!this.currentMessageBuilder.toolCalls) {
+      this.currentMessageBuilder.toolCalls = new Map();
+    }
+
+    const toolCallData = {
+      id: tool_id,
+      name: tool_name,
+      description: description,
+      status: 'calling',
+      args: args,
+      startTime: Date.now()
+    };
+
+    this.currentMessageBuilder.toolCalls.set(tool_id, toolCallData);
+
+    // ✨ 添加工具调用块到内容块列表
+    if (!this.currentMessageBuilder.contentBlocks) {
+      this.currentMessageBuilder.contentBlocks = [];
+    }
+
+    this.currentMessageBuilder.contentBlocks.push({
+      type: 'tool_call',
+      toolCall: toolCallData,
+      timestamp: Date.now()
+    });
+
+    console.log('✅ [前端] 添加工具调用到 contentBlocks, 当前总数:', this.currentMessageBuilder.contentBlocks.length, 'session_id:', message.session_id);
+
+    // ✅ 实时更新 UI，不使用 RAF 批处理
+    this.updateCurrentMessage({
+      toolCalls: Array.from(this.currentMessageBuilder.toolCalls.values()) as any[],
+      contentBlocks: this.currentMessageBuilder.contentBlocks
+    }, message);
+  };
+
+  private handleToolCallProgress = (message: { tool_id?: string; status?: string }) => {
+    const { tool_id, status } = message;
+
+    const toolCall = this.currentMessageBuilder.toolCalls?.get(tool_id);
+    if (toolCall) {
+      console.log(`工具 ${tool_id} 进度: ${status}`);
+    }
+  };
+
+  private handleToolCallResult = (message: { tool_use_id?: string; result?: unknown; status?: string; session_id?: string }) => {
+    const { tool_use_id, result, status } = message;
+
+    // 🔍 诊断日志
+    console.log('📥 [前端] 收到 tool_call_result 事件:', message, 'session_id:', message.session_id);
+
+    // 1. 更新 toolCalls Map 中的状态
+    const toolCall = this.currentMessageBuilder.toolCalls?.get(tool_use_id);
+    if (toolCall) {
+      toolCall.status = status || 'success';
+      toolCall.result = result;
+      toolCall.endTime = Date.now();
+
+      // 计算耗时（将毫秒转换为秒）
+      if (toolCall.startTime) {
+        toolCall.duration = (toolCall.endTime - toolCall.startTime) / 1000;
+      }
+    } else {
+      console.warn(`⚠️ 未找到对应的工具调用: ${tool_use_id}`);
+    }
+
+    // 2. 更新 contentBlocks 中的状态 (这是 UI 渲染的关键)
+    if (this.currentMessageBuilder.contentBlocks) {
+      const blockIndex = this.currentMessageBuilder.contentBlocks.findIndex(
+        block => block.type === 'tool_call' && block.toolCall.id === tool_use_id
+      );
+
+      if (blockIndex !== -1) {
+        const block = this.currentMessageBuilder.contentBlocks[blockIndex];
+        block.toolCall.status = status || 'success';
+        block.toolCall.result = result;
+        block.toolCall.endTime = Date.now();
+
+        if (block.toolCall.startTime) {
+          block.toolCall.duration = (block.toolCall.endTime - block.toolCall.startTime) / 1000;
+        }
+
+        console.log(`✅ 更新了 contentBlock 中的工具状态:`, block.toolCall);
+      }
+    }
+
+    // 3. ✅ 触发 UI 更新，不使用 RAF 批处理
+    this.updateCurrentMessage({
+      toolCalls: Array.from(this.currentMessageBuilder.toolCalls?.values() || []),
+      contentBlocks: this.currentMessageBuilder.contentBlocks
+    }, message);
+  };
+
+  private handleToolCallError = (message: { tool_use_id?: string; error?: string; session_id?: string }) => {
+    const { tool_use_id, error } = message;
+
+    // 1. 更新 toolCalls Map
+    const toolCall = this.currentMessageBuilder.toolCalls?.get(tool_use_id);
+    if (toolCall) {
+      toolCall.status = 'error';
+      toolCall.error = error;
+      toolCall.endTime = Date.now();
+
+      if (toolCall.startTime) {
+        toolCall.duration = (toolCall.endTime - toolCall.startTime) / 1000;
+      }
+    }
+
+    // 2. 更新 contentBlocks
+    if (this.currentMessageBuilder.contentBlocks) {
+      const blockIndex = this.currentMessageBuilder.contentBlocks.findIndex(
+        block => block.type === 'tool_call' && block.toolCall.id === tool_use_id
+      );
+
+      if (blockIndex !== -1) {
+        const block = this.currentMessageBuilder.contentBlocks[blockIndex];
+        block.toolCall.status = 'error';
+        block.toolCall.error = error;
+        block.toolCall.endTime = Date.now();
+
+        if (block.toolCall.startTime) {
+          block.toolCall.duration = (block.toolCall.endTime - block.toolCall.startTime) / 1000;
+        }
+      }
+    }
+
+    // 3. ✅ 触发 UI 更新，不使用 RAF 批处理
+    this.updateCurrentMessage({
+      toolCalls: Array.from(this.currentMessageBuilder.toolCalls?.values() || []),
+      contentBlocks: this.currentMessageBuilder.contentBlocks
+    }, message);
+  };
+
+  private handleContentDelta = (message: { delta?: string; session_id?: string }) => {
+    const { delta } = message;
+
+    this.currentMessageBuilder.content += delta;
+
+    // ✨ 合并文本块：如果最后一个块是文本，就追加；否则创建新块
+    if (delta) {
+      if (!this.currentMessageBuilder.contentBlocks) {
+        this.currentMessageBuilder.contentBlocks = [];
+      }
+
+      const lastBlock = this.currentMessageBuilder.contentBlocks[this.currentMessageBuilder.contentBlocks.length - 1];
+
+      if (lastBlock && lastBlock.type === 'text') {
+        // 最后一个是文本块，追加内容
+        lastBlock.content += delta;
+      } else {
+        // 最后一个不是文本块（或没有块），创建新的文本块
+        this.currentMessageBuilder.contentBlocks.push({
+          type: 'text',
+          content: delta,
+          timestamp: Date.now()
+        });
+      }
+    }
+
+    // ✅ 直接调用 updateCurrentMessage，不使用 RAF 批处理
+    // 这样可以实现真正的流式输出，每个 delta 立即显示在 UI 上
+    this.updateCurrentMessage({
+      content: this.currentMessageBuilder.content,
+      contentBlocks: this.currentMessageBuilder.contentBlocks,
+      meta: {
+        status: 'streaming',
+        isStreaming: true  // ✅ 明确设置流式状态
+      },
+      showStatus: false  // 隐藏状态卡片
+    }, message);
+  };
+
+  private handleMessageComplete = (message: { session_id?: string; query_id?: string }) => {
+    console.log('✅ [messageHandler.handleMessageComplete] 收到 message_complete 事件, session_id:', message.session_id);
+
+    // ✅ 优先使用消息中的 session_id
+    const sessionId = message?.session_id;
+    const currentChatId = sessionId || this.currentMessageBuilder.chatId || this.chatStore.currentChatId;
+
+    if (!currentChatId || !this.currentMessageBuilder.messageId) {
+      console.warn('⚠️ [messageHandler.handleMessageComplete] 没有当前聊天或消息ID');
+      return;
+    }
+
+    // ✅ 获取当前消息（使用正确的chatId）
+    const messages = this.chatStore.messages[currentChatId] || [];
+    const currentMessage = messages.find(m => m.id === this.currentMessageBuilder.messageId);
+
+    // ✅ 检查是否有暂存的 Token 统计（修复竞态条件）
+    const query_id = message?.query_id;
+    if (query_id && this.pendingTokenUsage.has(query_id)) {
+      const tokenUsage = this.pendingTokenUsage.get(query_id);
+      console.log('📊 应用暂存的 Token 统计:', tokenUsage);
+
+      this.chatStore.updateMessage(currentChatId, this.currentMessageBuilder.messageId, {
+        tokenUsage
+      });
+
+      this.pendingTokenUsage.delete(query_id);
+    }
+
+    // 标记消息完成
+    this.chatStore.updateMessage(currentChatId, this.currentMessageBuilder.messageId, {
+      meta: {
+        ...currentMessage?.meta,
+        status: 'completed',
+        isStreaming: false,
+        streamingProgress: 100,
+        endTime: Date.now()
+      } as any
+    });
+
+    console.log(`✅ 消息已标记为完成 - chatId: ${currentChatId}, messageId: ${this.currentMessageBuilder.messageId}`);
+
+    // ✅ 调用重置查询回调，更新 currentQueryId
+    console.log('🔴 [messageHandler.handleMessageComplete] 调用 resetCurrentQuery()');
+    if (this.resetCurrentQuery) {
+      this.resetCurrentQuery();
+    } else {
+      console.error('❌ [messageHandler.handleMessageComplete] resetCurrentQuery 未设置！');
+    }
+
+    // ✅ 重置构建器（包含 messageId）
+    this.currentMessageBuilder = {
+      thinking: undefined,
+      toolCalls: new Map(),
+      content: '',
+      contentBlocks: [],
+      messageId: undefined,  // ✅ 重置 messageId，确保下次查询创建新消息
+      chatId: undefined
+    };
+  };
+
+  private handleError = (message: { error?: string; session_id?: string }) => {
+    const { error } = message;
+    // ✅ 已移除 flushUpdates 调用，不再需要批处理机制
+
+    console.log('❌ [messageHandler.handleError] 收到错误:', error, 'session_id:', message.session_id);
+
+    notification.error({
+      message: '处理失败',
+      description: error,
+      duration: 5
+    });
+
+    // ✅ 调用重置查询回调，更新 currentQueryId
+    if (this.resetCurrentQuery) {
+      this.resetCurrentQuery();
+    }
+
+    // 如果有当前消息，标记为失败
+    const sessionId = message?.session_id;
+    const currentChatId = sessionId || this.currentMessageBuilder.chatId || this.chatStore.currentChatId;
+
+    if (currentChatId && this.currentMessageBuilder.messageId) {
+      const messages = this.chatStore.messages[currentChatId] || [];
+      const currentMessage = messages.find(m => m.id === this.currentMessageBuilder.messageId);
+
+      this.chatStore.updateMessage(currentChatId, this.currentMessageBuilder.messageId, {
+        meta: {
+          ...currentMessage?.meta,
+          status: 'failed',
+          error: {
+            message: error,
+            code: undefined,
+            retryable: true
+          }
+        } as any
+      });
+    }
+  };
+
+  // ✅ 新增: 处理生成取消事件
+  private handleGenerationCancelled = (message: { reason?: string; query_id?: string; session_id?: string }) => {
+    const { reason, query_id } = message;
+    // ✅ 已移除 flushUpdates 调用，不再需要批处理机制
+
+    const sessionId = message?.session_id;
+    const currentChatId = sessionId || this.currentMessageBuilder.chatId || this.chatStore.currentChatId;
+
+    if (!currentChatId || !this.currentMessageBuilder.messageId) {
+      console.warn('⚠️ [handleGenerationCancelled] 无法标记取消状态：没有当前聊天或消息');
+      return;
+    }
+
+    console.log(`🛑 生成已取消 - Query: ${query_id}, ChatId: ${currentChatId}, Reason: ${reason}`);
+
+    const messages = this.chatStore.messages[currentChatId] || [];
+    const currentMessage = messages.find(m => m.id === this.currentMessageBuilder.messageId);
+
+    // 更新消息状态为"已取消"
+    this.chatStore.updateMessage(
+      currentChatId,
+      this.currentMessageBuilder.messageId,
+      {
+        meta: {
+          ...currentMessage?.meta,
+          status: 'cancelled' as const,
+          isStreaming: false,
+          streamingProgress: 100,
+          endTime: Date.now(),
+          cancelReason: reason,
+          retryCount: currentMessage?.meta.retryCount || 0,
+          maxRetries: currentMessage?.meta.maxRetries || 3,
+          canRetry: true,
+          canEdit: false,
+          canDelete: true
+        },
+        // ✅ 清除状态卡片显示（避免继续显示"正在分析数据..."）
+        showStatus: false,
+        statusType: undefined,
+        statusMessage: undefined
+      }
+    );
+
+    // ✅ 调用重置查询回调，更新 currentQueryId
+    if (this.resetCurrentQuery) {
+      this.resetCurrentQuery();
+    }
+
+    // ✅ 重置构建器（包含 messageId）
+    this.currentMessageBuilder = {
+      thinking: undefined,
+      toolCalls: new Map(),
+      content: '',
+      contentBlocks: [],
+      messageId: undefined,  // ✅ 重置 messageId，确保下次查询创建新消息
+      chatId: undefined
+    };
+
+    // 显示通知
+    notification.info({
+      message: '已停止生成',
+      description: reason,
+      duration: 3
+    });
+  };
+
+  // ✅ 新增: 处理取消确认事件
+  private handleCancellationAcknowledged = (message: { query_id?: string }) => {
+    const { query_id } = message;
+    console.log(`✅ 取消确认 - Query: ${query_id}`);
+
+    // 可以在这里添加额外的UI反馈（如果需要）
+  };
+
+  // ========== 辅助方法 ==========
+
+  private ensureCurrentMessage = (message?: { session_id?: string }) => {
+    // ✅ 优先使用消息中的 session_id，否则回退到 currentChatId
+    const sessionId = message?.session_id;
+    let currentChatId = sessionId || this.chatStore.currentChatId;
+
+    // ✅ 如果 currentChatId 为空，创建一个新会话（用于显示错误消息等）
+    if (!currentChatId) {
+      console.warn('⚠️ [ensureCurrentMessage] currentChatId 为空，创建新会话');
+      // ✅ createNewChat 现在是同步的，立即创建临时会话
+      currentChatId = this.chatStore.createNewChat();
+      console.log(`✅ [ensureCurrentMessage] 已创建新会话: ${currentChatId}`);
+    }
+
+    // 如果已经有当前消息，检查是否归属于同一个会话
+    if (this.currentMessageBuilder.messageId) {
+      const existingChatId = this.currentMessageBuilder.chatId;
+      if (existingChatId !== currentChatId) {
+        // 不同的会话，重置构建器（可能是新查询）
+        console.warn(`⚠️ 检测到会话切换: ${existingChatId} → ${currentChatId}，重置消息构建器`);
+        this.currentMessageBuilder = {
+          thinking: undefined,
+          toolCalls: new Map(),
+          content: '',
+          contentBlocks: [],
+          messageId: undefined,
+          chatId: undefined
+        };
+      } else {
+        // ✅ 同一个会话，但需要检查是否是新查询
+        // 如果消息已经标记为完成（通过 message_complete 事件），则应该创建新消息
+        // 这里我们继续使用现有消息，因为 message_complete 会重置 messageId
+        console.log(`♻️  复用现有消息 - chatId: ${currentChatId}, messageId: ${this.currentMessageBuilder.messageId}`);
+        return;
+      }
+    }
+
+    // 创建新的 Assistant 消息
+    const messageId = Date.now().toString() + '_' + Math.random().toString(36).substr(2, 9);
+    this.currentMessageBuilder.messageId = messageId;
+    this.currentMessageBuilder.chatId = currentChatId;  // ✅ 记录消息归属的 chatId
+
+    // 确保会话存在
+    if (!this.chatStore.chats[currentChatId]) {
+      console.warn(`⚠️ 会话 ${currentChatId} 不存在，可能是后端创建的新会话，等待 session_created 事件`);
+      // 创建临时会话占位符（稍后由 session_created 更新）
+      this.chatStore.chats[currentChatId] = {
+        id: currentChatId,
+        title: '新对话',
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      } as any;
+      this.chatStore.messages[currentChatId] = [];
+    }
+
+    this.chatStore.addMessage(currentChatId, {
+      id: messageId,
+      chatId: currentChatId,
+      type: 'assistant',
+      content: '',
+      meta: {
+        status: 'streaming',
+        isStreaming: true,
+        streamingProgress: 0,
+        retryCount: 0,
+        maxRetries: 3,
+        canRetry: true,
+        canEdit: false,
+        canDelete: true
+      }
+    } as any);
+
+    console.log(`✅ 创建新消息 - chatId: ${currentChatId}, messageId: ${messageId}, 来源: ${sessionId ? 'session_id' : 'currentChatId'}`);
+  };
+
+  private updateCurrentMessage = (updates: MessageUpdate, message?: { session_id?: string }) => {
+    // ✅ 优先使用消息中的 session_id
+    const sessionId = message?.session_id;
+    const currentChatId = sessionId || this.currentMessageBuilder.chatId || this.chatStore.currentChatId;
+
+    if (!currentChatId || !this.currentMessageBuilder.messageId) {
+      this.ensureCurrentMessage(message);
+      if (!this.currentMessageBuilder.messageId) {
+        console.error('❌ [updateCurrentMessage] ensureCurrentMessage 失败');
+        return;
+      }
+    }
+
+    // ✅ 验证消息归属
+    const targetChatId = this.currentMessageBuilder.chatId || currentChatId;
+    if (targetChatId !== currentChatId && sessionId) {
+      console.warn(`⚠️ 消息归属不匹配: builder=${this.currentMessageBuilder.chatId}, message=${currentChatId}`);
+      // 使用消息中的 session_id 作为最终真相
+      this.currentMessageBuilder.chatId = currentChatId;
+    }
+
+    this.chatStore.updateMessage(targetChatId!, this.currentMessageBuilder.messageId!, updates);
+  };
+
+  // ========== 状态提示消息处理 ==========
+
+  private handleStatusMessage = (message: { status_type?: string; message?: string; estimated_seconds?: number; details?: string[]; session_id?: string }) => {
+    const { status_type, message: statusMessage, estimated_seconds, details } = message;
+
+    console.log('📊 收到状态消息:', { status_type, message: statusMessage });
+
+    // ✅ 关键修复：确保有当前消息（传递message以使用session_id）
+    this.ensureCurrentMessage(message);
+
+    if (!this.currentMessageBuilder.messageId) {
+      console.warn('⚠️  无法处理状态消息：没有当前消息ID');
+      return;
+    }
+
+    // ✅ 关键修复：更新消息的状态信息（传递message以使用session_id）
+    this.updateCurrentMessage({
+      statusType: status_type,
+      statusMessage: statusMessage,
+      statusEstimatedSeconds: estimated_seconds,
+      statusDetails: details,
+      showStatus: true  // ✅ 强制显示状态卡片！
+    }, message);
+
+    console.log('✅ 状态卡片已更新:', { statusType: status_type, showStatus: true, messageId: this.currentMessageBuilder.messageId });
+  };
+
+  // ✅ 新增：处理后端返回的 session_id（简化版）
+  // ✅ 现在前端已经知道 session_id（因为是自己生成的），只需要验证确认
+  private handleSessionCreated = (message: { session_id?: string; query_id?: string }) => {
+    const { session_id, query_id } = message;
+
+    console.log('🆕 收到后端确认的 session_id:', session_id, 'for query:', query_id);
+
+    const currentChatId = this.chatStore.currentChatId;
+
+    // ✅ 前端已经知道 session_id（因为是自己生成的）
+    // ✅ 只需要验证是否匹配，不需要迁移
+    if (currentChatId !== session_id) {
+      console.warn(`⚠️ session_id 不匹配 - currentChatId: ${currentChatId}, session_id: ${session_id}`);
+
+      // ✅ 如果会话已存在，更新 currentChatId（后端确认了这个 session_id）
+      if (this.chatStore.chats[session_id]) {
+        console.log(`🔄 更新 currentChatId: ${currentChatId} → ${session_id}`);
+        this.chatStore.currentChatId = session_id;
+        this.chatStore.saveToStorage();
+      } else {
+        // ✅ 如果会话不存在，可能是后端创建的新会话（向后兼容）
+        console.log(`📝 后端创建了新会话: ${session_id}，但前端没有对应的chat`);
+        // 可以选择创建新的chat，或者忽略（取决于业务逻辑）
+      }
+    } else {
+      console.log(`✅ session_id 匹配 - currentChatId: ${currentChatId}`);
+    }
+
+    // ✅ 不再需要迁移消息的逻辑（因为前端已经使用真实UUID）
+    // ✅ 不再需要删除临时chat的逻辑（因为不再使用temp_xxx）
+  };
+
+  // ✅ 新增：处理 Token 使用统计（修复竞态条件）
+  private handleTokenUsage = (message: TokenUsageMessage) => {
+    const { usage, query_id } = message;
+
+    if (!usage) {
+      console.warn('[handleTokenUsage] 无效的 token_usage 消息:', message);
+      return;
+    }
+
+    console.log('📊 Token 统计:', {
+      input: usage.input_tokens,
+      output: usage.output_tokens,
+      cacheRead: usage.cache_read_tokens,
+      inputCacheHitRate: `${usage.input_cache_hit_rate}%`
+    });
+
+    // 构建 tokenUsage 对象
+    const tokenUsage = {
+      input_tokens: usage.input_tokens,
+      output_tokens: usage.output_tokens,
+      cache_read_tokens: usage.cache_read_tokens,
+      cache_write_tokens: usage.cache_write_tokens,
+      input_cache_hit_rate: usage.input_cache_hit_rate,
+      output_cache_hit_rate: usage.output_cache_hit_rate
+    };
+
+    // 更新当前消息的 tokenUsage 字段
+    const messageId = this.currentMessageBuilder.messageId;
+    const chatId = this.currentMessageBuilder.chatId;
+
+    if (!messageId || !chatId) {
+      // ✅ 修复竞态条件：暂存 Token 统计，等待 message_complete 后应用
+      console.warn('[handleTokenUsage] messageId 或 chatId 不存在，暂存 Token 统计');
+      if (query_id) {
+        this.pendingTokenUsage.set(query_id, tokenUsage);
+      }
+      return;
+    }
+
+    // 直接调用 store 更新消息
+    this.chatStore.updateMessage(chatId, messageId, { tokenUsage });
+
+    console.log(`✅ Token 统计已更新到消息 ${messageId}`);
+  };
+
+  // ✅ P2修复：处理session续期事件
+  private handleSessionRenewed = (message: { old_session_id?: string; new_session_id?: string; reason?: string; message?: string }) => {
+    const { old_session_id, new_session_id, reason, message: msg } = message;
+
+    console.log('🔄 Session续期:', {
+      old: old_session_id,
+      new: new_session_id,
+      reason
+    });
+
+    // 1. 更新当前消息构建器的chatId
+    if (this.currentMessageBuilder.chatId === old_session_id) {
+      this.currentMessageBuilder.chatId = new_session_id;
+      console.log(`✅ 更新消息构建器 chatId: ${old_session_id} → ${new_session_id}`);
+    }
+
+    // 2. 更新chatStore中的currentChatId（直接设置state）
+    if (this.chatStore.currentChatId === old_session_id) {
+      useChatStore.setState({ currentChatId: new_session_id });
+      console.log(`✅ 更新 currentChatId: ${old_session_id} → ${new_session_id}`);
+    }
+
+    // 3. 迁移chat和messages到新session_id
+    const oldChat = this.chatStore.chats[old_session_id];
+    const oldMessages = this.chatStore.messages[old_session_id];
+
+    if (oldChat) {
+      // 创建新chat
+      this.chatStore.chats[new_session_id] = {
+        ...oldChat,
+        id: new_session_id,
+        updatedAt: Date.now()
+      };
+
+      // 迁移消息
+      if (oldMessages && oldMessages.length > 0) {
+        this.chatStore.messages[new_session_id] = oldMessages.map(msg => ({
+          ...msg,
+          chatId: new_session_id
+        }));
+      }
+
+      // 删除旧chat和消息
+      delete this.chatStore.chats[old_session_id];
+      delete this.chatStore.messages[old_session_id];
+
+      // 保存到localStorage
+      this.chatStore.saveToStorage();
+      console.log(`✅ 已迁移chat和消息到新session: ${new_session_id}`);
+    }
+
+    // 4. 显示通知（可选）
+    notification.info({
+      message: '会话已自动续期',
+      description: msg || '会话已过期，已自动创建新会话',
+      duration: 3,
+      placement: 'topRight'
+    });
+  };
+}
+
+// 创建全局实例
+export const messageHandler = new MessageHandler();

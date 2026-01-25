@@ -1,0 +1,347 @@
+/* MessageLayout - 消息布局样式（响应式优化） */
+/* 改进依据：使用CSS类替代内联样式，提升可维护性和响应式能力 */
+
+/* ===== 用户消息布局 ===== */
+
+.user-message-container {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-bottom: var(--message-spacing);
+  padding-right: var(--spacing-sm);
+}
+
+.user-message-wrapper {
+  display: flex;
+  align-items: flex-start;
+  max-width: 60%;  /* 保持原有的60%宽度 */
+  flex-direction: row-reverse;
+}
+
+.user-avatar {
+  background-color: #667eea;
+  margin: 0 0 0 var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.user-message-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.user-message-card {
+  background-color: #5568d3;
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-sm) var(--spacing-md);
+  box-shadow: 0 2px 8px rgba(85, 104, 211, 0.25);
+}
+
+.user-message-card:hover {
+  transform: translateY(-1px) translateZ(0);
+  box-shadow: 0 4px 12px rgba(85, 104, 211, 0.35);
+}
+
+.user-message-text {
+  color: white;
+  font-size: var(--font-size-content);
+  line-height: var(--line-height-relaxed);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.user-message-actions {
+  margin-top: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.user-message-timestamp {
+  font-size: var(--font-size-xs);
+}
+
+.user-message-copy-btn {
+  font-size: var(--font-size-xs);
+  color: #8c8c8c;
+  padding: 0 var(--spacing-xs);
+  height: 1.25rem;
+}
+
+/* ===== AI消息布局 ===== */
+
+.ai-message-container {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  margin-bottom: var(--message-spacing);
+  padding-left: 28px;   /* Compact密度：32px → 28px */
+  padding-right: 58px;  /* Compact密度：65px → 58px */
+}
+
+.ai-message-wrapper {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  /* 移除max-width限制，让内容自然填充 */
+}
+
+.ai-avatar {
+  background-color: #52c41a;
+  margin: 0 var(--spacing-sm) 0 0;
+  flex-shrink: 0;
+}
+
+.ai-message-content-wrapper {
+  flex: 1;
+  min-width: 0;
+}
+
+.ai-message-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-xs);
+}
+
+.ai-message-assistant-label {
+  font-size: var(--font-size-small);
+  color: #52c41a;
+  font-weight: 600;
+}
+
+.ai-message-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease;
+}
+
+.ai-message-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.ai-message-text-block {
+  margin-bottom: var(--spacing-md);
+}
+
+.ai-message-actions {
+  margin-top: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid #f0f0f0;
+}
+
+.ai-message-timestamp {
+  font-size: var(--font-size-xs);
+}
+
+.ai-message-action-btn {
+  font-size: var(--font-size-small);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  height: auto;
+}
+
+/* ===== 响应式优化（简化版本） ===== */
+
+/* 小屏幕（手机）：0-599px */
+@media (max-width: 599px) {
+  .user-message-container {
+    padding-right: 4px;
+  }
+
+  .user-message-wrapper {
+    max-width: 85vw;
+  }
+
+  .user-message-card {
+    padding: 6px 8px;
+  }
+
+  .ai-message-container {
+    padding-left: 8px;
+    padding-right: 16px;
+  }
+
+  .ai-message-card {
+    padding: 8px 12px;
+  }
+
+  .ai-message-actions {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+}
+
+/* 大屏桌面（1440px+）- Compact密度 */
+@media (min-width: 1440px) {
+  .ai-message-container {
+    padding-left: 32px;   /* Compact密度：40px → 32px */
+    padding-right: 64px;  /* Compact密度：80px → 64px */
+  }
+
+  .ai-message-card {
+    padding: 16px 20px;   /* Compact密度：18px 24px → 16px 20px */
+  }
+
+  .user-message-card {
+    padding: 10px 14px;   /* Compact密度：12px 16px → 10px 14px */
+  }
+}
+
+/* ===== Token 使用统计样式 - 内联集成版本 ===== */
+
+/* Token 统计区域 - 集成到消息卡片内部 */
+.token-usage-inline {
+  margin-top: 16px;
+  padding-top: 12px;
+}
+
+/* 分割线 - 视觉呼吸感 */
+.token-usage-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, #e9ecef 20%, #e9ecef 80%, transparent);
+  margin-bottom: 10px;
+}
+
+/* 紧凑的水平布局 - UI 优化版 */
+.token-usage-compact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px; /* 从 12px 增加到 16px，增强呼吸感 */
+  font-size: 12.5px; /* 从 11px 提升到 12.5px，提升可读性 */
+  color: #495057; /* 从 #6c757d 调深，增强对比度 */
+  line-height: 1.6;
+  padding: 2px 0; /* 增加垂直空间 */
+}
+
+/* Token 使用标签 - 增强视觉引导 */
+.token-usage-label {
+  font-size: 12.5px; /* 从 11px 提升到 12.5px */
+  font-weight: 700; /* 从 600 提升到 700，更加突出 */
+  color: #212529; /* 从 #868e96 调深，增强对比 */
+  margin-right: 6px; /* 从 4px 增加到 6px */
+  letter-spacing: 0.2px; /* 增加字间距，提升可读性 */
+}
+
+/* 内联 Token 统计项 - 优化可读性 */
+.token-stat-inline {
+  display: inline-flex;
+  align-items: center;
+  color: #495057; /* 从 #6c757d 调深 */
+  font-size: 12.5px; /* 从 11px 提升到 12.5px */
+  font-weight: 500; /* 增加字重 */
+}
+
+.token-stat-inline strong {
+  color: #212529; /* 从 #495057 调深，数字更突出 */
+  font-weight: 700; /* 从 600 提升到 700，增强对比 */
+  font-family: 'SF Mono', 'Monaco', 'Consolas', 'Menlo', monospace;
+  font-size: 13.5px; /* 数字字体稍大，提升可读性 */
+  margin-left: 4px; /* 从 3px 增加到 4px */
+}
+
+/* 缓存读取 - 绿色（节省成本） */
+.token-stat-inline.token-cache-read {
+  color: #52c41a;
+}
+
+.token-stat-inline.token-cache-read strong {
+  color: #389e0d;
+}
+
+/* 缓存写入 - 橙色 */
+.token-stat-inline.token-cache-write {
+  color: #fa8c16;
+}
+
+.token-stat-inline.token-cache-write strong {
+  color: #d46b08;
+}
+
+/* 缓存命中率 - UI 优化版 */
+.token-cache-rate {
+  color: #52c41a;
+  font-weight: 600; /* 从 500 提升到 600 */
+  font-size: 11.5px; /* 从 10px 提升到 11.5px */
+  letter-spacing: 0.2px;
+}
+
+/* 深色模式适配 - 优化对比度 */
+@media (prefers-color-scheme: dark) {
+  .token-usage-divider {
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.15) 20%, rgba(255, 255, 255, 0.15) 80%, transparent);
+  }
+
+  .token-usage-label {
+    color: #e9ecef; /* 从 #adb5bd 调亮，增强对比 */
+  }
+
+  .token-stat-inline {
+    color: #adb5bd; /* 从 #868e96 调亮 */
+  }
+
+  .token-stat-inline strong {
+    color: #f8f9fa; /* 从 #dee2e6 调亮，数字更突出 */
+  }
+
+  .token-stat-inline.token-cache-read strong {
+    color: #95de64; /* 从 #73d13d 调亮，提升可读性 */
+  }
+
+  .token-stat-inline.token-cache-write strong {
+    color: #ffd666; /* 从 #ffc53d 调亮 */
+  }
+
+  .token-cache-rate {
+    color: #95de64; /* 从 #73d13d 调亮 */
+  }
+}
+
+/* 小屏幕优化 - 确保移动端可读性 */
+@media (max-width: 599px) {
+  .token-usage-compact {
+    font-size: 11.5px; /* 从 10px 提升到 11.5px，符合 WCAG 标准 */
+    gap: 12px; /* 从 8px 增加到 12px */
+  }
+
+  .token-usage-label {
+    font-size: 11.5px; /* 从 10px 提升到 11.5px */
+  }
+
+  .token-stat-inline {
+    font-size: 11.5px;
+  }
+
+  .token-stat-inline strong {
+    font-size: 12.5px;
+  }
+
+  .token-cache-rate {
+    font-size: 11px; /* 移动端稍微调整 */
+  }
+}
+
+/* ===== 打印优化 ===== */
+@media print {
+  .user-message-actions,
+  .ai-message-actions {
+    display: none;
+  }
+
+  .user-message-card,
+  .ai-message-card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+
+  .token-usage-inline {
+    display: none;
+  }
+}

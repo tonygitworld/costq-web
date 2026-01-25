@@ -1,0 +1,194 @@
+/* 认证页面样式优化 - 完全可滚动布局 */
+
+/* ============================================
+   语言切换器样式（认证页面专用）
+   ============================================ */
+
+/* 让认证页面的语言切换器文字清晰可见 */
+.auth-page-wrapper .ant-btn-text {
+  color: #ffffff !important;
+}
+
+.auth-page-wrapper .ant-btn-text:hover {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
+}
+
+/* 确保语言切换器的下拉菜单可见且在最上层 */
+.ant-dropdown {
+  z-index: 10000 !important;
+}
+
+/* 下拉菜单项样式 */
+.ant-dropdown-menu {
+  z-index: 10000 !important;
+}
+
+.auth-page-wrapper .ant-dropdown-menu-item {
+  color: #262626 !important;
+}
+
+/* ============================================
+   修复 #root 的 overflow: hidden 限制
+   ============================================ */
+
+/* 认证页面包装器 - 关键：设置为固定定位，脱离#root的限制 */
+.auth-page-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 9999;
+}
+
+/* Form优化 */
+.auth-form .ant-form-item {
+  margin-bottom: 20px !important;
+}
+
+/* Label样式优化 */
+.auth-form .ant-form-item-label {
+  padding-bottom: 8px !important;
+}
+
+.auth-form .ant-form-item-label > label {
+  font-size: 14px;
+  font-weight: 400;
+  color: #262626;
+  height: auto;
+}
+
+/* 修复输入框聚焦时的背景色问题 */
+.auth-form .ant-input,
+.auth-form .ant-input-password {
+  background-color: #ffffff !important;
+}
+
+.auth-form .ant-input:focus,
+.auth-form .ant-input-focused,
+.auth-form .ant-input-password:focus,
+.auth-form .ant-input-password-focused {
+  background-color: #ffffff !important;
+}
+
+.auth-form .ant-input-affix-wrapper {
+  background-color: #ffffff !important;
+}
+
+.auth-form .ant-input-affix-wrapper:focus,
+.auth-form .ant-input-affix-wrapper-focused {
+  background-color: #ffffff !important;
+}
+
+/* 错误提示优化 */
+.auth-form .ant-form-item-explain-error {
+  font-size: 13px;
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+/* Help提示优化 */
+.auth-form .ant-form-item-extra {
+  font-size: 12px;
+  margin-top: 6px;
+  color: #8c8c8c;
+}
+
+/* Alert组件优化 */
+.auth-alert {
+  padding: 12px 16px !important;
+  font-size: 13px;
+  border-radius: 8px !important;
+}
+
+.auth-alert .ant-alert-message {
+  font-size: 14px;
+  margin-bottom: 0;
+  font-weight: 500;
+}
+
+.auth-alert .ant-alert-description {
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* 滚动条样式 */
+.auth-form::-webkit-scrollbar {
+  width: 6px;
+}
+
+.auth-form::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.auth-form::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.auth-form::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   响应式布局
+   ============================================ */
+
+/* 平板设备 (768px - 1024px) */
+@media screen and (max-width: 1024px) {
+  .auth-form .ant-input,
+  .auth-form .ant-input-password,
+  .auth-form .ant-btn {
+    height: 46px !important;
+    font-size: 15px !important;
+  }
+}
+
+/* 移动设备 (最大 768px) */
+@media screen and (max-width: 768px) {
+  /* 输入框和按钮稍微小一点 */
+  .auth-form .ant-input,
+  .auth-form .ant-input-password,
+  .auth-form .ant-btn {
+    height: 44px !important;
+    font-size: 14px !important;
+  }
+
+  /* 减少间距 */
+  .auth-form .ant-form-item {
+    margin-bottom: 16px !important;
+  }
+
+  /* Alert 字体稍小 */
+  .auth-alert .ant-alert-message {
+    font-size: 13px;
+  }
+
+  .auth-alert .ant-alert-description {
+    font-size: 12px;
+  }
+}
+
+/* 小屏手机 (最大 480px) */
+@media screen and (max-width: 480px) {
+  /* 输入框和按钮更小 */
+  .auth-form .ant-input,
+  .auth-form .ant-input-password,
+  .auth-form .ant-btn {
+    height: 42px !important;
+    font-size: 14px !important;
+  }
+
+  /* 进一步减少间距 */
+  .auth-form .ant-form-item {
+    margin-bottom: 14px !important;
+  }
+
+  /* Help 提示文字更小 */
+  .auth-form .ant-form-item-extra {
+    font-size: 11px;
+  }
+}

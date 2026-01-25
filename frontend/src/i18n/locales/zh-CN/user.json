@@ -1,0 +1,119 @@
+{
+  "profile": {
+    "title": "基本信息",
+    "username": "用户名",
+    "fullName": "真实姓名",
+    "email": "邮箱地址",
+    "organization": "所属组织",
+    "role": "角色",
+    "accountStatus": "账号状态",
+    "createdAt": "创建时间",
+    "lastLoginAt": "最后登录时间",
+    "neverLogin": "从未登录",
+    "noValue": "-"
+  },
+  "management": {
+    "title": "用户管理",
+    "addUser": "添加用户",
+    "editUser": "编辑用户",
+    "deleteUser": "删除用户",
+    "enableUser": "启用用户",
+    "disableUser": "禁用用户",
+    "resetPassword": "重置密码",
+    "managePermissions": "管理权限",
+    "userCount": "{{count}} 个用户"
+  },
+  "dropdown": {
+    "profile": "基本信息",
+    "changePassword": "修改密码",
+    "logout": "退出",
+    "admin": "管理员"
+  },
+  "changePassword": {
+    "title": "修改密码",
+    "currentPassword": "当前密码",
+    "newPassword": "新密码",
+    "confirmPassword": "确认新密码",
+    "currentPasswordPlaceholder": "请输入当前密码",
+    "newPasswordPlaceholder": "请输入新密码",
+    "confirmPasswordPlaceholder": "请再次输入新密码",
+    "submitButton": "修改密码",
+    "passwordHint": "密码要求：至少8位，包含大小写字母和数字",
+    "validation": {
+      "currentPasswordRequired": "请输入当前密码",
+      "newPasswordRequired": "请输入新密码",
+      "newPasswordMin": "至少8位",
+      "newPasswordPattern": "需含大小写字母和数字",
+      "confirmPasswordRequired": "请确认新密码",
+      "passwordMismatch": "两次输入的密码不一致",
+      "sameAsOld": "新密码不能与当前密码相同"
+    },
+    "message": {
+      "changeSuccess": "密码修改成功，请重新登录",
+      "changeFailed": "密码修改失败"
+    }
+  },
+  "permission": {
+    "title": "账号权限管理",
+    "awsPermissions": "AWS 账号权限",
+    "gcpPermissions": "GCP 账号权限",
+    "selectAll": "全选",
+    "deselectAll": "取消全选",
+    "selectedCount": "已选择 {{count}} 个账号",
+    "saveButton": "保存权限",
+    "message": {
+      "saveSuccess": "权限保存成功",
+      "saveFailed": "权限保存失败"
+    }
+  },
+  "table": {
+    "username": "用户名",
+    "fullName": "真实姓名",
+    "role": "角色",
+    "status": "状态",
+    "accountCount": "可访问账号数",
+    "lastLogin": "最后登录",
+    "actions": "操作",
+    "noData": "暂无用户数据"
+  },
+  "message": {
+    "logoutSuccess": "已退出登录",
+    "createSuccess": "添加成功",
+    "deleteSuccess": "删除成功",
+    "updateSuccess": "修改成功",
+    "enableSuccess": "用户已启用",
+    "disableSuccess": "用户已禁用",
+    "deleteFailed": "删除失败",
+    "updateFailed": "更新失败",
+    "createFailed": "创建失败",
+    "operationFailed": "操作失败",
+    "tokenExpired": "登录已过期，请重新登录",
+    "permissionDenied": "权限不足，需要管理员权限",
+    "userNotFound": "用户不存在"
+  },
+  "form": {
+    "addUser": "添加用户",
+    "editUser": "编辑用户",
+    "searchPlaceholder": "搜索用户名或真实姓名",
+    "usernamePlaceholder": "请输入用户名或邮箱",
+    "passwordPlaceholder": "请输入密码",
+    "fullNamePlaceholder": "请输入真实姓名",
+    "selectRole": "请选择角色",
+    "selectStatus": "请选择状态",
+    "validation": {
+      "usernameRequired": "请输入用户名",
+      "passwordRequired": "请输入密码",
+      "passwordMin": "密码长度至少为 8 位",
+      "passwordPattern": "必须包含大小写字母和数字",
+      "roleRequired": "请选择角色"
+    }
+  },
+  "actions": {
+    "edit": "编辑",
+    "delete": "删除",
+    "authorize": "授权",
+    "managePermissions": "管理权限",
+    "confirmDeleteUser": "确认删除",
+    "confirmDeleteDesc": "确定要删除用户\"{{username}}\"吗？删除后无法恢复。"
+  }
+}

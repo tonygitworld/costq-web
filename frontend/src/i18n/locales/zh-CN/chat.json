@@ -1,0 +1,88 @@
+{
+  "sidebar": {
+    "title": "CostQ 云成本专家",
+    "newChat": "新建对话",
+    "chatHistory": "聊天历史",
+    "settings": "设置",
+    "cloudAccounts": "云账号管理",
+    "userManagement": "用户管理"
+  },
+  "input": {
+    "placeholder": "输入您的问题... (Enter 发送, Shift+Enter 换行)",
+    "placeholderNoAccount": "💡 请先在页面顶部选择云账号，然后即可开始提问...",
+    "sendButton": "发送",
+    "stopButton": "停止",
+    "stopping": "停止中...",
+    "characterCount": "{{count}}/2000",
+    "connected": "已连接",
+    "disconnected": "未连接"
+  },
+  "message": {
+    "assistant": "Assistant",
+    "copyContent": "复制内容",
+    "downloadPDF": "下载为PDF",
+    "analysisFailed": "❌ 分析失败",
+    "stopped": "🛑 已停止生成",
+    "generationStopped": "生成已停止",
+    "generationStoppedDesc": "您已停止此次生成，以上为部分生成的内容",
+    "interruptedByRefresh": "生成因页面刷新中断",
+    "interruptedDesc": "页面在 {{time}} 被刷新，以上为已生成的内容",
+    "emptyState": "选择一个对话或创建新对话开始聊天"
+  },
+  "template": {
+    "title": "💰 成本优化助手",
+    "description": "选择模板快速分析 AWS/GCP 成本",
+    "viewAll": "查看所有",
+    "customTemplates": "自定义模板",
+    "favoriteTemplates": "收藏的模板",
+    "systemTemplates": "系统模板",
+    "category": {
+      "cost": "成本分析",
+      "optimization": "优化建议",
+      "security": "安全审计",
+      "performance": "性能分析"
+    }
+  },
+  "status": {
+    "initializing": "正在初始化连接...",
+    "processing": "正在处理...",
+    "ready": "准备就绪",
+    "error": "发生错误",
+    "estimatedTime": "预计需要约 {{seconds}} 秒",
+    "firstQueryTip": "首次查询需要初始化连接，后续查询将更快"
+  },
+  "thinking": {
+    "title": "💭 思考过程",
+    "duration": "耗时 {{seconds}}秒"
+  },
+  "toolCall": {
+    "calling": "调用中",
+    "success": "成功",
+    "error": "失败",
+    "duration": "耗时 {{seconds}}秒",
+    "viewDetails": "查看详情",
+    "hideDetails": "隐藏详情",
+    "arguments": "调用参数",
+    "result": "返回结果",
+    "errorInfo": "错误信息"
+  },
+  "history": {
+    "newChat": "新对话",
+    "noChatHistory": "暂无聊天记录",
+    "confirmDelete": "确认删除",
+    "confirmDeleteDesc": "确定要删除这个对话吗？",
+    "confirmDeleteSelected": "确认删除",
+    "confirmDeleteSelectedDesc": "确定要删除选中的 {{count}} 个对话吗？",
+    "confirmClearAll": "确认清空",
+    "confirmClearAllDesc": "确定要清空所有对话历史吗？此操作不可撤销",
+    "deleteFailed": "删除失败，请重试",
+    "analyzing": "正在分析"
+  },
+  "connection": {
+    "connected": "已连接",
+    "disconnected": "已断开",
+    "error": "连接错误",
+    "unknown": "未知状态",
+    "reconnect": "重新连接"
+  }
+}

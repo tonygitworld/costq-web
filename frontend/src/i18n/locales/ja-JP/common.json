@@ -1,0 +1,102 @@
+{
+  "app": {
+    "name": "CostQ クラウドコスト専門家",
+    "shortName": "CostQ",
+    "description": "マルチクラウドコスト管理プラットフォーム"
+  },
+  "button": {
+    "confirm": "確定",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "delete": "削除",
+    "edit": "編集",
+    "add": "追加",
+    "create": "作成",
+    "update": "更新",
+    "submit": "送信",
+    "reset": "リセット",
+    "back": "戻る",
+    "next": "次へ",
+    "previous": "前へ",
+    "close": "閉じる",
+    "refresh": "更新",
+    "search": "検索",
+    "export": "エクスポート",
+    "import": "インポート",
+    "download": "ダウンロード",
+    "upload": "アップロード",
+    "copy": "コピー",
+    "viewDetails": "詳細を表示",
+    "collapse": "折りたたむ",
+    "expand": "展開"
+  },
+  "status": {
+    "active": "有効",
+    "inactive": "無効",
+    "enabled": "有効",
+    "disabled": "無効",
+    "success": "成功",
+    "failed": "失敗",
+    "pending": "保留中",
+    "processing": "処理中",
+    "completed": "完了",
+    "cancelled": "キャンセル済み",
+    "error": "エラー",
+    "warning": "警告",
+    "info": "情報",
+    "loading": "読み込み中",
+    "connected": "接続済み",
+    "disconnected": "未接続",
+    "online": "オンライン",
+    "offline": "オフライン"
+  },
+  "role": {
+    "admin": "管理者",
+    "user": "一般ユーザー",
+    "viewer": "閲覧者"
+  },
+  "action": {
+    "select": "選択",
+    "selectAll": "すべて選択",
+    "deselectAll": "選択解除",
+    "filter": "フィルター",
+    "sort": "並び替え",
+    "group": "グループ化"
+  },
+  "time": {
+    "createdAt": "作成日時",
+    "updatedAt": "更新日時",
+    "lastLogin": "最終ログイン",
+    "never": "なし",
+    "justNow": "たった今",
+    "minutesAgo": "{{count}}分前",
+    "hoursAgo": "{{count}}時間前",
+    "daysAgo": "{{count}}日前"
+  },
+  "common": {
+    "yes": "はい",
+    "no": "いいえ",
+    "all": "すべて",
+    "none": "なし",
+    "other": "その他",
+    "unknown": "不明",
+    "optional": "任意",
+    "required": "必須"
+  },
+  "placeholder": {
+    "select": "選択してください",
+    "input": "入力してください",
+    "search": "検索...",
+    "noData": "データがありません",
+    "loading": "読み込み中..."
+  },
+  "message": {
+    "confirmDelete": "削除してもよろしいですか？",
+    "deleteWarning": "この操作は取り消せません",
+    "operationSuccess": "操作が成功しました",
+    "operationFailed": "操作に失敗しました",
+    "networkError": "ネットワークエラーが発生しました。後ほど再度お試しください。",
+    "permissionDenied": "権限がありません",
+    "notFound": "コンテンツが見つかりません"
+  }
+}

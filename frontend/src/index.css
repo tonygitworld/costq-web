@@ -1,0 +1,441 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f5f5f5;
+}
+
+#root {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Sidebar menu styles */
+.sidebar-menu .ant-menu-submenu-title {
+  height: 48px !important;
+  line-height: 48px !important;
+  margin: 4px 0 !important;
+  border-radius: 8px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.sidebar-menu .ant-menu-submenu-title:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  transform: translateX(2px);
+}
+
+.sidebar-menu .ant-menu-item {
+  height: 44px !important;
+  line-height: 44px !important;
+  margin: 4px 0 !important;
+  border-radius: 8px !important;
+  padding-left: 40px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.sidebar-menu .ant-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  transform: translateX(2px);
+}
+
+.sidebar-menu .ant-menu-item-selected {
+  background-color: rgba(64, 169, 255, 0.15) !important;
+}
+
+.sidebar-menu .ant-menu-submenu-arrow {
+  transition: transform 0.3s ease !important;
+}
+
+/* Chat layout styles */
+.chat-layout {
+  height: 100vh;
+}
+
+.chat-layout .ant-layout-sider {
+  background: #2c3e50 !important;
+}
+
+.chat-layout .ant-layout-content {
+  background: #f5f5f5 !important;
+}
+
+/* Message styles */
+.message-item {
+  width: 100%;
+
+  /* 性能优化 */
+  contain: layout style paint;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.message-item.user {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.message-item.assistant {
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* Progress timeline styles */
+.progress-timeline .ant-timeline-item-content {
+  margin-left: 8px;
+}
+
+.progress-timeline .ant-timeline-item-tail {
+  border-left-color: #e9ecef;
+}
+
+/* 自定义滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 统一进度容器样式 */
+.unified-progress-container {
+  margin-bottom: 8px;
+}
+
+.unified-progress-container .ant-card-body {
+  padding: 16px;
+}
+
+.progress-section {
+  margin-bottom: 0;
+}
+
+.progress-section .progress-header {
+  user-select: none;
+  transition: background-color 0.2s;
+  border-radius: 4px;
+  margin: -4px;
+  padding: 4px;
+}
+
+.progress-section .progress-header:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+  /* 确保hover时不改变布局 */
+  transform: translateZ(0);
+}
+
+/* 进度目的说明样式 */
+.progress-purpose {
+  padding-left: 24px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-style: italic;
+  color: #8c8c8c;
+  line-height: 1.4;
+}
+
+.response-section {
+  margin-top: 0;
+}
+
+.response-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #666;
+  font-size: 13px;
+}
+
+/* 进度时间线样式优化 */
+.timeline-content {
+  padding-left: 8px;
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.timeline-time {
+  font-size: 11px !important;
+  margin-left: 8px;
+}
+
+.timeline-details {
+  margin-top: 8px;
+  padding-left: 12px;
+  border-left: 2px solid #f0f0f0;
+}
+
+.detail-item {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.stage-progress {
+  margin-top: 8px;
+  max-width: 200px;
+}
+
+/* 流式消息样式 */
+.streaming-message {
+  position: relative;
+}
+
+.streaming-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  padding: 8px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.streaming-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #666;
+}
+
+/* 确保消息列表正确滚动 */
+.message-list-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+
+  /* 性能优化 */
+  contain: layout style;
+  transform: translateZ(0);
+}
+
+.message-list-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  min-height: 0;
+
+  /* 性能优化 */
+  contain: layout style;
+  transform: translate3d(0, 0, 0);
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* 输入框样式优化 */
+.message-input-container {
+  flex-shrink: 0;
+  padding: 8px 16px 16px 16px;
+  background-color: transparent;
+  /* 防止布局重排 */
+  contain: layout style;
+  position: relative;
+}
+
+.message-input-box {
+  padding: 16px;
+  background-color: white;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+  /* 防止意外滚动的关键样式 */
+  contain: layout style paint;
+  position: relative;
+  transform: translateZ(0); /* 启用GPU加速 */
+
+  /* 确保鼠标事件不会导致页面跳转 */
+  isolation: isolate;
+
+  /* 防止输入框高度变化时影响页面滚动 */
+  overflow: visible;
+}
+
+/* 输入框焦点状态优化 */
+.message-input-box:focus-within {
+  /* 使用transform而不是改变布局属性 */
+  transform: translateZ(0);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-color: #1890ff;
+
+  /* 防止焦点变化导致页面跳转 */
+  scroll-behavior: auto;
+}
+
+/* TextArea组件特殊优化 */
+.message-input-box .ant-input {
+  /* 防止自动调整高度时的布局重排 */
+  contain: layout;
+  resize: none !important;
+
+  /* 确保焦点不会触发滚动 */
+  scroll-margin: 0;
+  scroll-padding: 0;
+}
+
+/* 防止Ant Design TextArea的默认滚动行为 */
+.message-input-box .ant-input:focus {
+  /* 覆盖可能导致页面跳转的默认样式 */
+  scroll-behavior: auto !important;
+  outline: none;
+}
+
+/* 输入框自动调整高度时的稳定性 */
+.message-input-box .ant-input[style*="height"] {
+  /* 确保高度变化不会影响页面滚动位置 */
+  transition: height 0.2s ease;
+  contain: layout;
+}
+
+/* 连接状态指示器 */
+.connection-status {
+  padding: 8px 12px;
+  background-color: white;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* HoverStableCard 样式优化 */
+.hover-stable-card.ant-card {
+  /* 确保Ant Design Card的默认样式不会干扰hover效果 */
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+
+  /* 性能优化 */
+  transform: translateZ(0);
+  contain: layout style paint;
+  will-change: transform, opacity, box-shadow;
+}
+
+.hover-stable-card.ant-card:hover {
+  /* 覆盖Ant Design可能的默认hover效果 */
+  border-color: inherit !important;
+
+  /* GPU加速的hover效果 */
+  transform: translateY(-1px) translateZ(0);
+}
+
+/* 确保消息项容器稳定 */
+.message-item .hover-stable-card {
+  /* 防止hover时影响周围元素 */
+  contain: layout style paint;
+}
+
+/* 滚动容器优化 */
+.ant-layout-content {
+  /* 确保主内容区域的滚动稳定 */
+  contain: layout style;
+  overflow-anchor: auto;
+  scroll-behavior: smooth;
+
+  /* 防止意外的滚动跳转 */
+  position: relative;
+  isolation: isolate;
+}
+
+/* 消息列表容器优化 */
+.message-list-container {
+  /* 限制重排影响范围 */
+  contain: layout style paint;
+
+  /* 确保滚动性能 */
+  transform: translateZ(0);
+  will-change: scroll-position;
+}
+
+/* 防止HoverStableCard影响滚动 */
+.hover-stable-card {
+  /* 确保hover效果不会影响页面滚动 */
+  contain: layout style paint;
+  position: relative;
+
+  /* 防止hover时的意外滚动 */
+  scroll-margin: 0;
+  scroll-padding: 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .ant-layout-sider {
+    width: 250px !important;
+    min-width: 250px !important;
+    max-width: 250px !important;
+  }
+
+  .message-input-box {
+    padding: 12px;
+    /* 移动端额外的滚动保护 */
+    touch-action: manipulation;
+  }
+
+  .message-list-content {
+    padding: 12px;
+  }
+
+  /* 移动端消息宽度优化 */
+  .message-item {
+    max-width: 95% !important;
+  }
+
+  /* 移动端字体微调 */
+  body {
+    font-size: 14px;
+  }
+}
+
+/* 中等屏幕 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .message-list-content {
+    padding: 16px 20px;
+  }
+}
+
+/* 减少动画偏好用户的优化 */
+@media (prefers-reduced-motion: reduce) {
+  .message-input-box,
+  .hover-stable-card,
+  .ant-layout-content {
+    /* 禁用可能导致滚动问题的动画 */
+    transition: none !important;
+    animation: none !important;
+    scroll-behavior: auto !important;
+  }
+}

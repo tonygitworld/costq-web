@@ -1,0 +1,79 @@
+/* 全局样式 - 响应式设计优化 */
+
+/* 导入响应式基础样式 */
+@import './responsive.css';
+
+/*
+ * 关键优化：使用标准字体大小作为基准
+ *
+ * 改进依据：
+ * - 浏览器默认字体大小为16px，这是经过验证的最佳基准
+ * - 使用16px作为1rem，便于计算和维护
+ * - 支持用户自定义字体大小（无障碍访问）
+ * - 响应式字体通过CSS变量在responsive.css中定义
+ *
+ * 参考：W3C WCAG 2.1 - 用户应能够调整文本大小
+ */
+html {
+  /* 使用浏览器默认字体大小（16px = 1rem） */
+  font-size: 100%;
+
+  /* 平滑字体渲染（高DPI显示器优化） */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+
+  /* 允许用户调整文本大小（无障碍访问） */
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+
+  /* 系统字体栈（优先使用系统原生字体） */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+
+  /* 使用响应式基础字体大小 */
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+
+  /* 字体渲染优化 */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+
+  /* 字体特性优化 */
+  font-feature-settings: "kern" 1;
+  font-kerning: normal;
+}
+
+/* 确保所有元素使用 border-box */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* 滚动条样式优化（WebKit 浏览器） */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

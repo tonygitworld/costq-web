@@ -1,0 +1,159 @@
+{
+  "management": {
+    "title": "云账号管理",
+    "selectProvider": "选择云厂商",
+    "awsAccounts": "AWS 账号",
+    "gcpAccounts": "GCP 账号",
+    "azureAccounts": "Azure 账号",
+    "addAccount": "添加账号",
+    "editAccount": "编辑账号",
+    "deleteAccount": "删除账号",
+    "validateCredentials": "验证凭证",
+    "refreshList": "刷新列表",
+    "selectAccount": "选择账号",
+    "noAccountSelected": "未选择账号",
+    "accountCount": "{{count}} 个账号"
+  },
+  "aws": {
+    "alias": "账号别名",
+    "accountId": "账号ID",
+    "region": "区域",
+    "authType": "认证方式",
+    "accessKey": "Access Key",
+    "secretKey": "Secret Key",
+    "roleArn": "IAM Role ARN",
+    "externalId": "External ID",
+    "sessionName": "会话名称",
+    "description": "Amazon云全球账号",
+    "authTypes": {
+      "access_key": "访问密钥",
+      "iam_role": "IAM角色"
+    },
+    "validation": {
+      "aliasRequired": "请输入账号别名",
+      "accountIdRequired": "请输入账号ID",
+      "accountIdInvalid": "账号ID必须是12位数字",
+      "regionRequired": "请选择区域",
+      "accessKeyRequired": "请输入Access Key",
+      "secretKeyRequired": "请输入Secret Key",
+      "roleArnRequired": "请输入Role ARN"
+    },
+    "status": {
+      "valid": "凭证有效",
+      "invalid": "凭证无效",
+      "validating": "验证中...",
+      "unknown": "未验证"
+    },
+    "message": {
+      "createSuccess": "AWS账号创建成功",
+      "deleteSuccess": "AWS账号删除成功",
+      "validateSuccess": "凭证验证成功",
+      "validateFailed": "凭证验证失败，请检查 Access Key 是否有效",
+      "deleteFailed": "删除账号失败"
+    }
+  },
+  "gcp": {
+    "alias": "账号别名",
+    "projectId": "项目ID",
+    "serviceAccount": "服务账号JSON",
+    "description": "Google云平台账号",
+    "uploadJson": "上传JSON文件",
+    "pasteJson": "粘贴JSON内容",
+    "validation": {
+      "aliasRequired": "请输入账号别名",
+      "projectIdRequired": "请输入项目ID",
+      "serviceAccountRequired": "请提供服务账号凭证",
+      "invalidJson": "JSON格式不正确"
+    },
+    "message": {
+      "createSuccess": "GCP账号创建成功",
+      "deleteSuccess": "GCP账号删除成功",
+      "updateSuccess": "GCP账号更新成功",
+      "deleteFailed": "删除账号失败"
+    }
+  },
+  "selector": {
+    "placeholder": "选择账号",
+    "noAccounts": "暂无账号",
+    "selectFirst": "请先选择账号"
+  },
+  "modal": {
+    "addAccount": "添加账号",
+    "editAccount": "编辑账号",
+    "verifyAndAdd": "验证并添加",
+    "uploadSuccess": "文件上传成功",
+    "uploadFailed": "文件读取失败",
+    "addFailed": "添加账号失败",
+    "securityTip": "安全提示",
+    "securityDesc": "添加账号时会自动验证凭证有效性",
+    "uploadJson": "上传JSON文件",
+    "pasteJson": "粘贴JSON内容"
+  },
+  "iamRole": {
+    "step1Title": "步骤 1: 获取部署信息",
+    "step1Desc": "使用 CloudFormation 在您的 AWS 账号中一键创建 IAM Role",
+    "step2Title": "步骤 2: 在 AWS 控制台部署",
+    "step2Desc": "点击按钮在新窗口打开 AWS CloudFormation",
+    "step3Title": "步骤 3: 配置账号信息",
+    "step3Desc": "部署完成后，填写 Role ARN",
+    "externalId": "External ID",
+    "externalIdTip": "将此 ID 复制到 CloudFormation 参数中",
+    "deployButton": "一键部署 CloudFormation Stack",
+    "copyExternalId": "复制 External ID",
+    "loadingError": "无法加载 External ID 信息",
+    "stepTitle1": "获取部署信息",
+    "stepDesc1": "External ID 和模板",
+    "stepTitle2": "部署 CloudFormation",
+    "stepDesc2": "在 AWS 控制台",
+    "stepTitle3": "配置账号",
+    "stepDesc3": "填写 Role ARN"
+  },
+  "form": {
+    "accountAlias": "账号别名",
+    "accountAliasPlaceholder": "请输入账号别名",
+    "accountAliasRequired": "请输入账号别名",
+    "accountIdRequired": "请输入账号ID",
+    "defaultRegion": "默认区域",
+    "selectRegion": "请选择默认区域",
+    "regionRequired": "请选择默认区域",
+    "accessKeyIdRequired": "请输入Access Key ID",
+    "secretAccessKeyRequired": "请输入Secret Access Key",
+    "projectIdRequired": "请输入项目ID",
+    "projectIdPlaceholder": "请输入GCP项目ID",
+    "serviceAccountRequired": "请提供服务账号JSON",
+    "pasteJsonPlaceholder": "粘贴服务账号JSON内容...",
+    "description": "描述（可选）",
+    "descriptionPlaceholder": "请输入描述（可选）",
+    "akskMethod": "AKSK 方式",
+    "iamRoleMethod": "IAM Role 方式（推荐）",
+    "securityTipList": {
+      "item1": "凭证将加密存储在数据库中",
+      "item2": "建议使用只读权限的 IAM 策略",
+      "item3": "定期轮换 Access Key 以提高安全性"
+    }
+  },
+  "permission": {
+    "title": "云账号授权管理",
+    "awsTitle": "AWS 账号授权",
+    "gcpTitle": "GCP 账号授权",
+    "unauthorized": "未授权",
+    "authorized": "已授权",
+    "saveSuccess": "授权设置已保存",
+    "saveFailed": "保存失败",
+    "loadFailed": "加载授权信息失败"
+  },
+  "table": {
+    "alias": "账号别名",
+    "id": "账号ID/项目ID",
+    "region": "区域",
+    "authType": "认证方式",
+    "credential": "凭证信息",
+    "status": "状态",
+    "createdAt": "创建时间",
+    "actions": "操作",
+    "validate": "验证",
+    "edit": "编辑",
+    "delete": "删除",
+    "noData": "暂无账号数据"
+  }
+}

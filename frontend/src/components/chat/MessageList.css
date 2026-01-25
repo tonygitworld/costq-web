@@ -1,0 +1,96 @@
+/* MessageList styles */
+
+.message-list-wrapper {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.message-list-container {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  /* ❌ 移除 scroll-behavior: auto/smooth，完全由 JS 控制 */
+  /* scroll-behavior: auto; */
+
+  /* ✅ 性能优化：告知浏览器此元素将发生滚动变化 */
+  will-change: scroll-position;
+  /* ✅ 隔离布局计算，提升滚动性能 */
+  contain: layout style paint;
+
+  /* ✅ Firefox 兼容性支持 */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+}
+
+/* ✅ 自定义滚动条样式 (WebKit: Chrome/Edge/Safari) */
+.message-list-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.message-list-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.message-list-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.message-list-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* ✅ 滚动到底部按钮样式 - 现代化悬浮设计（水平居中） */
+.scroll-to-bottom-btn {
+  position: absolute !important;
+  left: 50% !important;
+  bottom: 24px !important;
+  z-index: 50;
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  max-width: 40px !important;
+  border-radius: 50% !important;
+  background-color: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  color: #555555 !important;
+  cursor: pointer;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  padding: 0 !important;
+  margin: 0 !important;
+
+  /* 初始隐藏状态 - 包含水平居中 */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(10px) scale(0.9);
+  pointer-events: none;
+}
+
+/* 显式类名控制显示 - 保持水平居中 */
+.scroll-to-bottom-btn.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.scroll-to-bottom-btn:hover {
+  background-color: #ffffff !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16) !important;
+  transform: translateX(-50%) translateY(-2px) !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  color: #000000 !important;
+}
+
+.scroll-to-bottom-btn .anticon {
+  font-size: 18px !important;
+  line-height: 1 !important;
+  display: block !important;
+}
