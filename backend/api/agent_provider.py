@@ -330,33 +330,34 @@ class AWSBedrockAgentProvider(AgentProvider):
                 "query_id": query_id,
             }
 
-            # 获取账号凭证
+            # 获取账号元数据（只获取显示信息，不获取凭证）
             gcp_account_info = None
-            credentials = None
+            account_display_name = None
+            aws_account_id_12digit = None
 
             try:
                 if account_type == "gcp":
+                    # ✅ 只获取 GCP 账号元数据（账号名称、项目ID等）
                     gcp_account_info = gcp_credentials_provider.get_account_info(account_id_to_use)
                     if not gcp_account_info:
                         raise Exception(f"GCP 账号 {account_id_to_use} 不存在")
                     account_display_name = gcp_account_info.get("account_name", account_id_to_use)
                 else:
-                    # ✅ 获取账号信息（包含 AWS 账号 ID）
+                    # ✅ 只获取 AWS 账号元数据（账号别名、账号ID等）
+                    # ⚠️ 不获取凭证（凭证由 Runtime 负责获取）
                     aws_account_info = aws_credentials_provider.get_account_info(account_id_to_use)
                     if not aws_account_info:
                         raise Exception(f"AWS 账号 {account_id_to_use} 不存在")
                     account_display_name = aws_account_info.get("alias", account_id_to_use)
-                    # ✅ 获取 AWS 账号 ID（12位数字），用于工具调用
+                    # ✅ 获取 AWS 账号 ID（12位数字），用于增强查询显示
                     aws_account_id_12digit = aws_account_info.get("account_id")
                     if not aws_account_id_12digit:
-                        logger.warning("%s AWS ID12", account_id_to_use)
-                    # 获取凭证（用于后续调用）
-                    credentials = aws_credentials_provider.get_credentials(account_id_to_use)
+                        logger.warning("账号 %s 缺少 AWS Account ID (12位数字)", account_id_to_use)
             except Exception as e:
-                logger.error(": %s", e)
+                logger.error("获取账号信息失败: %s", e)
                 yield {
                     "type": "error",
-                    "content": f"账号初始化失败: {str(e)}",
+                    "content": f"获取账号信息失败: {str(e)}",
                     "timestamp": time.time(),
                 }
                 return
