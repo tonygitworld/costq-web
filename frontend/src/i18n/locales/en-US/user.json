@@ -1,0 +1,119 @@
+{
+  "profile": {
+    "title": "Profile",
+    "username": "Username",
+    "fullName": "Full Name",
+    "email": "Email",
+    "organization": "Organization",
+    "role": "Role",
+    "accountStatus": "Account Status",
+    "createdAt": "Created At",
+    "lastLoginAt": "Last Login",
+    "neverLogin": "Never logged in",
+    "noValue": "-"
+  },
+  "management": {
+    "title": "User Management",
+    "addUser": "Add User",
+    "editUser": "Edit User",
+    "deleteUser": "Delete User",
+    "enableUser": "Enable User",
+    "disableUser": "Disable User",
+    "resetPassword": "Reset Password",
+    "managePermissions": "Manage Permissions",
+    "userCount": "{{count}} user(s)"
+  },
+  "dropdown": {
+    "profile": "Profile",
+    "changePassword": "Change Password",
+    "logout": "Sign Out",
+    "admin": "Admin"
+  },
+  "changePassword": {
+    "title": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm New Password",
+    "currentPasswordPlaceholder": "Enter your current password",
+    "newPasswordPlaceholder": "Enter your new password",
+    "confirmPasswordPlaceholder": "Re-enter your new password",
+    "submitButton": "Change Password",
+    "passwordHint": "Requirements: At least 8 characters with uppercase, lowercase, and numbers",
+    "validation": {
+      "currentPasswordRequired": "Please enter your current password",
+      "newPasswordRequired": "Please enter new password",
+      "newPasswordMin": "At least 8 characters",
+      "newPasswordPattern": "Must contain uppercase, lowercase, and numbers",
+      "confirmPasswordRequired": "Please confirm new password",
+      "passwordMismatch": "Passwords do not match",
+      "sameAsOld": "New password cannot be the same as current password"
+    },
+    "message": {
+      "changeSuccess": "Password changed successfully. Please sign in again.",
+      "changeFailed": "Failed to change password"
+    }
+  },
+  "permission": {
+    "title": "Account Permission Management",
+    "awsPermissions": "AWS Account Permissions",
+    "gcpPermissions": "GCP Account Permissions",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "selectedCount": "{{count}} account(s) selected",
+    "saveButton": "Save Permissions",
+    "message": {
+      "saveSuccess": "Permissions saved successfully",
+      "saveFailed": "Failed to save permissions"
+    }
+  },
+  "table": {
+    "username": "Username",
+    "fullName": "Full Name",
+    "role": "Role",
+    "status": "Status",
+    "accountCount": "Accessible Accounts",
+    "lastLogin": "Last Login",
+    "actions": "Actions",
+    "noData": "No user data"
+  },
+  "message": {
+    "logoutSuccess": "Signed out successfully",
+    "createSuccess": "User created successfully",
+    "deleteSuccess": "User deleted successfully",
+    "updateSuccess": "User updated successfully",
+    "enableSuccess": "User enabled",
+    "disableSuccess": "User disabled",
+    "deleteFailed": "Delete failed",
+    "updateFailed": "Update failed",
+    "createFailed": "Create failed",
+    "operationFailed": "Operation failed",
+    "tokenExpired": "Session expired. Please sign in again.",
+    "permissionDenied": "Permission denied. Administrator access required.",
+    "userNotFound": "User not found"
+  },
+  "form": {
+    "addUser": "Add User",
+    "editUser": "Edit User",
+    "searchPlaceholder": "Search by username or full name",
+    "usernamePlaceholder": "Enter username or email",
+    "passwordPlaceholder": "Enter password",
+    "fullNamePlaceholder": "Enter full name",
+    "selectRole": "Select role",
+    "selectStatus": "Select status",
+    "validation": {
+      "usernameRequired": "Please enter username",
+      "passwordRequired": "Please enter password",
+      "passwordMin": "Password must be at least 8 characters",
+      "passwordPattern": "Must contain uppercase, lowercase, and numbers",
+      "roleRequired": "Please select role"
+    }
+  },
+  "actions": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "authorize": "Permissions",
+    "managePermissions": "Manage Permissions",
+    "confirmDeleteUser": "Confirm Delete",
+    "confirmDeleteDesc": "Are you sure you want to delete user \"{{username}}\"? This action cannot be undone."
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "manager": {
+    "title": "自定义模板管理",
+    "createTemplate": "创建模板",
+    "editTemplate": "编辑模板",
+    "deleteTemplate": "删除模板",
+    "saveTemplate": "保存模板",
+    "favorite": "收藏",
+    "unfavorite": "取消收藏",
+    "confirmDelete": "确认删除",
+    "confirmDeleteDesc": "确定要删除这个模板吗？",
+    "name": "模板名称",
+    "category": "分类",
+    "description": "描述",
+    "content": "模板内容",
+    "namePlaceholder": "请输入模板名称",
+    "descriptionPlaceholder": "请输入模板描述（可选）",
+    "contentPlaceholder": "请输入模板内容...",
+    "validation": {
+      "nameRequired": "请输入模板名称",
+      "contentRequired": "请输入模板内容"
+    },
+    "message": {
+      "createSuccess": "模板创建成功",
+      "updateSuccess": "模板更新成功",
+      "deleteSuccess": "模板删除成功",
+      "favoriteSuccess": "已收藏",
+      "unfavoriteSuccess": "已取消收藏",
+      "operationFailed": "操作失败"
+    },
+    "category": {
+      "cost": "成本分析",
+      "optimization": "优化建议",
+      "security": "安全审计",
+      "performance": "性能分析",
+      "other": "其他"
+    }
+  },
+  "allTemplates": {
+    "title": "💰 全部成本模板",
+    "systemTemplates": "系统模板",
+    "userTemplates": "我的模板",
+    "search": "搜索模板标题或描述...",
+    "noResults": "暂无模板",
+    "noResultsWithSearch": "未找到匹配 \"{{search}}\" 的模板",
+    "selectCategory": "选择分类",
+    "loading": "加载模板中...",
+    "all": "全部",
+    "awsTemplates": "🟧 AWS",
+    "gcpTemplates": "🔵 GCP",
+    "showing": "显示 {{count}} 个模板"
+  },
+  "customManager": {
+    "title": "📝 我的模板",
+    "createButton": "创建新模板",
+    "emptyState": "暂无自定义模板",
+    "createFirstTemplate": "创建第一个模板",
+    "templateTitle": "模板标题",
+    "templateTitlePlaceholder": "例如：我的每日成本报告",
+    "description": "描述（可选）",
+    "descriptionPlaceholder": "简短描述模板的用途",
+    "templateContent": "模板内容",
+    "contentPlaceholder": "例如：查看最近 {{days}} 天的 AWS 成本，重点关注 {{service}} 服务",
+    "contentHint": "提示：可使用 {{变量名}} 创建动态模板",
+    "createButton2": "创建",
+    "updateButton": "更新",
+    "validation": {
+      "titleRequired": "请输入模板标题",
+      "contentRequired": "请输入模板内容"
+    },
+    "confirmDelete": "确认删除",
+    "confirmDeleteDesc": "删除后无法恢复"
+  }
+}

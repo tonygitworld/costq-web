@@ -1,0 +1,87 @@
+{
+  "sidebar": {
+    "title": "CostQ クラウドコスト専門家",
+    "newChat": "新しい会話",
+    "chatHistory": "会話履歴",
+    "settings": "設定",
+    "cloudAccounts": "クラウドアカウント管理",
+    "userManagement": "ユーザー管理"
+  },
+  "input": {
+    "placeholder": "ご質問を入力してください... (Enterで送信、Shift+Enterで改行)",
+    "placeholderNoAccount": "💡 まずページ上部でクラウドアカウントを選択してから、質問を始めてください...",
+    "sendButton": "送信",
+    "stopButton": "停止",
+    "stopping": "停止中...",
+    "characterCount": "{{count}}/2000",
+    "connected": "接続済み",
+    "disconnected": "未接続"
+  },
+  "message": {
+    "assistant": "アシスタント",
+    "copyContent": "内容をコピー",
+    "downloadPDF": "PDFとしてダウンロード",
+    "analysisFailed": "❌ 分析に失敗しました",
+    "stopped": "🛑 生成を停止しました",
+    "generationStopped": "生成が停止されました",
+    "generationStoppedDesc": "生成を停止しました。上記は部分的に生成された内容です。",
+    "interruptedByRefresh": "ページの更新により生成が中断されました",
+    "interruptedDesc": "{{time}}にページが更新されました。上記はこれまでに生成された内容です。",
+    "emptyState": "会話を選択するか、新しい会話を作成してください"
+  },
+  "template": {
+    "title": "💰 コスト最適化アシスタント",
+    "description": "テンプレートを選択してAWS/GCPコストを素早く分析",
+    "viewAll": "すべて表示",
+    "customTemplates": "カスタムテンプレート",
+    "favoriteTemplates": "お気に入りテンプレート",
+    "systemTemplates": "システムテンプレート",
+    "category": {
+      "cost": "コスト分析",
+      "optimization": "最適化",
+      "security": "セキュリティ監査",
+      "performance": "パフォーマンス"
+    }
+  },
+  "status": {
+    "initializing": "接続を初期化しています...",
+    "processing": "処理中...",
+    "ready": "準備完了",
+    "error": "エラーが発生しました",
+    "estimatedTime": "推定時間：約{{seconds}}秒",
+    "firstQueryTip": "初回クエリは接続の初期化が必要です。その後のクエリはより速くなります。"
+  },
+  "thinking": {
+    "title": "💭 思考プロセス",
+    "duration": "所要時間 {{seconds}}秒"
+  },
+  "toolCall": {
+    "calling": "呼び出し中",
+    "success": "成功",
+    "error": "失敗",
+    "duration": "所要時間 {{seconds}}秒",
+    "viewDetails": "詳細を表示",
+    "hideDetails": "詳細を非表示",
+    "arguments": "引数",
+    "result": "結果",
+    "errorInfo": "エラー情報"
+  },
+  "history": {
+    "newChat": "新しい会話",
+    "noChatHistory": "会話履歴がありません",
+    "confirmDelete": "削除の確認",
+    "confirmDeleteDesc": "この会話を削除してもよろしいですか？",
+    "confirmDeleteSelected": "削除の確認",
+    "confirmDeleteSelectedDesc": "選択した{{count}}件の会話を削除してもよろしいですか？",
+    "confirmClearAll": "すべてクリア",
+    "confirmClearAllDesc": "すべての会話履歴をクリアしてもよろしいですか？この操作は取り消せません。",
+    "analyzing": "分析中"
+  },
+  "connection": {
+    "connected": "接続済み",
+    "disconnected": "切断",
+    "error": "接続エラー",
+    "unknown": "不明",
+    "reconnect": "再接続"
+  }
+}

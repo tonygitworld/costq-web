@@ -1,0 +1,102 @@
+{
+  "app": {
+    "name": "CostQ Cloud Cost Expert",
+    "shortName": "CostQ",
+    "description": "Multi-Cloud Cost Management Platform"
+  },
+  "button": {
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "create": "Create",
+    "update": "Update",
+    "submit": "Submit",
+    "reset": "Reset",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "close": "Close",
+    "refresh": "Refresh",
+    "search": "Search",
+    "export": "Export",
+    "import": "Import",
+    "download": "Download",
+    "upload": "Upload",
+    "copy": "Copy",
+    "viewDetails": "View Details",
+    "collapse": "Collapse",
+    "expand": "Expand"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "success": "Success",
+    "failed": "Failed",
+    "pending": "Pending",
+    "processing": "Processing",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Info",
+    "loading": "Loading",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "online": "Online",
+    "offline": "Offline"
+  },
+  "role": {
+    "admin": "Administrator",
+    "user": "User",
+    "viewer": "Viewer"
+  },
+  "action": {
+    "select": "Select",
+    "selectAll": "Select All",
+    "deselectAll": "Deselect All",
+    "filter": "Filter",
+    "sort": "Sort",
+    "group": "Group"
+  },
+  "time": {
+    "createdAt": "Created At",
+    "updatedAt": "Updated At",
+    "lastLogin": "Last Login",
+    "never": "Never",
+    "justNow": "Just now",
+    "minutesAgo": "{{count}} minute(s) ago",
+    "hoursAgo": "{{count}} hour(s) ago",
+    "daysAgo": "{{count}} day(s) ago"
+  },
+  "common": {
+    "yes": "Yes",
+    "no": "No",
+    "all": "All",
+    "none": "None",
+    "other": "Other",
+    "unknown": "Unknown",
+    "optional": "Optional",
+    "required": "Required"
+  },
+  "placeholder": {
+    "select": "Please select",
+    "input": "Please enter",
+    "search": "Search...",
+    "noData": "No data available",
+    "loading": "Loading..."
+  },
+  "message": {
+    "confirmDelete": "Are you sure you want to delete this?",
+    "deleteWarning": "This action cannot be undone",
+    "operationSuccess": "Operation successful",
+    "operationFailed": "Operation failed",
+    "networkError": "Network error. Please try again later.",
+    "permissionDenied": "Permission denied",
+    "notFound": "Content not found"
+  }
+}

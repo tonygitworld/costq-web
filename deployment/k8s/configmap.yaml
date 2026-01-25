@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: costq-fastapi-config
+  namespace: costq-fastapi
+  labels:
+    app: costq-fastapi
+    environment: production
+  annotations:
+    description: "CostQ - AWS Intelligent Assistant - Application Configuration (FastAPI Backend)"
+data:
+  # 核心配置
+  ENVIRONMENT: "production"
+  DEBUG: "false"
+  LOG_LEVEL: "INFO"
+  FASTMCP_LOG_LEVEL: "WARNING"
+
+  # AWS 区域配置
+  AWS_REGION: "ap-northeast-1"
+  AWS_DEFAULT_REGION: "ap-northeast-1"
+
+  # AWS 资源
+  S3_BUCKET_NAME: "costq-storage"
+  EKS_CLUSTER_NAME: "costq-eks-cluster"
+  ECR_REPOSITORY: "000451883532.dkr.ecr.ap-northeast-1.amazonaws.com/costq-fastapi"
+  AGENTCORE_RUNTIME_ARN: "arn:aws:bedrock-agentcore:ap-northeast-1:000451883532:runtime/costq_agents_production-EmkFap5Vmc"
+  RDS_SECRET_NAME: "costq/rds/postgresql"
+
+  # Bedrock 配置
+  BEDROCK_MODEL_ID: "us.anthropic.claude-sonnet-4-20250514-v1:0"
+  BEDROCK_REGION: "us-west-2"
+  BEDROCK_CROSS_ACCOUNT_ROLE_ARN: "arn:aws:iam::905418431228:role/CostQCrossAccountBedrockRole"
+
+  # 前端配置
+  FRONTEND_URL: "https://costq.cloudminos.jp"
+  CORS_ORIGINS: "https://costq.cloudminos.jp"

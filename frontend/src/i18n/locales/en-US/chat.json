@@ -1,0 +1,87 @@
+{
+  "sidebar": {
+    "title": "CostQ Cloud Cost Expert",
+    "newChat": "New Chat",
+    "chatHistory": "Chat History",
+    "settings": "Settings",
+    "cloudAccounts": "Cloud Accounts",
+    "userManagement": "User Management"
+  },
+  "input": {
+    "placeholder": "Type your question... (Enter to send, Shift+Enter for new line)",
+    "placeholderNoAccount": "💡 Please select a cloud account at the top of the page to start asking questions...",
+    "sendButton": "Send",
+    "stopButton": "Stop",
+    "stopping": "Stopping...",
+    "characterCount": "{{count}}/2000",
+    "connected": "Connected",
+    "disconnected": "Disconnected"
+  },
+  "message": {
+    "assistant": "Assistant",
+    "copyContent": "Copy content",
+    "downloadPDF": "Download as PDF",
+    "analysisFailed": "❌ Analysis failed",
+    "stopped": "🛑 Generation stopped",
+    "generationStopped": "Generation Stopped",
+    "generationStoppedDesc": "You have stopped this generation. Above is the partially generated content.",
+    "interruptedByRefresh": "Generation interrupted by page refresh",
+    "interruptedDesc": "Page was refreshed at {{time}}. Above is the content generated so far.",
+    "emptyState": "Select a chat or create a new one to get started"
+  },
+  "template": {
+    "title": "💰 Cost Optimization Assistant",
+    "description": "Choose a template for quick AWS/GCP cost analysis",
+    "viewAll": "View All",
+    "customTemplates": "Custom Templates",
+    "favoriteTemplates": "Favorite Templates",
+    "systemTemplates": "System Templates",
+    "category": {
+      "cost": "Cost Analysis",
+      "optimization": "Optimization",
+      "security": "Security Audit",
+      "performance": "Performance"
+    }
+  },
+  "status": {
+    "initializing": "Initializing connection...",
+    "processing": "Processing...",
+    "ready": "Ready",
+    "error": "Error occurred",
+    "estimatedTime": "Estimated time: ~{{seconds}} seconds",
+    "firstQueryTip": "First query requires initialization. Subsequent queries will be faster."
+  },
+  "thinking": {
+    "title": "💭 Thinking Process",
+    "duration": "Took {{seconds}}s"
+  },
+  "toolCall": {
+    "calling": "Calling",
+    "success": "Success",
+    "error": "Failed",
+    "duration": "Took {{seconds}}s",
+    "viewDetails": "View Details",
+    "hideDetails": "Hide Details",
+    "arguments": "Arguments",
+    "result": "Result",
+    "errorInfo": "Error Info"
+  },
+  "history": {
+    "newChat": "New Chat",
+    "noChatHistory": "No chat history",
+    "confirmDelete": "Confirm Delete",
+    "confirmDeleteDesc": "Are you sure you want to delete this chat?",
+    "confirmDeleteSelected": "Confirm Delete",
+    "confirmDeleteSelectedDesc": "Are you sure you want to delete {{count}} selected chat(s)?",
+    "confirmClearAll": "Clear All",
+    "confirmClearAllDesc": "Are you sure you want to clear all chat history? This action cannot be undone.",
+    "analyzing": "Analyzing"
+  },
+  "connection": {
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "error": "Connection Error",
+    "unknown": "Unknown",
+    "reconnect": "Reconnect"
+  }
+}

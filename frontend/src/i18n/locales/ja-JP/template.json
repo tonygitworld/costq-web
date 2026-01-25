@@ -1,0 +1,74 @@
+{
+  "manager": {
+    "title": "カスタムテンプレート管理",
+    "createTemplate": "テンプレートを作成",
+    "editTemplate": "テンプレートを編集",
+    "deleteTemplate": "テンプレートを削除",
+    "saveTemplate": "テンプレートを保存",
+    "favorite": "お気に入りに追加",
+    "unfavorite": "お気に入りから削除",
+    "confirmDelete": "削除の確認",
+    "confirmDeleteDesc": "このテンプレートを削除してもよろしいですか？",
+    "name": "テンプレート名",
+    "category": "カテゴリ",
+    "description": "説明",
+    "content": "テンプレート内容",
+    "namePlaceholder": "テンプレート名を入力してください",
+    "descriptionPlaceholder": "説明を入力してください（任意）",
+    "contentPlaceholder": "テンプレート内容を入力してください...",
+    "validation": {
+      "nameRequired": "テンプレート名を入力してください",
+      "contentRequired": "テンプレート内容を入力してください"
+    },
+    "message": {
+      "createSuccess": "テンプレートを作成しました",
+      "updateSuccess": "テンプレートを更新しました",
+      "deleteSuccess": "テンプレートを削除しました",
+      "favoriteSuccess": "お気に入りに追加しました",
+      "unfavoriteSuccess": "お気に入りから削除しました",
+      "operationFailed": "操作に失敗しました"
+    },
+    "category": {
+      "cost": "コスト分析",
+      "optimization": "最適化",
+      "security": "セキュリティ監査",
+      "performance": "パフォーマンス",
+      "other": "その他"
+    }
+  },
+  "allTemplates": {
+    "title": "💰 すべてのコストテンプレート",
+    "systemTemplates": "システムテンプレート",
+    "userTemplates": "マイテンプレート",
+    "search": "タイトルまたは説明で検索...",
+    "noResults": "テンプレートがありません",
+    "noResultsWithSearch": "「{{search}}」に一致するテンプレートが見つかりません",
+    "selectCategory": "カテゴリを選択",
+    "loading": "テンプレートを読み込み中...",
+    "all": "すべて",
+    "awsTemplates": "🟧 AWS",
+    "gcpTemplates": "🔵 GCP",
+    "showing": "{{count}}件のテンプレートを表示"
+  },
+  "customManager": {
+    "title": "📝 マイテンプレート",
+    "createButton": "新しいテンプレートを作成",
+    "emptyState": "カスタムテンプレートがありません",
+    "createFirstTemplate": "最初のテンプレートを作成",
+    "templateTitle": "テンプレートタイトル",
+    "templateTitlePlaceholder": "例：毎日のコストレポート",
+    "description": "説明（任意）",
+    "descriptionPlaceholder": "テンプレートの用途を簡潔に説明",
+    "templateContent": "テンプレート内容",
+    "contentPlaceholder": "例：過去{{days}}日間のAWSコストを確認、{{service}}サービスに注目",
+    "contentHint": "ヒント：{{変数名}}を使用して動的テンプレートを作成できます",
+    "createButton2": "作成",
+    "updateButton": "更新",
+    "validation": {
+      "titleRequired": "テンプレートタイトルを入力してください",
+      "contentRequired": "テンプレート内容を入力してください"
+    },
+    "confirmDelete": "削除の確認",
+    "confirmDeleteDesc": "この操作は取り消せません"
+  }
+}

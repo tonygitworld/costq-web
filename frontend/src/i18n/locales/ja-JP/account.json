@@ -1,0 +1,159 @@
+{
+  "management": {
+    "title": "クラウドアカウント管理",
+    "selectProvider": "クラウドプロバイダーを選択",
+    "awsAccounts": "AWS アカウント",
+    "gcpAccounts": "GCP アカウント",
+    "azureAccounts": "Azure アカウント",
+    "addAccount": "アカウントを追加",
+    "editAccount": "アカウントを編集",
+    "deleteAccount": "アカウントを削除",
+    "validateCredentials": "認証情報を検証",
+    "refreshList": "リストを更新",
+    "selectAccount": "アカウントを選択",
+    "noAccountSelected": "アカウント未選択",
+    "accountCount": "{{count}}個のアカウント"
+  },
+  "aws": {
+    "alias": "アカウント名",
+    "accountId": "アカウントID",
+    "region": "リージョン",
+    "authType": "認証方式",
+    "accessKey": "アクセスキー",
+    "secretKey": "シークレットキー",
+    "roleArn": "IAM ロール ARN",
+    "externalId": "外部ID",
+    "sessionName": "セッション名",
+    "description": "Amazon ウェブサービス グローバルアカウント",
+    "authTypes": {
+      "access_key": "アクセスキー",
+      "iam_role": "IAM ロール"
+    },
+    "validation": {
+      "aliasRequired": "アカウント名を入力してください",
+      "accountIdRequired": "アカウントIDを入力してください",
+      "accountIdInvalid": "アカウントIDは12桁の数字である必要があります",
+      "regionRequired": "リージョンを選択してください",
+      "accessKeyRequired": "アクセスキーを入力してください",
+      "secretKeyRequired": "シークレットキーを入力してください",
+      "roleArnRequired": "ロールARNを入力してください"
+    },
+    "status": {
+      "valid": "有効",
+      "invalid": "無効",
+      "validating": "検証中...",
+      "unknown": "未検証"
+    },
+    "message": {
+      "createSuccess": "AWSアカウントを作成しました",
+      "deleteSuccess": "AWSアカウントを削除しました",
+      "validateSuccess": "認証情報の検証に成功しました",
+      "validateFailed": "認証情報の検証に失敗しました。アクセスキーが有効かご確認ください。",
+      "deleteFailed": "アカウントの削除に失敗しました"
+    }
+  },
+  "gcp": {
+    "alias": "アカウント名",
+    "projectId": "プロジェクトID",
+    "serviceAccount": "サービスアカウント JSON",
+    "description": "Google Cloud Platform アカウント",
+    "uploadJson": "JSONファイルをアップロード",
+    "pasteJson": "JSON内容を貼り付け",
+    "validation": {
+      "aliasRequired": "アカウント名を入力してください",
+      "projectIdRequired": "プロジェクトIDを入力してください",
+      "serviceAccountRequired": "サービスアカウントの認証情報を提供してください",
+      "invalidJson": "JSON形式が正しくありません"
+    },
+    "message": {
+      "createSuccess": "GCPアカウントを作成しました",
+      "deleteSuccess": "GCPアカウントを削除しました",
+      "updateSuccess": "GCPアカウントを更新しました",
+      "deleteFailed": "アカウントの削除に失敗しました"
+    }
+  },
+  "selector": {
+    "placeholder": "アカウントを選択",
+    "noAccounts": "アカウントがありません",
+    "selectFirst": "まずアカウントを選択してください"
+  },
+  "modal": {
+    "addAccount": "アカウントを追加",
+    "editAccount": "アカウントを編集",
+    "verifyAndAdd": "検証して追加",
+    "uploadSuccess": "ファイルをアップロードしました",
+    "uploadFailed": "ファイルの読み取りに失敗しました",
+    "addFailed": "アカウントの追加に失敗しました",
+    "securityTip": "セキュリティに関するお知らせ",
+    "securityDesc": "アカウント追加時に認証情報が自動的に検証されます",
+    "uploadJson": "JSONファイルをアップロード",
+    "pasteJson": "JSON内容を貼り付け"
+  },
+  "iamRole": {
+    "step1Title": "ステップ 1: デプロイ情報の取得",
+    "step1Desc": "CloudFormationを使用してAWSアカウントでIAM Roleをワンクリック作成",
+    "step2Title": "ステップ 2: AWSコンソールでデプロイ",
+    "step2Desc": "ボタンをクリックして新しいウィンドウでAWS CloudFormationを開く",
+    "step3Title": "ステップ 3: アカウント情報の設定",
+    "step3Desc": "デプロイ完了後、Role ARNを入力",
+    "externalId": "External ID",
+    "externalIdTip": "このIDをCloudFormationパラメータにコピーしてください",
+    "deployButton": "CloudFormation Stackをデプロイ",
+    "copyExternalId": "External IDをコピー",
+    "loadingError": "External ID情報を読み込めません",
+    "stepTitle1": "デプロイ情報の取得",
+    "stepDesc1": "External IDとテンプレート",
+    "stepTitle2": "CloudFormationのデプロイ",
+    "stepDesc2": "AWSコンソールで",
+    "stepTitle3": "アカウントの設定",
+    "stepDesc3": "Role ARNを入力"
+  },
+  "form": {
+    "accountAlias": "アカウント名",
+    "accountAliasPlaceholder": "アカウント名を入力してください",
+    "accountAliasRequired": "アカウント名を入力してください",
+    "accountIdRequired": "アカウントIDを入力してください",
+    "defaultRegion": "デフォルトリージョン",
+    "selectRegion": "デフォルトリージョンを選択",
+    "regionRequired": "デフォルトリージョンを選択してください",
+    "accessKeyIdRequired": "アクセスキーIDを入力してください",
+    "secretAccessKeyRequired": "シークレットアクセスキーを入力してください",
+    "projectIdRequired": "プロジェクトIDを入力してください",
+    "projectIdPlaceholder": "GCPプロジェクトIDを入力してください",
+    "serviceAccountRequired": "サービスアカウントJSONを提供してください",
+    "pasteJsonPlaceholder": "サービスアカウントJSON内容を貼り付けてください...",
+    "description": "説明（任意）",
+    "descriptionPlaceholder": "説明を入力してください（任意）",
+    "akskMethod": "アクセスキー方式",
+    "iamRoleMethod": "IAM ロール方式（推奨）",
+    "securityTipList": {
+      "item1": "認証情報は暗号化してデータベースに保存されます",
+      "item2": "読み取り専用のIAMポリシーの使用を推奨します",
+      "item3": "セキュリティ向上のため定期的にアクセスキーをローテーションしてください"
+    }
+  },
+  "permission": {
+    "title": "クラウドアカウント権限管理",
+    "awsTitle": "AWS アカウント権限",
+    "gcpTitle": "GCP アカウント権限",
+    "unauthorized": "未認可",
+    "authorized": "認可済み",
+    "saveSuccess": "権限設定を保存しました",
+    "saveFailed": "保存に失敗しました",
+    "loadFailed": "権限情報の読み込みに失敗しました"
+  },
+  "table": {
+    "alias": "アカウント名",
+    "id": "アカウントID / プロジェクトID",
+    "region": "リージョン",
+    "authType": "認証方式",
+    "credential": "認証情報",
+    "status": "ステータス",
+    "createdAt": "作成日時",
+    "actions": "操作",
+    "validate": "検証",
+    "edit": "編集",
+    "delete": "削除",
+    "noData": "アカウントデータがありません"
+  }
+}

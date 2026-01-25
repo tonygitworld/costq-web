@@ -1,0 +1,288 @@
+/* MessageItem styling - Agent workflow display */
+/* 响应式优化 - 基于Material Design 3标准 */
+
+/* ===== 思考过程摘要 ===== */
+
+.thinking-summary {
+  background: linear-gradient(135deg, #667eea10, #764ba210);
+  border-left: 3px solid #667eea;
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin: 0 0 var(--message-spacing) 0;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease;
+}
+
+.thinking-summary:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.thinking-summary-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-weight: 500;
+  color: #667eea;
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-base);
+}
+
+.thinking-summary-header .icon {
+  font-size: calc(var(--font-size-base) * 1.15);
+}
+
+.thinking-summary-header .label {
+  flex: 1;
+}
+
+.thinking-summary-header .duration {
+  font-size: var(--font-size-small);
+  color: #8c8c8c;
+  font-weight: 400;
+}
+
+.thinking-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.thinking-steps li {
+  padding: var(--spacing-xs) 0 var(--spacing-xs) 1.25rem;
+  position: relative;
+  color: #595959;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+}
+
+.thinking-steps li::before {
+  content: "•";
+  position: absolute;
+  left: var(--spacing-sm);
+  color: #667eea;
+  font-weight: bold;
+}
+
+/* ===== 工具调用摘要 ===== */
+
+.tool-call-summary {
+  background: #f5f7fa;
+  border-left: 3px solid #1890ff;
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin: 0 0 var(--message-spacing) 0;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease;
+}
+
+.tool-call-summary:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.tool-call-summary-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.tool-call-summary-header .icon {
+  font-size: calc(var(--font-size-base) * 1.15);
+}
+
+.tool-name {
+  font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  color: #1a1a1a;
+  flex: 1;
+}
+
+.tool-call-summary-header .duration {
+  font-size: var(--font-size-small);
+  color: #8c8c8c;
+  margin-left: var(--spacing-sm);
+}
+
+.tool-call-description {
+  color: #595959;
+  font-size: var(--font-size-base);
+  padding-left: 1.5rem;
+  line-height: var(--line-height-normal);
+}
+
+/* ===== 详细信息 ===== */
+
+.message-details {
+  margin-top: var(--spacing-lg);
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tool-details-section {
+  background: #fafbfc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-lg);
+  margin: var(--spacing-md) 0;
+}
+
+.section-title {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: calc(var(--font-size-base) * 1.07);
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.detail-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.detail-item {
+  display: flex;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-base);
+}
+
+.detail-label {
+  color: #595959;
+  min-width: 5rem;
+}
+
+.detail-value {
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+/* ===== JSON 展示 ===== */
+
+.json-block {
+  margin: var(--spacing-md) 0;
+}
+
+.json-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.json-block-label {
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  color: #595959;
+}
+
+.json-content {
+  background: #f6f8fa;
+  border: 1px solid #e1e4e8;
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-md);
+  overflow-x: auto;
+  font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-normal);
+}
+
+.json-display {
+  max-height: 25rem;
+  overflow-y: auto;
+}
+
+/* ===== 错误展示 ===== */
+
+.error-block {
+  background: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.error-label {
+  display: block;
+  font-weight: 500;
+  color: #ff4d4f;
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-base);
+}
+
+.error-content {
+  font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+  font-size: var(--font-size-small);
+  color: #cf1322;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: var(--line-height-normal);
+}
+
+/* ===== 响应式优化 - 基于Material Design 3断点 ===== */
+
+/* 小屏幕（手机）：0-599px */
+@media (max-width: 599px) {
+  .thinking-summary,
+  .tool-call-summary,
+  .tool-details-section {
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .thinking-steps li {
+    padding-left: 1rem;
+  }
+
+  .thinking-steps li::before {
+    left: var(--spacing-xs);
+  }
+
+  .tool-call-description {
+    padding-left: 1rem;
+  }
+
+  .json-display {
+    max-height: 20rem;
+  }
+
+  .detail-label {
+    min-width: 4rem;
+  }
+}
+
+/* 平板（600-904px） */
+@media (min-width: 600px) and (max-width: 904px) {
+  .thinking-summary,
+  .tool-call-summary {
+    padding: calc(var(--spacing-md) * 0.9) var(--spacing-lg);
+  }
+}
+
+/* 大屏幕（1440px+）：增加间距和阴影 */
+@media (min-width: 1440px) {
+  .thinking-summary,
+  .tool-call-summary {
+    padding: var(--spacing-lg) var(--spacing-xl);
+  }
+
+  .thinking-summary:hover,
+  .tool-call-summary:hover {
+    box-shadow: var(--shadow-lg);
+  }
+
+  .tool-details-section {
+    padding: var(--spacing-xl);
+  }
+}

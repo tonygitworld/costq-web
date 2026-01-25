@@ -1,0 +1,344 @@
+// SSE Context - 全局SSE连接管理
+import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
+import {
+  type WebSocketMessage,
+  type BatchMessage,
+} from '../types/message';
+import { messageHandler } from '../utils/messageHandler';
+import { useAuthStore } from '../stores/authStore';
+import { apiClient } from '../services/apiClient';
+import AWSAPIConfirmationDialog from '../components/chat/AWSAPIConfirmationDialog';
+
+
+interface ConfirmationRequest {
+  confirmationId: string;
+  toolName: string;
+  arguments: Record<string, any>;
+  title: string;
+  description: string;
+  warning: string;
+  riskLevel: 'low' | 'medium' | 'high';
+  timeoutSeconds: number;
+}
+
+interface SSEContextType {
+  sendMessage: (message: string | object) => Promise<void>;
+  sendQuery: (content: string, accountIds?: string[], gcpAccountIds?: string[], sessionId?: string) => string;
+  cancelGeneration: (queryId: string) => Promise<void>;
+  currentQueryId: string | null;
+  isCancelling: boolean;
+}
+
+const SSEContext = createContext<SSEContextType | null>(null);
+
+export const useSSEContext = () => {
+  const context = useContext(SSEContext);
+  if (!context) {
+    throw new Error('useSSEContext must be used within a SSEProvider');
+  }
+  return context;
+};
+
+interface SSEProviderProps {
+  children: React.ReactNode;
+}
+
+// ==================== Provider组件 ====================
+
+export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
+  const [confirmationRequest, setConfirmationRequest] = useState<ConfirmationRequest | null>(null);
+  const [currentQueryId, setCurrentQueryId] = useState<string | null>(null);
+  const [isCancelling, setIsCancelling] = useState<boolean>(false);
+
+  useEffect(() => {
+    console.log('🔥🔥🔥 [SSEContext] V2版本已加载（基于Fetch API）！时间戳: 2025-01-20 🔥🔥🔥');
+  }, []);
+
+  useEffect(() => {
+    console.log(`🔄 [SSEContext] currentQueryId 变化: ${currentQueryId ? currentQueryId : 'null'}`);
+  }, [currentQueryId]);
+
+  // ✅ V2 架构：存储每个查询的 AbortController，用于取消查询
+  const queryAbortControllers = useRef<Map<string, AbortController>>(new Map());
+
+  // ✅ 用于发送确认响应等消息（通过 HTTP POST）
+  // ✅ 统一使用 apiClient，自动处理 Token 刷新和 401 错误
+  const sendMessage = async (message: string | object) => {
+    try {
+      const messageStr = typeof message === 'string' ? message : JSON.stringify(message);
+
+      // ✅ 使用 apiClient.post，自动处理 Token 刷新和 401 错误
+      await apiClient.post('/sse/message', messageStr);
+      console.log('✅ [SSE] 消息已通过 HTTP POST 发送成功');
+    } catch (error) {
+      console.error('❌ [SSE] 发送消息失败:', error);
+      // ✅ apiClient 已经处理了 401 错误和 Token 刷新
+    }
+  };
+
+  const sendQuery = (content: string, accountIds?: string[], gcpAccountIds?: string[], sessionId?: string): string => {
+    messageHandler.resetMessageBuilder();
+
+    const queryId = `query_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const token = useAuthStore.getState().token;
+
+    if (!token) {
+      console.warn('⚠️ [SSEContext.sendQuery] 未登录，无法发送查询');
+      return queryId;
+    }
+
+    console.log(`🟢 [SSEContext.sendQuery] 设置 currentQueryId = ${queryId}, sessionId = ${sessionId}`);
+    setCurrentQueryId(queryId);
+
+    // ✅ V2: 创建 AbortController 用于取消请求
+    const abortController = new AbortController();
+    queryAbortControllers.current.set(queryId, abortController);
+
+    // ✅ V2: 使用 apiClient.stream 发起 SSE 流式请求
+    // ✅ 统一使用 apiClient，自动处理 Token 刷新和 401 错误
+    (async () => {
+      try {
+        console.log(`📤 [SSEContext.sendQuery] 发送查询 - QueryID: ${queryId}, SessionID: ${sessionId}`);
+
+        // ✅ 使用 apiClient.stream，自动处理 Token 刷新和 401 错误
+        const response = await apiClient.stream('/sse/query/v2', {
+          query: content,
+          query_id: queryId,
+          session_id: sessionId,
+          account_ids: accountIds || [],
+          gcp_account_ids: gcpAccountIds || [],
+        }, {
+          signal: abortController.signal,  // ✅ 支持取消
+        });
+
+        console.log(`✅ [SSEContext.sendQuery] SSE查询连接已建立 - QueryID: ${queryId}`);
+
+        // ✅ V2: 处理流式响应
+        const reader = response.body?.getReader();
+        if (!reader) {
+          throw new Error('无法获取响应流');
+        }
+
+        const decoder = new TextDecoder();
+        let buffer = '';  // 缓冲区，用于存储不完整的数据
+
+        while (true) {
+          const { done, value } = await reader.read();
+
+          if (done) {
+            console.log(`🔌 [SSEContext.sendQuery] 流式响应完成 - QueryID: ${queryId}`);
+            // ✅ 流正常结束，清理 AbortController
+            // ✅ currentQueryId 的清理由 messageHandler.handleCompletion 统一处理
+            queryAbortControllers.current.delete(queryId);
+            break;
+          }
+
+          // 解码数据块
+          buffer += decoder.decode(value, { stream: true });
+
+          // ✅ V2: 解析 SSE 格式: "data: {...}\n\n"
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';  // 保留最后不完整的行
+
+          for (const line of lines) {
+            if (line.trim() === '') continue;  // 跳过空行
+
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6);  // 去掉 "data: " 前缀
+
+              try {
+                const message = JSON.parse(data) as WebSocketMessage;
+
+                // 过滤心跳消息
+                if (message.type === 'pong' || message.type === 'ping') {
+                  continue;
+                }
+
+                // 处理批量消息
+                if (message.type === 'batch') {
+                  const batchData = message as BatchMessage;
+                  if (Array.isArray(batchData.messages)) {
+                    batchData.messages.forEach((msg: WebSocketMessage) => {
+                      messageHandler.handleMessage(msg);
+                    });
+                  }
+                } else {
+                  messageHandler.handleMessage(message);
+                }
+
+                // ✅ 如果收到 complete 或 error，让 messageHandler 处理清理（通过 resetCurrentQuery）
+                // ✅ 不要在这里立即清理 currentQueryId，让 messageHandler.handleCompletion 统一处理
+                if (message.type === 'complete' || message.type === 'error') {
+                  console.log(`🔌 [SSEContext.sendQuery] 查询完成，关闭连接 - QueryID: ${queryId}`);
+                  queryAbortControllers.current.delete(queryId);
+                  // ✅ 不在这里清理 currentQueryId，让 messageHandler.handleCompletion 统一处理
+                  // ✅ 这样可以确保停止按钮在查询完成前一直显示
+                  return;  // 退出循环
+                }
+              } catch (e) {
+                console.error('❌ [SSEContext.sendQuery] SSE消息解析失败:', e, 'Data:', data);
+              }
+            } else if (line.startsWith('event: ')) {
+              // 处理事件类型（如果需要）
+              const eventType = line.slice(7);
+              console.log(`📋 [SSEContext.sendQuery] 事件类型: ${eventType}`);
+            } else if (line.startsWith('id: ')) {
+              // 处理事件ID（如果需要）
+              const eventId = line.slice(4);
+              console.log(`🆔 [SSEContext.sendQuery] 事件ID: ${eventId}`);
+            }
+          }
+        }
+
+        // ✅ 流正常结束时的清理（如果还没有收到 complete/error 消息）
+        // ✅ 注意：如果收到 complete/error，已经在上面 return 了，不会执行到这里
+        // ✅ AbortController 已经在 done 检查中清理了
+        // ✅ currentQueryId 的清理由 messageHandler.handleCompletion 统一处理
+        // ✅ 如果流正常结束但没有 complete 消息，需要手动清理 currentQueryId
+        if (currentQueryId === queryId) {
+          console.log(`🧹 [SSEContext.sendQuery] 流正常结束但没有 complete 消息，清理 currentQueryId - QueryID: ${queryId}`);
+          setCurrentQueryId(null);
+        }
+
+      } catch (error: any) {
+        queryAbortControllers.current.delete(queryId);
+        // ✅ 错误时也不立即清理 currentQueryId，让 messageHandler 统一处理
+        // ✅ 如果 error 消息已经通过 handleMessage 处理，会调用 resetCurrentQuery
+        // ✅ 但如果错误发生在消息处理之前（如网络错误），需要手动清理
+        if (error.name !== 'AbortError' && currentQueryId === queryId) {
+          console.log(`🧹 [SSEContext.sendQuery] 发生错误，清理 currentQueryId - QueryID: ${queryId}`);
+          setCurrentQueryId(null);
+        }
+
+        if (error.name === 'AbortError') {
+          console.log(`🛑 [SSEContext.sendQuery] 查询已取消 - QueryID: ${queryId}`);
+        } else {
+          console.error(`❌ [SSEContext.sendQuery] SSE查询连接错误 - QueryID: ${queryId}:`, error);
+
+          // ✅ apiClient 已经处理了 401 错误和 Token 刷新
+          // 如果是 401 错误，apiClient 已经处理了通知和跳转
+          if (error.message?.includes('401') ||
+              error.message?.includes('Unauthorized') ||
+              error.message?.includes('过期') ||
+              error.message?.includes('expired')) {
+            console.warn('⚠️ [SSEContext.sendQuery] Token 已过期，apiClient 已处理跳转');
+          }
+        }
+      }
+    })();
+
+    console.log('📤 [SSEContext.sendQuery] 查询已发送，创建Fetch连接:', queryId, content.substring(0, 50), 'session:', sessionId);
+
+    return queryId;
+  };
+
+  const resetCurrentQuery = useCallback(() => {
+    console.log('🔴 [SSEContext] 重置 currentQueryId 和 isCancelling');
+    setCurrentQueryId(null);
+    setIsCancelling(false);
+  }, []);
+
+  const cancellingRef = useRef<Set<string>>(new Set());
+
+  // ✅ V2 架构：取消查询通过 AbortController + 显式调用取消接口实现
+  const cancelGeneration = async (queryId: string) => {
+    console.log('🟡 [SSEContext.cancelGeneration] 开始取消查询:', queryId);
+
+    if (cancellingRef.current.has(queryId)) {
+      console.warn('⚠️ [SSEContext.cancelGeneration] 取消请求已发送，避免重复', queryId);
+      return;
+    }
+
+    cancellingRef.current.add(queryId);
+    setIsCancelling(true);
+    console.log('🟡 [SSEContext.cancelGeneration] 设置 isCancelling = true');
+
+    try {
+      // ✅ 1. 显式调用取消接口（优雅的 API 设计）
+      try {
+        const { apiClient } = await import('../services/apiClient');
+        await apiClient.post(`/sse/cancel/v2/${queryId}`, { reason: 'user_cancelled' });
+        console.log('✅ [SSEContext.cancelGeneration] 取消接口调用成功 - QueryID:', queryId);
+      } catch (error) {
+        console.warn('⚠️ [SSEContext.cancelGeneration] 取消接口调用失败（继续关闭连接）:', error);
+        // 即使接口调用失败，也继续关闭连接
+      }
+
+      // ✅ 2. 使用 AbortController 关闭连接（双重保障）
+      const abortController = queryAbortControllers.current.get(queryId);
+      if (abortController) {
+        console.log('🛑 [SSEContext.cancelGeneration] 关闭连接 - QueryID:', queryId);
+        abortController.abort();  // ✅ 这会触发 AbortError，后端会检测到连接断开
+        queryAbortControllers.current.delete(queryId);
+      } else {
+        console.warn('⚠️ [SSEContext.cancelGeneration] 未找到查询的 AbortController:', queryId);
+      }
+
+      // ✅ 3. 清理状态
+      setCurrentQueryId(null);
+    } catch (error) {
+      console.error('❌ [SSEContext.cancelGeneration] 取消查询失败:', error);
+    } finally {
+      setTimeout(() => {
+        cancellingRef.current.delete(queryId);
+        setIsCancelling(false);
+      }, 3000);
+    }
+  };
+
+
+  const handleApprove = (confirmationId: string) => {
+    console.log('✅ 用户批准操作:', confirmationId);
+    sendMessage({
+      type: 'confirmation_response',
+      confirmation_id: confirmationId,
+      approved: true
+    });
+    setConfirmationRequest(null);
+  };
+
+  const handleReject = (confirmationId: string) => {
+    console.log('❌ 用户拒绝操作:', confirmationId);
+    sendMessage({
+      type: 'confirmation_response',
+      confirmation_id: confirmationId,
+      approved: false
+    });
+    setConfirmationRequest(null);
+  };
+
+  useEffect(() => {
+    console.log('🔧 [SSEContext] 设置 resetCurrentQuery 回调');
+    messageHandler.setResetCurrentQuery(resetCurrentQuery);
+  }, [resetCurrentQuery]);
+
+  const contextValue: SSEContextType = {
+    sendMessage,
+    sendQuery,
+    cancelGeneration,
+    currentQueryId,
+    isCancelling
+  };
+
+  return (
+    <SSEContext.Provider value={contextValue}>
+      {children}
+
+      {confirmationRequest && (
+        <AWSAPIConfirmationDialog
+          open={true}
+          confirmationId={confirmationRequest.confirmationId}
+          toolName={confirmationRequest.toolName}
+          arguments={confirmationRequest.arguments}
+          title={confirmationRequest.title}
+          description={confirmationRequest.description}
+          warning={confirmationRequest.warning}
+          riskLevel={confirmationRequest.riskLevel}
+          timeoutSeconds={confirmationRequest.timeoutSeconds}
+          onApprove={handleApprove}
+          onReject={handleReject}
+        />
+      )}
+    </SSEContext.Provider>
+  );
+};

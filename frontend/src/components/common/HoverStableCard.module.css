@@ -1,0 +1,93 @@
+/* HoverStableCard 样式模块 */
+
+.hoverStableCard {
+  /* 基础样式 - 确保稳定的布局 */
+  position: relative;
+  box-sizing: border-box;
+
+  /* 性能优化 */
+  contain: layout style paint;
+  will-change: transform, opacity, box-shadow;
+
+  /* 平滑过渡 */
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hoverStableCard:hover {
+  /* 默认hover效果 - 仅使用不触发重排的属性 */
+  transform: translateY(-1px) translateZ(0);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 禁用hover效果的变体 */
+.hoverStableCard--disabled {
+  transition: none;
+  will-change: auto;
+}
+
+.hoverStableCard--disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* 激活状态的样式 */
+.hoverStableCard--hovered {
+  /* 通过类名控制的hover状态 */
+}
+
+/* 不同尺寸的变体 */
+.hoverStableCard--small {
+  /* 小尺寸卡片的特殊处理 */
+}
+
+.hoverStableCard--large {
+  /* 大尺寸卡片的特殊处理 */
+}
+
+/* 响应式优化 */
+@media (max-width: 768px) {
+  .hoverStableCard {
+    /* 移动设备上减少动画效果以提升性能 */
+    transition-duration: 0.1s;
+  }
+
+  .hoverStableCard:hover {
+    /* 移动设备上的轻量hover效果 */
+    transform: translateY(-0.5px) translateZ(0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* 减少动画偏好的用户 */
+@media (prefers-reduced-motion: reduce) {
+  .hoverStableCard {
+    transition: none;
+    will-change: auto;
+  }
+
+  .hoverStableCard:hover {
+    transform: none;
+    /* 仅保留阴影效果 */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* GPU加速优化 */
+.hoverStableCard {
+  /* 强制GPU加速 */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* 防止文本选择影响hover效果 */
+.hoverStableCard * {
+  user-select: text;
+}
+
+.hoverStableCard:hover * {
+  /* hover时保持文本可选择性 */
+  user-select: text;
+}

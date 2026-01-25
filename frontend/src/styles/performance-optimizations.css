@@ -1,0 +1,309 @@
+/* CSS性能优化样式 */
+
+/* GPU加速优化 */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform, opacity;
+}
+
+/* 消息容器性能优化 */
+.message-list-container {
+  /* 启用硬件加速 */
+  transform: translateZ(0);
+
+  /* 限制重排范围 */
+  contain: layout style paint;
+
+  /* 优化滚动性能 */
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.message-list-content {
+  /* GPU加速 */
+  transform: translate3d(0, 0, 0);
+
+  /* 限制重排影响 */
+  contain: layout style;
+
+  /* 优化滚动条 */
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* 消息项性能优化 */
+.message-item {
+  /* 启用合成层 */
+  will-change: transform;
+
+  /* 限制重排范围 */
+  contain: layout style paint;
+
+  /* GPU加速 */
+  transform: translateZ(0);
+}
+
+.message-item:hover {
+  /* 使用transform而非改变布局属性 */
+  transform: translateY(-1px) translateZ(0);
+}
+
+/* HoverStableCard增强优化 */
+.hover-stable-card {
+  /* 强制GPU加速 */
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+
+  /* 优化重绘性能 */
+  contain: layout style paint;
+
+  /* 预设变换属性 */
+  will-change: transform, opacity, box-shadow;
+
+  /* 平滑过渡 */
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-stable-card:hover {
+  /* 仅使用transform和opacity */
+  transform: translateY(-1px) translateZ(0);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 滚动性能优化 */
+.smooth-scroll {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scroll-container {
+  /* 优化滚动性能 */
+  contain: strict;
+  overflow-anchor: auto;
+
+  /* GPU加速 */
+  transform: translateZ(0);
+
+  /* 优化滚动条样式 */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.scroll-container::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* 动画性能优化 */
+.optimized-animation {
+  /* 使用transform3d强制GPU加速 */
+  transform: translate3d(0, 0, 0);
+
+  /* 优化动画性能 */
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* 预设变换属性 */
+  will-change: transform, opacity;
+}
+
+/* 减少重排的布局优化 */
+.layout-optimized {
+  /* 使用flexbox避免浮动 */
+  display: flex;
+
+  /* 避免margin collapse */
+  margin: 0;
+
+  /* 使用padding而非margin */
+  padding: 0;
+
+  /* 固定盒模型 */
+  box-sizing: border-box;
+}
+
+/* 文本渲染优化 */
+.text-optimized {
+  /* 优化文本渲染 */
+  text-rendering: optimizeSpeed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* 避免文本选择影响性能 */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.text-optimized.selectable {
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
+
+/* 图片和媒体优化 */
+.media-optimized {
+  /* 优化图片渲染 */
+  image-rendering: optimizeSpeed;
+
+  /* GPU加速 */
+  transform: translateZ(0);
+
+  /* 避免布局抖动 */
+  width: 100%;
+  height: auto;
+
+  /* 懒加载支持 */
+  loading: lazy;
+}
+
+/* 响应式性能优化 */
+@media (max-width: 768px) {
+  .mobile-optimized {
+    /* 移动端减少动画 */
+    animation-duration: 0.1s;
+    transition-duration: 0.1s;
+
+    /* 简化阴影效果 */
+    box-shadow: none;
+
+    /* 减少GPU使用 */
+    will-change: auto;
+  }
+
+  .hover-stable-card:hover {
+    /* 移动端简化hover效果 */
+    transform: translateZ(0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* 高DPI屏幕优化 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .high-dpi-optimized {
+    /* 高DPI屏幕的优化 */
+    -webkit-font-smoothing: subpixel-antialiased;
+
+    /* 更精细的边框 */
+    border-width: 0.5px;
+  }
+}
+
+/* 减少动画偏好用户的优化 */
+@media (prefers-reduced-motion: reduce) {
+  .respect-motion-preference {
+    /* 禁用动画 */
+    animation: none;
+    transition: none;
+
+    /* 移除will-change */
+    will-change: auto;
+
+    /* 简化变换 */
+    transform: none;
+  }
+
+  .hover-stable-card {
+    transition: none;
+  }
+
+  .hover-stable-card:hover {
+    transform: none;
+    /* 仅保留阴影效果 */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* 暗色主题性能优化 */
+@media (prefers-color-scheme: dark) {
+  .dark-theme-optimized {
+    /* 暗色主题下的优化 */
+    color-scheme: dark;
+
+    /* 减少对比度以降低功耗 */
+    filter: contrast(0.9);
+  }
+}
+
+/* 内存优化 */
+.memory-optimized {
+  /* 限制合成层数量 */
+  will-change: auto;
+
+  /* 避免不必要的GPU加速 */
+  transform: none;
+
+  /* 清理未使用的属性 */
+  backface-visibility: visible;
+  perspective: none;
+}
+
+/* 批量更新优化 */
+.batch-update-optimized {
+  /* 使用contain优化批量更新 */
+  contain: layout style paint;
+
+  /* 避免不必要的重排 */
+  position: relative;
+
+  /* 优化子元素更新 */
+  isolation: isolate;
+}
+
+/* 虚拟滚动优化 */
+.virtual-scroll-optimized {
+  /* 优化大列表性能 */
+  contain: strict;
+
+  /* 固定高度避免重排 */
+  height: 100%;
+  overflow: auto;
+
+  /* GPU加速 */
+  transform: translateZ(0);
+
+  /* 优化滚动性能 */
+  -webkit-overflow-scrolling: touch;
+  overflow-anchor: none;
+}
+
+/* 调试性能的辅助类 */
+.performance-debug {
+  /* 显示重绘区域 */
+  outline: 1px solid red;
+
+  /* 显示合成层 */
+  background: rgba(255, 0, 0, 0.1);
+}
+
+.performance-debug::before {
+  content: 'GPU Layer';
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: red;
+  color: white;
+  font-size: 10px;
+  padding: 2px 4px;
+  z-index: 9999;
+}

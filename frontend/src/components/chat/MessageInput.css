@@ -1,0 +1,159 @@
+/* MessageInput - 输入框响应式优化（保守版本） */
+/* 改进依据：保持原有布局，仅优化字体和间距 */
+
+/* ===== 容器样式 ===== */
+
+.message-input-container {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ===== 输入框样式 ===== */
+
+.message-input-textarea {
+  /* 不强制覆盖字体大小，让Ant Design控制 */
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+  padding: 8px 12px !important;
+}
+
+.message-input-textarea-enabled {
+  background-color: #ffffff !important;
+  cursor: text !important;
+  color: #000000 !important;
+}
+
+.message-input-textarea-disabled {
+  background-color: #fafafa !important;
+  cursor: not-allowed !important;
+  color: #595959 !important;
+}
+
+/* ===== 底部操作栏 ===== */
+
+.message-input-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.message-input-actions-left {
+  flex: 1;
+}
+
+.message-input-actions-right {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
+/* ===== 连接状态指示器 ===== */
+
+.message-input-status {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.message-input-status-connected {
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+}
+
+.message-input-status-disconnected {
+  background-color: #fff1f0;
+  border: 1px solid #ffa39e;
+}
+
+.message-input-status-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.message-input-status-dot-connected {
+  background-color: #52c41a;
+}
+
+.message-input-status-dot-disconnected {
+  background-color: #ff4d4f;
+}
+
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+}
+
+.message-input-status-text {
+  font-size: var(--font-size-xs);
+}
+
+.message-input-status-text-connected {
+  color: #389e0d;
+}
+
+.message-input-status-text-disconnected {
+  color: #cf1322;
+}
+
+/* ===== 字数统计 ===== */
+
+.message-input-char-count {
+  font-size: var(--font-size-xs);
+}
+
+/* ===== 按钮样式 ===== */
+
+.message-input-button {
+  /* 保持原有大小，不强制覆盖 */
+  height: 32px !important;
+  font-size: 13px !important;
+}
+
+/* ===== 调试信息 ===== */
+
+.message-input-debug {
+  font-size: var(--font-size-xs);
+  color: #999;
+  margin-left: var(--spacing-sm);
+}
+
+/* ===== 响应式断点（保守版本） ===== */
+
+/* 大屏桌面（1440px+）- 仅在超大屏幕上略微增大 */
+@media (min-width: 1440px) {
+  .message-input-textarea {
+    font-size: 14px !important;
+    padding: 10px 14px !important;
+  }
+
+  .message-input-button {
+    height: 34px !important;
+    font-size: 14px !important;
+  }
+
+  .message-input-status {
+    font-size: 11px;
+  }
+}
+
+/* ===== 打印优化 ===== */
+@media print {
+  .message-input-actions,
+  .message-input-status,
+  .message-input-button,
+  .message-input-debug {
+    display: none;
+  }
+}

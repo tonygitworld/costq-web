@@ -1,0 +1,154 @@
+/* ChatLayout - 响应式布局优化（保守版本） */
+/* 改进依据：保持原有布局，仅在大屏幕上略微调整 */
+
+/* ===== 侧边栏样式 ===== */
+
+.chat-layout-sider {
+  overflow: auto;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+}
+
+/* 侧边栏宽度 - 保持原有宽度 */
+.chat-layout-sider-width {
+  width: 260px;
+}
+
+/* ===== 主布局区域 ===== */
+
+.chat-layout-main {
+  margin-left: 260px;
+  transition: margin-left 0.2s ease;
+}
+
+.chat-layout-main-collapsed {
+  margin-left: 0;
+}
+
+/* ===== Header 样式 ===== */
+
+.chat-layout-header {
+  background-color: #fff;
+  padding: 0 18px;
+  height: 52px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.chat-layout-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.chat-layout-account-section {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.chat-layout-account-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #595959;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.chat-layout-account-selector {
+  width: 160px;
+}
+
+.chat-layout-divider {
+  width: 1px;
+  height: 26px;
+  background-color: #e8e8e8;
+  margin: 0 3px;
+}
+
+.chat-layout-warning-icon {
+  font-size: 18px;
+  color: #faad14;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ===== 移动端抽屉 ===== */
+
+.chat-layout-drawer {
+  width: 228px;
+}
+
+.chat-layout-drawer-body {
+  padding: 0;
+  background-color: #1a1f2e;
+}
+
+.chat-layout-drawer-header {
+  background-color: #1a1f2e;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ===== 响应式断点（保守版本） ===== */
+
+/* 大屏桌面（1440px+）- 仅在超大屏幕上略微调整 */
+@media (min-width: 1440px) {
+  .chat-layout-sider-width {
+    width: 280px;
+  }
+
+  .chat-layout-main {
+    margin-left: 280px;
+  }
+
+  .chat-layout-header {
+    padding: 0 24px;
+    height: 56px;
+  }
+
+  .chat-layout-header-actions {
+    gap: 16px;
+  }
+
+  .chat-layout-account-label {
+    font-size: 12px;
+  }
+
+  .chat-layout-account-selector {
+    width: 180px;
+  }
+
+  .chat-layout-divider {
+    height: 28px;
+  }
+}
+
+/* ===== 打印优化 ===== */
+@media print {
+  .chat-layout-sider,
+  .chat-layout-header {
+    display: none;
+  }
+
+  .chat-layout-main {
+    margin-left: 0;
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "management": {
+    "title": "Cloud Account Management",
+    "selectProvider": "Select Cloud Provider",
+    "awsAccounts": "AWS Accounts",
+    "gcpAccounts": "GCP Accounts",
+    "azureAccounts": "Azure Accounts",
+    "addAccount": "Add Account",
+    "editAccount": "Edit Account",
+    "deleteAccount": "Delete Account",
+    "validateCredentials": "Validate Credentials",
+    "refreshList": "Refresh List",
+    "selectAccount": "Select Account",
+    "noAccountSelected": "No account selected",
+    "accountCount": "{{count}} account(s)"
+  },
+  "aws": {
+    "alias": "Account Alias",
+    "accountId": "Account ID",
+    "region": "Region",
+    "authType": "Authentication Type",
+    "accessKey": "Access Key",
+    "secretKey": "Secret Key",
+    "roleArn": "IAM Role ARN",
+    "externalId": "External ID",
+    "sessionName": "Session Name",
+    "description": "Amazon Web Services Global Account",
+    "authTypes": {
+      "access_key": "Access Key",
+      "iam_role": "IAM Role"
+    },
+    "validation": {
+      "aliasRequired": "Please enter account alias",
+      "accountIdRequired": "Please enter account ID",
+      "accountIdInvalid": "Account ID must be 12 digits",
+      "regionRequired": "Please select region",
+      "accessKeyRequired": "Please enter Access Key",
+      "secretKeyRequired": "Please enter Secret Key",
+      "roleArnRequired": "Please enter Role ARN"
+    },
+    "status": {
+      "valid": "Valid",
+      "invalid": "Invalid",
+      "validating": "Validating...",
+      "unknown": "Not Verified"
+    },
+    "message": {
+      "createSuccess": "AWS account created successfully",
+      "deleteSuccess": "AWS account deleted successfully",
+      "validateSuccess": "Credentials validated successfully",
+      "validateFailed": "Credential validation failed. Please check if your Access Key is valid.",
+      "deleteFailed": "Failed to delete account"
+    }
+  },
+  "gcp": {
+    "alias": "Account Alias",
+    "projectId": "Project ID",
+    "serviceAccount": "Service Account JSON",
+    "description": "Google Cloud Platform Account",
+    "uploadJson": "Upload JSON File",
+    "pasteJson": "Paste JSON Content",
+    "validation": {
+      "aliasRequired": "Please enter account alias",
+      "projectIdRequired": "Please enter project ID",
+      "serviceAccountRequired": "Please provide service account credentials",
+      "invalidJson": "Invalid JSON format"
+    },
+    "message": {
+      "createSuccess": "GCP account created successfully",
+      "deleteSuccess": "GCP account deleted successfully",
+      "updateSuccess": "GCP account updated successfully",
+      "deleteFailed": "Failed to delete account"
+    }
+  },
+  "selector": {
+    "placeholder": "Select account",
+    "noAccounts": "No accounts available",
+    "selectFirst": "Please select an account first"
+  },
+  "modal": {
+    "addAccount": "Add Account",
+    "editAccount": "Edit Account",
+    "verifyAndAdd": "Verify & Add",
+    "uploadSuccess": "File uploaded successfully",
+    "uploadFailed": "Failed to read file",
+    "addFailed": "Failed to add account",
+    "securityTip": "Security Notice",
+    "securityDesc": "Credentials will be automatically verified when adding account",
+    "uploadJson": "Upload JSON File",
+    "pasteJson": "Paste JSON Content"
+  },
+  "iamRole": {
+    "step1Title": "Step 1: Get Deployment Information",
+    "step1Desc": "One-click IAM Role creation in your AWS account using CloudFormation",
+    "step2Title": "Step 2: Deploy in AWS Console",
+    "step2Desc": "Click button to open AWS CloudFormation in new window",
+    "step3Title": "Step 3: Configure Account Information",
+    "step3Desc": "After deployment, fill in Role ARN",
+    "externalId": "External ID",
+    "externalIdTip": "Copy this ID to CloudFormation parameters",
+    "deployButton": "Deploy CloudFormation Stack",
+    "copyExternalId": "Copy External ID",
+    "loadingError": "Unable to load External ID information",
+    "stepTitle1": "Get Deployment Info",
+    "stepDesc1": "External ID and Template",
+    "stepTitle2": "Deploy CloudFormation",
+    "stepDesc2": "In AWS Console",
+    "stepTitle3": "Configure Account",
+    "stepDesc3": "Fill in Role ARN"
+  },
+  "form": {
+    "accountAlias": "Account Alias",
+    "accountAliasPlaceholder": "Enter account alias",
+    "accountAliasRequired": "Please enter account alias",
+    "accountIdRequired": "Please enter account ID",
+    "defaultRegion": "Default Region",
+    "selectRegion": "Select default region",
+    "regionRequired": "Please select default region",
+    "accessKeyIdRequired": "Please enter Access Key ID",
+    "secretAccessKeyRequired": "Please enter Secret Access Key",
+    "projectIdRequired": "Please enter project ID",
+    "projectIdPlaceholder": "Enter GCP project ID",
+    "serviceAccountRequired": "Please provide service account JSON",
+    "pasteJsonPlaceholder": "Paste service account JSON content...",
+    "description": "Description (Optional)",
+    "descriptionPlaceholder": "Enter description (optional)",
+    "akskMethod": "Access Key Method",
+    "iamRoleMethod": "IAM Role Method (Recommended)",
+    "securityTipList": {
+      "item1": "Credentials will be encrypted and stored in database",
+      "item2": "Recommend using read-only IAM policy",
+      "item3": "Rotate Access Keys regularly for better security"
+    }
+  },
+  "permission": {
+    "title": "Cloud Account Permission Management",
+    "awsTitle": "AWS Account Permissions",
+    "gcpTitle": "GCP Account Permissions",
+    "unauthorized": "Unauthorized",
+    "authorized": "Authorized",
+    "saveSuccess": "Permissions saved successfully",
+    "saveFailed": "Save failed",
+    "loadFailed": "Failed to load permissions"
+  },
+  "table": {
+    "alias": "Account Alias",
+    "id": "Account ID / Project ID",
+    "region": "Region",
+    "authType": "Auth Type",
+    "credential": "Credential",
+    "status": "Status",
+    "createdAt": "Created At",
+    "actions": "Actions",
+    "validate": "Validate",
+    "edit": "Edit",
+    "delete": "Delete",
+    "noData": "No account data"
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "profile": {
+    "title": "基本情報",
+    "username": "ユーザー名",
+    "fullName": "お名前",
+    "email": "メールアドレス",
+    "organization": "所属組織",
+    "role": "役割",
+    "accountStatus": "アカウントステータス",
+    "createdAt": "作成日時",
+    "lastLoginAt": "最終ログイン",
+    "neverLogin": "ログインなし",
+    "noValue": "-"
+  },
+  "management": {
+    "title": "ユーザー管理",
+    "addUser": "ユーザーを追加",
+    "editUser": "ユーザーを編集",
+    "deleteUser": "ユーザーを削除",
+    "enableUser": "ユーザーを有効化",
+    "disableUser": "ユーザーを無効化",
+    "resetPassword": "パスワードをリセット",
+    "managePermissions": "権限を管理",
+    "userCount": "{{count}}人のユーザー"
+  },
+  "dropdown": {
+    "profile": "基本情報",
+    "changePassword": "パスワード変更",
+    "logout": "ログアウト",
+    "admin": "管理者"
+  },
+  "changePassword": {
+    "title": "パスワード変更",
+    "currentPassword": "現在のパスワード",
+    "newPassword": "新しいパスワード",
+    "confirmPassword": "新しいパスワード（確認）",
+    "currentPasswordPlaceholder": "現在のパスワードを入力してください",
+    "newPasswordPlaceholder": "新しいパスワードを入力してください",
+    "confirmPasswordPlaceholder": "新しいパスワードを再入力してください",
+    "submitButton": "パスワードを変更",
+    "passwordHint": "要件：8文字以上、大文字・小文字・数字を含む",
+    "validation": {
+      "currentPasswordRequired": "現在のパスワードを入力してください",
+      "newPasswordRequired": "新しいパスワードを入力してください",
+      "newPasswordMin": "8文字以上",
+      "newPasswordPattern": "大文字・小文字・数字を含む必要があります",
+      "confirmPasswordRequired": "新しいパスワードを確認してください",
+      "passwordMismatch": "パスワードが一致しません",
+      "sameAsOld": "新しいパスワードは現在のパスワードと同じにはできません"
+    },
+    "message": {
+      "changeSuccess": "パスワードを変更しました。再度ログインしてください。",
+      "changeFailed": "パスワードの変更に失敗しました"
+    }
+  },
+  "permission": {
+    "title": "アカウント権限管理",
+    "awsPermissions": "AWS アカウント権限",
+    "gcpPermissions": "GCP アカウント権限",
+    "selectAll": "すべて選択",
+    "deselectAll": "選択解除",
+    "selectedCount": "{{count}}個のアカウントを選択中",
+    "saveButton": "権限を保存",
+    "message": {
+      "saveSuccess": "権限を保存しました",
+      "saveFailed": "権限の保存に失敗しました"
+    }
+  },
+  "table": {
+    "username": "ユーザー名",
+    "fullName": "お名前",
+    "role": "役割",
+    "status": "ステータス",
+    "accountCount": "アクセス可能なアカウント数",
+    "lastLogin": "最終ログイン",
+    "actions": "操作",
+    "noData": "ユーザーデータがありません"
+  },
+  "message": {
+    "logoutSuccess": "ログアウトしました",
+    "createSuccess": "ユーザーを追加しました",
+    "deleteSuccess": "削除しました",
+    "updateSuccess": "更新しました",
+    "enableSuccess": "ユーザーを有効化しました",
+    "disableSuccess": "ユーザーを無効化しました",
+    "deleteFailed": "削除に失敗しました",
+    "updateFailed": "更新に失敗しました",
+    "createFailed": "作成に失敗しました",
+    "operationFailed": "操作に失敗しました",
+    "tokenExpired": "ログインの有効期限が切れました。再度ログインしてください。",
+    "permissionDenied": "権限がありません。管理者権限が必要です。",
+    "userNotFound": "ユーザーが見つかりません"
+  },
+  "form": {
+    "addUser": "ユーザーを追加",
+    "editUser": "ユーザーを編集",
+    "searchPlaceholder": "ユーザー名またはお名前で検索",
+    "usernamePlaceholder": "ユーザー名またはメールアドレスを入力",
+    "passwordPlaceholder": "パスワードを入力",
+    "fullNamePlaceholder": "お名前を入力",
+    "selectRole": "役割を選択",
+    "selectStatus": "ステータスを選択",
+    "validation": {
+      "usernameRequired": "ユーザー名を入力してください",
+      "passwordRequired": "パスワードを入力してください",
+      "passwordMin": "パスワードは8文字以上である必要があります",
+      "passwordPattern": "大文字・小文字・数字を含む必要があります",
+      "roleRequired": "役割を選択してください"
+    }
+  },
+  "actions": {
+    "edit": "編集",
+    "delete": "削除",
+    "authorize": "権限",
+    "managePermissions": "権限を管理",
+    "confirmDeleteUser": "削除の確認",
+    "confirmDeleteDesc": "ユーザー\"{{username}}\"を削除してもよろしいですか？この操作は取り消せません。"
+  }
+}
