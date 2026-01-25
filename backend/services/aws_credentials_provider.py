@@ -35,22 +35,25 @@ class AWSCredentialsProvider:
     def get_credentials(self, account_id: str) -> dict[str, str]:
         """获取指定账号的凭证（AKSK 认证）
 
+        ⚠️ 注意：此方法已废弃，Backend 不应该获取凭证
+        - 凭证获取应由 AgentCore Runtime 负责
+        - 此方法仅用于向后兼容，未来版本将移除
+
         Args:
             account_id: 账号 ID
 
         Returns:
-            Dict: 凭证字典
+            Dict: 凭证字典（仅限 AKSK）或元数据（IAM Role）
                 {
-                    'access_key_id': 'AKIA...',
-                    'secret_access_key': 'wJalr...',
+                    'access_key_id': 'AKIA...',  # AKSK
+                    'secret_access_key': 'wJalr...',  # AKSK
                     'region': 'us-east-1',
                     'account_id': '123456789012',
-                    'auth_type': 'aksk'
+                    'auth_type': 'aksk' | 'iam_role'
                 }
 
         Raises:
             ValueError: 账号不存在或凭证获取失败
-            NotImplementedError: IAM Role 认证类型（已移至 costq-agents）
 
         Example:
             >>> provider = AWSCredentialsProvider()
@@ -66,18 +69,25 @@ class AWSCredentialsProvider:
             raise ValueError(f"账号不存在: {account_id}")
 
         auth_type = account.get("auth_type", "aksk")
-        logger.info(
-            f"🔍 获取凭证 - Account: {account.get('alias')} "
-            f"({account.get('account_id')}), Type: {auth_type}"
+        logger.warning(
+            f"⚠️ get_credentials() 已废弃 - Account: {account.get('alias')} "
+            f"({account.get('account_id')}), Type: {auth_type}, "
+            f"建议改用 get_account_info() 只获取元数据"
         )
 
-        # 2. 根据认证类型获取凭证
+        # 2. 根据认证类型处理
         if auth_type == "iam_role":
-            # IAM Role 认证已移至 costq-agents 仓库（AgentCore Runtime 内运行）
-            raise NotImplementedError(
-                f"IAM Role 认证类型已移至 AgentCore Runtime，请使用 AKSK 认证方式。"
-                f"账号: {account.get('alias')}"
+            # ✅ IAM Role: 不抛出错误，返回元数据（凭证由 Runtime 获取）
+            logger.info(
+                f"IAM Role 账号，返回元数据 - Account: {account.get('alias')}"
             )
+            return {
+                "auth_type": "iam_role",
+                "region": account.get("region", "us-east-1"),
+                "account_id": account.get("account_id"),
+                "alias": account.get("alias"),
+                # ⚠️ 不返回凭证字段
+            }
 
         # AKSK: 解密 Secret Access Key
         try:
@@ -272,7 +282,8 @@ class AWSCredentialsProvider:
                     'id': 'account-id-123',
                     'alias': 'Production Account',
                     'account_id': '123456789012',
-                    'region': 'us-east-1'
+                    'region': 'us-east-1',
+                    'auth_type': 'aksk' | 'iam_role'
                 }
 
         Example:
@@ -291,6 +302,7 @@ class AWSCredentialsProvider:
             "alias": account.get("alias"),
             "account_id": account.get("account_id"),
             "region": account["region"],
+            "auth_type": account.get("auth_type", "aksk"),  # ✅ 添加认证类型
             "description": account.get("description"),
             "is_verified": account.get("is_verified", False),
         }
