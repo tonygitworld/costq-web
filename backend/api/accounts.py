@@ -560,10 +560,8 @@ async def create_iam_role_account(
         AWSAccountResponse: 创建的账号信息
 
     Raises:
-        HTTPException 400: IAM Role 验证失败
         HTTPException 409: 账号别名已存在
     """
-    from backend.services.aws_credentials_provider import validate_iam_role
     from backend.services.user_storage_postgresql import UserStoragePostgreSQL
 
     account_storage = get_account_storage()
@@ -580,25 +578,19 @@ async def create_iam_role_account(
     # 1. 获取 External ID
     external_id = user_storage.get_organization_external_id(current_user["org_id"])
 
-    # 2. 验证 IAM Role
-    logger.info("🔍 验证 IAM Role...")
-    validation = validate_iam_role(
-        role_arn=account_create.role_arn, external_id=external_id, region=account_create.region
-    )
+    # 2. TODO: IAM Role 验证应由 AgentCore Runtime 负责
+    # Backend 不应该处理凭证验证（架构原则）
+    # 暂时跳过验证，直接创建账号
+    logger.warning("⚠️ 跳过 IAM Role 验证（Backend 不处理凭证验证）")
 
-    if not validation["valid"]:
-        logger.error("IAM Role : %s", validation['error'])
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"IAM Role 验证失败: {validation['error']}",
-        )
-
-    logger.info(
-        f"✅ IAM Role 验证成功 - Account: {validation['account_id']}, ARN: {validation['arn']}"
-    )
-
-    # 3. 创建账号对象
+    # 3. 创建账号对象（使用提供的 Role ARN）
+    # 从 role_arn 提取 account_id：arn:aws:iam::123456789012:role/RoleName
     from backend.models.aws_account import AuthType, AWSAccount
+    import re
+
+    # 提取 AWS 账号 ID（12位数字）
+    account_id_match = re.search(r':(\d{12}):', account_create.role_arn)
+    extracted_account_id = account_id_match.group(1) if account_id_match else None
 
     aws_account = AWSAccount(
         org_id=current_user["org_id"],
@@ -608,9 +600,9 @@ async def create_iam_role_account(
         session_duration=account_create.session_duration,
         region=account_create.region,
         description=account_create.description,
-        account_id=validation["account_id"],
-        arn=validation["arn"],
-        is_verified=True,
+        account_id=extracted_account_id,  # 从 role_arn 提取
+        arn=account_create.role_arn,  # 使用 role_arn 作为 arn
+        is_verified=False,  # ⚠️ 未验证，标记为 False
         created_at=datetime.now(),
         updated_at=datetime.now(),
     )
