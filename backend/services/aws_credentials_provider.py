@@ -85,3 +85,67 @@ def get_credentials_provider() -> AWSCredentialsProvider:
         _credentials_provider = AWSCredentialsProvider()
 
     return _credentials_provider
+
+
+# ========== IAM Role 验证（独立函数） ==========
+
+
+def validate_iam_role(
+    role_arn: str, external_id: str, region: str = "us-east-1"
+) -> dict[str, any]:
+    """验证 IAM Role（通过尝试 AssumeRole）
+
+    注意：此函数仅用于验证 IAM Role 是否可访问，不属于凭证管理范畴。
+    验证是一次性操作，用于创建账号时检查配置是否正确。
+
+    Args:
+        role_arn: IAM Role ARN (例如: arn:aws:iam::123456789012:role/CostQRole)
+        external_id: External ID（用于防止混淆代理人攻击）
+        region: AWS 区域
+
+    Returns:
+        Dict: 验证结果
+            {
+                'valid': bool,
+                'account_id': str,  # 如果成功
+                'arn': str,         # 如果成功
+                'error': str        # 如果失败
+            }
+
+    Example:
+        >>> result = validate_iam_role(
+        ...     role_arn='arn:aws:iam::123456789012:role/CostQRole',
+        ...     external_id='unique-external-id',
+        ...     region='us-east-1'
+        ... )
+        >>> if result['valid']:
+        ...     print(f"Account ID: {result['account_id']}")
+    """
+    import boto3
+
+    try:
+        # 创建 STS 客户端（使用平台自己的凭证）
+        sts = boto3.client("sts", region_name=region)
+
+        # 尝试 AssumeRole
+        response = sts.assume_role(
+            RoleArn=role_arn,
+            RoleSessionName="costq-validation",
+            ExternalId=external_id,
+            DurationSeconds=900,  # 15 分钟，仅用于验证
+        )
+
+        # 从 AssumedRole ARN 提取 Account ID
+        # 格式: arn:aws:sts::123456789012:assumed-role/RoleName/SessionName
+        assumed_role_arn = response["AssumedRoleUser"]["Arn"]
+        account_id = assumed_role_arn.split(":")[4]
+
+        logger.info(f"✅ IAM Role 验证成功 - ARN: {role_arn}, Account: {account_id}")
+
+        return {"valid": True, "account_id": account_id, "arn": role_arn}
+
+    except Exception as e:
+        error_msg = str(e)
+        logger.error(f"❌ IAM Role 验证失败 - ARN: {role_arn}, Error: {error_msg}")
+
+        return {"valid": False, "error": error_msg}
