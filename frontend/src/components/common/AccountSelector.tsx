@@ -113,47 +113,47 @@ export const AccountSelector: FC<AccountSelectorProps> = ({
         )
       }
     >
-      {accounts.map((account) => {
-        // ✅ 构建完整的提示信息
-        const tooltipContent = (
-          <div>
-            <div><strong>{account.alias}</strong></div>
-            <div>{t('common:aws.accountId')}: {account.account_id || 'N/A'}</div>
-            <div>{t('common:aws.region')}: {account.region}</div>
-            {account.is_verified && <div style={{ color: '#52c41a' }}>✓ {t('common:aws.verified')}</div>}
-          </div>
-        );
+      {accounts.map((account) => (
+        <Option
+          key={account.id}
+          value={account.id}
+          label={
+            <Space size={4}>
+              <CloudOutlined />
+              <span>{account.alias}</span>
+            </Space>
+          }
+        >
+          {/* ✅ 紧凑布局：左右对齐，信息更紧凑 */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: '100%',
+            gap: '12px'
+          }}>
+            {/* 左侧：账号名称 + 验证图标 */}
+            <Space size={6}>
+              <CloudOutlined style={{ color: '#1890ff', fontSize: '14px' }} />
+              <span style={{ fontWeight: 500, fontSize: '14px' }}>{account.alias}</span>
+              {account.is_verified && (
+                <CheckCircleOutlined style={{ color: '#52c41a', fontSize: '14px' }} />
+              )}
+            </Space>
 
-        return (
-          <Option
-            key={account.id}
-            value={account.id}
-            label={
-              <Space size={4}>
-                <CloudOutlined />
-                <span>{account.alias}</span>
-              </Space>
-            }
-          >
-            {/* ✅ 鼠标悬浮显示完整信息 */}
-            <Tooltip title={tooltipContent} placement="right" mouseEnterDelay={0.5}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                <Space>
-                  <CloudOutlined style={{ color: '#1890ff' }} />
-                  <span style={{ fontWeight: 500 }}>{account.alias}</span>
-                  {account.is_verified && (
-                    <CheckCircleOutlined style={{ color: '#52c41a' }} />
-                  )}
-                </Space>
-                <Space direction="vertical" size={0} style={{ fontSize: '12px', color: '#999', textAlign: 'right' }}>
-                  <span>{t('common:aws.accountId')}: {account.account_id || 'N/A'}</span>
-                  <span>{t('common:aws.region')}: {account.region}</span>
-                </Space>
-              </div>
-            </Tooltip>
-          </Option>
-        );
-      })}
+            {/* 右侧：账号详细信息 */}
+            <Space direction="vertical" size={0} style={{
+              fontSize: '12px',
+              color: '#999',
+              textAlign: 'right',
+              lineHeight: 1.4
+            }}>
+              <span>{account.account_id || 'N/A'}</span>
+              <span>{account.region}</span>
+            </Space>
+          </div>
+        </Option>
+      ))}
     </Select>
   );
 };
