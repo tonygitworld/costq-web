@@ -127,5 +127,10 @@
     "system": "跟随系统",
     "switchToLight": "切换到浅色模式",
     "switchToDark": "切换到深色模式"
+  },
+  "aws": {
+    "accountId": "账号ID",
+    "region": "区域",
+    "verified": "已验证"
   }
 }

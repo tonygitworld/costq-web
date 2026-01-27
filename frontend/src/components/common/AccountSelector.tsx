@@ -85,6 +85,21 @@ export const AccountSelector: FC<AccountSelectorProps> = ({
       optionLabelProp="label"
       size="middle"
       disabled={loading || accounts.length === 0}
+      // ✅ 启用搜索功能
+      showSearch
+      filterOption={(input, option) => {
+        const account = accounts.find(acc => acc.id === option?.value);
+        if (!account) return false;
+        const searchText = input.toLowerCase();
+        return (
+          account.alias.toLowerCase().includes(searchText) ||
+          (account.account_id || '').toLowerCase().includes(searchText) ||
+          (account.region || '').toLowerCase().includes(searchText)
+        );
+      }}
+      // ✅ 下拉框宽度自适应，显示完整信息
+      popupMatchSelectWidth={false}
+      dropdownStyle={{ minWidth: 360, maxWidth: 480 }}
       notFoundContent={
         loading ? (
           <div style={{ textAlign: 'center', padding: '20px' }}>
@@ -98,32 +113,47 @@ export const AccountSelector: FC<AccountSelectorProps> = ({
         )
       }
     >
-      {accounts.map((account) => (
-        <Option
-          key={account.id}
-          value={account.id}
-          label={
-            <Space size={4}>
-              <CloudOutlined />
-              <span>{account.alias}</span>
-            </Space>
-          }
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Space>
-              <CloudOutlined style={{ color: '#1890ff' }} />
-              <span style={{ fontWeight: 500 }}>{account.alias}</span>
-              {account.is_verified && (
-                <CheckCircleOutlined style={{ color: '#52c41a' }} />
-              )}
-            </Space>
-            <Space direction="vertical" size={0} style={{ fontSize: '12px', color: '#999' }}>
-              <span>{t('aws.accountId')}: {account.account_id || 'N/A'}</span>
-              <span>{t('aws.region')}: {account.region}</span>
-            </Space>
+      {accounts.map((account) => {
+        // ✅ 构建完整的提示信息
+        const tooltipContent = (
+          <div>
+            <div><strong>{account.alias}</strong></div>
+            <div>{t('common:aws.accountId')}: {account.account_id || 'N/A'}</div>
+            <div>{t('common:aws.region')}: {account.region}</div>
+            {account.is_verified && <div style={{ color: '#52c41a' }}>✓ {t('common:aws.verified')}</div>}
           </div>
-        </Option>
-      ))}
+        );
+
+        return (
+          <Option
+            key={account.id}
+            value={account.id}
+            label={
+              <Space size={4}>
+                <CloudOutlined />
+                <span>{account.alias}</span>
+              </Space>
+            }
+          >
+            {/* ✅ 鼠标悬浮显示完整信息 */}
+            <Tooltip title={tooltipContent} placement="right" mouseEnterDelay={0.5}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                <Space>
+                  <CloudOutlined style={{ color: '#1890ff' }} />
+                  <span style={{ fontWeight: 500 }}>{account.alias}</span>
+                  {account.is_verified && (
+                    <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                  )}
+                </Space>
+                <Space direction="vertical" size={0} style={{ fontSize: '12px', color: '#999', textAlign: 'right' }}>
+                  <span>{t('common:aws.accountId')}: {account.account_id || 'N/A'}</span>
+                  <span>{t('common:aws.region')}: {account.region}</span>
+                </Space>
+              </div>
+            </Tooltip>
+          </Option>
+        );
+      })}
     </Select>
   );
 };
