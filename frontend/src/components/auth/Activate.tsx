@@ -4,6 +4,7 @@ import { Form, Input, Button, Card, Typography, message, Alert, Spin } from 'ant
 import { LockOutlined, CloudOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import { authApi } from '../../services/api/authApi';
+import { getErrorMessage } from '../../utils/ErrorHandler';
 import './auth.css';
 
 const { Title, Text, Paragraph } = Typography;
@@ -56,8 +57,8 @@ export const Activate: React.FC = () => {
       setTimeout(() => {
         navigate('/login');
       }, 3000);
-    } catch (error: any) {
-      message.error(error.message || '激活失败，请重试');
+    } catch (error: unknown) {
+      message.error(getErrorMessage(error, '激活失败，请重试'));
     } finally {
       setLoading(false);
     }

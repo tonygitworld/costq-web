@@ -1,8 +1,8 @@
 /**
- * 响应式设计系统 - Compact密度（数据密集型应用）
+ * 响应式设计系统 - 舒适密度（企业级SaaS应用）
  *
  * 参考标准：
- * - Material Design 3 (2024) - Compact Density
+ * - Material Design 3 (2024) - Comfortable Density
  * - Smashing Magazine - Modern Fluid Typography (2022)
  * - Baymard Institute - Optimal Line Length Research (2024)
  * - 8pt Grid System (业界标准)
@@ -10,37 +10,38 @@
  * 核心原则：
  * 1. 使用rem单位支持用户自定义字体大小
  * 2. 流式字体确保平滑过渡
- * 3. Compact密度：字体11-13px，间距20-22px
- * 4. 适合数据密集型应用（AWS成本分析工具）
+ * 3. 舒适密度：基础字体13-14px，平衡可读性与信息密度
+ * 4. 适合企业级SaaS应用（管理后台、数据分析）
  * 5. 字体和间距比例协调，整体密度一致
  */
 
 :root {
-  /* ===== 字体系统 (Fluid Typography) - Compact密度 ===== */
-  /* 参考：Smashing Magazine - CSS clamp() 最佳实践 */
-  /* 优化目标：统一为Compact密度，适合数据密集型应用 */
+  /* ===== 字体系统 - 舒适密度（与 antd-theme.ts 同步） ===== */
+  /* 参考：ui-ux-pro-max Font Size Scale: (12 13 14 16 18 20 24) */
+  /* 优化目标：统一的舒适密度，与 Ant Design 主题完全一致 */
 
-  /* 基础字体：11px (小屏) → 13px (大屏) - Compact密度 */
-  --font-size-base: clamp(0.6875rem, 0.65rem + 0.2vw, 0.8125rem);
+  /* 基础字体：14px - 业界标准（Material Design 3, Ant Design 默认） */
+  --font-size-base: 0.875rem;    /* 14px */
 
-  /* 内容字体：12px → 14px (优化阅读体验) */
-  --font-size-content: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  /* 内容字体：14px (与基础字体一致) */
+  --font-size-content: 0.875rem; /* 14px */
 
-  /* 小字体：10px → 12px */
-  --font-size-small: clamp(0.625rem, 0.6rem + 0.15vw, 0.75rem);
+  /* 小字体：13px */
+  --font-size-small: 0.8125rem;  /* 13px */
 
-  /* 超小字体：9px → 11px */
-  --font-size-xs: clamp(0.5625rem, 0.55rem + 0.1vw, 0.6875rem);
+  /* 超小字体：12px */
+  --font-size-xs: 0.75rem;       /* 12px */
 
-  /* 大字体（用于特殊场景） */
-  --font-size-lg: clamp(0.8125rem, 0.75rem + 0.3vw, 0.9375rem);    /* 13px → 15px */
-  --font-size-xl: clamp(0.9375rem, 0.85rem + 0.4vw, 1.0625rem);    /* 15px → 17px */
+  /* 大字体 */
+  --font-size-lg: 1rem;          /* 16px */
+  --font-size-xl: 1.125rem;      /* 18px */
 
-  /* 标题字体 - Compact密度 */
-  --font-size-h1: clamp(1.375rem, 1.2rem + 0.9vw, 1.875rem);       /* 22px → 30px */
-  --font-size-h2: clamp(1.1875rem, 1rem + 0.7vw, 1.5rem);          /* 19px → 24px */
-  --font-size-h3: clamp(1.0625rem, 0.95rem + 0.45vw, 1.3125rem);   /* 17px → 21px */
-  --font-size-h4: clamp(0.9375rem, 0.85rem + 0.35vw, 1.1875rem);   /* 15px → 19px */
+  /* 标题字体 - 与 antd-theme.ts 一致 */
+  --font-size-h1: 1.5rem;        /* 24px */
+  --font-size-h2: 1.25rem;       /* 20px */
+  --font-size-h3: 1.125rem;      /* 18px */
+  --font-size-h4: 1rem;          /* 16px */
+  --font-size-h5: 0.875rem;      /* 14px */
 
   /* ===== 行高系统 ===== */
   --line-height-tight: 1.3;
@@ -48,22 +49,22 @@
   --line-height-relaxed: 1.7;
   --line-height-loose: 1.8;
 
-  /* ===== 间距系统 (8pt Grid + Fluid Spacing) - Compact密度 ===== */
+  /* ===== 间距系统 (8pt Grid + Fluid Spacing) - 舒适密度 ===== */
   /* 参考：Material Design 3 间距标准 */
-  /* 优化目标：统一为Compact密度，与字体大小协调 */
+  /* 优化目标：舒适密度，与字体大小协调 */
 
   /* 固定间距（用于小元素，保持一致性） */
   --spacing-xs: 0.25rem;   /* 4px */
   --spacing-sm: 0.5rem;    /* 8px */
-  --spacing-md: 0.875rem;  /* 14px - Compact密度 */
-  --spacing-lg: 1.25rem;   /* 20px - Compact密度 */
+  --spacing-md: 0.75rem;   /* 12px - 舒适密度 */
+  --spacing-lg: 1rem;      /* 16px - 舒适密度 */
 
-  /* 流式间距（用于布局，响应视口变化） - Compact密度 */
-  --spacing-xl: clamp(1.25rem, 1.8vw + 0.9rem, 1.75rem);   /* 20px → 28px */
-  --spacing-xxl: clamp(1.75rem, 2.7vw + 1.3rem, 2.5rem);   /* 28px → 40px */
+  /* 流式间距（用于布局，响应视口变化） - 舒适密度 */
+  --spacing-xl: clamp(1.25rem, 1.8vw + 0.9rem, 1.5rem);    /* 20px → 24px */
+  --spacing-xxl: clamp(1.5rem, 2.5vw + 1.2rem, 2rem);      /* 24px → 32px */
 
-  /* 消息间距（优化对话流） - Compact密度 */
-  --message-spacing: clamp(0.625rem, 0.9vh, 0.875rem);     /* 10px → 14px */
+  /* 消息间距（优化对话流） - 舒适密度 */
+  --message-spacing: clamp(0.625rem, 0.8vh, 0.75rem);      /* 10px → 12px */
 
   /* ===== 内容宽度系统 ===== */
   /* 参考：Baymard Institute - 最佳阅读宽度研究 (50-75字符/行) */

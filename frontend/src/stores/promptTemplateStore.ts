@@ -14,6 +14,9 @@ import type {
 } from '../types/promptTemplate';
 import * as api from '../services/promptTemplateApi';
 
+import { logger } from '../utils/logger';
+import { getErrorMessage } from '../utils/ErrorHandler';
+
 interface PromptTemplateStore {
   // 状态
   systemTemplates: PromptTemplate[];
@@ -68,11 +71,11 @@ export const usePromptTemplateStore = create<PromptTemplateStore>((set, get) => 
         retryDelay: 1000  // ✅ 1秒延迟
       });
       set({ systemTemplates: templates, systemLoading: false });
-      console.log(`✅ 加载系统模板成功 - Count: ${templates.length}`);
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.detail || error.message || '加载系统模板失败';
+      logger.debug(`✅ 加载系统模板成功 - Count: ${templates.length}`);
+    } catch (error: unknown) {
+      const errorMsg = getErrorMessage(error, '加载系统模板失败');
       set({ error: errorMsg, systemLoading: false });
-      console.error('❌ 加载系统模板失败:', error);
+      logger.error('❌ 加载系统模板失败:', error);
     }
   },
 
@@ -90,11 +93,11 @@ export const usePromptTemplateStore = create<PromptTemplateStore>((set, get) => 
         retryDelay: 1000  // ✅ 1秒延迟
       });
       set({ userTemplates: templates, userLoading: false });
-      console.log(`✅ 加载用户模板成功 - Count: ${templates.length}`);
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.detail || error.message || '加载用户模板失败';
+      logger.debug(`✅ 加载用户模板成功 - Count: ${templates.length}`);
+    } catch (error: unknown) {
+      const errorMsg = getErrorMessage(error, '加载用户模板失败');
       set({ error: errorMsg, userLoading: false });
-      console.error('❌ 加载用户模板失败:', error);
+      logger.error('❌ 加载用户模板失败:', error);
     }
   },
 
@@ -106,12 +109,12 @@ export const usePromptTemplateStore = create<PromptTemplateStore>((set, get) => 
         userTemplates: [...state.userTemplates, newTemplate],
         userLoading: false
       }));
-      console.log(`✅ 创建模板成功 - ID: ${newTemplate.id}, Title: ${newTemplate.title}`);
+      logger.debug(`✅ 创建模板成功 - ID: ${newTemplate.id}, Title: ${newTemplate.title}`);
       return newTemplate;
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.detail || error.message || '创建模板失败';
+    } catch (error: unknown) {
+      const errorMsg = getErrorMessage(error, '创建模板失败');
       set({ error: errorMsg, userLoading: false });
-      console.error('❌ 创建模板失败:', error);
+      logger.error('❌ 创建模板失败:', error);
       throw error;
     }
   },
@@ -126,12 +129,12 @@ export const usePromptTemplateStore = create<PromptTemplateStore>((set, get) => 
         ),
         userLoading: false
       }));
-      console.log(`✅ 更新模板成功 - ID: ${id}`);
+      logger.debug(`✅ 更新模板成功 - ID: ${id}`);
       return updatedTemplate;
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.detail || error.message || '更新模板失败';
+    } catch (error: unknown) {
+      const errorMsg = getErrorMessage(error, '更新模板失败');
       set({ error: errorMsg, userLoading: false });
-      console.error('❌ 更新模板失败:', error);
+      logger.error('❌ 更新模板失败:', error);
       throw error;
     }
   },
@@ -144,11 +147,11 @@ export const usePromptTemplateStore = create<PromptTemplateStore>((set, get) => 
         userTemplates: state.userTemplates.filter(t => t.id !== id),
         userLoading: false
       }));
-      console.log(`✅ 删除模板成功 - ID: ${id}`);
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.detail || error.message || '删除模板失败';
+      logger.debug(`✅ 删除模板成功 - ID: ${id}`);
+    } catch (error: unknown) {
+      const errorMsg = getErrorMessage(error, '删除模板失败');
       set({ error: errorMsg, userLoading: false });
-      console.error('❌ 删除模板失败:', error);
+      logger.error('❌ 删除模板失败:', error);
       throw error;
     }
   },
@@ -161,11 +164,11 @@ export const usePromptTemplateStore = create<PromptTemplateStore>((set, get) => 
           t.id === id ? { ...t, is_favorite: result.is_favorite } : t
         )
       }));
-      console.log(`✅ 切换收藏成功 - ID: ${id}, Favorite: ${result.is_favorite}`);
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.detail || error.message || '切换收藏失败';
+      logger.debug(`✅ 切换收藏成功 - ID: ${id}, Favorite: ${result.is_favorite}`);
+    } catch (error: unknown) {
+      const errorMsg = getErrorMessage(error, '切换收藏失败');
       set({ error: errorMsg });
-      console.error('❌ 切换收藏失败:', error);
+      logger.error('❌ 切换收藏失败:', error);
       throw error;
     }
   },
@@ -176,11 +179,11 @@ export const usePromptTemplateStore = create<PromptTemplateStore>((set, get) => 
     try {
       const commands = await api.getSlashCommands();
       set({ slashCommands: commands });
-      console.log(`✅ 加载斜杠命令成功 - Count: ${commands.length}`);
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.detail || error.message || '加载斜杠命令失败';
+      logger.debug(`✅ 加载斜杠命令成功 - Count: ${commands.length}`);
+    } catch (error: unknown) {
+      const errorMsg = getErrorMessage(error, '加载斜杠命令失败');
       set({ error: errorMsg });
-      console.error('❌ 加载斜杠命令失败:', error);
+      logger.error('❌ 加载斜杠命令失败:', error);
     }
   },
 
@@ -189,8 +192,8 @@ export const usePromptTemplateStore = create<PromptTemplateStore>((set, get) => 
   executeTemplate: async (id, variables = {}) => {
     try {
       const result = await api.executeTemplate(id, { variables });
-      console.log(`✅ 执行模板成功 - ID: ${id}, UsageCount: ${result.usage_count}`);
-      console.log(`   渲染后的 Prompt: ${result.rendered_prompt}`);
+      logger.debug(`✅ 执行模板成功 - ID: ${id}, UsageCount: ${result.usage_count}`);
+      logger.debug(`   渲染后的 Prompt: ${result.rendered_prompt}`);
 
       // 更新使用计数（系统模板或用户模板）
       set(state => ({
@@ -203,10 +206,10 @@ export const usePromptTemplateStore = create<PromptTemplateStore>((set, get) => 
       }));
 
       return result.rendered_prompt;
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.detail || error.message || '执行模板失败';
+    } catch (error: unknown) {
+      const errorMsg = getErrorMessage(error, '执行模板失败');
       set({ error: errorMsg });
-      console.error('❌ 执行模板失败:', error);
+      logger.error('❌ 执行模板失败:', error);
       throw error;
     }
   },

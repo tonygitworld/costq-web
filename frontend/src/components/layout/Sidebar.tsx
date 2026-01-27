@@ -12,7 +12,7 @@ import {
   DashboardOutlined,
   FileSearchOutlined,
 } from '@ant-design/icons';
-import type { MenuProps } from 'antd';
+import type { MenuProps, MenuInfo } from 'antd/es/menu/menu';
 import { ChatHistory } from '../sidebar/ChatHistory';
 import { useChatStore } from '../../stores/chatStore';
 import { useAccountStore } from '../../stores/accountStore';
@@ -20,6 +20,8 @@ import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import { useAuthStore } from '../../stores/authStore';
 import { useI18n } from '../../hooks/useI18n';
 import '../../styles/sidebar.css';
+
+import { logger } from '../../utils/logger';
 
 const { Title } = Typography;
 
@@ -54,26 +56,26 @@ export const Sidebar: FC = () => {
 
   const handleNewChat = () => {
     const oldChatId = useChatStore.getState().currentChatId;
-    
+
     // ✅ 第一步：先导航到主页，确保 URL 立即更新（避免 URL → Store 同步逻辑切换回旧会话）
     navigate('/', { replace: true });
-    
+
     // ✅ 第二步：清除当前会话（在导航后，避免 URL 同步逻辑干扰）
     useChatStore.setState({ currentChatId: null });
-    
+
     // ✅ 第三步：创建新对话（使用 setTimeout 确保导航和状态清除完成后再创建）
     // ✅ 使用较长的延迟，确保 URL 更新完成，避免 URL → Store 同步逻辑干扰
     setTimeout(() => {
       // ✅ 再次检查 URL，确保已经是主页
       if (location.pathname === '/') {
         const newChatId = createNewChat();
-        console.log(`🆕 [Sidebar] 创建新会话: ${newChatId}，清除旧会话: ${oldChatId}，导航到主页（等待用户发送第一条消息）`);
+        logger.debug(`🆕 [Sidebar] 创建新会话: ${newChatId}，清除旧会话: ${oldChatId}，导航到主页（等待用户发送第一条消息）`);
       } else {
-        console.warn(`⚠️ [Sidebar] URL 还未更新到主页，延迟创建新会话: ${location.pathname}`);
+        logger.warn(`⚠️ [Sidebar] URL 还未更新到主页，延迟创建新会话: ${location.pathname}`);
         // 如果 URL 还没更新，再等一会儿
         setTimeout(() => {
           const newChatId = createNewChat();
-          console.log(`🆕 [Sidebar] 延迟创建新会话: ${newChatId}，清除旧会话: ${oldChatId}`);
+          logger.debug(`🆕 [Sidebar] 延迟创建新会话: ${newChatId}，清除旧会话: ${oldChatId}`);
         }, 50);
       }
     }, 10);
@@ -82,9 +84,12 @@ export const Sidebar: FC = () => {
   // 计算总账号数
   const totalAccounts = awsAccounts.length + gcpAccounts.length;
 
+  // 菜单点击事件处理器类型
+  type MenuItemClickHandler = (e: MenuInfo) => void;
+
   // 设置菜单项（根据用户角色动态构建）
   const buildSettingsMenu = (): MenuItem[] => {
-    const children: any[] = [];
+    const children: MenuItem[] = [];
 
     // 管理员专属菜单项
     if (isAdmin()) {
@@ -102,20 +107,20 @@ export const Sidebar: FC = () => {
             )}
           </Space>
         ),
-        onClick: (e: any) => {
+        onClick: ((e: MenuInfo) => {
           e.domEvent.stopPropagation();
           navigate('/settings/cloud-accounts');
-        }
+        }) as MenuItemClickHandler
       });
 
       children.push({
         key: 'user-management',
         icon: <TeamOutlined />,
         label: t('chat:sidebar.userManagement'),
-        onClick: (e: any) => {
+        onClick: ((e: MenuInfo) => {
           e.domEvent.stopPropagation();
           navigate('/settings/users');
-        }
+        }) as MenuItemClickHandler
       });
     }
 
@@ -124,10 +129,10 @@ export const Sidebar: FC = () => {
       key: 'alert-management',
       icon: <BellOutlined />,
       label: '告警管理',
-      onClick: (e: any) => {
+      onClick: ((e: MenuInfo) => {
         e.domEvent.stopPropagation();
         navigate('/settings/alerts');
-      }
+      }) as MenuItemClickHandler
     });
 
     return [
@@ -154,28 +159,28 @@ export const Sidebar: FC = () => {
             key: 'ops-dashboard',
             icon: <DashboardOutlined />,
             label: '运营 Dashboard',
-            onClick: (e: any) => {
+            onClick: ((e: MenuInfo) => {
               e.domEvent.stopPropagation();
               navigate('/ops/dashboard');
-            }
+            }) as MenuItemClickHandler
           },
           {
             key: 'ops-tenants',
             icon: <TeamOutlined />,
             label: '租户管理',
-            onClick: (e: any) => {
+            onClick: ((e: MenuInfo) => {
               e.domEvent.stopPropagation();
               navigate('/ops/tenants');
-            }
+            }) as MenuItemClickHandler
           },
           {
             key: 'ops-audit-logs',
             icon: <FileSearchOutlined />,
             label: '审计日志',
-            onClick: (e: any) => {
+            onClick: ((e: MenuInfo) => {
               e.domEvent.stopPropagation();
               navigate('/ops/audit-logs');
-            }
+            }) as MenuItemClickHandler
           },
         ],
       }

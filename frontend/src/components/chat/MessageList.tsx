@@ -130,6 +130,12 @@ export const MessageList: FC = () => {
     if (!content || !container) return;
 
     const resizeObserver = new ResizeObserver(() => {
+      // 🔧 关键修复：只在流式输出时才响应高度变化
+      // 非流式状态下，用户可能在展开/折叠详情，不应该自动滚动
+      if (!isStreaming) {
+        return;
+      }
+
       const { scrollHeight, scrollTop, clientHeight } = container;
       const distanceToBottom = scrollHeight - scrollTop - clientHeight;
 

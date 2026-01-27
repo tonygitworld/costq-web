@@ -1,0 +1,94 @@
+{
+  "dashboard": {
+    "title": "運営ダッシュボード",
+    "totalTenants": "テナント総数",
+    "totalUsers": "ユーザー総数",
+    "todayActive": "今日のアクティブ",
+    "todayQueries": "今日のクエリ",
+    "trendData": "トレンドデータ",
+    "tenantStatus": "テナントステータス",
+    "activated": "有効",
+    "pending": "審査待ち"
+  },
+  "tenant": {
+    "list": {
+      "title": "テナント一覧",
+      "searchPlaceholder": "テナント名を検索"
+    },
+    "table": {
+      "name": "テナント名",
+      "status": "ステータス",
+      "userCount": "ユーザー数",
+      "createdAt": "作成日時",
+      "lastActive": "最終アクティブ",
+      "actions": "操作"
+    },
+    "status": {
+      "activated": "有効",
+      "pending": "審査待ち"
+    },
+    "detail": {
+      "title": "テナント詳細",
+      "tenantId": "テナント ID"
+    },
+    "action": {
+      "activate": "テナントを有効化",
+      "deactivate": "テナントを無効化",
+      "confirmActivate": "有効化の確認",
+      "confirmDeactivate": "無効化の確認",
+      "confirmActivateContent": "このテナントを有効化しますか？",
+      "confirmDeactivateContent": "このテナントを無効化しますか？無効化すると、このテナントのすべてのユーザーはログインできなくなります。"
+    },
+    "message": {
+      "activateSuccess": "テナントが有効化されました",
+      "deactivateSuccess": "テナントが無効化されました",
+      "operationFailed": "操作に失敗しました"
+    }
+  },
+  "user": {
+    "table": {
+      "username": "ユーザー名",
+      "email": "メールアドレス",
+      "role": "役割",
+      "status": "ステータス",
+      "createdAt": "作成日時",
+      "lastLogin": "最終ログイン"
+    },
+    "role": {
+      "admin": "管理者",
+      "user": "一般ユーザー"
+    },
+    "status": {
+      "active": "有効",
+      "disabled": "無効"
+    }
+  },
+  "audit": {
+    "title": "監査ログ",
+    "table": {
+      "time": "時刻",
+      "tenant": "テナント",
+      "user": "ユーザー",
+      "action": "操作"
+    },
+    "filter": {
+      "today": "今日",
+      "last7Days": "過去7日間",
+      "last30Days": "過去30日間",
+      "selectTenant": "テナントを選択",
+      "selectUser": "ユーザーを選択",
+      "actionType": "操作タイプ",
+      "searchPlaceholder": "検索（テナント/ユーザー/詳細）"
+    }
+  },
+  "trend": {
+    "date": "日付",
+    "activeUsers": "アクティブユーザー",
+    "queries": "クエリ数"
+  },
+  "common": {
+    "confirm": "確認",
+    "cancel": "キャンセル",
+    "updatedAt": "更新日時"
+  }
+}

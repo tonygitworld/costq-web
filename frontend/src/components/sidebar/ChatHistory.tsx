@@ -1,12 +1,15 @@
 // ChatHistory component - Chat history list
 import { type FC, useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+// useNavigate, useLocation - 保留用于未来功能扩展
+import 'react-router-dom';
 import { Flex, Typography, Empty, Button, Checkbox, Space, App, message } from 'antd';
 import { DeleteOutlined, CheckSquareOutlined, CloseSquareOutlined } from '@ant-design/icons';
 import { useChatStore } from '../../stores/chatStore';
 import { useI18n } from '../../hooks/useI18n';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+
+import { logger } from '../../utils/logger';
 
 dayjs.extend(relativeTime);
 
@@ -28,9 +31,9 @@ export const ChatHistory: FC = () => {
     const loadChats = async () => {
       try {
         await loadFromStorage();
-        console.log('✅ ChatHistory: 聊天历史加载完成');
+        logger.debug('✅ ChatHistory: 聊天历史加载完成');
       } catch (error) {
-        console.error('❌ ChatHistory: 加载聊天历史失败', error);
+        logger.error('❌ ChatHistory: 加载聊天历史失败', error);
       }
     };
 
@@ -44,13 +47,13 @@ export const ChatHistory: FC = () => {
   const chatList = Object.values(chats)
     .filter(chat => {
       const chatMessages = messages[chat.id] || [];
-      
+
       // ✅ 如果会话有 messageCount 字段，说明是从后端加载的，应该显示
       // （即使消息为空，因为消息是懒加载的）
       if (chat.messageCount !== undefined) {
         return true;
       }
-      
+
       // ✅ 如果会话没有 messageCount 字段，说明是前端临时创建的
       // 只有有消息时才显示（至少有一条消息）
       return chatMessages.length > 0;
@@ -60,7 +63,7 @@ export const ChatHistory: FC = () => {
   // 处理单个删除
   const handleDeleteSingle = (chatId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('handleDeleteSingle called for chatId:', chatId);
+    logger.debug('handleDeleteSingle called for chatId:', chatId);
     modal.confirm({
       title: t('history.confirmDelete'),
       content: t('history.confirmDeleteDesc'),
@@ -68,12 +71,12 @@ export const ChatHistory: FC = () => {
       okType: 'danger',
       cancelText: t('common:button.cancel'),
       onOk: async () => {
-        console.log('Deleting chat:', chatId);
+        logger.debug('Deleting chat:', chatId);
         try {
           await deleteChat(chatId);
-          console.log('✅ Chat deleted successfully');
+          logger.debug('✅ Chat deleted successfully');
         } catch (error) {
-          console.error('❌ Failed to delete chat:', error);
+          logger.error('❌ Failed to delete chat:', error);
           message.error(t('history.deleteFailed'));
         }
       }
@@ -91,14 +94,14 @@ export const ChatHistory: FC = () => {
       okType: 'danger',
       cancelText: t('common:button.cancel'),
       onOk: async () => {
-        console.log('Deleting selected chats:', selectedChats);
+        logger.debug('Deleting selected chats:', selectedChats);
         try {
           await deleteChats(selectedChats);
-          console.log('✅ Selected chats deleted successfully');
+          logger.debug('✅ Selected chats deleted successfully');
           setSelectedChats([]);
           setIsSelectionMode(false);
         } catch (error) {
-          console.error('❌ Failed to delete selected chats:', error);
+          logger.error('❌ Failed to delete selected chats:', error);
           message.error(t('history.deleteFailed'));
         }
       }
@@ -107,7 +110,7 @@ export const ChatHistory: FC = () => {
 
   // 处理清空所有
   const handleClearAll = () => {
-    console.log('handleClearAll called, chatList.length:', chatList.length);
+    logger.debug('handleClearAll called, chatList.length:', chatList.length);
     modal.confirm({
       title: t('history.confirmClearAll'),
       content: t('history.confirmClearAllDesc'),
@@ -115,14 +118,14 @@ export const ChatHistory: FC = () => {
       okType: 'danger',
       cancelText: t('common:button.cancel'),
       onOk: async () => {
-        console.log('Clearing all chats');
+        logger.debug('Clearing all chats');
         try {
           await clearAllChats();
-          console.log('✅ All chats cleared successfully');
+          logger.debug('✅ All chats cleared successfully');
           setSelectedChats([]);
           setIsSelectionMode(false);
         } catch (error) {
-          console.error('❌ Failed to clear all chats:', error);
+          logger.error('❌ Failed to clear all chats:', error);
           message.error(t('history.deleteFailed'));
         }
       }

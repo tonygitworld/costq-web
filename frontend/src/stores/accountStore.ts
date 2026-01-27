@@ -5,6 +5,8 @@ import { accountApi } from '../services/api/accountApi';
 import type { AuthType } from '../types/awsAccount';
 import { AuthType as AuthTypeEnum } from '../types/awsAccount';
 
+import { logger } from '../utils/logger';
+
 export type { AuthType };
 export { AuthTypeEnum as AuthTypeValues };
 
@@ -96,7 +98,7 @@ export const useAccountStore = create<AccountState>()(
     // ✅ 去重：如果正在加载，直接返回
     const state = get();
     if (state.loading) {
-      console.log('⏳ AWS 账号正在加载中，跳过重复调用');
+      logger.debug('⏳ AWS 账号正在加载中，跳过重复调用');
       return;
     }
 

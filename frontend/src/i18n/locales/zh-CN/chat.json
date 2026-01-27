@@ -84,5 +84,10 @@
     "error": "连接错误",
     "unknown": "未知状态",
     "reconnect": "重新连接"
+  },
+  "pdf": {
+    "title": "AI助手回复",
+    "generatedAt": "生成时间",
+    "dateFormat": "YYYY年MM月DD日 HH:mm:ss"
   }
 }

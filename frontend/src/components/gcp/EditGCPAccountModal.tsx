@@ -3,6 +3,7 @@ import { type FC, useEffect, useState } from 'react';
 import { Modal, Form, Input, Alert, message as antMessage } from 'antd';
 import { GoogleOutlined, EditOutlined } from '@ant-design/icons';
 import { useGCPAccountStore } from '../../stores/gcpAccountStore';
+import { useI18n } from '../../hooks/useI18n';
 import type { GCPAccount } from '../../types/gcpAccount';
 
 const { TextArea } = Input;
@@ -23,6 +24,7 @@ export const EditGCPAccountModal: FC<EditGCPAccountModalProps> = ({
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
   const { updateAccount } = useGCPAccountStore();
+  const { t } = useI18n(['gcp', 'common']);
 
   // 当账号数据变化时，更新表单
   useEffect(() => {
@@ -52,12 +54,12 @@ export const EditGCPAccountModal: FC<EditGCPAccountModalProps> = ({
         billing_export_table: values.billing_export_table,
       });
 
-      antMessage.success('GCP 账号更新成功！');
+      antMessage.success(t('gcp:account.message.updateSuccess'));
       onCancel();
       onSuccess?.();
     } catch (error) {
       if (error instanceof Error) {
-        antMessage.error(error.message || '更新 GCP 账号失败');
+        antMessage.error(error.message || t('gcp:account.message.updateFailed'));
       }
     } finally {
       setSubmitting(false);
@@ -76,21 +78,21 @@ export const EditGCPAccountModal: FC<EditGCPAccountModalProps> = ({
       title={
         <span>
           <EditOutlined style={{ color: '#4285F4', marginRight: 8 }} />
-          编辑 GCP 账号
+          {t('gcp:account.editModal.title')}
         </span>
       }
       open={visible}
       onOk={handleSubmit}
       onCancel={handleCancel}
       confirmLoading={submitting}
-      okText="保存"
-      cancelText="取消"
+      okText={t('common:button.save')}
+      cancelText={t('common:button.cancel')}
       width={700}
       destroyOnClose
     >
       <Alert
-        message="提示"
-        description="Service Account 信息不可修改。如需更换 Service Account，请删除后重新添加。"
+        message={t('gcp:account.editModal.tip')}
+        description={t('common:hint.serviceAccountReadonly')}
         type="info"
         showIcon
         style={{ marginBottom: 16 }}
@@ -103,8 +105,8 @@ export const EditGCPAccountModal: FC<EditGCPAccountModalProps> = ({
       >
         {/* 只读字段：GCP 项目 ID */}
         <Form.Item
-          label="GCP 项目 ID"
-          tooltip="此字段不可修改"
+          label={t('gcp:account.form.projectId')}
+          tooltip={t('gcp:account.form.projectIdReadonly')}
         >
           <Input
             value={account.project_id}
@@ -116,7 +118,7 @@ export const EditGCPAccountModal: FC<EditGCPAccountModalProps> = ({
         {/* 只读字段：Service Account */}
         <Form.Item
           label="Service Account"
-          tooltip="此字段不可修改"
+          tooltip={t('gcp:account.form.projectIdReadonly')}
         >
           <Input
             value={account.service_account_email}
@@ -127,29 +129,29 @@ export const EditGCPAccountModal: FC<EditGCPAccountModalProps> = ({
 
         {/* 可编辑字段：账号名称 */}
         <Form.Item
-          label="账号名称"
+          label={t('gcp:account.form.name')}
           name="account_name"
           rules={[
-            { required: true, message: '请输入账号名称' },
-            { max: 100, message: '名称不能超过100个字符' }
+            { required: true, message: t('gcp:account.form.nameRequired') },
+            { max: 100, message: t('gcp:account.form.nameMaxLength') }
           ]}
         >
           <Input
             prefix={<GoogleOutlined />}
-            placeholder="例如：Production GCP"
+            placeholder={t('gcp:account.form.namePlaceholder')}
             maxLength={100}
           />
         </Form.Item>
 
         {/* 可编辑字段：描述 */}
         <Form.Item
-          label="描述（可选）"
+          label={t('gcp:account.form.description')}
           name="description"
-          rules={[{ max: 500, message: '描述不能超过500个字符' }]}
+          rules={[{ max: 500, message: t('gcp:account.form.descriptionMaxLength') }]}
         >
           <TextArea
             rows={2}
-            placeholder="例如：生产环境 GCP 项目，用于成本分析"
+            placeholder={t('gcp:account.form.descriptionPlaceholder')}
             maxLength={500}
             showCount
           />
@@ -157,15 +159,15 @@ export const EditGCPAccountModal: FC<EditGCPAccountModalProps> = ({
 
         {/* BigQuery Billing Export 配置 */}
         <Alert
-          message="BigQuery Billing Export 配置（可选）"
+          message={t('gcp:account.form.billingExportDataset')}
           description={
             <div>
-              <p>修改 BigQuery 配置以更新成本分析数据源。</p>
+              <p>{t('common:hint.billingExportTip')}</p>
               <p style={{ marginTop: 8, marginBottom: 0 }}>
-                <strong>示例：</strong>完整表路径是 <code>cy-export.cy_export.gcp_billing_export_resource_v1_XXX</code>，则分别填写：
-                <br />• 项目 ID: <code>cy-export</code>
+                <strong>{t('common:label.example')}:</strong> <code>cy-export.cy_export.gcp_billing_export_resource_v1_XXX</code>
+                <br />• {t('gcp:account.form.projectId')}: <code>cy-export</code>
                 <br />• Dataset: <code>cy_export</code>
-                <br />• 表名: <code>gcp_billing_export_resource_v1_XXX</code>（只填表名部分）
+                <br />• {t('gcp:account.form.tableName')}: <code>gcp_billing_export_resource_v1_XXX</code>
               </p>
             </div>
           }
@@ -175,34 +177,32 @@ export const EditGCPAccountModal: FC<EditGCPAccountModalProps> = ({
         />
 
         <Form.Item
-          label="BigQuery 项目 ID"
+          label={t('gcp:account.form.projectId')}
           name="billing_export_project_id"
-          tooltip="BigQuery billing export 数据所在的 GCP 项目 ID"
         >
           <Input
-            placeholder="例如：cy-export"
+            placeholder={t('gcp:account.form.datasetIdPlaceholder')}
             prefix={<GoogleOutlined />}
           />
         </Form.Item>
 
         <Form.Item
-          label="BigQuery Dataset 名称"
+          label={t('gcp:account.form.datasetId')}
           name="billing_export_dataset"
-          tooltip="BigQuery 中存储 billing export 的 dataset 名称（下划线格式）"
         >
           <Input
-            placeholder="例如：cy_export"
+            placeholder={t('gcp:account.form.billingExportDatasetPlaceholder')}
             prefix={<GoogleOutlined />}
           />
         </Form.Item>
 
         <Form.Item
-          label="BigQuery 表名"
+          label={t('gcp:account.form.tableName')}
           name="billing_export_table"
-          tooltip="只填写表名（不包含项目和 dataset），通常以 gcp_billing_export_resource_v1_ 开头"
+          tooltip={t('gcp:account.form.tableNameTooltip')}
         >
           <Input
-            placeholder="例如：gcp_billing_export_resource_v1_015B75_932950_C931B5"
+            placeholder={t('gcp:account.form.tableNamePlaceholder')}
             prefix={<GoogleOutlined />}
           />
         </Form.Item>

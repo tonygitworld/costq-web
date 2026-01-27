@@ -1,5 +1,5 @@
 // MessageItem component - Individual message display
-import { type FC } from 'react';
+import { type FC, memo } from 'react';
 import { Avatar, Typography, Button, Tooltip, Alert } from 'antd';
 import { UserOutlined, RobotOutlined, DownloadOutlined, CopyOutlined, StopOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { type Message } from '../../types/chat';
@@ -18,13 +18,15 @@ import StatusCard from './StatusCard';
 import './MessageItem.css';
 import './MessageLayout.css';
 
+import { logger } from '../../utils/logger';
+
 const { Text } = Typography;
 
 interface MessageItemProps {
   message: Message;
 }
 
-export const MessageItem: FC<MessageItemProps> = ({ message }) => {
+const MessageItemComponent: FC<MessageItemProps> = ({ message }) => {
   const isUser = message.type === 'user';
   const { t } = useI18n('chat');
 
@@ -109,7 +111,7 @@ export const MessageItem: FC<MessageItemProps> = ({ message }) => {
     (message.meta.status === 'completed' || message.meta.status === 'failed' || message.meta.status === 'cancelled');
 
   if (message.type === 'assistant' && (message.contentBlocks?.length ?? 0) > 0) {
-    console.log('🔍 [MessageItem] 操作按钮显示条件检查:', {
+    logger.debug('🔍 [MessageItem] 操作按钮显示条件检查:', {
       messageId: message.id,
       isStreaming: message.meta.isStreaming,
       status: message.meta.status,
@@ -333,3 +335,22 @@ export const MessageItem: FC<MessageItemProps> = ({ message }) => {
     </div>
   );
 };
+
+// ✅ 使用 React.memo 优化渲染性能，避免不必要的重渲染
+export const MessageItem = memo(MessageItemComponent, (prevProps, nextProps) => {
+  // 自定义比较函数：只在关键属性变化时重渲染
+  const prevMsg = prevProps.message;
+  const nextMsg = nextProps.message;
+
+  return (
+    prevMsg.id === nextMsg.id &&
+    prevMsg.content === nextMsg.content &&
+    prevMsg.meta?.status === nextMsg.meta?.status &&
+    prevMsg.meta?.isStreaming === nextMsg.meta?.isStreaming &&
+    prevMsg.meta?.streamingProgress === nextMsg.meta?.streamingProgress &&
+    prevMsg.thinking === nextMsg.thinking &&
+    prevMsg.toolCalls?.length === nextMsg.toolCalls?.length &&
+    prevMsg.contentBlocks?.length === nextMsg.contentBlocks?.length &&
+    prevMsg.showStatus === nextMsg.showStatus
+  );
+});

@@ -28,7 +28,9 @@
     "copy": "复制",
     "viewDetails": "查看详情",
     "collapse": "收起",
-    "expand": "展开"
+    "expand": "展开",
+    "paste": "粘贴",
+    "selectFile": "选择文件"
   },
   "status": {
     "active": "正常",
@@ -44,11 +46,31 @@
     "error": "错误",
     "warning": "警告",
     "info": "信息",
-    "loading": "加载中",
+    "loading": "加载中...",
     "connected": "已连接",
     "disconnected": "未连接",
     "online": "在线",
-    "offline": "离线"
+    "offline": "离线",
+    "configured": "已配置",
+    "notConfigured": "未配置"
+  },
+  "pagination": {
+    "total": "共 {{total}} 项"
+  },
+  "hint": {
+    "selectedCount": "已选择 {{count}} 项",
+    "supportJsonFile": "支持 .json 格式文件",
+    "billingExportTip": "如果你已配置了 Billing Export 到 BigQuery，可以填写以下信息以启用成本分析功能。",
+    "serviceAccountReadonly": "Service Account 信息不可修改。如需更换，请删除后重新添加。"
+  },
+  "label": {
+    "example": "示例"
+  },
+  "security": {
+    "tip": "安全提示",
+    "encryptedStorage": "凭证将加密存储在数据库中",
+    "minimalPermission": "建议授予最小权限",
+    "rotateKey": "定期轮换密钥以提高安全性"
   },
   "role": {
     "admin": "管理员",
@@ -98,5 +120,12 @@
     "networkError": "网络错误，请稍后重试",
     "permissionDenied": "权限不足",
     "notFound": "未找到相关内容"
+  },
+  "theme": {
+    "light": "浅色模式",
+    "dark": "深色模式",
+    "system": "跟随系统",
+    "switchToLight": "切换到浅色模式",
+    "switchToDark": "切换到深色模式"
   }
 }

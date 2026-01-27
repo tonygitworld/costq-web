@@ -1,0 +1,75 @@
+{
+  "account": {
+    "title": "GCP Account Management",
+    "addButton": "Add GCP Account",
+    "addModal": {
+      "title": "Add GCP Account",
+      "tip": "Service Account permissions will be verified automatically when adding"
+    },
+    "editModal": {
+      "title": "Edit GCP Account",
+      "tip": "Note"
+    },
+    "table": {
+      "name": "Account Name",
+      "organization": "Organization/Billing Account",
+      "description": "Description",
+      "status": "Status",
+      "createdAt": "Created At",
+      "actions": "Actions"
+    },
+    "status": {
+      "verified": "Credentials Verified",
+      "unverified": "Not Verified"
+    },
+    "form": {
+      "name": "Account Name",
+      "nameRequired": "Please enter account name",
+      "nameMaxLength": "Name cannot exceed 100 characters",
+      "namePlaceholder": "e.g., Production GCP",
+      "nameTooltip": "Set an easily identifiable name, e.g., Production GCP",
+      "description": "Description (Optional)",
+      "descriptionMaxLength": "Description cannot exceed 500 characters",
+      "descriptionPlaceholder": "e.g., Production GCP project for cost analysis",
+      "serviceAccountKey": "Service Account JSON Key",
+      "serviceAccountKeyTooltip": "JSON key file downloaded from GCP Console",
+      "serviceAccountKeyRequired": "Please paste JSON Key",
+      "serviceAccountKeyInvalid": "Please paste Service Account JSON Key",
+      "serviceAccountKeyTypeError": "Must be a service_account type key",
+      "serviceAccountKeyFormatError": "Invalid JSON format",
+      "projectId": "Project ID",
+      "projectIdReadonly": "This field cannot be modified",
+      "datasetId": "Dataset ID",
+      "datasetIdPlaceholder": "e.g., cy-export",
+      "tableName": "Table Name",
+      "tableNamePlaceholder": "e.g., gcp_billing_export_resource_v1_015B75_932950_C931B5",
+      "tableNameTooltip": "Enter table name only (without project and dataset), usually starts with gcp_billing_export_resource_v1_",
+      "billingExportDataset": "Billing Export Dataset",
+      "billingExportDatasetPlaceholder": "e.g., cy_export"
+    },
+    "action": {
+      "edit": "Edit Account",
+      "verify": "Verify Credentials",
+      "delete": "Delete",
+      "confirmDelete": "Confirm Delete",
+      "confirmDeleteContent": "Are you sure you want to delete this GCP account? This action cannot be undone."
+    },
+    "message": {
+      "addSuccess": "GCP account added successfully",
+      "addFailed": "Failed to add GCP account",
+      "updateSuccess": "GCP account updated successfully",
+      "updateFailed": "Failed to update GCP account",
+      "deleteSuccess": "GCP account deleted",
+      "deleteFailed": "Failed to delete GCP account",
+      "verifySuccess": "Credentials verified successfully",
+      "verifyFailed": "Verification failed"
+    },
+    "empty": {
+      "title": "No GCP Accounts Added",
+      "description": "Click \"Add Account\" button to get started"
+    },
+    "selector": {
+      "placeholder": "Select GCP account to query"
+    }
+  }
+}

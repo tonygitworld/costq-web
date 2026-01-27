@@ -5,6 +5,9 @@ import initFont from 'jspdf-font';
 import autoTable from 'jspdf-autotable';
 import dayjs from 'dayjs';
 
+import { logger } from './logger';
+import i18n from '../i18n';
+
 // 全局初始化中文字体（只需执行一次）
 let fontInitialized = false;
 
@@ -90,13 +93,14 @@ export const exportMessageToPDF = (content: string, timestamp: number) => {
     // 添加标题
     doc.setFontSize(18);
     doc.setTextColor(102, 126, 234);
-    doc.text('AI助手回复', margin, yPosition);
+    doc.text(i18n.t('chat:pdf.title'), margin, yPosition);
     yPosition += 10;
 
     // 添加时间戳
     doc.setFontSize(10);
     doc.setTextColor(102, 102, 102);
-    doc.text(`生成时间: ${dayjs(timestamp).format('YYYY年MM月DD日 HH:mm:ss')}`, margin, yPosition);
+    const dateFormat = i18n.t('chat:pdf.dateFormat');
+    doc.text(`${i18n.t('chat:pdf.generatedAt')}: ${dayjs(timestamp).format(dateFormat)}`, margin, yPosition);
     yPosition += 5;
 
     // 添加分隔线
@@ -262,7 +266,7 @@ export const exportMessageToPDF = (content: string, timestamp: number) => {
     doc.save(filename);
 
   } catch (error) {
-    console.error('PDF生成失败:', error);
-    alert('PDF生成失败，请重试');
+    logger.error('PDF生成失败:', error);
+    alert(i18n.t('error:pdf.generationFailed'));
   }
 };

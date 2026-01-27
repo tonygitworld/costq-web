@@ -1,0 +1,94 @@
+{
+  "dashboard": {
+    "title": "Operations Dashboard",
+    "totalTenants": "Total Tenants",
+    "totalUsers": "Total Users",
+    "todayActive": "Active Today",
+    "todayQueries": "Queries Today",
+    "trendData": "Trend Data",
+    "tenantStatus": "Tenant Status",
+    "activated": "Activated",
+    "pending": "Pending Review"
+  },
+  "tenant": {
+    "list": {
+      "title": "Tenant List",
+      "searchPlaceholder": "Search tenant name"
+    },
+    "table": {
+      "name": "Tenant Name",
+      "status": "Status",
+      "userCount": "Users",
+      "createdAt": "Created At",
+      "lastActive": "Last Active",
+      "actions": "Actions"
+    },
+    "status": {
+      "activated": "Activated",
+      "pending": "Pending Review"
+    },
+    "detail": {
+      "title": "Tenant Details",
+      "tenantId": "Tenant ID"
+    },
+    "action": {
+      "activate": "Activate Tenant",
+      "deactivate": "Deactivate Tenant",
+      "confirmActivate": "Confirm Activation",
+      "confirmDeactivate": "Confirm Deactivation",
+      "confirmActivateContent": "Are you sure you want to activate this tenant?",
+      "confirmDeactivateContent": "Are you sure you want to deactivate this tenant? All users under this tenant will be unable to log in."
+    },
+    "message": {
+      "activateSuccess": "Tenant activated successfully",
+      "deactivateSuccess": "Tenant deactivated successfully",
+      "operationFailed": "Operation failed"
+    }
+  },
+  "user": {
+    "table": {
+      "username": "Username",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "createdAt": "Created At",
+      "lastLogin": "Last Login"
+    },
+    "role": {
+      "admin": "Admin",
+      "user": "User"
+    },
+    "status": {
+      "active": "Active",
+      "disabled": "Disabled"
+    }
+  },
+  "audit": {
+    "title": "Audit Logs",
+    "table": {
+      "time": "Time",
+      "tenant": "Tenant",
+      "user": "User",
+      "action": "Action"
+    },
+    "filter": {
+      "today": "Today",
+      "last7Days": "Last 7 Days",
+      "last30Days": "Last 30 Days",
+      "selectTenant": "Select Tenant",
+      "selectUser": "Select User",
+      "actionType": "Action Type",
+      "searchPlaceholder": "Search (tenant/user/details)"
+    }
+  },
+  "trend": {
+    "date": "Date",
+    "activeUsers": "Active Users",
+    "queries": "Queries"
+  },
+  "common": {
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "updatedAt": "Updated At"
+  }
+}

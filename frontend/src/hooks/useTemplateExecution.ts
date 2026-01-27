@@ -13,6 +13,12 @@ import { useSSEContext } from '../contexts/SSEContext';
 import { useAccountStore } from '../stores/accountStore';
 import { useGCPAccountStore } from '../stores/gcpAccountStore';
 
+import { logger } from '../utils/logger';
+import { getErrorMessage } from '../utils/ErrorHandler';
+
+// 模板变量值类型
+type TemplateVariables = Record<string, string | number | boolean>;
+
 export const useTemplateExecution = () => {
   const [selectedTemplate, setSelectedTemplate] = useState<PromptTemplate | UserPromptTemplate | null>(null);
   const [variableForm] = Form.useForm();
@@ -21,7 +27,7 @@ export const useTemplateExecution = () => {
   const { selectedAccountIds } = useAccountStore();
   const { selectedAccountIds: selectedGCPAccountIds } = useGCPAccountStore();
 
-  const executeAndSend = async (templateId: string, variables: Record<string, any>) => {
+  const executeAndSend = async (templateId: string, variables: TemplateVariables) => {
     try {
       // 调用后端渲染模板
       const result = await executeTemplate(templateId, { variables });
@@ -57,11 +63,10 @@ export const useTemplateExecution = () => {
       });
 
       message.success('✅ 模板已发送');
-      console.log(`✅ 模板执行并发送成功 - Template: ${templateId}, Prompt: ${result.rendered_prompt}`);
-    } catch (error: any) {
-      console.error('❌ 执行模板失败:', error);
-      const errorMsg = error.message || '发送失败';
-      message.error(`❌ ${errorMsg}`);
+      logger.debug(`✅ 模板执行并发送成功 - Template: ${templateId}, Prompt: ${result.rendered_prompt}`);
+    } catch (error: unknown) {
+      logger.error('❌ 执行模板失败:', error);
+      message.error(`❌ ${getErrorMessage(error, '发送失败')}`);
     }
   };
 
@@ -71,7 +76,7 @@ export const useTemplateExecution = () => {
       setSelectedTemplate(template);
 
       // 设置默认值
-      const defaultValues: Record<string, any> = {};
+      const defaultValues: TemplateVariables = {};
       template.variables.forEach(v => {
         if (v.default !== undefined) {
           defaultValues[v.name] = v.default;
@@ -84,7 +89,7 @@ export const useTemplateExecution = () => {
     }
   };
 
-  const handleVariableFormSubmit = async (values: Record<string, any>) => {
+  const handleVariableFormSubmit = async (values: TemplateVariables) => {
     if (!selectedTemplate) return;
 
     await executeAndSend(selectedTemplate.id, values);

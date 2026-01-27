@@ -1,3 +1,4 @@
+import { logger } from './logger';
 /**
  * Token 工具函数
  * 
@@ -33,7 +34,7 @@ export function isTokenExpired(token: string | null): boolean {
     // ✅ 如果 Token 在 5 分钟内过期，也认为已过期（提前刷新）
     return now >= (exp - 300);
   } catch (error) {
-    console.warn('⚠️ [isTokenExpired] Token解析失败:', error);
+    logger.warn('⚠️ [isTokenExpired] Token解析失败:', error);
     return true;
   }
 }
@@ -52,15 +53,15 @@ export async function ensureTokenValid(): Promise<boolean> {
 
   // ✅ 检查 Token 是否过期
   if (isTokenExpired(state.token)) {
-    console.log('🔄 [ensureTokenValid] Token已过期，开始刷新...');
+    logger.debug('🔄 [ensureTokenValid] Token已过期，开始刷新...');
     
     try {
       // ✅ 使用 authStore 的刷新方法（内部已有并发控制）
       await state.refreshAccessToken();
-      console.log('✅ [ensureTokenValid] Token刷新成功');
+      logger.debug('✅ [ensureTokenValid] Token刷新成功');
       return true;
     } catch (error) {
-      console.error('❌ [ensureTokenValid] Token刷新失败:', error);
+      logger.error('❌ [ensureTokenValid] Token刷新失败:', error);
       // ✅ 刷新失败时，authStore 已经处理了通知和跳转，这里只需要返回 false
       return false;
     }

@@ -1,0 +1,152 @@
+{
+  "title": "アラート管理",
+  "create": "アラート作成",
+  "edit": "アラート編集",
+  "delete": "削除",
+  "detail": "詳細",
+  "back": "戻る",
+  "cancel": "キャンセル",
+  "save": "保存",
+  "test": "テスト",
+  "refresh": "更新",
+  "loading": "読み込み中...",
+
+  "form": {
+    "name": "アラート名",
+    "namePlaceholder": "SP利用率監視",
+    "nameRequired": "アラート名を入力してください",
+    "nameMaxLength": "名前は{{max}}文字以内で入力してください",
+    "description": "アラート説明（自然言語）",
+    "descriptionPlaceholder": "Savings Plans の利用率が 95% を下回った場合、ops@example.com と admin@example.com にメールを送信",
+    "descriptionRequired": "アラート説明を入力してください",
+    "descriptionMinLength": "説明は{{min}}文字以上で入力してください",
+    "account": "アカウント選択",
+    "accountPlaceholder": "AWS または GCP アカウントを選択",
+    "accountRequired": "監視するアカウントを選択してください"
+  },
+
+  "card": {
+    "basicInfo": "基本情報",
+    "examples": "📝 例",
+    "systemInfo": "ℹ️ システム情報",
+    "overview": "📊 アラート概要",
+    "config": "📝 アラート設定",
+    "history": "📜 実行履歴"
+  },
+
+  "button": {
+    "saveAndTest": "保存してテスト",
+    "sendTestEmail": "テストメール送信",
+    "checkNow": "今すぐチェック"
+  },
+
+  "message": {
+    "createSuccess": "作成しました",
+    "updateSuccess": "更新しました",
+    "deleteSuccess": "削除しました",
+    "testEmailSent": "テストメールを送信しました。受信箱をご確認ください",
+    "testEmailFailed": "テストメールの送信に失敗しました",
+    "formValidationError": "フォームの入力内容を確認してください",
+    "loadFailed": "アラートの読み込みに失敗しました",
+    "saveFailed": "保存に失敗しました",
+    "deleteFailed": "削除に失敗しました",
+    "triggerSuccess": "システムスキャンをトリガーしました。後でログを確認してください",
+    "triggerFailed": "トリガーに失敗しました",
+    "userNotLoaded": "ユーザー情報が読み込まれていません"
+  },
+
+  "confirm": {
+    "deleteTitle": "削除確認",
+    "deleteContent": "アラート「{{name}}」を削除してもよろしいですか？この操作は取り消せません。",
+    "deleteOk": "削除",
+    "deleteCancel": "キャンセル"
+  },
+
+  "notFound": "アラートが見つかりません",
+  "noAccountWarning": "このアラートには監視アカウントが設定されていません。まずアラートを編集してアカウントを設定してください。",
+
+  "tips": {
+    "nameHint": "💡 わかりやすい短い名前を付けてください",
+    "accountHint": "💡 監視するクラウドアカウントを選択してください。Agentはこのアカウントの認証情報を使用してデータを取得します。",
+    "descriptionHint": "💡 アラート条件と受信者を自然言語で説明してください。AIが自動的に理解します。"
+  },
+
+  "systemInfo": {
+    "checkFrequency": "チェック頻度：毎日自動実行",
+    "executionTime": "実行時間：毎日 09:00 (UTC+8)",
+    "notificationMethod": "通知方法：条件がトリガーされた場合のみメール送信",
+    "aiParsing": "AI解析：システムが説明から受信者メールを自動抽出"
+  },
+
+  "examples": {
+    "title": "参考となるアラート説明の例：",
+    "ec2Cost": "日次 EC2 コストが $1000 を超えた場合、finance@example.com にメール送信",
+    "riCoverage": "RI カバレッジが 80% を下回った場合、ops@example.com と admin@example.com に通知",
+    "unusedEbs": "未使用の EBS ボリュームをチェック、10 個以上の場合は devops@example.com にアラート",
+    "s3Growth": "S3 ストレージコストを毎日チェック、増加率が 20% を超えた場合は cost-team@example.com にメール送信"
+  },
+
+  "overview": {
+    "status": "ステータス",
+    "enabled": "有効",
+    "disabled": "無効",
+    "executions": "実行回数",
+    "triggers": "トリガー回数",
+    "successRate": "成功率"
+  },
+
+  "config": {
+    "description": "アラート説明",
+    "account": "監視アカウント",
+    "frequency": "チェック頻度",
+    "frequencyValue": "⏰ 毎日 09:00 (UTC+8)",
+    "createdInfo": "作成情報",
+    "createdBy": "👤 {{name}} | 📅 {{time}}に作成"
+  },
+
+  "history": {
+    "totalRecords": "{{count}} 回の実行",
+    "pagination": "全 {{total}} 件",
+    "columnTime": "実行時間",
+    "columnStatus": "ステータス",
+    "columnTriggered": "トリガー",
+    "columnResult": "結果概要",
+    "statusSuccess": "成功",
+    "statusFailed": "失敗",
+    "triggered": "トリガー済み",
+    "notTriggered": "未トリガー"
+  },
+
+  "table": {
+    "columnName": "名前",
+    "columnDescription": "説明",
+    "columnStatus": "ステータス",
+    "columnActions": "操作",
+    "statusEnabled": "有効",
+    "statusDisabled": "無効",
+    "statusNeverExecuted": "未実行",
+    "executedAgo": "{{time}}",
+    "total": "{{count}} 件のアラート",
+    "unknown": "不明",
+    "notSet": "未設定"
+  },
+
+  "filter": {
+    "searchPlaceholder": "アラート名または説明を検索...",
+    "allStatus": "すべてのステータス",
+    "enabled": "有効",
+    "disabled": "無効",
+    "allCreators": "すべての作成者",
+    "createdByMe": "自分が作成"
+  },
+
+  "account": {
+    "aws": "AWS",
+    "gcp": "GCP",
+    "notSet": "アカウント未設定"
+  },
+
+  "tooltip": {
+    "checkNow": "システム全体のアラートチェックを今すぐトリガー（管理者のみ）"
+  }
+}

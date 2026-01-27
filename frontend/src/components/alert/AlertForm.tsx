@@ -20,6 +20,7 @@ import { useAlertStore } from '../../stores/alertStore';
 import { useAuthStore } from '../../stores/authStore';
 import { useAccountStore } from '../../stores/accountStore';
 import { useGCPAccountStore } from '../../stores/gcpAccountStore';
+import { useI18n } from '../../hooks/useI18n';
 import type { CreateAlertRequest, UpdateAlertRequest } from '../../types/alert';
 
 
@@ -31,6 +32,7 @@ export const AlertForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [form] = Form.useForm();
   const currentUser = useAuthStore(state => state.user);
+  const { t } = useI18n('alert');
 
   const {
     currentAlert,
@@ -67,7 +69,7 @@ export const AlertForm: React.FC = () => {
     try {
       await fetchAlertById(id);
     } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : '加载告警失败';
+      const msg = error instanceof Error ? error.message : t('message.loadFailed');
       message.error(msg);
       navigate('/settings/alerts');
     }
@@ -109,22 +111,22 @@ export const AlertForm: React.FC = () => {
           account_type: accountType        // ✅ 添加账号类型
         };
         await updateAlert(id, updateData);
-        message.success('更新成功');
+        message.success(t('message.updateSuccess'));
 
         // 如果需要发送测试邮件
         if (sendTest) {
           try {
             await sendTestEmail(id, values.account_id); // ✅ 传递账号ID
-            message.success('测试邮件已发送');
+            message.success(t('message.testEmailSent'));
           } catch (error: unknown) {
-            const msg = error instanceof Error ? error.message : '发送失败';
-            message.warning(`告警更新成功，但测试邮件发送失败: ${msg}`);
+            const msg = error instanceof Error ? error.message : t('message.testEmailFailed');
+            message.warning(`${t('message.updateSuccess')}, ${msg}`);
           }
         }
       } else {
         // 创建告警：添加必需字段并映射字段名
         if (!currentUser) {
-          message.error('用户信息未加载');
+          message.error(t('message.userNotLoaded'));
           return;
         }
 
@@ -139,16 +141,16 @@ export const AlertForm: React.FC = () => {
         };
 
         const newAlert = await createAlert(createData);
-        message.success('创建成功');
+        message.success(t('message.createSuccess'));
 
         // 如果需要测试邮件
         if (sendTest) {
           try {
             await sendTestEmail(newAlert.id, values.account_id); // ✅ 传递账号ID
-            message.success('测试邮件已发送');
+            message.success(t('message.testEmailSent'));
           } catch (error: unknown) {
-            const msg = error instanceof Error ? error.message : '发送失败';
-            message.warning(`告警创建成功，但测试邮件发送失败: ${msg}`);
+            const msg = error instanceof Error ? error.message : t('message.testEmailFailed');
+            message.warning(`${t('message.createSuccess')}, ${msg}`);
           }
         }
       }
@@ -157,9 +159,9 @@ export const AlertForm: React.FC = () => {
     } catch (error: unknown) {
       // 表单验证错误
       if (error && typeof error === 'object' && 'errorFields' in error) {
-        message.error('请检查表单填写');
+        message.error(t('message.formValidationError'));
       } else {
-        const msg = error instanceof Error ? error.message : '保存失败';
+        const msg = error instanceof Error ? error.message : t('message.saveFailed');
         message.error(msg);
       }
     }
@@ -183,36 +185,36 @@ export const AlertForm: React.FC = () => {
             icon={<ArrowLeftOutlined />}
             onClick={() => navigate('/settings/alerts')}
           >
-            返回
+            {t('back')}
           </Button>
           <Title level={3}>
-            📝 {isEdit ? '编辑告警' : '新建告警'}
+            📝 {isEdit ? t('edit') : t('create')}
           </Title>
         </Space>
 
       {/* 表单 */}
-      <Card title="基本信息">
+      <Card title={t('card.basicInfo')}>
         <Form
           form={form}
           layout="vertical"
           autoComplete="off"
         >
           <Form.Item
-            label="告警名称"
+            label={t('form.name')}
             name="display_name"
             rules={[
-              { required: true, message: '请输入告警名称' },
-              { max: 50, message: '名称不能超过50个字符' }
+              { required: true, message: t('form.nameRequired') },
+              { max: 50, message: t('form.nameMaxLength', { max: 50 }) }
             ]}
           >
             <Input
-              placeholder="SP利用率监控"
+              placeholder={t('form.namePlaceholder')}
               maxLength={50}
             />
           </Form.Item>
 
           <Alert
-            message="💡 给告警起一个简短易懂的名称"
+            message={t('tips.nameHint')}
             type="info"
             showIcon
             style={{ marginBottom: 16 }}
@@ -220,14 +222,14 @@ export const AlertForm: React.FC = () => {
 
           {/* ✅ 新增：账号选择 */}
           <Form.Item
-            label="选择账号"
+            label={t('form.account')}
             name="account_id"
             rules={[
-              { required: true, message: '请选择要监控的账号' }
+              { required: true, message: t('form.accountRequired') }
             ]}
           >
             <Select
-              placeholder="选择 AWS 或 GCP 账号"
+              placeholder={t('form.accountPlaceholder')}
               showSearch
               optionFilterProp="children"
               filterOption={(input, option) =>
@@ -237,13 +239,13 @@ export const AlertForm: React.FC = () => {
                 // AWS 账号
                 ...awsAccounts.map(account => ({
                   value: account.id,
-                  label: `☁️ AWS - ${account.alias || account.account_id}`,
+                  label: `☁️ ${t('account.aws')} - ${account.alias || account.account_id}`,
                   account
                 })),
                 // GCP 账号
                 ...gcpAccounts.map(account => ({
                   value: account.id,
-                  label: `🔵 GCP - ${account.account_name || account.project_id}`,
+                  label: `🔵 ${t('account.gcp')} - ${account.account_name || account.project_id}`,
                   account
                 }))
               ]}
@@ -251,22 +253,22 @@ export const AlertForm: React.FC = () => {
           </Form.Item>
 
           <Alert
-            message="💡 选择要监控的云账号，Agent 将使用该账号的凭证查询数据"
+            message={t('tips.accountHint')}
             type="info"
             showIcon
             style={{ marginBottom: 16 }}
           />
 
           <Form.Item
-            label="告警描述 (自然语言)"
+            label={t('form.description')}
             name="description"
             rules={[
-              { required: true, message: '请输入告警描述' },
-              { min: 10, message: '描述至少10个字符' }
+              { required: true, message: t('form.descriptionRequired') },
+              { min: 10, message: t('form.descriptionMinLength', { min: 10 }) }
             ]}
           >
             <TextArea
-              placeholder="当 Savings Plans 利用率低于 95% 时，发送邮件至 ops@example.com 和 admin@example.com"
+              placeholder={t('form.descriptionPlaceholder')}
               rows={6}
               maxLength={500}
               showCount
@@ -274,7 +276,7 @@ export const AlertForm: React.FC = () => {
           </Form.Item>
 
           <Alert
-            message="💡 用自然语言描述告警条件和收件人，AI 会自动理解"
+            message={t('tips.descriptionHint')}
             type="info"
             showIcon
             style={{ marginBottom: 16 }}
@@ -283,23 +285,23 @@ export const AlertForm: React.FC = () => {
       </Card>
 
       {/* 示例卡片 */}
-      <Card title="📝 示例">
+      <Card title={t('card.examples')}>
         <Space direction="vertical" style={{ width: '100%' }}>
           <Paragraph>
-            <Text type="secondary">以下是一些告警描述的示例，供您参考：</Text>
+            <Text type="secondary">{t('examples.title')}</Text>
           </Paragraph>
           <ul style={{ paddingLeft: 20 }}>
             <li>
-              <Text code>当日 EC2 成本超过 $1000 时，发送邮件至 finance@example.com</Text>
+              <Text code>{t('examples.ec2Cost')}</Text>
             </li>
             <li>
-              <Text code>当 RI 覆盖率低于 80% 时，通知 ops@example.com 和 admin@example.com</Text>
+              <Text code>{t('examples.riCoverage')}</Text>
             </li>
             <li>
-              <Text code>检查未使用的 EBS 卷，如果超过 10 个则告警至 devops@example.com</Text>
+              <Text code>{t('examples.unusedEbs')}</Text>
             </li>
             <li>
-              <Text code>每天检查 S3 存储成本，如果增长超过 20% 则发送邮件至 cost-team@example.com</Text>
+              <Text code>{t('examples.s3Growth')}</Text>
             </li>
           </ul>
         </Space>
@@ -308,13 +310,13 @@ export const AlertForm: React.FC = () => {
       {/* 系统说明 */}
       <Card>
         <Alert
-          message="ℹ️ 系统说明"
+          message={t('card.systemInfo')}
           description={
             <ul style={{ paddingLeft: 20, marginBottom: 0 }}>
-              <li>检查频率：每天自动执行一次</li>
-              <li>执行时间：每天 09:00 (UTC+8)</li>
-              <li>通知方式：仅在触发条件时发送邮件</li>
-              <li>AI 解析：系统会自动从描述中提取收件人邮箱</li>
+              <li>{t('systemInfo.checkFrequency')}</li>
+              <li>{t('systemInfo.executionTime')}</li>
+              <li>{t('systemInfo.notificationMethod')}</li>
+              <li>{t('systemInfo.aiParsing')}</li>
             </ul>
           }
           type="info"
@@ -339,24 +341,24 @@ export const AlertForm: React.FC = () => {
       }}>
         <Space style={{ width: '100%', justifyContent: 'space-between' }}>
           <Button onClick={() => navigate('/settings/alerts')}>
-            取消
+            {t('cancel')}
           </Button>
           <Space>
             <Button
               type="default"
               icon={<SendOutlined />}
               onClick={() => handleSave(true)}
-              loading={savingAlert}  // ✅ 使用 savingAlert
+              loading={savingAlert}
             >
-              保存并测试
+              {t('button.saveAndTest')}
             </Button>
             <Button
               type="primary"
               icon={<SaveOutlined />}
               onClick={() => handleSave(false)}
-              loading={savingAlert}  // ✅ 使用 savingAlert
+              loading={savingAlert}
             >
-              保存
+              {t('save')}
             </Button>
           </Space>
         </Space>

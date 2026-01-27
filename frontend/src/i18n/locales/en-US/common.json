@@ -28,7 +28,9 @@
     "copy": "Copy",
     "viewDetails": "View Details",
     "collapse": "Collapse",
-    "expand": "Expand"
+    "expand": "Expand",
+    "paste": "Paste",
+    "selectFile": "Select File"
   },
   "status": {
     "active": "Active",
@@ -44,11 +46,31 @@
     "error": "Error",
     "warning": "Warning",
     "info": "Info",
-    "loading": "Loading",
+    "loading": "Loading...",
     "connected": "Connected",
     "disconnected": "Disconnected",
     "online": "Online",
-    "offline": "Offline"
+    "offline": "Offline",
+    "configured": "Configured",
+    "notConfigured": "Not Configured"
+  },
+  "pagination": {
+    "total": "Total {{total}} items"
+  },
+  "hint": {
+    "selectedCount": "{{count}} selected",
+    "supportJsonFile": "Supports .json format files",
+    "billingExportTip": "If you have configured Billing Export to BigQuery, fill in the following information to enable cost analysis.",
+    "serviceAccountReadonly": "Service Account info cannot be modified. Delete and re-add if needed."
+  },
+  "label": {
+    "example": "Example"
+  },
+  "security": {
+    "tip": "Security Notice",
+    "encryptedStorage": "Credentials will be encrypted and stored in the database",
+    "minimalPermission": "Recommend granting minimal permissions",
+    "rotateKey": "Rotate keys regularly to improve security"
   },
   "role": {
     "admin": "Administrator",
@@ -98,5 +120,12 @@
     "networkError": "Network error. Please try again later.",
     "permissionDenied": "Permission denied",
     "notFound": "Content not found"
+  },
+  "theme": {
+    "light": "Light Mode",
+    "dark": "Dark Mode",
+    "system": "System",
+    "switchToLight": "Switch to Light Mode",
+    "switchToDark": "Switch to Dark Mode"
   }
 }

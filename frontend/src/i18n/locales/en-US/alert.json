@@ -1,0 +1,152 @@
+{
+  "title": "Alert Management",
+  "create": "Create Alert",
+  "edit": "Edit Alert",
+  "delete": "Delete",
+  "detail": "Details",
+  "back": "Back",
+  "cancel": "Cancel",
+  "save": "Save",
+  "test": "Test",
+  "refresh": "Refresh",
+  "loading": "Loading...",
+
+  "form": {
+    "name": "Alert Name",
+    "namePlaceholder": "SP Utilization Monitor",
+    "nameRequired": "Please enter alert name",
+    "nameMaxLength": "Name cannot exceed {{max}} characters",
+    "description": "Alert Description (Natural Language)",
+    "descriptionPlaceholder": "When Savings Plans utilization is below 95%, send email to ops@example.com and admin@example.com",
+    "descriptionRequired": "Please enter alert description",
+    "descriptionMinLength": "Description must be at least {{min}} characters",
+    "account": "Select Account",
+    "accountPlaceholder": "Select AWS or GCP account",
+    "accountRequired": "Please select an account to monitor"
+  },
+
+  "card": {
+    "basicInfo": "Basic Information",
+    "examples": "📝 Examples",
+    "systemInfo": "ℹ️ System Information",
+    "overview": "📊 Alert Overview",
+    "config": "📝 Alert Configuration",
+    "history": "📜 Execution History"
+  },
+
+  "button": {
+    "saveAndTest": "Save & Test",
+    "sendTestEmail": "Send Test Email",
+    "checkNow": "Check Now"
+  },
+
+  "message": {
+    "createSuccess": "Created successfully",
+    "updateSuccess": "Updated successfully",
+    "deleteSuccess": "Deleted successfully",
+    "testEmailSent": "Test email sent, please check your inbox",
+    "testEmailFailed": "Failed to send test email",
+    "formValidationError": "Please check form fields",
+    "loadFailed": "Failed to load alert",
+    "saveFailed": "Failed to save",
+    "deleteFailed": "Failed to delete",
+    "triggerSuccess": "System scan triggered, please check logs later",
+    "triggerFailed": "Failed to trigger",
+    "userNotLoaded": "User information not loaded"
+  },
+
+  "confirm": {
+    "deleteTitle": "Confirm Deletion",
+    "deleteContent": "Are you sure you want to delete alert \"{{name}}\"? This action cannot be undone.",
+    "deleteOk": "Delete",
+    "deleteCancel": "Cancel"
+  },
+
+  "notFound": "Alert not found",
+  "noAccountWarning": "This alert has no account configured. Please edit the alert and set an account first.",
+
+  "tips": {
+    "nameHint": "💡 Give your alert a short, descriptive name",
+    "accountHint": "💡 Select the cloud account to monitor. The Agent will use this account's credentials to query data.",
+    "descriptionHint": "💡 Describe the alert condition and recipients in natural language. AI will understand automatically."
+  },
+
+  "systemInfo": {
+    "checkFrequency": "Check Frequency: Runs automatically once daily",
+    "executionTime": "Execution Time: Every day at 09:00 (UTC+8)",
+    "notificationMethod": "Notification: Email sent only when conditions are triggered",
+    "aiParsing": "AI Parsing: System automatically extracts recipient emails from description"
+  },
+
+  "examples": {
+    "title": "Here are some example alert descriptions for your reference:",
+    "ec2Cost": "When daily EC2 cost exceeds $1000, send email to finance@example.com",
+    "riCoverage": "When RI coverage is below 80%, notify ops@example.com and admin@example.com",
+    "unusedEbs": "Check for unused EBS volumes, alert devops@example.com if more than 10 found",
+    "s3Growth": "Check S3 storage cost daily, send email to cost-team@example.com if growth exceeds 20%"
+  },
+
+  "overview": {
+    "status": "Status",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "executions": "Executions",
+    "triggers": "Triggers",
+    "successRate": "Success Rate"
+  },
+
+  "config": {
+    "description": "Alert Description",
+    "account": "Monitored Account",
+    "frequency": "Check Frequency",
+    "frequencyValue": "⏰ Daily at 09:00 (UTC+8)",
+    "createdInfo": "Created By",
+    "createdBy": "👤 {{name}} | 📅 Created {{time}}"
+  },
+
+  "history": {
+    "totalRecords": "{{count}} executions",
+    "pagination": "{{total}} records in total",
+    "columnTime": "Execution Time",
+    "columnStatus": "Status",
+    "columnTriggered": "Triggered",
+    "columnResult": "Result Summary",
+    "statusSuccess": "Success",
+    "statusFailed": "Failed",
+    "triggered": "Triggered",
+    "notTriggered": "Not Triggered"
+  },
+
+  "table": {
+    "columnName": "Name",
+    "columnDescription": "Description",
+    "columnStatus": "Status",
+    "columnActions": "Actions",
+    "statusEnabled": "Enabled",
+    "statusDisabled": "Disabled",
+    "statusNeverExecuted": "Never Executed",
+    "executedAgo": "{{time}}",
+    "total": "{{count}} alerts",
+    "unknown": "Unknown",
+    "notSet": "Not Set"
+  },
+
+  "filter": {
+    "searchPlaceholder": "Search alert name or description...",
+    "allStatus": "All Status",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "allCreators": "All Creators",
+    "createdByMe": "Created by Me"
+  },
+
+  "account": {
+    "aws": "AWS",
+    "gcp": "GCP",
+    "notSet": "No Account"
+  },
+
+  "tooltip": {
+    "checkNow": "Trigger a system-wide alert check immediately (Admin only)"
+  }
+}

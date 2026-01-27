@@ -5,8 +5,16 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { useI18n } from '../../hooks/useI18n';
 import { apiClient } from '../../services/apiClient';
+import { getErrorMessage } from '../../utils/ErrorHandler';
 
 const { Title } = Typography;
+
+// 密码表单值类型
+interface PasswordFormValues {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
 
 export const ChangePassword: React.FC = () => {
   const navigate = useNavigate();
@@ -16,7 +24,7 @@ export const ChangePassword: React.FC = () => {
   const { t } = useI18n(['user', 'common']);
   const { modal, message } = App.useApp();
 
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async (values: PasswordFormValues) => {
     setLoading(true);
     try {
       // ✅ 使用 apiClient，自动处理 Token 刷新和 401 错误
@@ -37,9 +45,8 @@ export const ChangePassword: React.FC = () => {
           navigate('/login');
         },
       });
-    } catch (error: any) {
-      const errorMessage = error?.message || error?.detail || t('changePassword.message.changeFailed');
-      message.error(errorMessage);
+    } catch (error: unknown) {
+      message.error(getErrorMessage(error, t('changePassword.message.changeFailed')));
     } finally {
       setLoading(false);
     }

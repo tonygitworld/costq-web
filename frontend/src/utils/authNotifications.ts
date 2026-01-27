@@ -1,3 +1,4 @@
+import { logger } from './logger';
 /**
  * 认证相关的全局通知机制
  * 用于在 Zustand store 中触发消息提示和页面跳转
@@ -13,14 +14,14 @@ let redirectListener: AuthRedirectListener | null = null;
 /**
  * 设置消息监听器（在组件层调用）
  */
-export function setAuthMessageListener(listener: AuthNotificationListener) {
+export function setAuthMessageListener(listener: AuthNotificationListener | null) {
   messageListener = listener;
 }
 
 /**
  * 设置跳转监听器（在组件层调用）
  */
-export function setAuthRedirectListener(listener: AuthRedirectListener) {
+export function setAuthRedirectListener(listener: AuthRedirectListener | null) {
   redirectListener = listener;
 }
 
@@ -32,7 +33,7 @@ export function notifyAuthError(message: string) {
     messageListener(message);
   } else {
     // 兜底：使用原生 alert
-    console.warn('⚠️ [authNotifications] 消息监听器未设置，使用 alert');
+    logger.warn('⚠️ [authNotifications] 消息监听器未设置，使用 alert');
     alert(message);
   }
 }
@@ -45,7 +46,7 @@ export function redirectToLogin() {
     redirectListener();
   } else {
     // 兜底：使用 window.location
-    console.warn('⚠️ [authNotifications] 跳转监听器未设置，使用 window.location');
+    logger.warn('⚠️ [authNotifications] 跳转监听器未设置，使用 window.location');
     if (typeof window !== 'undefined') {
       window.location.href = '/login';
     }

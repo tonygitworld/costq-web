@@ -8,6 +8,8 @@ import { AccountManagement } from '../common/AccountManagement';
 import { GCPAccountManagement } from '../gcp/GCPAccountManagement';
 import { useI18n } from '../../hooks/useI18n';
 
+import { logger } from '../../utils/logger';
+
 const { Title, Text } = Typography;
 
 type CloudProvider = 'aws' | 'gcp' | 'azure';
@@ -40,7 +42,7 @@ export const CloudAccountManagement: React.FC = () => {
         // AWS 账号加载完成后再加载 GCP 账号
         await useGCPAccountStore.getState().fetchAccounts();
       } catch (error) {
-        console.error('加载账号失败:', error);
+        logger.error('加载账号失败:', error);
         // 即使失败也继续，UI会显示错误状态
       }
     };

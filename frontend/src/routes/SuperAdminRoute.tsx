@@ -11,12 +11,14 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Result, Button } from 'antd';
 import { useAuthStore } from '../stores/authStore';
 
+import { logger } from '../utils/logger';
+
 export const SuperAdminRoute: React.FC = () => {
   const location = useLocation();
   const { isAuthenticated, isSuperAdmin, user } = useAuthStore();
 
   // 调试日志
-  console.log('🔐 SuperAdminRoute check:', {
+  logger.debug('🔐 SuperAdminRoute check:', {
     isAuthenticated,
     isSuperAdmin: isSuperAdmin(),
     username: user?.username,

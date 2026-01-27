@@ -1,0 +1,152 @@
+{
+  "title": "告警管理",
+  "create": "新建告警",
+  "edit": "编辑告警",
+  "delete": "删除",
+  "detail": "详情",
+  "back": "返回",
+  "cancel": "取消",
+  "save": "保存",
+  "test": "测试",
+  "refresh": "刷新",
+  "loading": "加载中...",
+
+  "form": {
+    "name": "告警名称",
+    "namePlaceholder": "SP利用率监控",
+    "nameRequired": "请输入告警名称",
+    "nameMaxLength": "名称不能超过{{max}}个字符",
+    "description": "告警描述 (自然语言)",
+    "descriptionPlaceholder": "当 Savings Plans 利用率低于 95% 时，发送邮件至 ops@example.com 和 admin@example.com",
+    "descriptionRequired": "请输入告警描述",
+    "descriptionMinLength": "描述至少{{min}}个字符",
+    "account": "选择账号",
+    "accountPlaceholder": "选择 AWS 或 GCP 账号",
+    "accountRequired": "请选择要监控的账号"
+  },
+
+  "card": {
+    "basicInfo": "基本信息",
+    "examples": "📝 示例",
+    "systemInfo": "ℹ️ 系统说明",
+    "overview": "📊 告警概览",
+    "config": "📝 告警配置",
+    "history": "📜 执行历史"
+  },
+
+  "button": {
+    "saveAndTest": "保存并测试",
+    "sendTestEmail": "发送测试邮件",
+    "checkNow": "立即检查"
+  },
+
+  "message": {
+    "createSuccess": "创建成功",
+    "updateSuccess": "更新成功",
+    "deleteSuccess": "删除成功",
+    "testEmailSent": "测试邮件已发送，请检查邮箱",
+    "testEmailFailed": "测试邮件发送失败",
+    "formValidationError": "请检查表单填写",
+    "loadFailed": "加载告警失败",
+    "saveFailed": "保存失败",
+    "deleteFailed": "删除失败",
+    "triggerSuccess": "已触发系统扫描，请稍后查看日志",
+    "triggerFailed": "触发失败",
+    "userNotLoaded": "用户信息未加载"
+  },
+
+  "confirm": {
+    "deleteTitle": "确认删除",
+    "deleteContent": "确定要删除告警「{{name}}」吗？此操作不可恢复。",
+    "deleteOk": "删除",
+    "deleteCancel": "取消"
+  },
+
+  "notFound": "未找到告警信息",
+  "noAccountWarning": "该告警未配置监控账号，请先编辑告警并设置账号",
+
+  "tips": {
+    "nameHint": "💡 给告警起一个简短易懂的名称",
+    "accountHint": "💡 选择要监控的云账号，Agent 将使用该账号的凭证查询数据",
+    "descriptionHint": "💡 用自然语言描述告警条件和收件人，AI 会自动理解"
+  },
+
+  "systemInfo": {
+    "checkFrequency": "检查频率：每天自动执行一次",
+    "executionTime": "执行时间：每天 09:00 (UTC+8)",
+    "notificationMethod": "通知方式：仅在触发条件时发送邮件",
+    "aiParsing": "AI 解析：系统会自动从描述中提取收件人邮箱"
+  },
+
+  "examples": {
+    "title": "以下是一些告警描述的示例，供您参考：",
+    "ec2Cost": "当日 EC2 成本超过 $1000 时，发送邮件至 finance@example.com",
+    "riCoverage": "当 RI 覆盖率低于 80% 时，通知 ops@example.com 和 admin@example.com",
+    "unusedEbs": "检查未使用的 EBS 卷，如果超过 10 个则告警至 devops@example.com",
+    "s3Growth": "每天检查 S3 存储成本，如果增长超过 20% 则发送邮件至 cost-team@example.com"
+  },
+
+  "overview": {
+    "status": "状态",
+    "enabled": "启用中",
+    "disabled": "已禁用",
+    "executions": "执行次数",
+    "triggers": "触发次数",
+    "successRate": "成功率"
+  },
+
+  "config": {
+    "description": "告警描述",
+    "account": "监控账号",
+    "frequency": "检查频率",
+    "frequencyValue": "⏰ 每日 09:00 (UTC+8)",
+    "createdInfo": "创建信息",
+    "createdBy": "👤 {{name}} | 📅 创建于 {{time}}"
+  },
+
+  "history": {
+    "totalRecords": "共 {{count}} 次",
+    "pagination": "共 {{total}} 条记录",
+    "columnTime": "执行时间",
+    "columnStatus": "状态",
+    "columnTriggered": "触发",
+    "columnResult": "结果摘要",
+    "statusSuccess": "成功",
+    "statusFailed": "失败",
+    "triggered": "已触发",
+    "notTriggered": "未触发"
+  },
+
+  "table": {
+    "columnName": "名称",
+    "columnDescription": "描述",
+    "columnStatus": "状态",
+    "columnActions": "操作",
+    "statusEnabled": "启用",
+    "statusDisabled": "禁用",
+    "statusNeverExecuted": "未执行",
+    "executedAgo": "{{time}}",
+    "total": "共 {{count}} 个告警",
+    "unknown": "未知",
+    "notSet": "未设置"
+  },
+
+  "filter": {
+    "searchPlaceholder": "搜索告警名称或描述...",
+    "allStatus": "全部状态",
+    "enabled": "启用",
+    "disabled": "禁用",
+    "allCreators": "全部创建者",
+    "createdByMe": "我创建的"
+  },
+
+  "account": {
+    "aws": "AWS",
+    "gcp": "GCP",
+    "notSet": "未设置账号"
+  },
+
+  "tooltip": {
+    "checkNow": "立即触发一次全系统告警检查（仅管理员）"
+  }
+}

@@ -83,5 +83,10 @@
     "error": "接続エラー",
     "unknown": "不明",
     "reconnect": "再接続"
+  },
+  "pdf": {
+    "title": "AIアシスタントの回答",
+    "generatedAt": "生成日時",
+    "dateFormat": "YYYY年MM月DD日 HH:mm:ss"
   }
 }

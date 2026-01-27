@@ -20,6 +20,9 @@
   /* ✅ 隔离布局计算，提升滚动性能 */
   contain: layout style paint;
 
+  /* 🔧 修复：禁用浏览器滚动锚定，防止展开详情时窗口跳动 */
+  overflow-anchor: none;
+
   /* ✅ Firefox 兼容性支持 */
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.1) transparent;

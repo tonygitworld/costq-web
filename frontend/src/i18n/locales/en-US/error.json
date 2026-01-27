@@ -1,0 +1,62 @@
+{
+  "network": {
+    "connectionFailed": "Network connection failed, please check your network settings",
+    "timeout": "Request timeout",
+    "serverError": "Server error, please try again later",
+    "serviceUnavailable": "Service unavailable, please try again later"
+  },
+  "auth": {
+    "tokenExpired": "Login expired, please log in again",
+    "tokenRefreshFailed": "Token refresh failed, please log in again",
+    "unauthorized": "Unauthorized access, please log in first",
+    "forbidden": "Access forbidden, insufficient permissions",
+    "invalidCredentials": "Invalid username or password",
+    "sessionExpired": "Session expired, please log in again"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidFormat": "Invalid format",
+    "tooLong": "Input is too long",
+    "tooShort": "Input is too short"
+  },
+  "api": {
+    "parseError": "Unable to parse response data",
+    "requestFailed": "Request failed",
+    "retryFailed": "Retry failed: {{message}}",
+    "notFound": "Resource not found"
+  },
+  "file": {
+    "uploadFailed": "File upload failed",
+    "downloadFailed": "File download failed",
+    "exportFailed": "Export failed, please try again"
+  },
+  "pdf": {
+    "generationFailed": "PDF generation failed, please try again",
+    "exportSuccess": "PDF exported successfully"
+  },
+  "account": {
+    "loadFailed": "Failed to load accounts",
+    "addFailed": "Failed to add account",
+    "deleteFailed": "Failed to delete account",
+    "updateFailed": "Failed to update account"
+  },
+  "chat": {
+    "sendFailed": "Failed to send message",
+    "loadFailed": "Failed to load chat history",
+    "deleteFailed": "Failed to delete chat",
+    "sessionCreateFailed": "Failed to create session"
+  },
+  "template": {
+    "loadFailed": "Failed to load templates",
+    "createFailed": "Failed to create template",
+    "updateFailed": "Failed to update template",
+    "deleteFailed": "Failed to delete template",
+    "executeFailed": "Failed to execute template"
+  },
+  "alert": {
+    "loadFailed": "Failed to load alerts",
+    "createFailed": "Failed to create alert",
+    "updateFailed": "Failed to update alert",
+    "deleteFailed": "Failed to delete alert"
+  }
+}

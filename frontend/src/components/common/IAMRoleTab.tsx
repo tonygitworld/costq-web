@@ -26,6 +26,9 @@ import {
 import { useAccountStore, type IAMRoleFormData, type ExternalIdInfo } from '../../stores/accountStore';
 import { useI18n } from '../../hooks/useI18n';
 
+import { logger } from '../../utils/logger';
+import { getErrorMessage } from '../../utils/ErrorHandler';
+
 const { Title, Text, Paragraph } = Typography;
 const { Step } = Steps;
 
@@ -54,7 +57,7 @@ export const IAMRoleTab: FC<IAMRoleTabProps> = ({ onSuccess, onCancel }) => {
     try {
       const info = await getExternalId();
       setExternalIdInfo(info);
-    } catch (error) {
+    } catch {
       message.error(t('iamRole.loadingError'));
     } finally {
       setLoadingExtId(false);
@@ -69,39 +72,30 @@ export const IAMRoleTab: FC<IAMRoleTabProps> = ({ onSuccess, onCancel }) => {
 
   // 提交表单
   const handleSubmit = async (values: IAMRoleFormData) => {
-    console.log('[IAMRoleTab] 开始提交表单:', values);
+    logger.debug('[IAMRoleTab] 开始提交表单:', values);
     setSubmitting(true);
 
     try {
-      console.log('[IAMRoleTab] 调用 addIAMRoleAccount...');
+      logger.debug('[IAMRoleTab] 调用 addIAMRoleAccount...');
       await addIAMRoleAccount(values);
-      console.log('[IAMRoleTab] 添加成功');
+      logger.debug('[IAMRoleTab] 添加成功');
       message.success(t('aws.message.createSuccess'));
       form.resetFields();
       onSuccess?.();
-    } catch (error: any) {
-      console.error('[IAMRoleTab] 捕获到错误:', error);
-      console.error('[IAMRoleTab] 错误类型:', typeof error);
-      console.error('[IAMRoleTab] 错误对象:', error);
+    } catch (error: unknown) {
+      logger.error('[IAMRoleTab] 捕获到错误:', error);
 
-      let errorMsg = '添加账号失败';
-      if (error?.message) {
-        errorMsg = error.message;
-      } else if (typeof error === 'string') {
-        errorMsg = error;
-      }
-
-      console.log('[IAMRoleTab] 错误消息:', errorMsg);
+      let errorMsg = getErrorMessage(error, '添加账号失败');
 
       // 特殊处理重名错误
       if (errorMsg.includes('已存在') || errorMsg.includes('already exists')) {
         errorMsg = `账号别名已存在，请使用不同的名称。${errorMsg}`;
       }
 
-      console.log('[IAMRoleTab] 显示错误消息:', errorMsg);
+      logger.debug('[IAMRoleTab] 显示错误消息:', errorMsg);
       message.error(errorMsg, 5); // 显示5秒
     } finally {
-      console.log('[IAMRoleTab] 提交流程结束');
+      logger.debug('[IAMRoleTab] 提交流程结束');
       setSubmitting(false);
     }
   };
