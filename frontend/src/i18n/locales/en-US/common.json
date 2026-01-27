@@ -127,5 +127,10 @@
     "system": "System",
     "switchToLight": "Switch to Light Mode",
     "switchToDark": "Switch to Dark Mode"
+  },
+  "aws": {
+    "accountId": "Account ID",
+    "region": "Region",
+    "verified": "Verified"
   }
 }

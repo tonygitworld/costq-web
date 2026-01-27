@@ -127,5 +127,10 @@
     "system": "システム設定",
     "switchToLight": "ライトモードに切り替え",
     "switchToDark": "ダークモードに切り替え"
+  },
+  "aws": {
+    "accountId": "アカウントID",
+    "region": "リージョン",
+    "verified": "検証済み"
   }
 }
