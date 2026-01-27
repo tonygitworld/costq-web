@@ -29,23 +29,35 @@ import { useAlertStore } from '../../stores/alertStore';
 import { useAccountStore } from '../../stores/accountStore';
 import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import { usePagination } from '../../hooks/usePagination';
+import { useI18n } from '../../hooks/useI18n';
 import type { AlertHistory } from '../../types/alert';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/zh-cn';
+import 'dayjs/locale/en';
+import 'dayjs/locale/ja';
+
+import { logger } from '../../utils/logger';
 
 dayjs.extend(relativeTime);
-dayjs.locale('zh-cn');
 
 const { Title, Text, Paragraph } = Typography;
 
 export const AlertDetail: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  console.log('🎯 AlertDetail 组件渲染 - id 参数:', id);
-  console.log('🎯 AlertDetail 组件渲染 - id 类型:', typeof id);
-  console.log('🎯 AlertDetail 组件渲染 - useParams 完整对象:', useParams());
   const { modal } = App.useApp();
+  const { t, i18n } = useI18n('alert');
+
+  // 根据当前语言设置 dayjs 语言
+  React.useEffect(() => {
+    const dayjsLocaleMap: Record<string, string> = {
+      'zh-CN': 'zh-cn',
+      'en-US': 'en',
+      'ja-JP': 'ja'
+    };
+    dayjs.locale(dayjsLocaleMap[i18n.language] || 'en');
+  }, [i18n.language]);
 
   const {
     currentAlert,
@@ -65,7 +77,7 @@ export const AlertDetail: React.FC = () => {
 
   // 加载数据
   useEffect(() => {
-    console.log('🔍 AlertDetail useEffect - ID:', id);
+    logger.debug('🔍 AlertDetail useEffect - ID:', id);
     if (id) {
       loadData();
       fetchAWSAccounts();
@@ -76,16 +88,16 @@ export const AlertDetail: React.FC = () => {
 
   const loadData = async () => {
     if (!id) return;
-    console.log('📡 开始加载告警数据 - ID:', id);
+    logger.debug('📡 开始加载告警数据 - ID:', id);
     try {
       await Promise.all([
         fetchAlertById(id),
         fetchAlertHistory(id)
       ]);
-      console.log('✅ 告警数据加载成功');
+      logger.debug('✅ 告警数据加载成功');
     } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : '加载数据失败';
-      console.error('❌ 加载告警数据失败:', error);
+      const msg = error instanceof Error ? error.message : t('message.loadFailed');
+      logger.error('❌ 加载告警数据失败:', error);
       message.error(msg);
       navigate('/settings/alerts');
     }
@@ -96,18 +108,18 @@ export const AlertDetail: React.FC = () => {
     if (!currentAlert) return;
 
     modal.confirm({
-      title: '确认删除',
-      content: `确定要删除告警"${currentAlert.display_name}"吗？此操作不可恢复。`,
+      title: t('confirm.deleteTitle'),
+      content: t('confirm.deleteContent', { name: currentAlert.display_name }),
       okType: 'danger',
-      okText: '删除',
-      cancelText: '取消',
+      okText: t('confirm.deleteOk'),
+      cancelText: t('confirm.deleteCancel'),
       onOk: async () => {
         try {
           await deleteAlert(currentAlert.id);
-          message.success('删除成功');
+          message.success(t('message.deleteSuccess'));
           navigate('/settings/alerts');
         } catch (error: unknown) {
-          const msg = error instanceof Error ? error.message : '删除失败';
+          const msg = error instanceof Error ? error.message : t('message.deleteFailed');
           message.error(msg);
         }
       }
@@ -120,19 +132,19 @@ export const AlertDetail: React.FC = () => {
 
     // ✅ 检查账号ID
     if (!currentAlert.account_id) {
-      message.warning('该告警未配置监控账号，请先编辑告警并设置账号');
+      message.warning(t('noAccountWarning'));
       return;
     }
 
     try {
       // ✅ 传递账号ID参数（与编辑页保持一致）
       await sendTestEmail(id, currentAlert.account_id);
-      message.success('测试邮件已发送，请检查邮箱');
+      message.success(t('message.testEmailSent'));
       // ✅ 测试后刷新历史记录
       await fetchAlertHistory(id);
     } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : '发送失败';
-      message.error(`测试失败: ${msg}`);
+      const msg = error instanceof Error ? error.message : t('message.testEmailFailed');
+      message.error(msg);
     }
   };
 
@@ -140,34 +152,31 @@ export const AlertDetail: React.FC = () => {
   if (loading && !currentAlert) {
     return (
       <div style={{ padding: '24px', textAlign: 'center' }}>
-        <Typography.Text>加载中...</Typography.Text>
+        <Typography.Text>{t('loading')}</Typography.Text>
       </div>
     );
   }
 
   // 如果没有数据，显示提示
   if (!currentAlert) {
-    console.warn('⚠️ currentAlert 为空，但不在加载状态');
     return (
       <div style={{ padding: '24px', textAlign: 'center' }}>
-        <Typography.Text type="secondary">未找到告警信息</Typography.Text>
+        <Typography.Text type="secondary">{t('notFound')}</Typography.Text>
       </div>
     );
   }
 
-  console.log('✅ 渲染 AlertDetail - Alert:', currentAlert);
-
   // ✅ 获取账号名称
   const getAccountName = () => {
     if (!currentAlert.account_id) {
-      return <Tag color="default">未设置账号</Tag>;
+      return <Tag color="default">{t('account.notSet')}</Tag>;
     }
 
     if (currentAlert.account_type === 'gcp') {
       const gcpAccount = gcpAccounts.find(a => a.id === currentAlert.account_id);
       return (
         <Tag color="blue" icon={<span>🔵</span>}>
-          GCP: {gcpAccount?.account_name || gcpAccount?.project_id || currentAlert.account_id?.slice(0, 8)}
+          {t('account.gcp')}: {gcpAccount?.account_name || gcpAccount?.project_id || currentAlert.account_id?.slice(0, 8)}
         </Tag>
       );
     }
@@ -176,7 +185,7 @@ export const AlertDetail: React.FC = () => {
     const awsAccount = awsAccounts.find(a => a.id === currentAlert.account_id);
     return (
       <Tag color="orange" icon={<span>☁️</span>}>
-        AWS: {awsAccount?.alias || awsAccount?.account_id || currentAlert.account_id?.slice(0, 8)}
+        {t('account.aws')}: {awsAccount?.alias || awsAccount?.account_id || currentAlert.account_id?.slice(0, 8)}
       </Tag>
     );
   };
@@ -200,34 +209,34 @@ export const AlertDetail: React.FC = () => {
       )
     },
     {
-      title: '执行时间',
+      title: t('history.columnTime'),
       dataIndex: 'executed_at',
       key: 'executed_at',
       width: 180,
       render: (text) => dayjs(text).format('YYYY-MM-DD HH:mm')
     },
     {
-      title: '状态',
+      title: t('history.columnStatus'),
       dataIndex: 'status',
       key: 'status',
       width: 80,
       render: (status) => (
         <Tag color={status === 'success' ? 'success' : 'error'}>
-          {status === 'success' ? '成功' : '失败'}
+          {status === 'success' ? t('history.statusSuccess') : t('history.statusFailed')}
         </Tag>
       )
     },
     {
-      title: '触发',
+      title: t('history.columnTriggered'),
       dataIndex: 'triggered',
       key: 'triggered',
       width: 80,
       render: (triggered) => (
-        triggered ? <Tag color="warning">已触发</Tag> : <Tag>未触发</Tag>
+        triggered ? <Tag color="warning">{t('history.triggered')}</Tag> : <Tag>{t('history.notTriggered')}</Tag>
       )
     },
     {
-      title: '结果摘要',
+      title: t('history.columnResult'),
       dataIndex: 'result_summary',
       key: 'result_summary',
       ellipsis: true
@@ -253,7 +262,7 @@ export const AlertDetail: React.FC = () => {
               icon={<ArrowLeftOutlined />}
               onClick={() => navigate('/settings/alerts')}
             >
-              返回
+              {t('back')}
             </Button>
             <Title level={3} style={{ margin: 0 }}>
               {currentAlert.display_name}
@@ -264,50 +273,50 @@ export const AlertDetail: React.FC = () => {
               icon={<EditOutlined />}
               onClick={() => navigate(`/settings/alerts/${id}/edit`)}
             >
-              编辑
+              {t('edit')}
             </Button>
             <Button
               icon={<SendOutlined />}
               onClick={handleTest}
-              loading={savingAlert}  // ✅ 使用 savingAlert 状态
+              loading={savingAlert}
             >
-              测试
+              {t('test')}
             </Button>
             <Button
               danger
               icon={<DeleteOutlined />}
               onClick={handleDelete}
             >
-              删除
+              {t('delete')}
             </Button>
           </Space>
         </Space>
 
       {/* 告警概览 */}
-      <Card title="📊 告警概览">
+      <Card title={t('card.overview')}>
         <Row gutter={16}>
           <Col span={6}>
             <Statistic
-              title="状态"
-              value={currentAlert.is_active ? '启用中' : '已禁用'}
+              title={t('overview.status')}
+              value={currentAlert.is_active ? t('overview.enabled') : t('overview.disabled')}
               prefix={currentAlert.is_active ? '🟢' : '🔴'}
             />
           </Col>
           <Col span={6}>
             <Statistic
-              title="执行次数"
+              title={t('overview.executions')}
               value={totalExecutions}
             />
           </Col>
           <Col span={6}>
             <Statistic
-              title="触发次数"
+              title={t('overview.triggers')}
               value={triggeredCount}
             />
           </Col>
           <Col span={6}>
             <Statistic
-              title="成功率"
+              title={t('overview.successRate')}
               value={successRate}
               suffix="%"
             />
@@ -316,31 +325,34 @@ export const AlertDetail: React.FC = () => {
       </Card>
 
       {/* 告警配置 */}
-      <Card title="📝 告警配置">
+      <Card title={t('card.config')}>
         <Space direction="vertical" style={{ width: '100%' }} size="middle">
           <div>
-            <Text strong>告警描述</Text>
+            <Text strong>{t('config.description')}</Text>
             <Paragraph style={{ marginTop: 8 }}>
               {currentAlert.description}
             </Paragraph>
           </div>
           {/* ✅ 新增：账号信息 */}
           <div>
-            <Text strong>监控账号</Text>
+            <Text strong>{t('config.account')}</Text>
             <Paragraph style={{ marginTop: 8 }}>
               {getAccountName()}
             </Paragraph>
           </div>
           <div>
-            <Text strong>检查频率</Text>
+            <Text strong>{t('config.frequency')}</Text>
             <Paragraph style={{ marginTop: 8 }}>
-              ⏰ 每日 09:00 (UTC+8)
+              {t('config.frequencyValue')}
             </Paragraph>
           </div>
           <div>
-            <Text strong>创建信息</Text>
+            <Text strong>{t('config.createdInfo')}</Text>
             <Paragraph style={{ marginTop: 8 }}>
-              👤 {currentAlert.created_by_username || '未知'} | 📅 创建于 {dayjs(currentAlert.created_at).fromNow()}
+              {t('config.createdBy', {
+                name: currentAlert.created_by_username || t('table.unknown'),
+                time: dayjs(currentAlert.created_at).fromNow()
+              })}
             </Paragraph>
           </div>
         </Space>
@@ -348,14 +360,14 @@ export const AlertDetail: React.FC = () => {
 
       {/* 执行历史 */}
       <Card
-        title={`📜 执行历史 (共 ${totalExecutions} 次)`}
+        title={`${t('card.history')} (${t('history.totalRecords', { count: totalExecutions })})`}
         extra={
           <Button
             icon={<ReloadOutlined />}
             onClick={loadData}
             loading={loading}
           >
-            刷新
+            {t('refresh')}
           </Button>
         }
       >
@@ -367,7 +379,7 @@ export const AlertDetail: React.FC = () => {
           pagination={{
             ...paginationProps,
             total: alertHistory.length,
-            showTotal: (total) => `共 ${total} 条记录`,
+            showTotal: (total) => t('history.pagination', { total }),
           }}
         />
       </Card>

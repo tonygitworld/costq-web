@@ -3,7 +3,8 @@ import { Card, Table, Button, Space, Tag, Typography, Input, Modal, Form, messag
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, ArrowLeftOutlined, KeyOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import type { ColumnsType } from 'antd/es/table';
-import { useAuthStore } from '../../stores/authStore';
+// useAuthStore - 保留用于未来权限控制扩展
+// import { useAuthStore } from '../../stores/authStore';
 import { AccountPermissionModal } from './AccountPermissionModal';
 import { useI18n } from '../../hooks/useI18n';
 import { usePagination } from '../../hooks/usePagination';
@@ -11,6 +12,7 @@ import { apiClient } from '../../services/apiClient';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import { getErrorMessage } from '../../utils/ErrorHandler';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -193,11 +195,8 @@ export const UserManagement: React.FC = () => {
           await apiClient.delete(`/users/${user.id}`);
           message.success(t('message.deleteSuccess'));
           fetchUsers();
-        } catch (error: any) {
-          // ✅ apiClient 已经处理了 401 错误和 Token 刷新
-          // 如果是 401，apiClient 会尝试刷新 Token，如果刷新失败会跳转登录页
-          const errorMessage = error?.message || error?.detail || t('message.deleteFailed');
-          message.error(errorMessage);
+        } catch (error: unknown) {
+          message.error(getErrorMessage(error, t('message.deleteFailed')));
         }
       },
     });
@@ -224,10 +223,8 @@ export const UserManagement: React.FC = () => {
       setIsModalVisible(false);
       form.resetFields();
       fetchUsers();
-    } catch (error: any) {
-      // ✅ apiClient 已经处理了 401 错误和 Token 刷新
-      const errorMessage = error?.message || error?.detail || t('message.operationFailed');
-      message.error(errorMessage);
+    } catch (error: unknown) {
+      message.error(getErrorMessage(error, t('message.operationFailed')));
     }
   };
 

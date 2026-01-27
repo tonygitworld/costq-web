@@ -11,6 +11,31 @@ import { useI18n } from '../../hooks/useI18n';
 import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import './auth.css';
 
+import { logger } from '../../utils/logger';
+
+// 类型安全的 API 错误信息提取
+interface ApiErrorDetail {
+  error_code?: string;
+  message?: string;
+}
+
+function getApiErrorInfo(error: unknown): { errorCode?: string; errorMessage?: string } {
+  if (typeof error === 'object' && error !== null) {
+    const err = error as Record<string, unknown>;
+    if (err.response && typeof err.response === 'object') {
+      const response = err.response as Record<string, unknown>;
+      if (response.data && typeof response.data === 'object') {
+        const data = response.data as Record<string, unknown>;
+        if (data.detail && typeof data.detail === 'object') {
+          const detail = data.detail as ApiErrorDetail;
+          return { errorCode: detail.error_code, errorMessage: detail.message };
+        }
+      }
+    }
+  }
+  return {};
+}
+
 const { Title, Text } = Typography;
 
 export const Login: React.FC = () => {
@@ -39,25 +64,25 @@ export const Login: React.FC = () => {
       // ✅ 登录成功后，加载用户数据
       // 1. 加载聊天记录
       await loadFromStorage();
-      
+
       // 2. 加载账号数据（确保账号选择器有数据可用）
       const { fetchAccounts: fetchAWSAccounts } = useAccountStore.getState();
       const { fetchAccounts: fetchGCPAccounts } = useGCPAccountStore.getState();
       await Promise.all([
-        fetchAWSAccounts().catch(err => console.warn('登录后加载 AWS 账号失败:', err)),
-        fetchGCPAccounts().catch(err => console.warn('登录后加载 GCP 账号失败:', err))
+        fetchAWSAccounts().catch(err => logger.warn('登录后加载 AWS 账号失败:', err)),
+        fetchGCPAccounts().catch(err => logger.warn('登录后加载 GCP 账号失败:', err))
       ]);
 
       message.success(t('login.success.login'));
       navigate('/');
-    } catch (error: any) {
+    } catch (error: unknown) {
       // ✅ 检查是否为租户未激活错误
-      const errorCode = error?.response?.data?.detail?.error_code;
+      const { errorCode, errorMessage } = getApiErrorInfo(error);
 
       if (errorCode === 'TENANT_INACTIVE') {
         modal.warning({
           title: '账号审核中',
-          content: error?.response?.data?.detail?.message || '你的账号正在审核中，审核通过后即可登录。如有疑问请联系管理员。',
+          content: errorMessage || '你的账号正在审核中，审核通过后即可登录。如有疑问请联系管理员。',
           okText: '我知道了'
         });
         return;

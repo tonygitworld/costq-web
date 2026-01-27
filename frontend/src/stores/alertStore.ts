@@ -6,6 +6,8 @@ import { create } from 'zustand';
 import { alertApi } from '../services/api/alertApi';
 import type { Alert, AlertHistory, CreateAlertRequest, UpdateAlertRequest, ListAlertsParams, AlertTestResult } from '../types/alert';
 
+import { logger } from '../utils/logger';
+
 interface AlertStore {
   // 状态
   alerts: Alert[];
@@ -42,16 +44,16 @@ export const useAlertStore = create<AlertStore>((set) => ({
 
   // 获取告警列表
   fetchAlerts: async (params?: ListAlertsParams) => {
-    console.log('📡 alertStore.fetchAlerts - 开始请求');
+    logger.debug('📡 alertStore.fetchAlerts - 开始请求');
     set({ loading: true, error: null });
     try {
       const alerts = await alertApi.getAll(params);
-      console.log('✅ alertStore.fetchAlerts - 请求成功, alerts:', alerts);
-      console.log('📊 第一个告警的ID:', alerts[0]?.id);
+      logger.debug('✅ alertStore.fetchAlerts - 请求成功, alerts:', alerts);
+      logger.debug('📊 第一个告警的ID:', alerts[0]?.id);
       set({ alerts, loading: false });
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : '获取告警列表失败';
-      console.error('❌ alertStore.fetchAlerts - 请求失败:', error);
+      logger.error('❌ alertStore.fetchAlerts - 请求失败:', error);
       set({ error: message, loading: false });
       throw error;
     }
@@ -59,15 +61,15 @@ export const useAlertStore = create<AlertStore>((set) => ({
 
   // 获取单个告警
   fetchAlertById: async (id: string) => {
-    console.log('📡 alertStore.fetchAlertById - 开始请求, ID:', id);
+    logger.debug('📡 alertStore.fetchAlertById - 开始请求, ID:', id);
     set({ fetchingAlert: true, error: null });  // ✅ 使用 fetchingAlert
     try {
       const alert = await alertApi.getById(id);
-      console.log('✅ alertStore.fetchAlertById - 请求成功, Alert:', alert);
+      logger.debug('✅ alertStore.fetchAlertById - 请求成功, Alert:', alert);
       set({ currentAlert: alert, fetchingAlert: false });  // ✅ 使用 fetchingAlert
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : '获取告警详情失败';
-      console.error('❌ alertStore.fetchAlertById - 请求失败:', error);
+      logger.error('❌ alertStore.fetchAlertById - 请求失败:', error);
       set({ error: message, fetchingAlert: false });  // ✅ 使用 fetchingAlert
       throw error;
     }

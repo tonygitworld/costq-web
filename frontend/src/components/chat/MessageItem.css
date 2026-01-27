@@ -1,16 +1,17 @@
 /* MessageItem styling - Agent workflow display */
 /* 响应式优化 - 基于Material Design 3标准 */
+/* 更新：使用 design-tokens.css 设计变量 */
 
 /* ===== 思考过程摘要 ===== */
 
 .thinking-summary {
-  background: linear-gradient(135deg, #667eea10, #764ba210);
-  border-left: 3px solid #667eea;
-  border-radius: var(--border-radius-md);
+  background: linear-gradient(135deg, rgba(30, 64, 175, 0.06), rgba(59, 130, 246, 0.06));
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-md, var(--border-radius-md));
   padding: var(--spacing-md) var(--spacing-lg);
   margin: 0 0 var(--message-spacing) 0;
   box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s ease;
+  transition: box-shadow var(--duration-normal, 0.2s) var(--ease-default, ease);
 }
 
 .thinking-summary:hover {
@@ -22,7 +23,7 @@
   align-items: center;
   gap: var(--spacing-sm);
   font-weight: 500;
-  color: #667eea;
+  color: var(--color-primary);
   margin-bottom: var(--spacing-sm);
   font-size: var(--font-size-base);
 }
@@ -59,20 +60,20 @@
   content: "•";
   position: absolute;
   left: var(--spacing-sm);
-  color: #667eea;
+  color: var(--color-primary);
   font-weight: bold;
 }
 
 /* ===== 工具调用摘要 ===== */
 
 .tool-call-summary {
-  background: #f5f7fa;
-  border-left: 3px solid #1890ff;
-  border-radius: var(--border-radius-md);
+  background: var(--color-gray-50, #f5f7fa);
+  border-left: 3px solid var(--color-primary-light);
+  border-radius: var(--radius-md, var(--border-radius-md));
   padding: var(--spacing-md) var(--spacing-lg);
   margin: 0 0 var(--message-spacing) 0;
   box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s ease;
+  transition: box-shadow var(--duration-normal, 0.2s) var(--ease-default, ease);
 }
 
 .tool-call-summary:hover {

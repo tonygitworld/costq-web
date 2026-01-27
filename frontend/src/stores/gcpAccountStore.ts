@@ -4,6 +4,8 @@ import { persist } from 'zustand/middleware';
 import type { GCPAccount, GCPAccountFormData, GCPAccountUpdateData } from '../types/gcpAccount';
 import { gcpAccountApi } from '../services/api/gcpAccountApi';
 
+import { logger } from '../utils/logger';
+
 interface GCPAccountState {
   // 状态
   accounts: GCPAccount[];
@@ -43,7 +45,7 @@ export const useGCPAccountStore = create<GCPAccountState>()(
         // ✅ 去重：如果正在加载，直接返回
         const state = get();
         if (state.loading) {
-          console.log('⏳ GCP 账号正在加载中，跳过重复调用');
+          logger.debug('⏳ GCP 账号正在加载中，跳过重复调用');
           return;
         }
 

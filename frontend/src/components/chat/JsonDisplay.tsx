@@ -1,18 +1,21 @@
 // JsonDisplay component - Display JSON data with formatting
 import { type FC, useMemo } from 'react';
 
+// JSON 值类型定义
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+
 interface JsonDisplayProps {
-  data: any;
+  data: unknown;
   maxDepth?: number;
 }
 
 /**
  * 智能解析数据，自动处理嵌套的 JSON 字符串
  */
-function parseNestedJson(data: any): any {
+function parseNestedJson(data: unknown): JsonValue {
   // null 或 undefined
   if (data == null) {
-    return data;
+    return null;
   }
 
   // 字符串类型 - 尝试解析为 JSON
@@ -23,7 +26,7 @@ function parseNestedJson(data: any): any {
     // 检查是否像 JSON（以 { 或 [ 开头）
     if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
       try {
-        const parsed = JSON.parse(trimmed);
+        const parsed = JSON.parse(trimmed) as unknown;
         // 递归解析嵌套的 JSON
         return parseNestedJson(parsed);
       } catch {
@@ -41,17 +44,23 @@ function parseNestedJson(data: any): any {
 
   // 对象类型 - 递归解析每个属性
   if (typeof data === 'object') {
-    const result: any = {};
-    for (const key in data) {
-      if (Object.prototype.hasOwnProperty.call(data, key)) {
-        result[key] = parseNestedJson(data[key]);
+    const result: { [key: string]: JsonValue } = {};
+    const obj = data as Record<string, unknown>;
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        result[key] = parseNestedJson(obj[key]);
       }
     }
     return result;
   }
 
-  // 其他类型（数字、布尔等）
-  return data;
+  // 数字或布尔类型
+  if (typeof data === 'number' || typeof data === 'boolean') {
+    return data;
+  }
+
+  // 其他类型，转为字符串
+  return String(data);
 }
 
 export const JsonDisplay: FC<JsonDisplayProps> = ({ data }) => {
@@ -62,7 +71,7 @@ export const JsonDisplay: FC<JsonDisplayProps> = ({ data }) => {
   const formattedJson = useMemo(() => {
     try {
       return JSON.stringify(parsedData, null, 2);
-    } catch (error) {
+    } catch {
       // 如果格式化失败，返回原始数据的字符串形式
       return String(parsedData);
     }

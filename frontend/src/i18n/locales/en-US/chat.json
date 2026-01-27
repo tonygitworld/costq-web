@@ -83,5 +83,10 @@
     "error": "Connection Error",
     "unknown": "Unknown",
     "reconnect": "Reconnect"
+  },
+  "pdf": {
+    "title": "AI Assistant Response",
+    "generatedAt": "Generated at",
+    "dateFormat": "MMMM D, YYYY HH:mm:ss"
   }
 }

@@ -6,7 +6,13 @@ import { useAuthStore } from '../../stores/authStore';
 import { useI18n } from '../../hooks/useI18n';
 import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import { authApi } from '../../services/api/authApi';
+import { getErrorMessage } from '../../utils/ErrorHandler';
 import './auth.css';
+
+// 表单验证错误类型
+interface FormValidationError {
+  errorFields?: unknown[];
+}
 
 const { Title, Text } = Typography;
 
@@ -64,12 +70,13 @@ export const Register: React.FC = () => {
           return prev - 1;
         });
       }, 1000);
-    } catch (error: any) {
-      if (error.errorFields) {
+    } catch (error: unknown) {
+      const formError = error as FormValidationError;
+      if (formError.errorFields) {
         // 表单验证错误
         message.error('请输入有效的邮箱地址');
       } else {
-        message.error(error.message || '发送验证码失败');
+        message.error(getErrorMessage(error, '发送验证码失败'));
       }
     } finally {
       setSendingCode(false);
@@ -94,7 +101,6 @@ export const Register: React.FC = () => {
       );
 
       // ✅ 检查是否需要激活（租户审核）
-      // @ts-ignore - response 可能包含 requires_activation 字段
       if (response?.requires_activation === true) {
         // 租户未激活：切换到成功状态页面
         setRegistrationSuccess(true);

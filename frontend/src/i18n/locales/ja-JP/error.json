@@ -1,0 +1,62 @@
+{
+  "network": {
+    "connectionFailed": "ネットワーク接続に失敗しました。ネットワーク設定を確認してください",
+    "timeout": "リクエストがタイムアウトしました",
+    "serverError": "サーバーエラーが発生しました。しばらくしてからもう一度お試しください",
+    "serviceUnavailable": "サービスが一時的に利用できません。しばらくしてからもう一度お試しください"
+  },
+  "auth": {
+    "tokenExpired": "ログインの有効期限が切れました。再度ログインしてください",
+    "tokenRefreshFailed": "トークンの更新に失敗しました。再度ログインしてください",
+    "unauthorized": "未認証のアクセスです。先にログインしてください",
+    "forbidden": "アクセスが拒否されました。権限が不足しています",
+    "invalidCredentials": "ユーザー名またはパスワードが正しくありません",
+    "sessionExpired": "セッションの有効期限が切れました。再度ログインしてください"
+  },
+  "validation": {
+    "required": "この項目は必須です",
+    "invalidFormat": "形式が正しくありません",
+    "tooLong": "入力が長すぎます",
+    "tooShort": "入力が短すぎます"
+  },
+  "api": {
+    "parseError": "レスポンスデータを解析できません",
+    "requestFailed": "リクエストが失敗しました",
+    "retryFailed": "リトライに失敗しました：{{message}}",
+    "notFound": "リソースが見つかりません"
+  },
+  "file": {
+    "uploadFailed": "ファイルのアップロードに失敗しました",
+    "downloadFailed": "ファイルのダウンロードに失敗しました",
+    "exportFailed": "エクスポートに失敗しました。もう一度お試しください"
+  },
+  "pdf": {
+    "generationFailed": "PDF生成に失敗しました。もう一度お試しください",
+    "exportSuccess": "PDFのエクスポートが完了しました"
+  },
+  "account": {
+    "loadFailed": "アカウントの読み込みに失敗しました",
+    "addFailed": "アカウントの追加に失敗しました",
+    "deleteFailed": "アカウントの削除に失敗しました",
+    "updateFailed": "アカウントの更新に失敗しました"
+  },
+  "chat": {
+    "sendFailed": "メッセージの送信に失敗しました",
+    "loadFailed": "チャット履歴の読み込みに失敗しました",
+    "deleteFailed": "チャットの削除に失敗しました",
+    "sessionCreateFailed": "セッションの作成に失敗しました"
+  },
+  "template": {
+    "loadFailed": "テンプレートの読み込みに失敗しました",
+    "createFailed": "テンプレートの作成に失敗しました",
+    "updateFailed": "テンプレートの更新に失敗しました",
+    "deleteFailed": "テンプレートの削除に失敗しました",
+    "executeFailed": "テンプレートの実行に失敗しました"
+  },
+  "alert": {
+    "loadFailed": "アラートの読み込みに失敗しました",
+    "createFailed": "アラートの作成に失敗しました",
+    "updateFailed": "アラートの更新に失敗しました",
+    "deleteFailed": "アラートの削除に失敗しました"
+  }
+}

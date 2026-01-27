@@ -10,6 +10,8 @@ import type {
 } from '../types/position';
 import { ErrorHandler } from '../utils/ErrorHandler';
 
+import { logger } from '../utils/logger';
+
 /**
  * usePositionKeeper Hook
  *
@@ -98,7 +100,7 @@ export const usePositionKeeper = ({
     }
 
     if (config.debug) {
-      console.log(`[PositionKeeper] Event: ${event}`, data);
+      logger.debug(`[PositionKeeper] Event: ${event}`, data);
     }
   }, [config.onEvent, config.debug]);
 
@@ -250,7 +252,7 @@ export const usePositionKeeper = ({
     setUserBehaviorPattern(newPattern);
 
     if (config.debug) {
-      console.log('[PositionKeeper] Behavior pattern updated:', newPattern);
+      logger.debug('[PositionKeeper] Behavior pattern updated:', newPattern);
     }
   }, [config.debug]);
 
@@ -385,7 +387,7 @@ export const usePositionKeeper = ({
     // 检查内容是否发生变化
     if (memory.contentHash !== currentContentHash) {
       if (config.debug) {
-        console.log('[PositionKeeper] Content changed, position restore skipped');
+        logger.debug('[PositionKeeper] Content changed, position restore skipped');
       }
       return false;
     }
@@ -393,7 +395,7 @@ export const usePositionKeeper = ({
     // 检查保存时间是否过期（5分钟）
     if (Date.now() - memory.savedAt > 300000) {
       if (config.debug) {
-        console.log('[PositionKeeper] Saved position expired');
+        logger.debug('[PositionKeeper] Saved position expired');
       }
       return false;
     }

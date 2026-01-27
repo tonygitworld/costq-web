@@ -29,7 +29,7 @@ export default defineConfig({
       '/api/sse': {
         target: 'http://localhost:8000',
         changeOrigin: true,
-        configure: (proxy, _options) => {
+        configure: (proxy) => {
           proxy.on('proxyReq', (proxyReq, req) => {
             // SSE 请求需要保持连接
             if (req.headers.accept === 'text/event-stream') {

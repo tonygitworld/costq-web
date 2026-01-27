@@ -3,6 +3,7 @@ import { type FC, useEffect } from 'react';
 import { Select, Tag, Space, Spin, Tooltip } from 'antd';
 import { GoogleOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useGCPAccountStore } from '../../stores/gcpAccountStore';
+import { useI18n } from '../../hooks/useI18n';
 
 const { Option } = Select;
 
@@ -13,7 +14,7 @@ interface GCPAccountSelectorProps {
 
 export const GCPAccountSelector: FC<GCPAccountSelectorProps> = ({
   style,
-  placeholder = "选择要查询的 GCP 账号"
+  placeholder
 }) => {
   const {
     accounts,
@@ -22,6 +23,7 @@ export const GCPAccountSelector: FC<GCPAccountSelectorProps> = ({
     fetchAccounts,
     setSelectedAccounts
   } = useGCPAccountStore();
+  const { t } = useI18n(['gcp', 'common']);
 
   // 组件挂载时获取账号列表
   // ✅ 使用空依赖数组，只在组件挂载时调用一次
@@ -54,6 +56,8 @@ export const GCPAccountSelector: FC<GCPAccountSelectorProps> = ({
     setSelectedAccounts(values);
   };
 
+  const selectorPlaceholder = placeholder || t('gcp:account.selector.placeholder');
+
   return (
     <Select
       mode="multiple"
@@ -65,10 +69,10 @@ export const GCPAccountSelector: FC<GCPAccountSelectorProps> = ({
         loading ? (
           <Space>
             <Spin size="small" />
-            <span>加载账号列表...</span>
+            <span>{t('common:status.loading')}</span>
           </Space>
         ) : (
-          placeholder
+          selectorPlaceholder
         )
       }
       value={selectedAccountIds}
@@ -76,7 +80,7 @@ export const GCPAccountSelector: FC<GCPAccountSelectorProps> = ({
       loading={loading}
       maxTagCount={1}
       maxTagPlaceholder={(omittedValues) => (
-        <Tooltip title={`已选择 ${selectedAccountIds.length} 个账号`}>
+        <Tooltip title={t('common:hint.selectedCount', { count: selectedAccountIds.length })}>
           <Tag>+{omittedValues.length}</Tag>
         </Tooltip>
       )}
@@ -87,11 +91,11 @@ export const GCPAccountSelector: FC<GCPAccountSelectorProps> = ({
         loading ? (
           <div style={{ textAlign: 'center', padding: '20px' }}>
             <Spin />
-            <div style={{ marginTop: '8px' }}>加载中...</div>
+            <div style={{ marginTop: '8px' }}>{t('common:status.loading')}</div>
           </div>
         ) : (
           <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
-            暂无账号，请先添加 GCP 账号
+            {t('gcp:account.empty.title')}
           </div>
         )
       }
@@ -116,9 +120,9 @@ export const GCPAccountSelector: FC<GCPAccountSelectorProps> = ({
               )}
             </Space>
             <Space direction="vertical" size={0} style={{ fontSize: '12px', color: '#999' }}>
-              <span>项目: {account.project_id}</span>
+              <span>{t('gcp:account.form.projectId')}: {account.project_id}</span>
               {account.organization_id && (
-                <span>组织: {account.organization_id}</span>
+                <span>{t('gcp:account.table.organization')}: {account.organization_id}</span>
               )}
             </Space>
           </div>

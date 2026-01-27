@@ -1,0 +1,75 @@
+{
+  "account": {
+    "title": "GCP アカウント管理",
+    "addButton": "GCP アカウントを追加",
+    "addModal": {
+      "title": "GCP アカウントを追加",
+      "tip": "アカウント追加時に Service Account の権限が自動検証されます"
+    },
+    "editModal": {
+      "title": "GCP アカウントを編集",
+      "tip": "注意"
+    },
+    "table": {
+      "name": "アカウント名",
+      "organization": "組織/請求アカウント",
+      "description": "説明",
+      "status": "ステータス",
+      "createdAt": "作成日時",
+      "actions": "操作"
+    },
+    "status": {
+      "verified": "認証情報検証済み",
+      "unverified": "未検証"
+    },
+    "form": {
+      "name": "アカウント名",
+      "nameRequired": "アカウント名を入力してください",
+      "nameMaxLength": "名前は100文字以内にしてください",
+      "namePlaceholder": "例：Production GCP",
+      "nameTooltip": "識別しやすい名前を設定してください（例：本番環境 GCP）",
+      "description": "説明（任意）",
+      "descriptionMaxLength": "説明は500文字以内にしてください",
+      "descriptionPlaceholder": "例：コスト分析用の本番環境 GCP プロジェクト",
+      "serviceAccountKey": "Service Account JSON Key",
+      "serviceAccountKeyTooltip": "GCP Console からダウンロードした JSON キーファイル",
+      "serviceAccountKeyRequired": "JSON Key を貼り付けてください",
+      "serviceAccountKeyInvalid": "Service Account JSON Key を貼り付けてください",
+      "serviceAccountKeyTypeError": "service_account タイプのキーである必要があります",
+      "serviceAccountKeyFormatError": "無効な JSON 形式です",
+      "projectId": "プロジェクト ID",
+      "projectIdReadonly": "このフィールドは変更できません",
+      "datasetId": "Dataset ID",
+      "datasetIdPlaceholder": "例：cy-export",
+      "tableName": "テーブル名",
+      "tableNamePlaceholder": "例：gcp_billing_export_resource_v1_015B75_932950_C931B5",
+      "tableNameTooltip": "テーブル名のみを入力（プロジェクトと dataset は含めない）、通常 gcp_billing_export_resource_v1_ で始まります",
+      "billingExportDataset": "Billing Export Dataset",
+      "billingExportDatasetPlaceholder": "例：cy_export"
+    },
+    "action": {
+      "edit": "アカウントを編集",
+      "verify": "認証情報を検証",
+      "delete": "削除",
+      "confirmDelete": "削除の確認",
+      "confirmDeleteContent": "この GCP アカウントを削除しますか？この操作は元に戻せません。"
+    },
+    "message": {
+      "addSuccess": "GCP アカウントが追加されました",
+      "addFailed": "GCP アカウントの追加に失敗しました",
+      "updateSuccess": "GCP アカウントが更新されました",
+      "updateFailed": "GCP アカウントの更新に失敗しました",
+      "deleteSuccess": "GCP アカウントが削除されました",
+      "deleteFailed": "GCP アカウントの削除に失敗しました",
+      "verifySuccess": "認証情報の検証に成功しました",
+      "verifyFailed": "検証に失敗しました"
+    },
+    "empty": {
+      "title": "GCP アカウントが追加されていません",
+      "description": "「アカウントを追加」ボタンをクリックして開始してください"
+    },
+    "selector": {
+      "placeholder": "クエリする GCP アカウントを選択"
+    }
+  }
+}

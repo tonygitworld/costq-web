@@ -48,6 +48,14 @@ export interface LoginResponse {
   organization: Organization;
 }
 
+// 注册响应：可能需要激活（租户审核）
+export interface RegisterResponse extends Partial<LoginResponse> {
+  requires_activation?: boolean;
+  message?: string;
+  user?: User;
+  organization?: Organization;
+}
+
 export const authApi = {
   /**
    * 发送邮箱验证码
@@ -74,8 +82,8 @@ export const authApi = {
   /**
    * 用户注册
    */
-  async register(data: RegisterRequest): Promise<LoginResponse | any> {
-    return apiClient.post<LoginResponse | any>('/auth/register', data, {
+  async register(data: RegisterRequest): Promise<RegisterResponse> {
+    return apiClient.post<RegisterResponse>('/auth/register', data, {
       skipAuth: true,
     });
   },

@@ -22,13 +22,14 @@ import { useAuthStore } from './stores/authStore';
 import { useAccountStore } from './stores/accountStore';
 import { useGCPAccountStore } from './stores/gcpAccountStore';
 import { antdTheme } from './styles/antd-theme';
-import { TestDataButton } from './components/dev/TestDataButton';
 import { useBeforeUnload } from './hooks/useBeforeUnload';
 import { ensureTokenValid } from './utils/tokenUtils';
 import { setAuthMessageListener, setAuthRedirectListener } from './utils/authNotifications';
 import './i18n';  // 初始化i18n
 import 'antd/dist/reset.css';
 import './styles/account-selection.css';
+
+import { logger } from './utils/logger';
 
 // 创建 QueryClient 实例
 const queryClient = new QueryClient({
@@ -58,8 +59,8 @@ const AppContent: FC = () => {
 
     // 清理函数
     return () => {
-      setAuthMessageListener(null as any);
-      setAuthRedirectListener(null as any);
+      setAuthMessageListener(null);
+      setAuthRedirectListener(null);
     };
   }, [message, navigate]);
 
@@ -99,13 +100,11 @@ const AppContent: FC = () => {
           <ProtectedRoute>
             <div className="app" style={{ height: '100vh', width: '100vw' }}>
               <ChatLayout />
-              {/* 开发工具：测试数据注入按钮（仅开发模式） */}
-              <TestDataButton />
             </div>
           </ProtectedRoute>
         }
       />
-      
+
       {/* 会话页面 - 支持 URL 路由（类似 OpenAI /c/{conversation-id}） */}
       <Route
         path="/c/:sessionId"
@@ -113,8 +112,6 @@ const AppContent: FC = () => {
           <ProtectedRoute>
             <div className="app" style={{ height: '100vh', width: '100vw' }}>
               <ChatLayout />
-              {/* 开发工具：测试数据注入按钮（仅开发模式） */}
-              <TestDataButton />
             </div>
           </ProtectedRoute>
         }
@@ -289,33 +286,33 @@ const App: FC = () => {
       // 检查用户是否已登录
       const { isAuthenticated } = useAuthStore.getState();
       if (!isAuthenticated) {
-        console.log('ℹ️ 用户未登录，跳过初始化');
+        logger.debug('ℹ️ 用户未登录，跳过初始化');
         return;
       }
 
       try {
         // ✅ 第一步：检查并刷新 Token（如果过期）
-        console.log('🔄 [App] 检查 Token 状态...');
+        logger.debug('🔄 [App] 检查 Token 状态...');
         const tokenValid = await ensureTokenValid();
-        
+
         if (!tokenValid) {
-          console.warn('⚠️ [App] Token 刷新失败，跳过数据加载');
+          logger.warn('⚠️ [App] Token 刷新失败，跳过数据加载');
           return;
         }
 
         // ✅ 第二步：Token 有效后，加载账号数据
         const { fetchAccounts: fetchAWSAccounts } = useAccountStore.getState();
         const { fetchAccounts: fetchGCPAccounts } = useGCPAccountStore.getState();
-        
+
         // 并行加载，提高性能
         await Promise.all([
-          fetchAWSAccounts().catch(err => console.warn('加载 AWS 账号失败:', err)),
-          fetchGCPAccounts().catch(err => console.warn('加载 GCP 账号失败:', err))
+          fetchAWSAccounts().catch(err => logger.warn('加载 AWS 账号失败:', err)),
+          fetchGCPAccounts().catch(err => logger.warn('加载 GCP 账号失败:', err))
         ]);
-        
-        console.log('✅ 应用启动：账号数据加载完成');
+
+        logger.debug('✅ 应用启动：账号数据加载完成');
       } catch (error) {
-        console.error('❌ 应用启动：初始化失败:', error);
+        logger.error('❌ 应用启动：初始化失败:', error);
       }
     };
 

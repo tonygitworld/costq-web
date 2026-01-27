@@ -23,12 +23,12 @@ export const AddGCPAccountModal: FC<AddGCPAccountModalProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [inputMethod, setInputMethod] = useState<'paste' | 'upload'>('paste');
   const { addAccount } = useGCPAccountStore();
-  const { t } = useI18n(['account', 'common']);
+  const { t } = useI18n(['gcp', 'common']);
 
   // 验证 JSON 格式
   const validateJSON = (_: any, value: string) => {
     if (!value) {
-      return Promise.reject(new Error('请粘贴 Service Account JSON Key'));
+      return Promise.reject(new Error(t('gcp:account.form.serviceAccountKeyRequired')));
     }
 
     try {
@@ -38,17 +38,17 @@ export const AddGCPAccountModal: FC<AddGCPAccountModalProps> = ({
       const requiredFields = ['type', 'project_id', 'private_key', 'client_email'];
       for (const field of requiredFields) {
         if (!parsed[field]) {
-          return Promise.reject(new Error(`JSON Key 缺少必需字段: ${field}`));
+          return Promise.reject(new Error(t('gcp:account.form.serviceAccountKeyInvalid')));
         }
       }
 
       if (parsed.type !== 'service_account') {
-        return Promise.reject(new Error('必须是 service_account 类型的密钥'));
+        return Promise.reject(new Error(t('gcp:account.form.serviceAccountKeyTypeError')));
       }
 
       return Promise.resolve();
-    } catch (error) {
-      return Promise.reject(new Error('无效的 JSON 格式'));
+    } catch {
+      return Promise.reject(new Error(t('gcp:account.form.serviceAccountKeyFormatError')));
     }
   };
 
@@ -90,8 +90,8 @@ export const AddGCPAccountModal: FC<AddGCPAccountModalProps> = ({
       let serviceAccountJson;
       try {
         serviceAccountJson = JSON.parse(values.service_account_json_text);
-      } catch (error) {
-        antMessage.error('JSON 格式错误');
+      } catch {
+        antMessage.error(t('gcp:account.form.serviceAccountKeyFormatError'));
         setSubmitting(false);
         return;
       }
@@ -108,13 +108,13 @@ export const AddGCPAccountModal: FC<AddGCPAccountModalProps> = ({
       // 调用 API 添加账号
       await addAccount(formData);
 
-      antMessage.success('GCP 账号添加成功！');
+      antMessage.success(t('gcp:account.message.addSuccess'));
       form.resetFields();
       onCancel();
       onSuccess?.();
     } catch (error) {
       if (error instanceof Error) {
-        antMessage.error(error.message || '添加 GCP 账号失败');
+        antMessage.error(error.message || t('gcp:account.message.addFailed'));
       }
     } finally {
       setSubmitting(false);
@@ -131,20 +131,20 @@ export const AddGCPAccountModal: FC<AddGCPAccountModalProps> = ({
       title={
         <Space>
           <GoogleOutlined style={{ color: '#4285F4' }} />
-          <span>添加 GCP 账号</span>
+          <span>{t('gcp:account.addModal.title')}</span>
         </Space>
       }
       open={visible}
       onOk={handleSubmit}
       onCancel={handleCancel}
       confirmLoading={submitting}
-      okText={t('modal.verifyAndAdd')}
+      okText={t('common:button.confirm')}
       cancelText={t('common:button.cancel')}
       width={700}
       destroyOnClose
     >
       <Alert
-        message="添加账号时会自动验证 Service Account 权限"
+        message={t('gcp:account.addModal.tip')}
         type="info"
         showIcon
         style={{ marginBottom: 16 }}
@@ -156,25 +156,25 @@ export const AddGCPAccountModal: FC<AddGCPAccountModalProps> = ({
         autoComplete="off"
       >
         <Form.Item
-          label="账号名称"
+          label={t('gcp:account.form.name')}
           name="account_name"
           rules={[
-            { required: true, message: '请输入账号名称' },
-            { max: 100, message: '名称不能超过100个字符' }
+            { required: true, message: t('gcp:account.form.nameRequired') },
+            { max: 100, message: t('gcp:account.form.nameMaxLength') }
           ]}
-          tooltip="为账号设置一个容易识别的名称，例如：生产环境 GCP"
+          tooltip={t('gcp:account.form.nameTooltip')}
         >
           <Input
             prefix={<GoogleOutlined />}
-            placeholder="例如：Production GCP"
+            placeholder={t('gcp:account.form.namePlaceholder')}
             maxLength={100}
           />
         </Form.Item>
 
         <Form.Item
-          label="Service Account JSON Key"
+          label={t('gcp:account.form.serviceAccountKey')}
           required
-          tooltip="从 GCP Console 下载的 Service Account JSON 密钥文件"
+          tooltip={t('gcp:account.form.serviceAccountKeyTooltip')}
         >
           <Tabs
             activeKey={inputMethod}
@@ -185,14 +185,14 @@ export const AddGCPAccountModal: FC<AddGCPAccountModalProps> = ({
                 label: (
                   <Space>
                     <CodeOutlined />
-                    粘贴 JSON
+                    {t('common:button.paste')} JSON
                   </Space>
                 ),
                 children: (
                   <Form.Item
                     name="service_account_json_text"
                     rules={[
-                      { required: inputMethod === 'paste', message: '请粘贴 JSON Key' },
+                      { required: inputMethod === 'paste', message: t('gcp:account.form.serviceAccountKeyRequired') },
                       { validator: inputMethod === 'paste' ? validateJSON : undefined }
                     ]}
                     noStyle
@@ -218,7 +218,7 @@ export const AddGCPAccountModal: FC<AddGCPAccountModalProps> = ({
                 label: (
                   <Space>
                     <UploadOutlined />
-                    上传文件
+                    {t('common:button.upload')}
                   </Space>
                 ),
                 children: (
@@ -227,15 +227,15 @@ export const AddGCPAccountModal: FC<AddGCPAccountModalProps> = ({
                     maxCount={1}
                     beforeUpload={(file) => {
                       handleFileUpload(file);
-                      return false; // 阻止自动上传
+                      return false;
                     }}
                     fileList={[]}
                   >
                     <Button icon={<UploadOutlined />}>
-                      选择 JSON 文件
+                      {t('common:button.selectFile')}
                     </Button>
                     <div style={{ marginTop: '8px', color: '#999', fontSize: '12px' }}>
-                      支持 .json 格式文件
+                      {t('common:hint.supportJsonFile')}
                     </div>
                   </Upload>
                 )
@@ -245,13 +245,13 @@ export const AddGCPAccountModal: FC<AddGCPAccountModalProps> = ({
         </Form.Item>
 
         <Form.Item
-          label="描述（可选）"
+          label={t('gcp:account.form.description')}
           name="description"
-          rules={[{ max: 500, message: '描述不能超过500个字符' }]}
+          rules={[{ max: 500, message: t('gcp:account.form.descriptionMaxLength') }]}
         >
           <TextArea
             rows={2}
-            placeholder="例如：生产环境 GCP 项目，用于成本分析"
+            placeholder={t('gcp:account.form.descriptionPlaceholder')}
             maxLength={500}
             showCount
           />
@@ -259,15 +259,15 @@ export const AddGCPAccountModal: FC<AddGCPAccountModalProps> = ({
 
         {/* BigQuery Billing Export 配置 */}
         <Alert
-          message="BigQuery Billing Export 配置（可选）"
+          message={t('gcp:account.form.billingExportDataset')}
           description={
             <div>
-              <p>如果你已在 GCP 中配置了 Billing Export 到 BigQuery，可以填写以下信息以启用成本分析功能。</p>
+              <p>{t('common:hint.billingExportTip')}</p>
               <p style={{ marginTop: 8, marginBottom: 0 }}>
-                <strong>示例：</strong>完整表路径是 <code>cy-export.cy_export.gcp_billing_export_resource_v1_XXX</code>，则分别填写：
-                <br />• 项目 ID: <code>cy-export</code>
+                <strong>{t('common:label.example')}:</strong> <code>cy-export.cy_export.gcp_billing_export_resource_v1_XXX</code>
+                <br />• {t('gcp:account.form.projectId')}: <code>cy-export</code>
                 <br />• Dataset: <code>cy_export</code>
-                <br />• 表名: <code>gcp_billing_export_resource_v1_XXX</code>（只填表名部分）
+                <br />• {t('gcp:account.form.tableName')}: <code>gcp_billing_export_resource_v1_XXX</code>
               </p>
             </div>
           }
@@ -277,34 +277,32 @@ export const AddGCPAccountModal: FC<AddGCPAccountModalProps> = ({
         />
 
         <Form.Item
-          label="BigQuery 项目 ID"
+          label={t('gcp:account.form.projectId')}
           name="billing_export_project_id"
-          tooltip="BigQuery billing export 数据所在的 GCP 项目 ID"
         >
           <Input
-            placeholder="例如：cy-export"
+            placeholder={t('gcp:account.form.datasetIdPlaceholder')}
             prefix={<GoogleOutlined />}
           />
         </Form.Item>
 
         <Form.Item
-          label="BigQuery Dataset 名称"
+          label={t('gcp:account.form.datasetId')}
           name="billing_export_dataset"
-          tooltip="BigQuery 中存储 billing export 的 dataset 名称（下划线格式）"
         >
           <Input
-            placeholder="例如：cy_export"
+            placeholder={t('gcp:account.form.billingExportDatasetPlaceholder')}
             prefix={<GoogleOutlined />}
           />
         </Form.Item>
 
         <Form.Item
-          label="BigQuery 表名"
+          label={t('gcp:account.form.tableName')}
           name="billing_export_table"
-          tooltip="只填写表名（不包含项目和 dataset），通常以 gcp_billing_export_resource_v1_ 开头"
+          tooltip={t('gcp:account.form.tableNameTooltip')}
         >
           <Input
-            placeholder="例如：gcp_billing_export_resource_v1_015B75_932950_C931B5"
+            placeholder={t('gcp:account.form.tableNamePlaceholder')}
             prefix={<GoogleOutlined />}
           />
         </Form.Item>
@@ -313,12 +311,12 @@ export const AddGCPAccountModal: FC<AddGCPAccountModalProps> = ({
       <Alert
         type="warning"
         showIcon
-        message={t('modal.securityTip')}
+        message={t('common:security.tip')}
         description={
           <ul style={{ margin: '8px 0 0 0', paddingLeft: '20px' }}>
-            <li>Service Account JSON Key 将加密存储在数据库中</li>
-            <li>建议为该 SA 授予最小权限：<code>roles/billing.viewer</code></li>
-            <li>定期轮换 Service Account Key 以提高安全性</li>
+            <li>{t('common:security.encryptedStorage')}</li>
+            <li>{t('common:security.minimalPermission')}: <code>roles/billing.viewer</code></li>
+            <li>{t('common:security.rotateKey')}</li>
           </ul>
         }
       />

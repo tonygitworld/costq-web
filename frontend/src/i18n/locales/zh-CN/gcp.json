@@ -1,0 +1,75 @@
+{
+  "account": {
+    "title": "GCP 账号管理",
+    "addButton": "添加 GCP 账号",
+    "addModal": {
+      "title": "添加 GCP 账号",
+      "tip": "添加账号时会自动验证 Service Account 权限"
+    },
+    "editModal": {
+      "title": "编辑 GCP 账号",
+      "tip": "提示"
+    },
+    "table": {
+      "name": "账号名称",
+      "organization": "组织/计费账号",
+      "description": "描述",
+      "status": "状态",
+      "createdAt": "创建时间",
+      "actions": "操作"
+    },
+    "status": {
+      "verified": "凭证已验证",
+      "unverified": "未验证"
+    },
+    "form": {
+      "name": "账号名称",
+      "nameRequired": "请输入账号名称",
+      "nameMaxLength": "名称不能超过100个字符",
+      "namePlaceholder": "例如：Production GCP",
+      "nameTooltip": "为账号设置一个容易识别的名称，例如：生产环境 GCP",
+      "description": "描述（可选）",
+      "descriptionMaxLength": "描述不能超过500个字符",
+      "descriptionPlaceholder": "例如：生产环境 GCP 项目，用于成本分析",
+      "serviceAccountKey": "Service Account JSON Key",
+      "serviceAccountKeyTooltip": "从 GCP Console 下载的 Service Account JSON 密钥文件",
+      "serviceAccountKeyRequired": "请粘贴 JSON Key",
+      "serviceAccountKeyInvalid": "请粘贴 Service Account JSON Key",
+      "serviceAccountKeyTypeError": "必须是 service_account 类型的密钥",
+      "serviceAccountKeyFormatError": "无效的 JSON 格式",
+      "projectId": "项目 ID",
+      "projectIdReadonly": "此字段不可修改",
+      "datasetId": "Dataset ID",
+      "datasetIdPlaceholder": "例如：cy-export",
+      "tableName": "表名",
+      "tableNamePlaceholder": "例如：gcp_billing_export_resource_v1_015B75_932950_C931B5",
+      "tableNameTooltip": "只填写表名（不包含项目和 dataset），通常以 gcp_billing_export_resource_v1_ 开头",
+      "billingExportDataset": "Billing Export Dataset",
+      "billingExportDatasetPlaceholder": "例如：cy_export"
+    },
+    "action": {
+      "edit": "编辑账号",
+      "verify": "验证凭证",
+      "delete": "删除",
+      "confirmDelete": "确认删除",
+      "confirmDeleteContent": "确定要删除此 GCP 账号吗？此操作不可恢复。"
+    },
+    "message": {
+      "addSuccess": "GCP 账号添加成功",
+      "addFailed": "添加 GCP 账号失败",
+      "updateSuccess": "GCP 账号更新成功",
+      "updateFailed": "更新 GCP 账号失败",
+      "deleteSuccess": "GCP 账号已删除",
+      "deleteFailed": "删除 GCP 账号失败",
+      "verifySuccess": "凭证验证成功",
+      "verifyFailed": "验证失败"
+    },
+    "empty": {
+      "title": "尚未添加 GCP 账号",
+      "description": "点击「添加账号」按钮开始添加"
+    },
+    "selector": {
+      "placeholder": "选择要查询的 GCP 账号"
+    }
+  }
+}

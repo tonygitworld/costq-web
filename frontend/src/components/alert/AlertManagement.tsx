@@ -33,13 +33,15 @@ import { useAuthStore } from '../../stores/authStore';
 import { useAccountStore } from '../../stores/accountStore';
 import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import { usePagination } from '../../hooks/usePagination';
+import { useI18n } from '../../hooks/useI18n';
 import type { Alert } from '../../types/alert';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/zh-cn';
+import 'dayjs/locale/en';
+import 'dayjs/locale/ja';
 
 dayjs.extend(relativeTime);
-dayjs.locale('zh-cn');
 
 const { Title } = Typography;
 const { Search } = Input;
@@ -48,6 +50,17 @@ export const AlertManagement: React.FC = () => {
   const navigate = useNavigate();
   const { modal } = App.useApp();
   const currentUser = useAuthStore(state => state.user);
+  const { t, i18n } = useI18n('alert');
+
+  // 根据当前语言设置 dayjs 语言
+  React.useEffect(() => {
+    const dayjsLocaleMap: Record<string, string> = {
+      'zh-CN': 'zh-cn',
+      'en-US': 'en',
+      'ja-JP': 'ja'
+    };
+    dayjs.locale(dayjsLocaleMap[i18n.language] || 'en');
+  }, [i18n.language]);
 
   const {
     alerts,
@@ -81,7 +94,7 @@ export const AlertManagement: React.FC = () => {
     try {
       await fetchAlerts();
     } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : '加载告警列表失败';
+      const msg = error instanceof Error ? error.message : t('message.loadFailed');
       message.error(msg);
     }
   };
@@ -91,11 +104,11 @@ export const AlertManagement: React.FC = () => {
     setTriggering(true);
     try {
       await triggerScheduler();
-      message.success('已触发系统扫描，请稍后查看日志');
-      // 延迟刷新列表，以便看到状态更新（虽然是异步的，但也许能看到 last_checked_at 变化）
+      message.success(t('message.triggerSuccess'));
+      // 延迟刷新列表，以便看到状态更新
       setTimeout(loadAlerts, 2000);
     } catch (error: unknown) {
-      const msg = error instanceof Error ? error.message : '触发失败';
+      const msg = error instanceof Error ? error.message : t('message.triggerFailed');
       message.error(msg);
     } finally {
       setTriggering(false);
@@ -128,10 +141,10 @@ export const AlertManagement: React.FC = () => {
   // 获取状态显示
   const getStatusDisplay = (alert: Alert) => {
     if (!alert.is_active) {
-      return <Tag color="default">⏸️ 禁用</Tag>;
+      return <Tag color="default">⏸️ {t('table.statusDisabled')}</Tag>;
     }
     if (!alert.last_executed_at) {
-      return <Tag color="default">⏳ 未执行</Tag>;
+      return <Tag color="default">⏳ {t('table.statusNeverExecuted')}</Tag>;
     }
     // 这里简化处理，实际应该从历史记录获取最后执行状态
     return <Tag color="success">✅ {dayjs(alert.last_executed_at).fromNow()}</Tag>;
@@ -140,14 +153,14 @@ export const AlertManagement: React.FC = () => {
   // ✅ 获取账号名称
   const getAccountName = (accountId?: string, accountType?: string) => {
     if (!accountId) {
-      return <Tag color="default">未设置</Tag>;
+      return <Tag color="default">{t('table.notSet')}</Tag>;
     }
 
     if (accountType === 'gcp') {
       const gcpAccount = gcpAccounts.find(a => a.id === accountId);
       return (
         <Tag color="blue" icon={<span>🔵</span>}>
-          GCP: {gcpAccount?.account_name || gcpAccount?.project_id || accountId.slice(0, 8)}
+          {t('account.gcp')}: {gcpAccount?.account_name || gcpAccount?.project_id || accountId.slice(0, 8)}
         </Tag>
       );
     }
@@ -156,7 +169,7 @@ export const AlertManagement: React.FC = () => {
     const awsAccount = awsAccounts.find(a => a.id === accountId);
     return (
       <Tag color="orange" icon={<span>☁️</span>}>
-        AWS: {awsAccount?.alias || awsAccount?.account_id || accountId.slice(0, 8)}
+        {t('account.aws')}: {awsAccount?.alias || awsAccount?.account_id || accountId.slice(0, 8)}
       </Tag>
     );
   };
@@ -164,17 +177,17 @@ export const AlertManagement: React.FC = () => {
   // 删除告警
   const handleDelete = (alert: Alert) => {
     modal.confirm({
-      title: '确认删除',
-      content: `确定要删除告警"${alert.display_name}"吗？此操作不可恢复。`,
+      title: t('confirm.deleteTitle'),
+      content: t('confirm.deleteContent', { name: alert.display_name }),
       okType: 'danger',
-      okText: '删除',
-      cancelText: '取消',
+      okText: t('confirm.deleteOk'),
+      cancelText: t('confirm.deleteCancel'),
       onOk: async () => {
         try {
           await deleteAlert(alert.id);
-          message.success('删除成功');
+          message.success(t('message.deleteSuccess'));
         } catch (error: unknown) {
-          const msg = error instanceof Error ? error.message : '删除失败';
+          const msg = error instanceof Error ? error.message : t('message.deleteFailed');
           message.error(msg);
         }
       }
@@ -187,25 +200,21 @@ export const AlertManagement: React.FC = () => {
       title: '●',
       key: 'indicator',
       width: 40,
-      render: (_, record) => {
-        console.log('📋 Table render - record:', record);
-        console.log('🆔 Table render - record.id:', record.id);
-        return (
-          <span style={{ fontSize: '20px' }}>
-            {record.is_active ? '🟢' : '🔴'}
-          </span>
-        );
-      }
+      render: (_, record) => (
+        <span style={{ fontSize: '20px' }}>
+          {record.is_active ? '🟢' : '🔴'}
+        </span>
+      )
     },
     {
-      title: '名称',
+      title: t('table.columnName'),
       dataIndex: 'display_name',
       key: 'display_name',
       width: 150,
       render: (text) => <strong>{text}</strong>
     },
     {
-      title: '描述',
+      title: t('table.columnDescription'),
       dataIndex: 'description',
       key: 'description',
       ellipsis: true,
@@ -214,7 +223,7 @@ export const AlertManagement: React.FC = () => {
           <div style={{ marginBottom: 4 }}>{text}</div>
           <Space size={4} style={{ fontSize: '12px' }}>
             <span style={{ color: '#999' }}>
-              👤 {record.created_by_username || '未知'} | 📅 {dayjs(record.created_at).fromNow()}
+              👤 {record.created_by_username || t('table.unknown')} | 📅 {dayjs(record.created_at).fromNow()}
             </span>
             {/* ✅ 显示账号信息 */}
             {record.account_id && (
@@ -228,13 +237,13 @@ export const AlertManagement: React.FC = () => {
       )
     },
     {
-      title: '状态',
+      title: t('table.columnStatus'),
       key: 'status',
       width: 120,
       render: (_, record) => getStatusDisplay(record)
     },
     {
-      title: '操作',
+      title: t('table.columnActions'),
       key: 'action',
       width: 200,
       fixed: 'right',
@@ -244,14 +253,9 @@ export const AlertManagement: React.FC = () => {
             type="link"
             size="small"
             icon={<EyeOutlined />}
-            onClick={() => {
-              console.log('🔘 点击详情按钮 - record:', record);
-              console.log('🔘 点击详情按钮 - record.id:', record.id);
-              console.log('🔘 导航到:', `/settings/alerts/${record.id}`);
-              navigate(`/settings/alerts/${record.id}`);
-            }}
+            onClick={() => navigate(`/settings/alerts/${record.id}`)}
           >
-            详情
+            {t('detail')}
           </Button>
           <Button
             type="link"
@@ -259,7 +263,7 @@ export const AlertManagement: React.FC = () => {
             icon={<EditOutlined />}
             onClick={() => navigate(`/settings/alerts/${record.id}/edit`)}
           >
-            编辑
+            {t('edit')}
           </Button>
           <Button
             type="link"
@@ -268,7 +272,7 @@ export const AlertManagement: React.FC = () => {
             icon={<DeleteOutlined />}
             onClick={() => handleDelete(record)}
           >
-            删除
+            {t('delete')}
           </Button>
         </Space>
       )
@@ -279,7 +283,7 @@ export const AlertManagement: React.FC = () => {
     <Space direction="vertical" size="large" style={{ width: '100%', padding: '24px' }}>
       {/* 标题 */}
       <Title level={3}>
-        <BellOutlined /> 告警管理
+        <BellOutlined /> {t('title')}
       </Title>
 
       {/* 主卡片 */}
@@ -288,7 +292,7 @@ export const AlertManagement: React.FC = () => {
         <Space style={{ marginBottom: 16, width: '100%', justifyContent: 'space-between' }}>
           <Space>
             <Search
-              placeholder="搜索告警名称或描述..."
+              placeholder={t('filter.searchPlaceholder')}
               prefix={<SearchOutlined />}
               style={{ width: 300 }}
               value={searchText}
@@ -300,17 +304,17 @@ export const AlertManagement: React.FC = () => {
               onChange={setStatusFilter}
               style={{ width: 120 }}
             >
-              <Select.Option value="all">全部状态</Select.Option>
-              <Select.Option value="active">启用</Select.Option>
-              <Select.Option value="inactive">禁用</Select.Option>
+              <Select.Option value="all">{t('filter.allStatus')}</Select.Option>
+              <Select.Option value="active">{t('filter.enabled')}</Select.Option>
+              <Select.Option value="inactive">{t('filter.disabled')}</Select.Option>
             </Select>
             <Select
               value={creatorFilter}
               onChange={setCreatorFilter}
               style={{ width: 120 }}
             >
-              <Select.Option value="all">全部创建者</Select.Option>
-              <Select.Option value="me">我创建的</Select.Option>
+              <Select.Option value="all">{t('filter.allCreators')}</Select.Option>
+              <Select.Option value="me">{t('filter.createdByMe')}</Select.Option>
             </Select>
           </Space>
           <Space>
@@ -319,18 +323,18 @@ export const AlertManagement: React.FC = () => {
               onClick={loadAlerts}
               loading={loading}
             >
-              刷新
+              {t('refresh')}
             </Button>
 
             {/* ✅ 仅管理员可见：手动触发调度器 */}
             {isAdmin && (
-              <Tooltip title="立即触发一次全系统告警检查（仅管理员）">
+              <Tooltip title={t('tooltip.checkNow')}>
                 <Button
                   icon={<PlayCircleOutlined />}
                   onClick={handleManualTrigger}
                   loading={triggering}
                 >
-                  立即检查
+                  {t('button.checkNow')}
                 </Button>
               </Tooltip>
             )}
@@ -340,7 +344,7 @@ export const AlertManagement: React.FC = () => {
               icon={<PlusOutlined />}
               onClick={() => navigate('/settings/alerts/new')}
             >
-              新建告警
+              {t('create')}
             </Button>
           </Space>
         </Space>
@@ -354,7 +358,7 @@ export const AlertManagement: React.FC = () => {
           pagination={{
             ...paginationProps,
             total: filteredAlerts.length,
-            showTotal: (total) => `共 ${total} 个告警`,
+            showTotal: (total) => t('table.total', { count: total }),
           }}
           scroll={{ x: 1000 }}
         />

@@ -22,6 +22,7 @@ import {
   type AuditLogItem,
   type AuditLogListParams,
 } from '../../services/opsService';
+import { useI18n } from '../../hooks/useI18n';
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -41,6 +42,7 @@ const ACTION_COLORS: Record<string, string> = {
 };
 
 export const AuditLogs: React.FC = () => {
+  const { t } = useI18n('ops');
   const [params, setParams] = useState<AuditLogListParams>({
     page: 1,
     page_size: 20,
@@ -118,28 +120,28 @@ export const AuditLogs: React.FC = () => {
   // 表格列定义
   const columns = [
     {
-      title: '时间',
+      title: t('audit.table.time'),
       dataIndex: 'timestamp',
       key: 'timestamp',
       width: 160,
       render: (ts: string) => dayjs(ts).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
-      title: '租户',
+      title: t('audit.table.tenant'),
       dataIndex: 'org_name',
       key: 'org_name',
       width: 120,
       render: (name: string | null) => name || '-',
     },
     {
-      title: '用户',
+      title: t('audit.table.user'),
       dataIndex: 'username',
       key: 'username',
       width: 160,
       render: (name: string | null) => name || '-',
     },
     {
-      title: '操作',
+      title: t('audit.table.action'),
       dataIndex: 'action',
       key: 'action',
       width: 100,
@@ -150,7 +152,7 @@ export const AuditLogs: React.FC = () => {
       },
     },
     {
-      title: 'IP 地址',
+      title: 'IP',
       dataIndex: 'ip_address',
       key: 'ip_address',
       width: 130,
@@ -217,7 +219,7 @@ export const AuditLogs: React.FC = () => {
 
   return (
     <div style={{ padding: 24 }}>
-      <Title level={4}>审计日志</Title>
+      <Title level={4}>{t('audit.title')}</Title>
 
       {/* 筛选栏 */}
       <Space wrap style={{ marginBottom: 16 }}>
@@ -225,13 +227,13 @@ export const AuditLogs: React.FC = () => {
           value={dateRange}
           onChange={handleDateChange}
           presets={[
-            { label: '今天', value: [dayjs(), dayjs()] },
-            { label: '最近7天', value: [dayjs().subtract(7, 'day'), dayjs()] },
-            { label: '最近30天', value: [dayjs().subtract(30, 'day'), dayjs()] },
+            { label: t('audit.filter.today'), value: [dayjs(), dayjs()] },
+            { label: t('audit.filter.last7Days'), value: [dayjs().subtract(7, 'day'), dayjs()] },
+            { label: t('audit.filter.last30Days'), value: [dayjs().subtract(30, 'day'), dayjs()] },
           ]}
         />
         <Select
-          placeholder="选择租户"
+          placeholder={t('audit.filter.selectTenant')}
           allowClear
           showSearch
           optionFilterProp="label"
@@ -244,7 +246,7 @@ export const AuditLogs: React.FC = () => {
           }))}
         />
         <Select
-          placeholder="选择用户"
+          placeholder={t('audit.filter.selectUser')}
           allowClear
           showSearch
           optionFilterProp="label"
@@ -257,7 +259,7 @@ export const AuditLogs: React.FC = () => {
           }))}
         />
         <Select
-          placeholder="操作类型"
+          placeholder={t('audit.filter.actionType')}
           allowClear
           style={{ width: 120 }}
           value={params.action}
@@ -268,7 +270,7 @@ export const AuditLogs: React.FC = () => {
           }))}
         />
         <Input
-          placeholder="搜索（租户/用户/详情）"
+          placeholder={t('audit.filter.searchPlaceholder')}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           onPressEnter={handleSearch}
@@ -276,7 +278,7 @@ export const AuditLogs: React.FC = () => {
           prefix={<SearchOutlined />}
         />
         <Button type="primary" onClick={handleSearch}>
-          查询
+          {t('common:button.search')}
         </Button>
         <Button onClick={handleReset}>重置</Button>
         <Button icon={<ReloadOutlined />} onClick={() => refetch()}>

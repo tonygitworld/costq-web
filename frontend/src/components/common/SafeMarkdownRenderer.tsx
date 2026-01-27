@@ -36,7 +36,7 @@ export const SafeMarkdownRenderer: FC<SafeMarkdownRendererProps> = ({
               </code>
             ) : (
               <SyntaxHighlighter
-                style={github as any}
+                style={github as Record<string, React.CSSProperties>}
                 language={match[1]}
                 PreTag="div"
                 customStyle={{

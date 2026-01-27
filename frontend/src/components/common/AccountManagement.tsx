@@ -54,7 +54,7 @@ export const AccountManagement: FC = () => {
     try {
       await deleteAccount(id);
       message.success(t('aws.message.deleteSuccess'));
-    } catch (error) {
+    } catch {
       message.error(t('aws.message.deleteFailed'));
     }
   };
@@ -69,7 +69,7 @@ export const AccountManagement: FC = () => {
       } else {
         message.error(t('aws.message.validateFailed'));
       }
-    } catch (error) {
+    } catch {
       message.error(t('aws.message.validateFailed'));
     } finally {
       setValidating(null);

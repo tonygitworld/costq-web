@@ -60,7 +60,7 @@ export interface ConfirmationRequiredMessage extends WebSocketMessage {
   type: 'confirmation_required';
   confirmation_id: string;
   tool_name: string;
-  arguments: Record<string, any>;
+  arguments: Record<string, unknown>;
   title: string;
   description: string;
   warning: string;

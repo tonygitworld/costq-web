@@ -8,6 +8,8 @@ import { useEffect } from 'react';
 import { useChatStore } from '../stores/chatStore';
 import { useSSEContext } from '../contexts/SSEContext';
 
+import { logger } from '../utils/logger';
+
 export const useBeforeUnload = () => {
   const { messages, currentChatId } = useChatStore();
   const { currentQueryId } = useSSEContext();
@@ -34,9 +36,9 @@ export const useBeforeUnload = () => {
 
         try {
           localStorage.setItem('interrupted_message', JSON.stringify(interruptedState));
-          console.log('💾 已保存流式中断内容:', interruptedState);
+          logger.debug('💾 已保存流式中断内容:', interruptedState);
         } catch (error) {
-          console.error('❌ 保存中断状态失败:', error);
+          logger.error('❌ 保存中断状态失败:', error);
         }
 
         // 3. 尽力发送停止生成请求（使用 sendBeacon 确保发送）
@@ -46,9 +48,9 @@ export const useBeforeUnload = () => {
             const cancelUrl = `${window.location.origin}/api/sse/cancel/v2/${currentQueryId}`;
             const cancelData = JSON.stringify({ reason: 'page_refresh' });
             navigator.sendBeacon(cancelUrl, cancelData);
-            console.log('📡 已发送取消请求 (sendBeacon) - V2');
+            logger.debug('📡 已发送取消请求 (sendBeacon) - V2');
           } catch (error) {
-            console.error('⚠️  发送取消请求失败:', error);
+            logger.error('⚠️  发送取消请求失败:', error);
           }
         }
       }
@@ -75,13 +77,13 @@ export const useBeforeUnload = () => {
       const MAX_AGE = 5 * 60 * 1000; // 5分钟
 
       if (age > MAX_AGE) {
-        console.log('⏰ 中断状态已过期，忽略');
+        logger.debug('⏰ 中断状态已过期，忽略');
         localStorage.removeItem('interrupted_message');
         return;
       }
 
       // 恢复中断的消息
-      console.log('🔄 恢复中断的消息:', state);
+      logger.debug('🔄 恢复中断的消息:', state);
 
       const currentMessages = messages[state.chatId] || [];
       const existingMessage = currentMessages.find(msg => msg.id === state.messageId);
@@ -97,13 +99,13 @@ export const useBeforeUnload = () => {
             interruptedAt: state.timestamp
           }
         });
-        console.log('✅ 已恢复中断消息');
+        logger.debug('✅ 已恢复中断消息');
       }
 
       // 清理 localStorage
       localStorage.removeItem('interrupted_message');
     } catch (error) {
-      console.error('❌ 恢复中断状态失败:', error);
+      logger.error('❌ 恢复中断状态失败:', error);
       localStorage.removeItem('interrupted_message');
     }
   }, []); // 只在组件挂载时执行一次

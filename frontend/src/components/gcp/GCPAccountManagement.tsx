@@ -27,6 +27,7 @@ import type { GCPAccount } from '../../types/gcpAccount';
 import { AddGCPAccountModal } from './AddGCPAccountModal';
 import { EditGCPAccountModal } from './EditGCPAccountModal';
 import { usePagination } from '../../hooks/usePagination';
+import { useI18n } from '../../hooks/useI18n';
 import dayjs from 'dayjs';
 
 const { Text } = Typography;
@@ -45,6 +46,7 @@ export const GCPAccountManagement: FC = () => {
   const [selectedAccount, setSelectedAccount] = useState<GCPAccount | null>(null);
   const [validating, setValidating] = useState<string | null>(null);
   const { paginationProps } = usePagination(10);
+  const { t } = useI18n(['gcp', 'common']);
 
   // 加载账号列表
   useEffect(() => {
@@ -61,9 +63,9 @@ export const GCPAccountManagement: FC = () => {
   const handleDelete = async (id: string) => {
     try {
       await deleteAccount(id);
-      message.success('GCP 账号删除成功');
-    } catch (error) {
-      message.error('删除 GCP 账号失败');
+      message.success(t('gcp:account.message.deleteSuccess'));
+    } catch {
+      message.error(t('gcp:account.message.deleteFailed'));
     }
   };
 
@@ -73,12 +75,12 @@ export const GCPAccountManagement: FC = () => {
     try {
       const isValid = await validateAccount(id);
       if (isValid) {
-        message.success('GCP 凭证验证成功');
+        message.success(t('gcp:account.message.verifySuccess'));
       } else {
-        message.error('GCP 凭证验证失败，请检查 Service Account 是否有效');
+        message.error(t('gcp:account.message.verifyFailed'));
       }
-    } catch (error) {
-      message.error('验证失败');
+    } catch {
+      message.error(t('gcp:account.message.verifyFailed'));
     } finally {
       setValidating(null);
     }
@@ -87,7 +89,7 @@ export const GCPAccountManagement: FC = () => {
   // 表格列定义
   const columns: ColumnsType<GCPAccount> = [
     {
-      title: '账号名称',
+      title: t('gcp:account.table.name'),
       dataIndex: 'account_name',
       key: 'account_name',
       width: 200,
@@ -96,7 +98,7 @@ export const GCPAccountManagement: FC = () => {
           <GoogleOutlined style={{ color: '#4285F4', fontSize: '16px' }} />
           <Text strong>{name}</Text>
           {record.is_verified && (
-            <Tooltip title="凭证已验证">
+            <Tooltip title={t('gcp:account.status.verified')}>
               <CheckCircleOutlined style={{ color: '#52c41a' }} />
             </Tooltip>
           )}
@@ -104,7 +106,7 @@ export const GCPAccountManagement: FC = () => {
       ),
     },
     {
-      title: 'GCP 项目 ID',
+      title: t('gcp:account.form.projectId'),
       dataIndex: 'project_id',
       key: 'project_id',
       width: 180,
@@ -124,7 +126,7 @@ export const GCPAccountManagement: FC = () => {
       ),
     },
     {
-      title: '组织/计费账号',
+      title: t('gcp:account.table.organization'),
       key: 'org_billing',
       width: 180,
       render: (_, record: GCPAccount) => (
@@ -155,24 +157,24 @@ export const GCPAccountManagement: FC = () => {
                          record.billing_export_table;
 
         if (!hasConfig) {
-          return <Tag color="default">未配置</Tag>;
+          return <Tag color="default">{t('common:status.notConfigured')}</Tag>;
         }
 
         return (
           <Tooltip title={
             <div>
-              <div>项目: {record.billing_export_project_id || '-'}</div>
+              <div>{t('gcp:account.form.projectId')}: {record.billing_export_project_id || '-'}</div>
               <div>Dataset: {record.billing_export_dataset || '-'}</div>
-              <div>表: {record.billing_export_table || '-'}</div>
+              <div>{t('gcp:account.form.tableName')}: {record.billing_export_table || '-'}</div>
             </div>
           }>
-            <Tag color="success" icon={<CheckCircleOutlined />}>已配置</Tag>
+            <Tag color="success" icon={<CheckCircleOutlined />}>{t('common:status.configured')}</Tag>
           </Tooltip>
         );
       },
     },
     {
-      title: '描述',
+      title: t('gcp:account.table.description'),
       dataIndex: 'description',
       key: 'description',
       ellipsis: true,
@@ -181,24 +183,24 @@ export const GCPAccountManagement: FC = () => {
       ),
     },
     {
-      title: '状态',
+      title: t('gcp:account.table.status'),
       key: 'status',
       width: 100,
       align: 'center',
       render: (_, record: GCPAccount) => (
         record.is_verified ? (
           <Tag icon={<CheckCircleOutlined />} color="success">
-            已验证
+            {t('gcp:account.status.verified')}
           </Tag>
         ) : (
           <Tag icon={<CloseCircleOutlined />} color="warning">
-            未验证
+            {t('gcp:account.status.unverified')}
           </Tag>
         )
       ),
     },
     {
-      title: '创建时间',
+      title: t('gcp:account.table.createdAt'),
       dataIndex: 'created_at',
       key: 'created_at',
       width: 180,
@@ -209,23 +211,23 @@ export const GCPAccountManagement: FC = () => {
       ),
     },
     {
-      title: '操作',
+      title: t('gcp:account.table.actions'),
       key: 'actions',
       width: 200,
       fixed: 'right',
       render: (_, record: GCPAccount) => (
         <Space size="small">
-          <Tooltip title="编辑账号">
+          <Tooltip title={t('gcp:account.action.edit')}>
             <Button
               type="text"
               size="small"
               icon={<EditOutlined />}
               onClick={() => handleEdit(record)}
             >
-              编辑
+              {t('common:button.edit')}
             </Button>
           </Tooltip>
-          <Tooltip title="验证凭证">
+          <Tooltip title={t('gcp:account.action.verify')}>
             <Button
               type="text"
               size="small"
@@ -233,15 +235,15 @@ export const GCPAccountManagement: FC = () => {
               loading={validating === record.id}
               onClick={() => handleValidate(record.id)}
             >
-              验证
+              {t('gcp:account.action.verify')}
             </Button>
           </Tooltip>
           <Popconfirm
-            title="确认删除"
-            description={`确定要删除 GCP 账号 "${record.account_name}" 吗？`}
+            title={t('gcp:account.action.confirmDelete')}
+            description={t('gcp:account.action.confirmDeleteContent')}
             onConfirm={() => handleDelete(record.id)}
-            okText="删除"
-            cancelText="取消"
+            okText={t('common:button.delete')}
+            cancelText={t('common:button.cancel')}
             okButtonProps={{ danger: true }}
           >
             <Button
@@ -250,7 +252,7 @@ export const GCPAccountManagement: FC = () => {
               danger
               icon={<DeleteOutlined />}
             >
-              删除
+              {t('common:button.delete')}
             </Button>
           </Popconfirm>
         </Space>
@@ -268,14 +270,14 @@ export const GCPAccountManagement: FC = () => {
               onClick={() => fetchAccounts()}
               loading={loading}
             >
-              刷新
+              {t('common:button.refresh')}
             </Button>
             <Button
               type="primary"
               icon={<PlusOutlined />}
               onClick={() => setAddModalVisible(true)}
             >
-              添加账号
+              {t('gcp:account.addButton')}
             </Button>
           </Space>
         </div>
@@ -284,9 +286,9 @@ export const GCPAccountManagement: FC = () => {
           <Empty
             description={
               <Space direction="vertical" size={4}>
-                <Text type="secondary">暂无 GCP 账号</Text>
+                <Text type="secondary">{t('gcp:account.empty.title')}</Text>
                 <Text type="secondary" style={{ fontSize: '12px' }}>
-                  点击"添加账号"按钮开始添加
+                  {t('gcp:account.empty.description')}
                 </Text>
               </Space>
             }
@@ -298,7 +300,7 @@ export const GCPAccountManagement: FC = () => {
               icon={<PlusOutlined />}
               onClick={() => setAddModalVisible(true)}
             >
-              添加第一个 GCP 账号
+              {t('gcp:account.addButton')}
             </Button>
           </Empty>
         ) : (
@@ -310,7 +312,7 @@ export const GCPAccountManagement: FC = () => {
             pagination={{
               ...paginationProps,
               total: accounts.length,
-              showTotal: (total) => `共 ${total} 个账号`,
+              showTotal: (total) => t('common:pagination.total', { total }),
             }}
             scroll={{ x: 1400 }}
           />

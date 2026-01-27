@@ -3,6 +3,7 @@ import { type WebSocketMessage, type StreamChunkMessage, type CompletionMessage,
 import { type ThinkingData, type ToolCallData, type ContentBlock, type Message, type TokenUsage } from '../types/chat';
 import { useChatStore } from '../stores/chatStore';
 import { notification } from 'antd';
+import { logger } from './logger';
 
 // 消息构建器状态类型
 interface MessageBuilderState {
@@ -59,7 +60,7 @@ export class MessageHandler {
 
   // ✅ 新增：重置消息构建器（在发送新查询时调用）
   resetMessageBuilder() {
-    console.log('🔄 [messageHandler] 重置消息构建器，准备新查询');
+    logger.debug('🔄 [messageHandler] 重置消息构建器，准备新查询');
     this.currentMessageBuilder = {
       thinking: undefined,
       toolCalls: new Map(),
@@ -69,6 +70,57 @@ export class MessageHandler {
       chatId: this.currentMessageBuilder.chatId  // ✅ 保留 chatId，因为可能在同一会话中
     };
     this.processedEventIds.clear();  // ✅ 清理事件去重集合
+  }
+
+  // ✅ 公共方法：更新工具调用状态（减少重复代码）
+  private updateToolCallStatus(
+    toolId: string | undefined,
+    status: 'success' | 'error',
+    data: { result?: unknown; error?: string },
+    originalMessage: { session_id?: string }
+  ) {
+    if (!toolId) return;
+
+    const endTime = Date.now();
+
+    // 1. 更新 toolCalls Map 中的状态
+    const toolCall = this.currentMessageBuilder.toolCalls?.get(toolId);
+    if (toolCall) {
+      toolCall.status = status;
+      toolCall.endTime = endTime;
+      if (data.result !== undefined) toolCall.result = data.result;
+      if (data.error !== undefined) toolCall.error = data.error;
+      if (toolCall.startTime) {
+        toolCall.duration = (endTime - toolCall.startTime) / 1000;
+      }
+    } else {
+      logger.warn(`⚠️ 未找到对应的工具调用: ${toolId}`);
+    }
+
+    // 2. 更新 contentBlocks 中的状态 (这是 UI 渲染的关键)
+    if (this.currentMessageBuilder.contentBlocks) {
+      const blockIndex = this.currentMessageBuilder.contentBlocks.findIndex(
+        block => block.type === 'tool_call' && block.toolCall.id === toolId
+      );
+
+      if (blockIndex !== -1) {
+        const block = this.currentMessageBuilder.contentBlocks[blockIndex];
+        block.toolCall.status = status;
+        block.toolCall.endTime = endTime;
+        if (data.result !== undefined) block.toolCall.result = data.result;
+        if (data.error !== undefined) block.toolCall.error = data.error;
+        if (block.toolCall.startTime) {
+          block.toolCall.duration = (endTime - block.toolCall.startTime) / 1000;
+        }
+        logger.debug(`✅ 更新了 contentBlock 中的工具状态:`, block.toolCall);
+      }
+    }
+
+    // 3. 触发 UI 更新
+    this.updateCurrentMessage({
+      toolCalls: Array.from(this.currentMessageBuilder.toolCalls?.values() || []),
+      contentBlocks: this.currentMessageBuilder.contentBlocks
+    }, originalMessage);
   }
 
   // ✅ 使用 requestAnimationFrame 实现丝滑更新（2025最佳实践）
@@ -167,14 +219,14 @@ export class MessageHandler {
         // ✅ 新增: 系统消息（欢迎消息等）
         case 'system':
           // 系统消息通常只是通知，不需要特殊处理
-          console.log('📢 收到系统消息:', message.content || message);
+          logger.debug('📢 收到系统消息:', message.content || message);
           break;
 
         default:
-          console.warn('未知的消息类型:', message.type);
+          logger.warn('未知的消息类型:', message.type);
       }
     } catch (error) {
-      console.error('处理消息时出错:', error);
+      logger.error('处理消息时出错:', error);
       notification.error({
         message: '消息处理错误',
         description: '处理服务器消息时出现错误，请重试。'
@@ -184,7 +236,8 @@ export class MessageHandler {
 
 
 
-  private handleStreamStart = (_message: WebSocketMessage) => {
+  private handleStreamStart = (_message: WebSocketMessage): void => {
+    void _message; // 显式忽略未使用参数
     const messageId = this.getCurrentMessageId();
     if (messageId) {
       // 更新消息状态为流式输出
@@ -206,7 +259,7 @@ export class MessageHandler {
 
   private handleStreamChunk = (message: StreamChunkMessage & { session_id?: string }) => {
     // 🔍 诊断：记录收到的chunk事件
-    console.log('📥 [前端] 收到 chunk 事件, content长度:', message.content?.length, '预览:', message.content?.substring(0, 50), 'session_id:', message.session_id);
+    logger.debug('📥 [前端] 收到 chunk 事件, content长度:', message.content?.length, '预览:', message.content?.substring(0, 50), 'session_id:', message.session_id);
 
     const content = message.content || '';
 
@@ -227,7 +280,7 @@ export class MessageHandler {
       if (lastBlock.type === 'text') {
         // 累积到现有text块
         lastBlock.content += content;
-        console.log('📝 [前端] 累积到现有text块, 总长度:', lastBlock.content.length);
+        logger.debug('📝 [前端] 累积到现有text块, 总长度:', lastBlock.content.length);
       } else {
         // 最后一个块不是text，创建新的text块
         this.currentMessageBuilder.contentBlocks.push({
@@ -235,7 +288,7 @@ export class MessageHandler {
           content: content,
           timestamp: Date.now()
         });
-        console.log('➕ [前端] 创建新text块（最后一个不是text）, contentBlocks总数:', this.currentMessageBuilder.contentBlocks.length);
+        logger.debug('➕ [前端] 创建新text块（最后一个不是text）, contentBlocks总数:', this.currentMessageBuilder.contentBlocks.length);
       }
     } else {
       // 没有contentBlocks，创建第一个text块
@@ -244,7 +297,7 @@ export class MessageHandler {
         content: content,
         timestamp: Date.now()
       });
-      console.log('➕ [前端] 创建第一个text块, contentBlocks总数:', this.currentMessageBuilder.contentBlocks.length);
+      logger.debug('➕ [前端] 创建第一个text块, contentBlocks总数:', this.currentMessageBuilder.contentBlocks.length);
     }
 
     // ✅ 直接调用 updateCurrentMessage，不使用 RAF 批处理
@@ -256,7 +309,8 @@ export class MessageHandler {
     }, message);
   };
 
-  private handleStreamEnd = (_message: WebSocketMessage) => {
+  private handleStreamEnd = (_message: WebSocketMessage): void => {
+    void _message; // 显式忽略未使用参数
     const messageId = this.getCurrentMessageId();
     const currentChatId = this.chatStore.currentChatId;
 
@@ -280,7 +334,7 @@ export class MessageHandler {
     const { success, error } = message;
     const messageId = this.getCurrentMessageId();
 
-    console.log('✅ [messageHandler.handleCompletion] 收到 complete 事件, success:', success, 'error:', error);
+    logger.debug('✅ [messageHandler.handleCompletion] 收到 complete 事件, success:', success, 'error:', error);
 
     if (messageId) {
       // 更新消息状态
@@ -318,7 +372,7 @@ export class MessageHandler {
     // ✅ 处理错误情况：无论是否有 error 字段，只要 success 为 false 就显示错误
     if (!success) {
       const errorMessage = error || '请求处理失败，请重试或简化问题';
-      console.error('❌ [messageHandler.handleCompletion] 查询失败:', errorMessage);
+      logger.error('❌ [messageHandler.handleCompletion] 查询失败:', errorMessage);
       notification.error({
         message: '处理失败',
         description: errorMessage,
@@ -327,26 +381,26 @@ export class MessageHandler {
     }
 
     // ✅ 调用重置查询回调，恢复输入框状态（无论成功或失败都要重置）
-    console.log('🔴 [messageHandler.handleCompletion] 调用 resetCurrentQuery()');
+    logger.debug('🔴 [messageHandler.handleCompletion] 调用 resetCurrentQuery()');
     if (this.resetCurrentQuery) {
       this.resetCurrentQuery();
     } else {
-      console.error('❌ [messageHandler.handleCompletion] resetCurrentQuery 未设置！');
+      logger.error('❌ [messageHandler.handleCompletion] resetCurrentQuery 未设置！');
     }
 
     // ✅ 清理已处理事件ID集合（为下一次查询准备）
     this.processedEventIds.clear();
-    console.log('🧹 [前端] 已清理事件去重集合');
+    logger.debug('🧹 [前端] 已清理事件去重集合');
 
     // ✅ 修复：标记消息已完成，但不重置 messageId
     // messageId 应该在下一次用户发送新查询时才重置
     // 这样可以确保一个完整的对话（工具调用 + 最终回复）在同一个消息中
-    console.log('✅ [前端] 消息完成，保留 messageId 直到下次查询');
+    logger.debug('✅ [前端] 消息完成，保留 messageId 直到下次查询');
   };
 
   private handleThinking = (message: WebSocketMessage) => {
     // ✅ 兼容后端发送的 thinking 事件，映射到 thinking_step
-    console.log('🧠 [前端] 收到 thinking 事件:', message.content);
+    logger.debug('🧠 [前端] 收到 thinking 事件:', message.content);
 
     // 确保有当前消息
     this.ensureCurrentMessage();
@@ -361,7 +415,7 @@ export class MessageHandler {
   };
 
   private handleMessageStart = (message: WebSocketMessage & { session_id?: string }) => {
-    console.log('🚀 [前端] 收到 message_start 事件, session_id:', message.session_id);
+    logger.debug('🚀 [前端] 收到 message_start 事件, session_id:', message.session_id);
     this.ensureCurrentMessage(message);
 
     // 更新消息状态
@@ -375,14 +429,14 @@ export class MessageHandler {
 
   private handleResponse = (message: WebSocketMessage) => {
     // ✅ 处理 response 类型消息（用于错误提示、账号配置提示等）
-    const content = (message as any).content || '';
+    const content = (message.content as string) || '';
 
     if (!content) {
-      console.warn('⚠️ [handleResponse] 收到空的 response 消息');
+      logger.warn('⚠️ [handleResponse] 收到空的 response 消息');
       return;
     }
 
-    console.log('📥 [handleResponse] 收到 response 消息，内容长度:', content.length);
+    logger.debug('📥 [handleResponse] 收到 response 消息，内容长度:', content.length);
 
     // ✅ 确保当前消息存在（传递message以使用session_id）
     this.ensureCurrentMessage(message);
@@ -448,7 +502,8 @@ export class MessageHandler {
 
   // ========== 新格式消息处理器 ==========
 
-  private handleThinkingStart = (_message: WebSocketMessage) => {
+  private handleThinkingStart = (_message: WebSocketMessage): void => {
+    void _message; // 显式忽略未使用参数
     // 初始化思考数据
     this.currentMessageBuilder.thinking = {
       steps: [],
@@ -492,7 +547,7 @@ export class MessageHandler {
   private handleThinkingEnd = (message: { duration?: number }) => {
     const { duration } = message;
 
-    console.log(`🧠 [前端] 收到思考结束事件, duration:`, duration);
+    logger.debug(`🧠 [前端] 收到思考结束事件, duration:`, duration);
 
     if (this.currentMessageBuilder.thinking) {
       this.currentMessageBuilder.thinking.duration = duration;
@@ -508,7 +563,7 @@ export class MessageHandler {
         }
       });
 
-      console.log(`🧠 [前端] 思考数据已更新:`, this.currentMessageBuilder.thinking);
+      logger.debug(`🧠 [前端] 思考数据已更新:`, this.currentMessageBuilder.thinking);
     }
   };
 
@@ -517,17 +572,17 @@ export class MessageHandler {
 
     // ✅ 添加详细时间戳日志（调试顺序问题）
     const timestamp = new Date().toISOString();
-    console.log(`⏰ [${timestamp}] handleToolCallStart - tool_id: ${tool_id}, tool_name: ${tool_name}, session_id: ${message.session_id}`);
+    logger.debug(`⏰ [${timestamp}] handleToolCallStart - tool_id: ${tool_id}, tool_name: ${tool_name}, session_id: ${message.session_id}`);
 
     // 🔄 如果这是一个更新事件（包含额外参数）
     if (update && tool_id) {
-      console.log(`⏰ [${timestamp}] 🔄 收到工具调用参数更新:`, tool_id, 'session_id:', message.session_id);
+      logger.debug(`⏰ [${timestamp}] 🔄 收到工具调用参数更新:`, tool_id, 'session_id:', message.session_id);
 
       // 更新 toolCalls Map 中的参数
       const existingToolCall = this.currentMessageBuilder.toolCalls?.get(tool_id);
       if (existingToolCall) {
         existingToolCall.args = args; // 更新为完整参数
-        console.log('✅ [前端] 已更新工具调用参数:', args);
+        logger.debug('✅ [前端] 已更新工具调用参数:', args);
       }
 
       // 更新 contentBlocks 中的参数
@@ -542,7 +597,7 @@ export class MessageHandler {
 
       // ✅ 触发 UI 更新，不使用 RAF 批处理
       this.updateCurrentMessage({
-        toolCalls: Array.from(this.currentMessageBuilder.toolCalls?.values() || []) as any[],
+        toolCalls: Array.from(this.currentMessageBuilder.toolCalls?.values() || []) as ToolCallData[],
         contentBlocks: this.currentMessageBuilder.contentBlocks
       }, message);
 
@@ -551,7 +606,7 @@ export class MessageHandler {
 
     // ✅ 去重检查：防止重复处理同一个工具调用
     if (tool_id && this.processedEventIds.has(tool_id)) {
-      console.warn('⚠️ [前端去重] 检测到重复工具调用事件，已忽略:', tool_id);
+      logger.warn('⚠️ [前端去重] 检测到重复工具调用事件，已忽略:', tool_id);
       return;
     }
 
@@ -561,7 +616,7 @@ export class MessageHandler {
     }
 
     // 🔍 详细诊断日志
-    console.log('📥 [前端] 收到 tool_call_start 事件:', {
+    logger.debug('📥 [前端] 收到 tool_call_start 事件:', {
       tool_id,
       tool_name,
       description,
@@ -596,11 +651,11 @@ export class MessageHandler {
       timestamp: Date.now()
     });
 
-    console.log('✅ [前端] 添加工具调用到 contentBlocks, 当前总数:', this.currentMessageBuilder.contentBlocks.length, 'session_id:', message.session_id);
+    logger.debug('✅ [前端] 添加工具调用到 contentBlocks, 当前总数:', this.currentMessageBuilder.contentBlocks.length, 'session_id:', message.session_id);
 
     // ✅ 实时更新 UI，不使用 RAF 批处理
     this.updateCurrentMessage({
-      toolCalls: Array.from(this.currentMessageBuilder.toolCalls.values()) as any[],
+      toolCalls: Array.from(this.currentMessageBuilder.toolCalls.values()) as ToolCallData[],
       contentBlocks: this.currentMessageBuilder.contentBlocks
     }, message);
   };
@@ -610,96 +665,33 @@ export class MessageHandler {
 
     const toolCall = this.currentMessageBuilder.toolCalls?.get(tool_id);
     if (toolCall) {
-      console.log(`工具 ${tool_id} 进度: ${status}`);
+      logger.debug(`工具 ${tool_id} 进度: ${status}`);
     }
   };
 
   private handleToolCallResult = (message: { tool_use_id?: string; result?: unknown; status?: string; session_id?: string }) => {
     const { tool_use_id, result, status } = message;
+    logger.debug('📥 [前端] 收到 tool_call_result 事件:', message, 'session_id:', message.session_id);
 
-    // 🔍 诊断日志
-    console.log('📥 [前端] 收到 tool_call_result 事件:', message, 'session_id:', message.session_id);
-
-    // 1. 更新 toolCalls Map 中的状态
-    const toolCall = this.currentMessageBuilder.toolCalls?.get(tool_use_id);
-    if (toolCall) {
-      toolCall.status = status || 'success';
-      toolCall.result = result;
-      toolCall.endTime = Date.now();
-
-      // 计算耗时（将毫秒转换为秒）
-      if (toolCall.startTime) {
-        toolCall.duration = (toolCall.endTime - toolCall.startTime) / 1000;
-      }
-    } else {
-      console.warn(`⚠️ 未找到对应的工具调用: ${tool_use_id}`);
-    }
-
-    // 2. 更新 contentBlocks 中的状态 (这是 UI 渲染的关键)
-    if (this.currentMessageBuilder.contentBlocks) {
-      const blockIndex = this.currentMessageBuilder.contentBlocks.findIndex(
-        block => block.type === 'tool_call' && block.toolCall.id === tool_use_id
-      );
-
-      if (blockIndex !== -1) {
-        const block = this.currentMessageBuilder.contentBlocks[blockIndex];
-        block.toolCall.status = status || 'success';
-        block.toolCall.result = result;
-        block.toolCall.endTime = Date.now();
-
-        if (block.toolCall.startTime) {
-          block.toolCall.duration = (block.toolCall.endTime - block.toolCall.startTime) / 1000;
-        }
-
-        console.log(`✅ 更新了 contentBlock 中的工具状态:`, block.toolCall);
-      }
-    }
-
-    // 3. ✅ 触发 UI 更新，不使用 RAF 批处理
-    this.updateCurrentMessage({
-      toolCalls: Array.from(this.currentMessageBuilder.toolCalls?.values() || []),
-      contentBlocks: this.currentMessageBuilder.contentBlocks
-    }, message);
+    // 使用公共方法更新工具调用状态
+    this.updateToolCallStatus(
+      tool_use_id,
+      (status as 'success' | 'error') || 'success',
+      { result },
+      message
+    );
   };
 
   private handleToolCallError = (message: { tool_use_id?: string; error?: string; session_id?: string }) => {
     const { tool_use_id, error } = message;
 
-    // 1. 更新 toolCalls Map
-    const toolCall = this.currentMessageBuilder.toolCalls?.get(tool_use_id);
-    if (toolCall) {
-      toolCall.status = 'error';
-      toolCall.error = error;
-      toolCall.endTime = Date.now();
-
-      if (toolCall.startTime) {
-        toolCall.duration = (toolCall.endTime - toolCall.startTime) / 1000;
-      }
-    }
-
-    // 2. 更新 contentBlocks
-    if (this.currentMessageBuilder.contentBlocks) {
-      const blockIndex = this.currentMessageBuilder.contentBlocks.findIndex(
-        block => block.type === 'tool_call' && block.toolCall.id === tool_use_id
-      );
-
-      if (blockIndex !== -1) {
-        const block = this.currentMessageBuilder.contentBlocks[blockIndex];
-        block.toolCall.status = 'error';
-        block.toolCall.error = error;
-        block.toolCall.endTime = Date.now();
-
-        if (block.toolCall.startTime) {
-          block.toolCall.duration = (block.toolCall.endTime - block.toolCall.startTime) / 1000;
-        }
-      }
-    }
-
-    // 3. ✅ 触发 UI 更新，不使用 RAF 批处理
-    this.updateCurrentMessage({
-      toolCalls: Array.from(this.currentMessageBuilder.toolCalls?.values() || []),
-      contentBlocks: this.currentMessageBuilder.contentBlocks
-    }, message);
+    // 使用公共方法更新工具调用状态
+    this.updateToolCallStatus(
+      tool_use_id,
+      'error',
+      { error },
+      message
+    );
   };
 
   private handleContentDelta = (message: { delta?: string; session_id?: string }) => {
@@ -742,14 +734,14 @@ export class MessageHandler {
   };
 
   private handleMessageComplete = (message: { session_id?: string; query_id?: string }) => {
-    console.log('✅ [messageHandler.handleMessageComplete] 收到 message_complete 事件, session_id:', message.session_id);
+    logger.debug('✅ [messageHandler.handleMessageComplete] 收到 message_complete 事件, session_id:', message.session_id);
 
     // ✅ 优先使用消息中的 session_id
     const sessionId = message?.session_id;
     const currentChatId = sessionId || this.currentMessageBuilder.chatId || this.chatStore.currentChatId;
 
     if (!currentChatId || !this.currentMessageBuilder.messageId) {
-      console.warn('⚠️ [messageHandler.handleMessageComplete] 没有当前聊天或消息ID');
+      logger.warn('⚠️ [messageHandler.handleMessageComplete] 没有当前聊天或消息ID');
       return;
     }
 
@@ -761,7 +753,7 @@ export class MessageHandler {
     const query_id = message?.query_id;
     if (query_id && this.pendingTokenUsage.has(query_id)) {
       const tokenUsage = this.pendingTokenUsage.get(query_id);
-      console.log('📊 应用暂存的 Token 统计:', tokenUsage);
+      logger.debug('📊 应用暂存的 Token 统计:', tokenUsage);
 
       this.chatStore.updateMessage(currentChatId, this.currentMessageBuilder.messageId, {
         tokenUsage
@@ -774,21 +766,21 @@ export class MessageHandler {
     this.chatStore.updateMessage(currentChatId, this.currentMessageBuilder.messageId, {
       meta: {
         ...currentMessage?.meta,
-        status: 'completed',
+        status: 'completed' as const,
         isStreaming: false,
         streamingProgress: 100,
         endTime: Date.now()
-      } as any
+      }
     });
 
-    console.log(`✅ 消息已标记为完成 - chatId: ${currentChatId}, messageId: ${this.currentMessageBuilder.messageId}`);
+    logger.debug(`✅ 消息已标记为完成 - chatId: ${currentChatId}, messageId: ${this.currentMessageBuilder.messageId}`);
 
     // ✅ 调用重置查询回调，更新 currentQueryId
-    console.log('🔴 [messageHandler.handleMessageComplete] 调用 resetCurrentQuery()');
+    logger.debug('🔴 [messageHandler.handleMessageComplete] 调用 resetCurrentQuery()');
     if (this.resetCurrentQuery) {
       this.resetCurrentQuery();
     } else {
-      console.error('❌ [messageHandler.handleMessageComplete] resetCurrentQuery 未设置！');
+      logger.error('❌ [messageHandler.handleMessageComplete] resetCurrentQuery 未设置！');
     }
 
     // ✅ 重置构建器（包含 messageId）
@@ -806,7 +798,7 @@ export class MessageHandler {
     const { error } = message;
     // ✅ 已移除 flushUpdates 调用，不再需要批处理机制
 
-    console.log('❌ [messageHandler.handleError] 收到错误:', error, 'session_id:', message.session_id);
+    logger.debug('❌ [messageHandler.handleError] 收到错误:', error, 'session_id:', message.session_id);
 
     notification.error({
       message: '处理失败',
@@ -830,13 +822,13 @@ export class MessageHandler {
       this.chatStore.updateMessage(currentChatId, this.currentMessageBuilder.messageId, {
         meta: {
           ...currentMessage?.meta,
-          status: 'failed',
+          status: 'failed' as const,
           error: {
             message: error,
             code: undefined,
             retryable: true
           }
-        } as any
+        }
       });
     }
   };
@@ -850,11 +842,11 @@ export class MessageHandler {
     const currentChatId = sessionId || this.currentMessageBuilder.chatId || this.chatStore.currentChatId;
 
     if (!currentChatId || !this.currentMessageBuilder.messageId) {
-      console.warn('⚠️ [handleGenerationCancelled] 无法标记取消状态：没有当前聊天或消息');
+      logger.warn('⚠️ [handleGenerationCancelled] 无法标记取消状态：没有当前聊天或消息');
       return;
     }
 
-    console.log(`🛑 生成已取消 - Query: ${query_id}, ChatId: ${currentChatId}, Reason: ${reason}`);
+    logger.debug(`🛑 生成已取消 - Query: ${query_id}, ChatId: ${currentChatId}, Reason: ${reason}`);
 
     const messages = this.chatStore.messages[currentChatId] || [];
     const currentMessage = messages.find(m => m.id === this.currentMessageBuilder.messageId);
@@ -910,7 +902,7 @@ export class MessageHandler {
   // ✅ 新增: 处理取消确认事件
   private handleCancellationAcknowledged = (message: { query_id?: string }) => {
     const { query_id } = message;
-    console.log(`✅ 取消确认 - Query: ${query_id}`);
+    logger.debug(`✅ 取消确认 - Query: ${query_id}`);
 
     // 可以在这里添加额外的UI反馈（如果需要）
   };
@@ -924,10 +916,10 @@ export class MessageHandler {
 
     // ✅ 如果 currentChatId 为空，创建一个新会话（用于显示错误消息等）
     if (!currentChatId) {
-      console.warn('⚠️ [ensureCurrentMessage] currentChatId 为空，创建新会话');
+      logger.warn('⚠️ [ensureCurrentMessage] currentChatId 为空，创建新会话');
       // ✅ createNewChat 现在是同步的，立即创建临时会话
       currentChatId = this.chatStore.createNewChat();
-      console.log(`✅ [ensureCurrentMessage] 已创建新会话: ${currentChatId}`);
+      logger.debug(`✅ [ensureCurrentMessage] 已创建新会话: ${currentChatId}`);
     }
 
     // 如果已经有当前消息，检查是否归属于同一个会话
@@ -935,7 +927,7 @@ export class MessageHandler {
       const existingChatId = this.currentMessageBuilder.chatId;
       if (existingChatId !== currentChatId) {
         // 不同的会话，重置构建器（可能是新查询）
-        console.warn(`⚠️ 检测到会话切换: ${existingChatId} → ${currentChatId}，重置消息构建器`);
+        logger.warn(`⚠️ 检测到会话切换: ${existingChatId} → ${currentChatId}，重置消息构建器`);
         this.currentMessageBuilder = {
           thinking: undefined,
           toolCalls: new Map(),
@@ -948,26 +940,26 @@ export class MessageHandler {
         // ✅ 同一个会话，但需要检查是否是新查询
         // 如果消息已经标记为完成（通过 message_complete 事件），则应该创建新消息
         // 这里我们继续使用现有消息，因为 message_complete 会重置 messageId
-        console.log(`♻️  复用现有消息 - chatId: ${currentChatId}, messageId: ${this.currentMessageBuilder.messageId}`);
+        logger.debug(`♻️  复用现有消息 - chatId: ${currentChatId}, messageId: ${this.currentMessageBuilder.messageId}`);
         return;
       }
     }
 
     // 创建新的 Assistant 消息
-    const messageId = Date.now().toString() + '_' + Math.random().toString(36).substr(2, 9);
+    const messageId = Date.now().toString() + '_' + Math.random().toString(36).slice(2, 11);
     this.currentMessageBuilder.messageId = messageId;
     this.currentMessageBuilder.chatId = currentChatId;  // ✅ 记录消息归属的 chatId
 
     // 确保会话存在
     if (!this.chatStore.chats[currentChatId]) {
-      console.warn(`⚠️ 会话 ${currentChatId} 不存在，可能是后端创建的新会话，等待 session_created 事件`);
+      logger.warn(`⚠️ 会话 ${currentChatId} 不存在，可能是后端创建的新会话，等待 session_created 事件`);
       // 创建临时会话占位符（稍后由 session_created 更新）
       this.chatStore.chats[currentChatId] = {
         id: currentChatId,
         title: '新对话',
         createdAt: Date.now(),
         updatedAt: Date.now()
-      } as any;
+      };
       this.chatStore.messages[currentChatId] = [];
     }
 
@@ -976,8 +968,9 @@ export class MessageHandler {
       chatId: currentChatId,
       type: 'assistant',
       content: '',
+      timestamp: Date.now(),
       meta: {
-        status: 'streaming',
+        status: 'streaming' as const,
         isStreaming: true,
         streamingProgress: 0,
         retryCount: 0,
@@ -986,9 +979,9 @@ export class MessageHandler {
         canEdit: false,
         canDelete: true
       }
-    } as any);
+    });
 
-    console.log(`✅ 创建新消息 - chatId: ${currentChatId}, messageId: ${messageId}, 来源: ${sessionId ? 'session_id' : 'currentChatId'}`);
+    logger.debug(`✅ 创建新消息 - chatId: ${currentChatId}, messageId: ${messageId}, 来源: ${sessionId ? 'session_id' : 'currentChatId'}`);
   };
 
   private updateCurrentMessage = (updates: MessageUpdate, message?: { session_id?: string }) => {
@@ -999,7 +992,7 @@ export class MessageHandler {
     if (!currentChatId || !this.currentMessageBuilder.messageId) {
       this.ensureCurrentMessage(message);
       if (!this.currentMessageBuilder.messageId) {
-        console.error('❌ [updateCurrentMessage] ensureCurrentMessage 失败');
+        logger.error('❌ [updateCurrentMessage] ensureCurrentMessage 失败');
         return;
       }
     }
@@ -1007,7 +1000,7 @@ export class MessageHandler {
     // ✅ 验证消息归属
     const targetChatId = this.currentMessageBuilder.chatId || currentChatId;
     if (targetChatId !== currentChatId && sessionId) {
-      console.warn(`⚠️ 消息归属不匹配: builder=${this.currentMessageBuilder.chatId}, message=${currentChatId}`);
+      logger.warn(`⚠️ 消息归属不匹配: builder=${this.currentMessageBuilder.chatId}, message=${currentChatId}`);
       // 使用消息中的 session_id 作为最终真相
       this.currentMessageBuilder.chatId = currentChatId;
     }
@@ -1020,13 +1013,13 @@ export class MessageHandler {
   private handleStatusMessage = (message: { status_type?: string; message?: string; estimated_seconds?: number; details?: string[]; session_id?: string }) => {
     const { status_type, message: statusMessage, estimated_seconds, details } = message;
 
-    console.log('📊 收到状态消息:', { status_type, message: statusMessage });
+    logger.debug('📊 收到状态消息:', { status_type, message: statusMessage });
 
     // ✅ 关键修复：确保有当前消息（传递message以使用session_id）
     this.ensureCurrentMessage(message);
 
     if (!this.currentMessageBuilder.messageId) {
-      console.warn('⚠️  无法处理状态消息：没有当前消息ID');
+      logger.warn('⚠️  无法处理状态消息：没有当前消息ID');
       return;
     }
 
@@ -1039,7 +1032,7 @@ export class MessageHandler {
       showStatus: true  // ✅ 强制显示状态卡片！
     }, message);
 
-    console.log('✅ 状态卡片已更新:', { statusType: status_type, showStatus: true, messageId: this.currentMessageBuilder.messageId });
+    logger.debug('✅ 状态卡片已更新:', { statusType: status_type, showStatus: true, messageId: this.currentMessageBuilder.messageId });
   };
 
   // ✅ 新增：处理后端返回的 session_id（简化版）
@@ -1047,27 +1040,27 @@ export class MessageHandler {
   private handleSessionCreated = (message: { session_id?: string; query_id?: string }) => {
     const { session_id, query_id } = message;
 
-    console.log('🆕 收到后端确认的 session_id:', session_id, 'for query:', query_id);
+    logger.debug('🆕 收到后端确认的 session_id:', session_id, 'for query:', query_id);
 
     const currentChatId = this.chatStore.currentChatId;
 
     // ✅ 前端已经知道 session_id（因为是自己生成的）
     // ✅ 只需要验证是否匹配，不需要迁移
     if (currentChatId !== session_id) {
-      console.warn(`⚠️ session_id 不匹配 - currentChatId: ${currentChatId}, session_id: ${session_id}`);
+      logger.warn(`⚠️ session_id 不匹配 - currentChatId: ${currentChatId}, session_id: ${session_id}`);
 
       // ✅ 如果会话已存在，更新 currentChatId（后端确认了这个 session_id）
       if (this.chatStore.chats[session_id]) {
-        console.log(`🔄 更新 currentChatId: ${currentChatId} → ${session_id}`);
+        logger.debug(`🔄 更新 currentChatId: ${currentChatId} → ${session_id}`);
         this.chatStore.currentChatId = session_id;
         this.chatStore.saveToStorage();
       } else {
         // ✅ 如果会话不存在，可能是后端创建的新会话（向后兼容）
-        console.log(`📝 后端创建了新会话: ${session_id}，但前端没有对应的chat`);
+        logger.debug(`📝 后端创建了新会话: ${session_id}，但前端没有对应的chat`);
         // 可以选择创建新的chat，或者忽略（取决于业务逻辑）
       }
     } else {
-      console.log(`✅ session_id 匹配 - currentChatId: ${currentChatId}`);
+      logger.debug(`✅ session_id 匹配 - currentChatId: ${currentChatId}`);
     }
 
     // ✅ 不再需要迁移消息的逻辑（因为前端已经使用真实UUID）
@@ -1079,11 +1072,11 @@ export class MessageHandler {
     const { usage, query_id } = message;
 
     if (!usage) {
-      console.warn('[handleTokenUsage] 无效的 token_usage 消息:', message);
+      logger.warn('[handleTokenUsage] 无效的 token_usage 消息:', message);
       return;
     }
 
-    console.log('📊 Token 统计:', {
+    logger.debug('📊 Token 统计:', {
       input: usage.input_tokens,
       output: usage.output_tokens,
       cacheRead: usage.cache_read_tokens,
@@ -1106,7 +1099,7 @@ export class MessageHandler {
 
     if (!messageId || !chatId) {
       // ✅ 修复竞态条件：暂存 Token 统计，等待 message_complete 后应用
-      console.warn('[handleTokenUsage] messageId 或 chatId 不存在，暂存 Token 统计');
+      logger.warn('[handleTokenUsage] messageId 或 chatId 不存在，暂存 Token 统计');
       if (query_id) {
         this.pendingTokenUsage.set(query_id, tokenUsage);
       }
@@ -1116,14 +1109,14 @@ export class MessageHandler {
     // 直接调用 store 更新消息
     this.chatStore.updateMessage(chatId, messageId, { tokenUsage });
 
-    console.log(`✅ Token 统计已更新到消息 ${messageId}`);
+    logger.debug(`✅ Token 统计已更新到消息 ${messageId}`);
   };
 
   // ✅ P2修复：处理session续期事件
   private handleSessionRenewed = (message: { old_session_id?: string; new_session_id?: string; reason?: string; message?: string }) => {
     const { old_session_id, new_session_id, reason, message: msg } = message;
 
-    console.log('🔄 Session续期:', {
+    logger.debug('🔄 Session续期:', {
       old: old_session_id,
       new: new_session_id,
       reason
@@ -1132,13 +1125,13 @@ export class MessageHandler {
     // 1. 更新当前消息构建器的chatId
     if (this.currentMessageBuilder.chatId === old_session_id) {
       this.currentMessageBuilder.chatId = new_session_id;
-      console.log(`✅ 更新消息构建器 chatId: ${old_session_id} → ${new_session_id}`);
+      logger.debug(`✅ 更新消息构建器 chatId: ${old_session_id} → ${new_session_id}`);
     }
 
     // 2. 更新chatStore中的currentChatId（直接设置state）
     if (this.chatStore.currentChatId === old_session_id) {
       useChatStore.setState({ currentChatId: new_session_id });
-      console.log(`✅ 更新 currentChatId: ${old_session_id} → ${new_session_id}`);
+      logger.debug(`✅ 更新 currentChatId: ${old_session_id} → ${new_session_id}`);
     }
 
     // 3. 迁移chat和messages到新session_id
@@ -1167,7 +1160,7 @@ export class MessageHandler {
 
       // 保存到localStorage
       this.chatStore.saveToStorage();
-      console.log(`✅ 已迁移chat和消息到新session: ${new_session_id}`);
+      logger.debug(`✅ 已迁移chat和消息到新session: ${new_session_id}`);
     }
 
     // 4. 显示通知（可选）

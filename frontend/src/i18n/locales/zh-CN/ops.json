@@ -1,0 +1,94 @@
+{
+  "dashboard": {
+    "title": "运营仪表盘",
+    "totalTenants": "租户总数",
+    "totalUsers": "用户总数",
+    "todayActive": "今日活跃",
+    "todayQueries": "今日查询",
+    "trendData": "趋势数据",
+    "tenantStatus": "租户状态",
+    "activated": "已激活",
+    "pending": "待审核"
+  },
+  "tenant": {
+    "list": {
+      "title": "租户列表",
+      "searchPlaceholder": "搜索租户名称"
+    },
+    "table": {
+      "name": "租户名称",
+      "status": "状态",
+      "userCount": "用户数",
+      "createdAt": "创建时间",
+      "lastActive": "最后活跃",
+      "actions": "操作"
+    },
+    "status": {
+      "activated": "已激活",
+      "pending": "待审核"
+    },
+    "detail": {
+      "title": "租户详情",
+      "tenantId": "租户 ID"
+    },
+    "action": {
+      "activate": "激活租户",
+      "deactivate": "禁用租户",
+      "confirmActivate": "确认激活",
+      "confirmDeactivate": "确认禁用",
+      "confirmActivateContent": "确定要激活该租户吗？",
+      "confirmDeactivateContent": "确定要禁用该租户吗？禁用后该租户下的所有用户将无法登录。"
+    },
+    "message": {
+      "activateSuccess": "租户已激活",
+      "deactivateSuccess": "租户已禁用",
+      "operationFailed": "操作失败"
+    }
+  },
+  "user": {
+    "table": {
+      "username": "用户名",
+      "email": "邮箱",
+      "role": "角色",
+      "status": "状态",
+      "createdAt": "创建时间",
+      "lastLogin": "最后登录"
+    },
+    "role": {
+      "admin": "管理员",
+      "user": "普通用户"
+    },
+    "status": {
+      "active": "正常",
+      "disabled": "禁用"
+    }
+  },
+  "audit": {
+    "title": "审计日志",
+    "table": {
+      "time": "时间",
+      "tenant": "租户",
+      "user": "用户",
+      "action": "操作"
+    },
+    "filter": {
+      "today": "今天",
+      "last7Days": "最近7天",
+      "last30Days": "最近30天",
+      "selectTenant": "选择租户",
+      "selectUser": "选择用户",
+      "actionType": "操作类型",
+      "searchPlaceholder": "搜索（租户/用户/详情）"
+    }
+  },
+  "trend": {
+    "date": "日期",
+    "activeUsers": "日活用户",
+    "queries": "查询量"
+  },
+  "common": {
+    "confirm": "确认",
+    "cancel": "取消",
+    "updatedAt": "更新时间"
+  }
+}

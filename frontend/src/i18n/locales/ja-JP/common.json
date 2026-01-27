@@ -28,7 +28,9 @@
     "copy": "コピー",
     "viewDetails": "詳細を表示",
     "collapse": "折りたたむ",
-    "expand": "展開"
+    "expand": "展開",
+    "paste": "貼り付け",
+    "selectFile": "ファイルを選択"
   },
   "status": {
     "active": "有効",
@@ -44,11 +46,31 @@
     "error": "エラー",
     "warning": "警告",
     "info": "情報",
-    "loading": "読み込み中",
+    "loading": "読み込み中...",
     "connected": "接続済み",
     "disconnected": "未接続",
     "online": "オンライン",
-    "offline": "オフライン"
+    "offline": "オフライン",
+    "configured": "設定済み",
+    "notConfigured": "未設定"
+  },
+  "pagination": {
+    "total": "合計 {{total}} 件"
+  },
+  "hint": {
+    "selectedCount": "{{count}} 件選択中",
+    "supportJsonFile": ".json 形式ファイルをサポート",
+    "billingExportTip": "BigQuery への Billing Export を設定済みの場合、以下の情報を入力してコスト分析を有効にできます。",
+    "serviceAccountReadonly": "Service Account 情報は変更できません。変更が必要な場合は削除して再追加してください。"
+  },
+  "label": {
+    "example": "例"
+  },
+  "security": {
+    "tip": "セキュリティに関する注意",
+    "encryptedStorage": "認証情報はデータベースに暗号化して保存されます",
+    "minimalPermission": "最小限の権限を付与することをお勧めします",
+    "rotateKey": "セキュリティ向上のため定期的にキーをローテーションしてください"
   },
   "role": {
     "admin": "管理者",
@@ -98,5 +120,12 @@
     "networkError": "ネットワークエラーが発生しました。後ほど再度お試しください。",
     "permissionDenied": "権限がありません",
     "notFound": "コンテンツが見つかりません"
+  },
+  "theme": {
+    "light": "ライトモード",
+    "dark": "ダークモード",
+    "system": "システム設定",
+    "switchToLight": "ライトモードに切り替え",
+    "switchToDark": "ダークモードに切り替え"
   }
 }

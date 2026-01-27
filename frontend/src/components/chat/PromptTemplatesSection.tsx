@@ -13,6 +13,8 @@ import { CustomTemplateManager } from './CustomTemplateManager';
 import { usePromptTemplateStore } from '../../stores/promptTemplateStore';
 import { useI18n } from '../../hooks/useI18n';
 
+import { logger } from '../../utils/logger';
+
 const { Text } = Typography;
 
 export const PromptTemplatesSection: React.FC = () => {
@@ -39,7 +41,7 @@ export const PromptTemplatesSection: React.FC = () => {
         // 系统模板加载完成后再加载用户模板
         await loadUserTemplates();
       } catch (err) {
-        console.error('加载模板失败:', err);
+        logger.error('加载模板失败:', err);
         // 错误已经在 store 中处理，这里不需要额外处理
       }
     };

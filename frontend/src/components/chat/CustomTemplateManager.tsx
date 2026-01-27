@@ -11,8 +11,16 @@ import { usePromptTemplateStore } from '../../stores/promptTemplateStore';
 import { useTemplateExecution } from '../../hooks/useTemplateExecution';
 import { useI18n } from '../../hooks/useI18n';
 import type { UserPromptTemplate } from '../../types/promptTemplate';
+import { getErrorMessage } from '../../utils/ErrorHandler';
 
 const { TextArea } = Input;
+
+// 模板表单值类型
+interface TemplateFormValues {
+  title: string;
+  description: string;
+  prompt_text: string;
+}
 
 interface Props {
   visible: boolean;
@@ -75,7 +83,7 @@ export const CustomTemplateManager: React.FC<Props> = ({ visible, onClose }) => 
   };
 
   // 保存模板
-  const handleSave = async (values: any) => {
+  const handleSave = async (values: TemplateFormValues) => {
     try {
       if (editingTemplate) {
         // 更新现有模板
@@ -98,8 +106,8 @@ export const CustomTemplateManager: React.FC<Props> = ({ visible, onClose }) => 
       setIsEditing(false);
       form.resetFields();
       loadUserTemplates(); // 刷新列表
-    } catch (error: any) {
-      message.error(`${t('manager.message.operationFailed')}: ${error.message}`);
+    } catch (error: unknown) {
+      message.error(`${t('manager.message.operationFailed')}: ${getErrorMessage(error)}`);
     }
   };
 
@@ -109,8 +117,8 @@ export const CustomTemplateManager: React.FC<Props> = ({ visible, onClose }) => 
       await deleteTemplate(id);
       message.success('✅ 模板已删除');
       loadUserTemplates();
-    } catch (error: any) {
-      message.error(`❌ 删除失败: ${error.message}`);
+    } catch (error: unknown) {
+      message.error(`❌ 删除失败: ${getErrorMessage(error)}`);
     }
   };
 
@@ -120,8 +128,8 @@ export const CustomTemplateManager: React.FC<Props> = ({ visible, onClose }) => 
     try {
       await toggleFavorite(id);
       loadUserTemplates();
-    } catch (error: any) {
-      message.error(`❌ 操作失败: ${error.message}`);
+    } catch (error: unknown) {
+      message.error(`❌ 操作失败: ${getErrorMessage(error)}`);
     }
   };
 

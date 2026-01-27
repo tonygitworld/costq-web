@@ -6,6 +6,8 @@ import type { MenuProps } from 'antd';
 import { useAuthStore } from '../../stores/authStore';
 import { useI18n } from '../../hooks/useI18n';
 
+import { logger } from '../../utils/logger';
+
 const { Text } = Typography;
 
 export const UserDropdown: React.FC = () => {
@@ -23,7 +25,7 @@ export const UserDropdown: React.FC = () => {
   };
 
   const handleLogout = useCallback(() => {
-    console.log('🔴 handleLogout 被调用');
+    logger.debug('🔴 handleLogout 被调用');
 
     // ✅ 登出时不清空聊天记录，让它保留在localStorage中
     // chatStore会在登录时自动加载对应用户的数据
@@ -33,7 +35,7 @@ export const UserDropdown: React.FC = () => {
   }, [logout, navigate, t, message]);
 
   const handleMenuClick: MenuProps['onClick'] = useCallback(({ key }: { key: string }) => {
-    console.log('🔵 菜单点击:', key);
+    logger.debug('🔵 菜单点击:', key);
     switch (key) {
       case 'profile':
         navigate('/user/profile');

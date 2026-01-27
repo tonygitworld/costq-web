@@ -42,10 +42,10 @@ export const AccountPermissionModal: React.FC<AccountPermissionModalProps> = ({
         apiClient.get<string[]>(`/users/${userId}/aws-accounts`).catch(() => []),
         apiClient.get<string[]>(`/users/${userId}/gcp-accounts`).catch(() => [])
       ]);
-      
+
       setAwsTargetKeys(awsData);
       setGcpTargetKeys(gcpData);
-    } catch (error) {
+    } catch {
       message.error(t('permission.loadFailed'));
     } finally {
       setLoading(false);
@@ -85,7 +85,7 @@ export const AccountPermissionModal: React.FC<AccountPermissionModalProps> = ({
 
       // 执行AWS撤销操作
       await Promise.all(
-        awsToRemove.map(accountId => 
+        awsToRemove.map(accountId =>
           apiClient.delete(`/users/${userId}/aws-accounts/${accountId}`)
         )
       );
@@ -97,7 +97,7 @@ export const AccountPermissionModal: React.FC<AccountPermissionModalProps> = ({
 
       // 执行GCP撤销操作
       await Promise.all(
-        gcpToRemove.map(accountId => 
+        gcpToRemove.map(accountId =>
           apiClient.delete(`/users/${userId}/gcp-accounts/${accountId}`)
         )
       );

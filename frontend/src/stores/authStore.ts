@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware';
 import { authApi } from '../services/api/authApi';
 import { UnauthorizedError } from '../services/errors';
 import { notifyAuthError, redirectToLogin } from '../utils/authNotifications';
+import { logger } from '../utils/logger';
 
 // 超级管理员白名单（与后端保持一致）
 const SUPER_ADMIN_EMAILS = ['liyuguang@marshotspot.com'];
@@ -58,7 +59,7 @@ interface AuthState {
   // 辅助方法
   isAdmin: () => boolean;
   isSuperAdmin: () => boolean;
-  getAuthHeaders: () => { Authorization: string } | {};
+  getAuthHeaders: () => { Authorization: string } | Record<string, never>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -92,12 +93,11 @@ export const useAuthStore = create<AuthState>()(
             verification_code: verificationCode || '', // ✅ 新增：邮箱验证码
           });
 
-          console.log('🔍 Register response:', data);
-          console.log('🔍 requires_activation:', data.requires_activation);
-          console.log('🔍 Type check:', typeof data.requires_activation, data.requires_activation === true);
+          logger.debug('🔍 Register response:', data);
+          logger.debug('🔍 requires_activation:', data.requires_activation);
+          logger.debug('🔍 Type check:', typeof data.requires_activation, data.requires_activation === true);
 
           // ✅ 检查是否需要激活（租户审核）
-          // @ts-ignore - data 可能包含 requires_activation 字段
           if (data.requires_activation === true) {
             // 租户未激活：不设置 token 和认证状态
             set({
@@ -197,16 +197,16 @@ export const useAuthStore = create<AuthState>()(
       // 刷新 Access Token（防止并发刷新）
       refreshAccessToken: async () => {
         const state = get();
-        
+
         // ✅ 如果刷新已经失败（Refresh Token 过期），直接抛出错误，不再尝试刷新
         if (state.refreshFailed) {
-          console.warn('⚠️ [AuthStore] Refresh Token 已过期，不再尝试刷新');
+          logger.warn('⚠️ [AuthStore] Refresh Token 已过期，不再尝试刷新');
           throw new Error('Refresh Token 已过期，请重新登录');
         }
-        
+
         // ✅ 如果已经有刷新在进行，等待它完成
         if (state.refreshPromise) {
-          console.log('⏳ [AuthStore] 刷新已在进行中，等待完成...');
+          logger.debug('⏳ [AuthStore] 刷新已在进行中，等待完成...');
           return state.refreshPromise;
         }
 
@@ -218,7 +218,7 @@ export const useAuthStore = create<AuthState>()(
         // ✅ 创建刷新 Promise
         const refreshPromise = (async () => {
           try {
-            console.log('🔄 [AuthStore] 开始刷新Token...');
+            logger.debug('🔄 [AuthStore] 开始刷新Token...');
             const data = await authApi.refreshToken(refreshToken);
 
             set({
@@ -227,20 +227,21 @@ export const useAuthStore = create<AuthState>()(
               refreshFailed: false,  // ✅ 刷新成功，清除失败标记
             });
 
-            console.log('✅ [AuthStore] Token刷新成功');
-          } catch (error: any) {
-            console.error('❌ [AuthStore] Token刷新失败:', error);
-            console.error('❌ [AuthStore] 错误详情:', {
-              name: error?.name,
-              message: error?.message,
-              status: error?.status,
-              constructor: error?.constructor?.name,
+            logger.debug('✅ [AuthStore] Token刷新成功');
+          } catch (error: unknown) {
+            logger.error('❌ [AuthStore] Token刷新失败:', error);
+            const err = error as { name?: string; message?: string; status?: number; constructor?: { name?: string } };
+            logger.error('❌ [AuthStore] 错误详情:', {
+              name: err?.name,
+              message: err?.message,
+              status: err?.status,
+              constructor: err?.constructor?.name,
             });
 
             // ✅ 检查是否是 Refresh Token 过期（401 错误）
             // 注意：UnauthorizedError 有 status 属性（值为 401），不是 response.status
             const { UnauthorizedError } = await import('../services/errors');
-            const isRefreshTokenExpired = 
+            const isRefreshTokenExpired =
               error instanceof UnauthorizedError ||
               error?.status === 401 ||
               error?.response?.status === 401 ||
@@ -249,32 +250,32 @@ export const useAuthStore = create<AuthState>()(
               error?.message?.includes('过期') ||
               error?.message?.includes('expired');
 
-            console.log('🔍 [AuthStore] 是否 Refresh Token 过期:', isRefreshTokenExpired);
+            logger.debug('🔍 [AuthStore] 是否 Refresh Token 过期:', isRefreshTokenExpired);
 
             if (isRefreshTokenExpired) {
               // ✅ Refresh Token 已过期，标记为失败，阻止后续刷新尝试
               set({ refreshFailed: true });
-              console.warn('⚠️ [AuthStore] Refresh Token 已过期，标记为失败状态');
+              logger.warn('⚠️ [AuthStore] Refresh Token 已过期，标记为失败状态');
             }
 
             // ✅ 刷新失败，清除认证状态并提示用户（无论什么原因都执行）
-            console.log('🔄 [AuthStore] 执行 logout()...');
+            logger.debug('🔄 [AuthStore] 执行 logout()...');
             get().logout();
 
             // ✅ 使用全局通知机制显示错误消息（只触发一次）
-            console.log('📢 [AuthStore] 调用 notifyAuthError()...');
+            logger.debug('📢 [AuthStore] 调用 notifyAuthError()...');
             notifyAuthError('登录已过期，请重新登录');
 
             // ✅ 跳转到登录页（只触发一次）
             // 使用 setTimeout 确保在下一个事件循环中执行，避免被其他逻辑覆盖
-            console.log('🔀 [AuthStore] 调用 redirectToLogin()...');
+            logger.debug('🔀 [AuthStore] 调用 redirectToLogin()...');
             setTimeout(() => {
               redirectToLogin();
               // ✅ 兜底：如果 React Router 跳转失败，使用 window.location 强制跳转
               if (typeof window !== 'undefined') {
                 setTimeout(() => {
                   if (window.location.pathname !== '/login') {
-                    console.warn('⚠️ [AuthStore] React Router 跳转失败，使用 window.location 强制跳转');
+                    logger.warn('⚠️ [AuthStore] React Router 跳转失败，使用 window.location 强制跳转');
                     window.location.href = '/login';
                   }
                 }, 100);

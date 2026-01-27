@@ -25,7 +25,7 @@ export interface ChatSession {
   last_message_at?: string;
   message_count: number;
   total_tokens: number;
-  model_config?: Record<string, any>;
+  model_config?: Record<string, unknown>;
 }
 
 export interface ChatMessage {
@@ -36,9 +36,36 @@ export interface ChatMessage {
   content: string;
   timestamp: string;  // API使用'timestamp'而不是'created_at'
   token_count?: number;
-  tool_calls?: any[];
-  tool_results?: any[];
-  metadata?: Record<string, any>;  // ✅ 修正：后端返回 'metadata' 而不是 'message_metadata'
+  tool_calls?: ToolCallRecord[];
+  tool_results?: ToolResultRecord[];
+  metadata?: ChatMessageMetadata;
+}
+
+// 工具调用记录
+interface ToolCallRecord {
+  id: string;
+  name: string;
+  arguments?: Record<string, unknown>;
+  status?: 'pending' | 'running' | 'success' | 'error';
+}
+
+// 工具结果记录
+interface ToolResultRecord {
+  tool_call_id: string;
+  result?: unknown;
+  error?: string;
+}
+
+// 消息元数据
+interface ChatMessageMetadata {
+  token_usage?: {
+    input_tokens?: number;
+    output_tokens?: number;
+    cache_read_tokens?: number;
+    cache_write_tokens?: number;
+    input_cache_hit_rate?: number;
+  };
+  [key: string]: unknown;
 }
 
 export interface CreateSessionRequest {
@@ -50,8 +77,8 @@ export interface SaveMessageRequest {
   content: string;
   message_type: 'user' | 'assistant' | 'system' | 'tool';
   metadata?: string;
-  tool_calls?: any[];
-  tool_results?: any[];
+  tool_calls?: ToolCallRecord[];
+  tool_results?: ToolResultRecord[];
   token_count?: number;
 }
 

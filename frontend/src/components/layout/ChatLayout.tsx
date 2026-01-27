@@ -14,6 +14,8 @@ import { useAccountSelectionDetails } from '../../hooks/useAccountSelection';
 import { useChatStore } from '../../stores/chatStore';
 import './ChatLayout.css';
 
+import { logger } from '../../utils/logger';
+
 interface ChatLayoutProps {
   className?: string;
   children?: React.ReactNode;
@@ -42,17 +44,17 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
       
       // ✅ 如果当前是新建的临时会话，且 URL 指向旧会话，不切换（避免覆盖新建会话）
       if (isNewTempSession && location.pathname.startsWith('/c/')) {
-        console.log(`ℹ️ [ChatLayout] 检测到新建临时会话，忽略 URL 切换: ${currentChatId} (URL: ${sessionId})`);
+        logger.debug(`ℹ️ [ChatLayout] 检测到新建临时会话，忽略 URL 切换: ${currentChatId} (URL: ${sessionId})`);
         return;
       }
       
       // 检查会话是否存在
       if (chats[sessionId]) {
-        console.log(`🔄 [ChatLayout] URL 会话ID变化，立即切换到: ${sessionId}`);
+        logger.debug(`🔄 [ChatLayout] URL 会话ID变化，立即切换到: ${sessionId}`);
         // ✅ 立即切换（不等待），消息加载在 switchToChat 内部异步进行
         switchToChat(sessionId);
       } else {
-        console.warn(`⚠️ [ChatLayout] URL 中的会话不存在: ${sessionId}`);
+        logger.warn(`⚠️ [ChatLayout] URL 中的会话不存在: ${sessionId}`);
         // 如果会话不存在，导航回主页
         if (location.pathname.startsWith('/c/')) {
           navigate('/', { replace: true });
@@ -71,7 +73,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
     if (!currentChatId) {
       // 如果 currentChatId 为空但 URL 是会话页面，导航回主页
       if (location.pathname.startsWith('/c/')) {
-        console.log(`🔄 [ChatLayout] currentChatId 为空，导航回主页`);
+        logger.debug(`🔄 [ChatLayout] currentChatId 为空，导航回主页`);
         navigate('/', { replace: true });
         lastSyncedChatId.current = null;
       }
@@ -91,7 +93,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
         const expectedPath = `/c/${currentChatId}`;
         // 只有当 URL 不匹配时才更新（避免与 URL → Store 的更新冲突）
         if (location.pathname !== expectedPath) {
-          console.log(`🔄 [ChatLayout] currentChatId 变化，同步 URL: ${expectedPath} (hasMessages: ${hasMessages}, isBackendSession: ${isBackendSession})`);
+          logger.debug(`🔄 [ChatLayout] currentChatId 变化，同步 URL: ${expectedPath} (hasMessages: ${hasMessages}, isBackendSession: ${isBackendSession})`);
           navigate(expectedPath, { replace: true });
           lastSyncedChatId.current = currentChatId;
         } else {
@@ -100,7 +102,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
         }
       } else {
         // ✅ 新建但未发送消息的会话（前端临时创建），不更新 URL（保持在主页）
-        console.log(`ℹ️ [ChatLayout] 新建会话但无消息，不更新 URL: ${currentChatId}`);
+        logger.debug(`ℹ️ [ChatLayout] 新建会话但无消息，不更新 URL: ${currentChatId}`);
         lastSyncedChatId.current = currentChatId;  // 更新 ref，避免重复检查
       }
     } else if (currentChatId === sessionId) {

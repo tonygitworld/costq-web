@@ -11,6 +11,8 @@ import React, { useState, useCallback } from 'react';
 import { Button, Modal, Form, Input, Select, message } from 'antd';
 import { BugOutlined, ReloadOutlined } from '@ant-design/icons';
 
+import { logger } from '../../utils/logger';
+
 const { TextArea } = Input;
 const { Option } = Select;
 
@@ -59,7 +61,7 @@ export const ScrollIssueReporter: React.FC<ScrollIssueReporterProps> = ({
       };
 
       // 这里可以发送到服务器
-      console.log('[ScrollIssueReporter] 问题报告:', reportData);
+      logger.debug('[ScrollIssueReporter] 问题报告:', reportData);
 
       // 模拟提交
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -68,7 +70,7 @@ export const ScrollIssueReporter: React.FC<ScrollIssueReporterProps> = ({
       handleCancel();
     } catch (error) {
       message.error('提交失败，请稍后重试');
-      console.error('Failed to submit report:', error);
+      logger.error('Failed to submit report:', error);
     } finally {
       setSubmitting(false);
     }

@@ -1,12 +1,13 @@
 // Ant Design theme configuration
-// Compact密度 - 适合数据密集型应用
+// 舒适密度 - 适合企业级SaaS应用
 
 /**
  * 改进依据：
- * - Material Design 3 Compact Density: 基础字体11px，紧凑间距14px
- * - 8pt Grid System: 间距使用8的倍数（8px, 14px, 20px, 28px）
- * - 统一字体和间距密度，提升信息密度
- * - 适合AWS成本分析工具（数据密集型应用）
+ * - Material Design 3 Comfortable Density: 基础字体14px
+ * - ui-ux-pro-max Font Size Scale: xs(12) sm(13) base(14) lg(16) h4(16) h3(18) h2(20) h1(24)
+ * - 8pt Grid System: 间距使用8的倍数（8px, 16px, 24px, 32px）
+ * - 与 responsive.css 舒适密度保持一致
+ * - 平衡可读性与信息密度，适合企业级应用
  */
 
 export const antdTheme = {
@@ -41,28 +42,29 @@ export const antdTheme = {
     borderRadiusLG: 12,
     borderRadiusSM: 6,
 
-    // 间距 - Compact密度（统一调整）
-    padding: 14,         // 14px (Compact密度)
-    paddingLG: 20,       // 20px (Compact密度)
+    // 间距 - 舒适密度（与 responsive.css 一致）
+    padding: 16,         // 16px (舒适密度)
+    paddingLG: 24,       // 24px (舒适密度)
     paddingSM: 8,        // 8px (小间距)
     paddingXS: 4,        // 4px (超小间距)
 
-    // 字体大小 - Compact密度（统一调整）
-    fontSize: 11,        // 基准字体 11px (Compact密度)
-    fontSizeSM: 10,      // 小字体 10px
-    fontSizeXS: 9,       // 超小字体 9px
-    fontSizeLG: 13,      // 大字体 13px
-    fontSizeXL: 15,      // 超大字体 15px
-    fontSizeHeading1: 19,// H1: 19px (Compact密度)
-    fontSizeHeading2: 16,// H2: 16px
-    fontSizeHeading3: 14,// H3: 14px
-    fontSizeHeading4: 13,// H4: 13px
-    fontSizeHeading5: 11,// H5: 11px
+    // 字体大小 - 舒适密度（与 responsive.css 一致）
+    // 参考 ui-ux-pro-max: Type scale (12 14 16 18 24 32)
+    fontSize: 14,        // 基准字体 14px (舒适密度，业界标准)
+    fontSizeSM: 13,      // 小字体 13px
+    fontSizeXS: 12,      // 超小字体 12px
+    fontSizeLG: 16,      // 大字体 16px
+    fontSizeXL: 18,      // 超大字体 18px
+    fontSizeHeading1: 24,// H1: 24px (舒适密度)
+    fontSizeHeading2: 20,// H2: 20px
+    fontSizeHeading3: 18,// H3: 18px
+    fontSizeHeading4: 16,// H4: 16px
+    fontSizeHeading5: 14,// H5: 14px
 
     // 行高优化
-    lineHeight: 1.5,
+    lineHeight: 1.5715,  // Ant Design 默认行高
     lineHeightHeading1: 1.3,
-    lineHeightHeading2: 1.3,
+    lineHeightHeading2: 1.35,
     lineHeightHeading3: 1.4,
   },
 
@@ -78,24 +80,25 @@ export const antdTheme = {
     },
     Card: {
       borderRadiusLG: 12,
-      paddingLG: 20,        // Compact密度
+      paddingLG: 24,        // 舒适密度
     },
     Button: {
-      controlHeight: 30,      // 标准高度 30px (Compact密度)
-      controlHeightLG: 36,    // 大按钮 36px
-      controlHeightSM: 22,    // 小按钮 22px
-      paddingContentHorizontal: 14,  // 水平内边距 (Compact密度)
+      controlHeight: 32,      // 标准高度 32px (舒适密度，Ant Design 默认)
+      controlHeightLG: 40,    // 大按钮 40px
+      controlHeightSM: 24,    // 小按钮 24px
+      paddingContentHorizontal: 16,  // 水平内边距 (舒适密度)
+      fontSize: 14,           // 按钮字体 14px
     },
     Input: {
-      controlHeight: 30,      // 标准高度 30px (Compact密度)
-      fontSize: 13,           // 字体大小 13px (Compact密度)
+      controlHeight: 32,      // 标准高度 32px (舒适密度)
+      fontSize: 14,           // 字体大小 14px (舒适密度)
       paddingBlock: 4,        // 垂直内边距
-      paddingInline: 11,      // 水平内边距 (Compact密度)
+      paddingInline: 12,      // 水平内边距 (舒适密度)
     },
     Select: {
-      // 尺寸优化 - Compact密度
-      controlHeight: 30,      // 标准高度 30px (Compact密度)
-      fontSize: 13,           // 字体大小 13px (Compact密度)
+      // 尺寸优化 - 舒适密度
+      controlHeight: 32,      // 标准高度 32px (舒适密度)
+      fontSize: 14,           // 字体大小 14px (舒适密度)
 
       // 配色优化：纯白背景 + 淡蓝边框（清晰可交互，不像禁用状态）
       colorBgContainer: '#ffffff',          // 背景：纯白
@@ -110,14 +113,65 @@ export const antdTheme = {
       // 圆角
       borderRadius: 6,
     },
+    Table: {
+      // 表格字体 - 舒适密度
+      fontSize: 14,           // 表格内容 14px
+      fontSizeSM: 13,         // 小尺寸表格 13px
+    },
+    Menu: {
+      // 菜单字体 - 舒适密度
+      fontSize: 14,           // 菜单项 14px
+      itemHeight: 40,         // 菜单项高度 40px
+      subMenuItemBg: 'transparent',
+    },
+    Modal: {
+      // Modal 字体 - 舒适密度
+      fontSize: 14,           // Modal 内容 14px
+      titleFontSize: 16,      // Modal 标题 16px
+    },
     Message: {
-      contentPadding: '10px 14px',  // Compact密度
-      fontSize: 13,                 // Compact密度
+      contentPadding: '10px 16px',  // 舒适密度
+      fontSize: 14,                 // 消息字体 14px
     },
     Tooltip: {
       colorBgSpotlight: '#667eea',
       colorTextLightSolid: '#ffffff',
-      fontSize: 11,                 // Compact密度
-    }
+      fontSize: 13,                 // Tooltip 稍小 13px
+    },
+    Dropdown: {
+      // 下拉菜单 - 舒适密度
+      fontSize: 14,
+      controlItemBgHover: 'rgba(102, 126, 234, 0.08)',
+    },
+    Form: {
+      // 表单 - 舒适密度
+      fontSize: 14,
+      labelFontSize: 14,
+      verticalLabelPadding: '0 0 8px',
+    },
+    Tabs: {
+      // 标签页 - 舒适密度
+      titleFontSize: 14,
+      titleFontSizeLG: 16,
+      titleFontSizeSM: 13,
+    },
+    Breadcrumb: {
+      // 面包屑 - 舒适密度
+      fontSize: 14,
+    },
+    Pagination: {
+      // 分页 - 舒适密度
+      fontSize: 14,
+      itemSize: 32,
+      itemSizeSM: 24,
+    },
+    Tag: {
+      // 标签 - 稍小
+      fontSize: 12,
+    },
+    Badge: {
+      // 徽标 - 稍小
+      fontSize: 12,
+    },
   },
 };

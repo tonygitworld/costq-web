@@ -1,3 +1,4 @@
+import { logger } from './logger';
 /**
  * 错误处理和降级方案管理器
  */
@@ -105,7 +106,7 @@ export class ErrorHandler {
       try {
         callback(fullError);
       } catch (callbackError) {
-        console.error('Error in error callback:', callbackError);
+        logger.error('Error in error callback:', callbackError);
       }
     });
 
@@ -162,16 +163,16 @@ export class ErrorHandler {
 
     switch (logLevel) {
       case 'error':
-        console.error(logMessage, error.stack);
+        logger.error(logMessage, error.stack);
         break;
       case 'warn':
-        console.warn(logMessage);
+        logger.warn(logMessage);
         break;
       case 'info':
         console.info(logMessage);
         break;
       default:
-        console.log(logMessage);
+        logger.debug(logMessage);
     }
   }
 
@@ -414,4 +415,48 @@ export class ErrorHandler {
       })
     };
   }
+}
+
+/**
+ * 类型安全的错误消息提取函数
+ * 用于替代 `catch (error: any)` 模式
+ */
+export function getErrorMessage(error: unknown, fallback = '操作失败'): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (typeof error === 'object' && error !== null) {
+    const err = error as Record<string, unknown>;
+
+    // 处理 API 响应错误格式
+    if (err.response && typeof err.response === 'object') {
+      const response = err.response as Record<string, unknown>;
+      if (response.data && typeof response.data === 'object') {
+        const data = response.data as Record<string, unknown>;
+        if (typeof data.detail === 'string') {
+          return data.detail;
+        }
+        if (typeof data.message === 'string') {
+          return data.message;
+        }
+      }
+    }
+
+    // 直接的 message 属性
+    if (typeof err.message === 'string') {
+      return err.message;
+    }
+
+    // detail 属性 (FastAPI 标准错误格式)
+    if (typeof err.detail === 'string') {
+      return err.detail;
+    }
+  }
+
+  if (typeof error === 'string') {
+    return error;
+  }
+
+  return fallback;
 }

@@ -23,6 +23,8 @@ import {
   ValidationError,
   ServerError,
 } from './errors';
+import { logger } from '../utils/logger';
+import i18n from '../i18n';
 
 export interface RequestConfig extends RequestInit {
   params?: Record<string, string | number | boolean>;
@@ -101,8 +103,8 @@ export class ApiClient {
     // 解析JSON响应
     try {
       return await response.json();
-    } catch (error) {
-      throw new ApiClientError('无法解析响应数据', response.status);
+    } catch {
+      throw new ApiClientError(i18n.t('error:api.parseError'), response.status);
     }
   }
 
@@ -127,11 +129,11 @@ export class ApiClient {
       message = errorData.detail;
     } else if (typeof errorData.detail === 'object' && errorData.detail !== null) {
       // 新格式：detail 是对象 { message, error_code }
-      message = errorData.detail.message || '请求失败';
+      message = errorData.detail.message || i18n.t('error:api.requestFailed');
       errorCode = errorData.detail.error_code;
     } else {
       // 备用：从 message 字段获取
-      message = errorData.message || '请求失败';
+      message = errorData.message || i18n.t('error:api.requestFailed');
     }
 
     // 根据状态码抛出特定错误
@@ -225,7 +227,7 @@ export class ApiClient {
         }
 
         // ✅ 网络错误或服务器错误，等待后重试
-        console.warn(`⚠️ [ApiClient] 请求失败 (${attempt + 1}/${retry + 1})，${retryDelay}ms 后重试:`, error.message);
+        logger.warn(`⚠️ [ApiClient] 请求失败 (${attempt + 1}/${retry + 1})，${retryDelay}ms 后重试:`, error.message);
 
         // 指数退避
         const delay = retryDelay * Math.pow(2, attempt);
@@ -276,10 +278,10 @@ export class ApiClient {
       if (response.status === 401 && !config.skipAuth && !skipTokenRefresh) {
         // ✅ 关键：如果这是刷新 Token 的请求本身返回 401，不应该再尝试刷新
         if (url.includes('/auth/refresh')) {
-          console.warn('⚠️ [ApiClient] Refresh Token 请求返回 401，不再尝试刷新');
+          logger.warn('⚠️ [ApiClient] Refresh Token 请求返回 401，不再尝试刷新');
           // ✅ 对于流式请求，不能读取响应体，直接抛出错误
           if (returnResponse) {
-            throw new UnauthorizedError('Refresh Token 已过期，请重新登录');
+            throw new UnauthorizedError(i18n.t('error:auth.tokenExpired'));
           }
           await this.handleErrorResponse(response);
         }
@@ -289,24 +291,24 @@ export class ApiClient {
         const authState = useAuthStore.getState();
 
         if (authState.refreshFailed) {
-          console.warn('⚠️ [ApiClient] Refresh Token 已过期，不再尝试刷新和重试');
+          logger.warn('⚠️ [ApiClient] Refresh Token 已过期，不再尝试刷新和重试');
           if (returnResponse) {
-            throw new UnauthorizedError('Refresh Token 已过期，请重新登录');
+            throw new UnauthorizedError(i18n.t('error:auth.tokenExpired'));
           }
           await this.handleErrorResponse(response);
         }
 
         // ✅ 检查用户是否已登出（可能在刷新过程中被登出）
         if (!authState.isAuthenticated) {
-          console.warn('⚠️ [ApiClient] 用户已登出，不再尝试刷新和重试');
+          logger.warn('⚠️ [ApiClient] 用户已登出，不再尝试刷新和重试');
           if (returnResponse) {
-            throw new UnauthorizedError('用户已登出，请重新登录');
+            throw new UnauthorizedError(i18n.t('error:auth.sessionExpired'));
           }
           await this.handleErrorResponse(response);
         }
 
         // ✅ 尝试刷新 Token 并重试请求
-        console.log('🔄 [ApiClient] 检测到 401 错误，尝试刷新 Token...');
+        logger.debug('🔄 [ApiClient] 检测到 401 错误，尝试刷新 Token...');
 
         try {
           await this.refreshToken();
@@ -314,9 +316,9 @@ export class ApiClient {
           // ✅ 再次检查刷新是否失败
           const currentAuthState = useAuthStore.getState();
           if (currentAuthState.refreshFailed || !currentAuthState.isAuthenticated) {
-            console.warn('⚠️ [ApiClient] Token 刷新失败，放弃重试');
+            logger.warn('⚠️ [ApiClient] Token 刷新失败，放弃重试');
             if (returnResponse) {
-              throw new UnauthorizedError('Token 刷新失败，请重新登录');
+              throw new UnauthorizedError(i18n.t('error:auth.tokenRefreshFailed'));
             }
             await this.handleErrorResponse(response);
           }
@@ -331,20 +333,20 @@ export class ApiClient {
           // ✅ 如果重试后仍然是 401，抛出错误
           if (retryResponse.status === 401) {
             if (returnResponse) {
-              throw new UnauthorizedError('Token 已过期，请重新登录');
+              throw new UnauthorizedError(i18n.t('error:auth.tokenExpired'));
             }
             await this.handleErrorResponse(retryResponse);
           }
 
           return await this.handleResponse<T>(retryResponse, returnResponse);
         } catch (refreshError) {
-          console.error('❌ [ApiClient] Token 刷新失败，放弃重试');
+          logger.error('❌ [ApiClient] Token 刷新失败，放弃重试');
           // ✅ 如果已经是 UnauthorizedError，直接抛出（authStore 已处理通知和跳转）
           if (refreshError instanceof UnauthorizedError) {
             throw refreshError;
           }
           if (returnResponse) {
-            throw new UnauthorizedError('Token 刷新失败，请重新登录');
+            throw new UnauthorizedError(i18n.t('error:auth.tokenRefreshFailed'));
           }
           await this.handleErrorResponse(response);
         }
@@ -354,7 +356,7 @@ export class ApiClient {
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
       if (err.name === 'AbortError') {
-        throw new ApiClientError('请求超时', 408);
+        throw new ApiClientError(i18n.t('error:network.timeout'), 408);
       }
 
       // ✅ 注意：401 错误的重试逻辑已经在上面处理了（在 response.status === 401 时）
@@ -370,9 +372,9 @@ export class ApiClient {
    * GET请求
    */
   async get<T = any>(url: string, config?: RequestConfig): Promise<T> {
-    console.log('📡 ApiClient.get - URL:', url, 'Config:', config);
+    logger.debug('📡 ApiClient.get - URL:', url, 'Config:', config);
     const result = await this.request<T>(url, { ...config, method: 'GET' });
-    console.log('✅ ApiClient.get - 响应:', result);
+    logger.debug('✅ ApiClient.get - 响应:', result);
     return result as T;
   }
 

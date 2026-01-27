@@ -28,12 +28,14 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { opsService } from '../../services/opsService';
+import { useI18n } from '../../hooks/useI18n';
 
 const { Title, Text } = Typography;
 
 export const OpsDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [trendDays, setTrendDays] = useState<number>(7);
+  const { t } = useI18n('ops');
 
   // 获取统计数据
   const {
@@ -80,18 +82,18 @@ export const OpsDashboard: React.FC = () => {
   // 趋势数据表格列
   const trendColumns = [
     {
-      title: '日期',
+      title: t('trend.date'),
       dataIndex: 'date',
       key: 'date',
       render: (date: string) => dayjs(date).format('MM-DD'),
     },
     {
-      title: '日活用户',
+      title: t('trend.activeUsers'),
       dataIndex: 'dau',
       key: 'dau',
     },
     {
-      title: '查询量',
+      title: t('trend.queries'),
       dataIndex: 'queries',
       key: 'queries',
     },
@@ -118,7 +120,7 @@ export const OpsDashboard: React.FC = () => {
         }}
       >
         <Title level={4} style={{ margin: 0 }}>
-          运营 Dashboard
+          {t('dashboard.title')}
         </Title>
         <div>
           <Button
@@ -126,7 +128,7 @@ export const OpsDashboard: React.FC = () => {
             onClick={handleRefresh}
             style={{ marginRight: 8 }}
           >
-            刷新
+            {t('common:button.refresh')}
           </Button>
           {stats && (
             <Text type="secondary">
@@ -142,7 +144,7 @@ export const OpsDashboard: React.FC = () => {
           <Col span={6}>
             <Card>
               <Statistic
-                title="租户总数"
+                title={t('dashboard.totalTenants')}
                 value={stats?.total_tenants ?? '-'}
                 prefix={<TeamOutlined />}
               />
@@ -151,7 +153,7 @@ export const OpsDashboard: React.FC = () => {
           <Col span={6}>
             <Card>
               <Statistic
-                title="用户总数"
+                title={t('dashboard.totalUsers')}
                 value={stats?.total_users ?? '-'}
                 prefix={<UserOutlined />}
               />
@@ -160,7 +162,7 @@ export const OpsDashboard: React.FC = () => {
           <Col span={6}>
             <Card>
               <Statistic
-                title="今日活跃"
+                title={t('dashboard.todayActive')}
                 value={stats?.today_dau ?? '-'}
                 prefix={<RiseOutlined />}
                 suffix={
@@ -172,7 +174,7 @@ export const OpsDashboard: React.FC = () => {
           <Col span={6}>
             <Card>
               <Statistic
-                title="今日查询"
+                title={t('dashboard.todayQueries')}
                 value={stats?.today_queries ?? '-'}
                 prefix={<MessageOutlined />}
                 suffix={
@@ -187,12 +189,12 @@ export const OpsDashboard: React.FC = () => {
 
       {/* 趋势数据（简化版：使用表格代替图表） */}
       <Card
-        title="趋势数据"
+        title={t('dashboard.trendData')}
         extra={
           <Segmented
             options={[
-              { label: '7天', value: 7 },
-              { label: '30天', value: 30 },
+              { label: t('audit.filter.last7Days'), value: 7 },
+              { label: t('audit.filter.last30Days'), value: 30 },
             ]}
             value={trendDays}
             onChange={(v) => setTrendDays(v as number)}
@@ -212,18 +214,18 @@ export const OpsDashboard: React.FC = () => {
       </Card>
 
       {/* 租户状态概览 */}
-      <Card title="租户状态">
+      <Card title={t('dashboard.tenantStatus')}>
         <Row gutter={16}>
           <Col span={12}>
             <Statistic
-              title="已激活"
+              title={t('dashboard.activated')}
               value={stats?.active_tenants ?? '-'}
               valueStyle={{ color: '#52c41a' }}
             />
           </Col>
           <Col span={12}>
             <Statistic
-              title="待审核"
+              title={t('dashboard.pending')}
               value={stats?.pending_tenants ?? '-'}
               valueStyle={{ color: '#faad14' }}
             />
@@ -234,7 +236,7 @@ export const OpsDashboard: React.FC = () => {
           style={{ padding: 0, marginTop: 16 }}
           onClick={() => navigate('/ops/tenants')}
         >
-          查看租户管理 →
+          {t('tenant.list.title')} →
         </Button>
       </Card>
     </div>

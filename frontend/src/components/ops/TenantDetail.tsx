@@ -21,6 +21,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { opsService } from '../../services/opsService';
 import { TenantUserList } from './TenantUserList';
+import { useI18n } from '../../hooks/useI18n';
 
 const { Title } = Typography;
 
@@ -29,6 +30,7 @@ export const TenantDetail: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [modal, contextHolder] = Modal.useModal();
+  const { t } = useI18n('ops');
 
   // 获取租户详情
   const { data: tenant, isLoading } = useQuery({
@@ -41,34 +43,34 @@ export const TenantDetail: React.FC = () => {
   const activateMutation = useMutation({
     mutationFn: opsService.activateTenant,
     onSuccess: () => {
-      message.success('租户已激活');
+      message.success(t('tenant.message.activateSuccess'));
       queryClient.invalidateQueries({ queryKey: ['ops-tenant', tenantId] });
     },
-    onError: () => message.error('操作失败'),
+    onError: () => message.error(t('tenant.message.operationFailed')),
   });
 
   // 禁用操作
   const deactivateMutation = useMutation({
     mutationFn: opsService.deactivateTenant,
     onSuccess: () => {
-      message.success('租户已禁用');
+      message.success(t('tenant.message.deactivateSuccess'));
       queryClient.invalidateQueries({ queryKey: ['ops-tenant', tenantId] });
     },
-    onError: () => message.error('操作失败'),
+    onError: () => message.error(t('tenant.message.operationFailed')),
   });
 
   // 切换状态
   const handleToggleStatus = () => {
     if (!tenant) return;
-    const action = tenant.is_active ? '禁用' : '激活';
+    const isActive = tenant.is_active;
     modal.confirm({
-      title: `确认${action}`,
-      content: `确定要${action}租户「${tenant.name}」吗？`,
-      okText: `确认${action}`,
-      okButtonProps: { danger: tenant.is_active },
-      cancelText: '取消',
+      title: isActive ? t('tenant.action.confirmDeactivate') : t('tenant.action.confirmActivate'),
+      content: isActive ? t('tenant.action.confirmDeactivateContent') : t('tenant.action.confirmActivateContent'),
+      okText: t('common.confirm'),
+      okButtonProps: { danger: isActive },
+      cancelText: t('common.cancel'),
       onOk: () =>
-        tenant.is_active
+        isActive
           ? deactivateMutation.mutateAsync(tenantId!)
           : activateMutation.mutateAsync(tenantId!),
     });
@@ -79,7 +81,7 @@ export const TenantDetail: React.FC = () => {
   }
 
   if (!tenant) {
-    return <div style={{ padding: 24 }}>租户不存在</div>;
+    return <div style={{ padding: 24 }}>{t('common:placeholder.noData')}</div>;
   }
 
   return (
@@ -92,19 +94,19 @@ export const TenantDetail: React.FC = () => {
         onClick={() => navigate('/ops/tenants')}
         style={{ padding: 0, marginBottom: 16 }}
       >
-        返回列表
+        {t('common:button.back')}
       </Button>
 
-      <Title level={4}>租户详情</Title>
+      <Title level={4}>{t('tenant.detail.title')}</Title>
 
       {/* 基本信息 */}
       <Card style={{ marginBottom: 24 }}>
         <Descriptions column={2}>
-          <Descriptions.Item label="租户名称">{tenant.name}</Descriptions.Item>
-          <Descriptions.Item label="租户 ID">{tenant.id}</Descriptions.Item>
-          <Descriptions.Item label="状态">
+          <Descriptions.Item label={t('tenant.table.name')}>{tenant.name}</Descriptions.Item>
+          <Descriptions.Item label={t('tenant.detail.tenantId')}>{tenant.id}</Descriptions.Item>
+          <Descriptions.Item label={t('tenant.table.status')}>
             <Tag color={tenant.is_active ? 'green' : 'orange'}>
-              {tenant.is_active ? '已激活' : '待审核'}
+              {tenant.is_active ? t('tenant.status.activated') : t('tenant.status.pending')}
             </Tag>
             <Button
               size="small"
@@ -113,14 +115,14 @@ export const TenantDetail: React.FC = () => {
               onClick={handleToggleStatus}
               style={{ marginLeft: 8 }}
             >
-              {tenant.is_active ? '禁用租户' : '激活租户'}
+              {tenant.is_active ? t('tenant.action.deactivate') : t('tenant.action.activate')}
             </Button>
           </Descriptions.Item>
-          <Descriptions.Item label="用户数">{tenant.user_count}</Descriptions.Item>
-          <Descriptions.Item label="创建时间">
+          <Descriptions.Item label={t('tenant.table.userCount')}>{tenant.user_count}</Descriptions.Item>
+          <Descriptions.Item label={t('tenant.table.createdAt')}>
             {dayjs(tenant.created_at).format('YYYY-MM-DD HH:mm:ss')}
           </Descriptions.Item>
-          <Descriptions.Item label="更新时间">
+          <Descriptions.Item label={t('common.updatedAt')}>
             {dayjs(tenant.updated_at).format('YYYY-MM-DD HH:mm:ss')}
           </Descriptions.Item>
         </Descriptions>

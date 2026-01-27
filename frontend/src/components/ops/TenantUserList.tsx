@@ -11,6 +11,7 @@ import {
   opsService,
   type TenantUserListParams,
 } from '../../services/opsService';
+import { useI18n } from '../../hooks/useI18n';
 
 const { Title } = Typography;
 
@@ -19,6 +20,7 @@ interface TenantUserListProps {
 }
 
 export const TenantUserList: React.FC<TenantUserListProps> = ({ tenantId }) => {
+  const { t } = useI18n('ops');
   const [params, setParams] = useState<TenantUserListParams>({
     page: 1,
     page_size: 10,
@@ -33,46 +35,46 @@ export const TenantUserList: React.FC<TenantUserListProps> = ({ tenantId }) => {
 
   const columns = [
     {
-      title: '用户名',
+      title: t('user.table.username'),
       dataIndex: 'username',
       key: 'username',
     },
     {
-      title: '邮箱',
+      title: t('user.table.email'),
       dataIndex: 'email',
       key: 'email',
     },
     {
-      title: '角色',
+      title: t('user.table.role'),
       dataIndex: 'role',
       key: 'role',
       width: 100,
       render: (role: string) => (
         <Tag color={role === 'admin' ? 'blue' : 'default'}>
-          {role === 'admin' ? '管理员' : '普通用户'}
+          {role === 'admin' ? t('user.role.admin') : t('user.role.user')}
         </Tag>
       ),
     },
     {
-      title: '状态',
+      title: t('user.table.status'),
       dataIndex: 'is_active',
       key: 'is_active',
       width: 80,
       render: (active: boolean) => (
         <Tag color={active ? 'green' : 'red'}>
-          {active ? '正常' : '禁用'}
+          {active ? t('user.status.active') : t('user.status.disabled')}
         </Tag>
       ),
     },
     {
-      title: '创建时间',
+      title: t('user.table.createdAt'),
       dataIndex: 'created_at',
       key: 'created_at',
       width: 120,
       render: (date: string) => dayjs(date).format('YYYY-MM-DD'),
     },
     {
-      title: '最后登录',
+      title: t('user.table.lastLogin'),
       dataIndex: 'last_login_at',
       key: 'last_login_at',
       width: 120,
@@ -83,7 +85,7 @@ export const TenantUserList: React.FC<TenantUserListProps> = ({ tenantId }) => {
 
   return (
     <div>
-      <Title level={5}>用户列表</Title>
+      <Title level={5}>{t('user.table.username')}</Title>
       <Table
         columns={columns}
         dataSource={data?.items}
