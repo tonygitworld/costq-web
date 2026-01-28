@@ -62,5 +62,5 @@ tmp/
 temp/
 *.tmp
 
-# Deployment Scripts (contain sensitive info)
-deployment/scripts/*.sh
+# Deployment (contains sensitive K8s configs and secrets)
+deployment/
