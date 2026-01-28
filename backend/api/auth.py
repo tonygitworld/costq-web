@@ -121,6 +121,7 @@ class UserResponse(BaseModel):
     id: str
     org_id: str
     username: str
+    email: str  # ✅ 新增：邮箱字段（用于超级管理员判断）
     full_name: str | None = None
     role: str
     is_active: bool
