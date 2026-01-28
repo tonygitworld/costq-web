@@ -12,7 +12,8 @@ const SUPER_ADMIN_EMAILS = ['liyuguang@marshotspot.com'];
 interface User {
   id: string;
   org_id: string;
-  username: string;  // 实际上是用户的 email
+  username: string;
+  email: string;  // ✅ 新增：邮箱字段（用于超级管理员判断）
   full_name?: string;
   role: string;
   is_active: boolean;
@@ -304,8 +305,8 @@ export const useAuthStore = create<AuthState>()(
       // 是否是超级管理员（运营后台权限）
       isSuperAdmin: () => {
         const { user } = get();
-        if (!user?.username) return false;
-        return SUPER_ADMIN_EMAILS.includes(user.username.toLowerCase().trim());
+        if (!user?.email) return false;
+        return SUPER_ADMIN_EMAILS.includes(user.email.toLowerCase().trim());
       },
 
       // 获取认证请求头
