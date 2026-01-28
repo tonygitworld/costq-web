@@ -34,7 +34,8 @@
 }
 
 .sidebar-container.sidebar-collapsed .sidebar-toggle-wrapper,
-.sidebar-container.sidebar-collapsed .sidebar-collapse-floating {
+.sidebar-container.sidebar-collapsed .sidebar-collapse-floating,
+.sidebar-container.sidebar-collapsed .sidebar-collapsed-settings {
   opacity: 1;
   pointer-events: auto;
 }
@@ -254,75 +255,11 @@
 }
 
 
-/* ===== 8. åº•éƒ¨ç”¨æˆ·/è®¾ç½®åŒºåŸŸ (Ant Design Menu è¦†ç›–) ===== */
+/* ===== 8. åº•éƒ¨è®¾ç½®èœå•åŒºåŸŸ ===== */
 
 .sidebar-menu-wrapper {
-  padding: 12px 8px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  flex: 0 0 auto;
   background-color: transparent !important;
-}
-
-/* å¼ºåˆ¶æ¸…é™¤æ‰€æœ‰ AntD é»˜è®¤èƒŒæ™¯ï¼Œé€‚é… Light Theme */
-:where(.sidebar-menu).ant-menu-light,
-:where(.sidebar-menu).ant-menu-light .ant-menu-sub,
-:where(.sidebar-menu).ant-menu-light .ant-menu-item,
-:where(.sidebar-menu).ant-menu-light .ant-menu-submenu-title {
-  background: transparent !important;
-  background-color: transparent !important;
-  color: rgb(68, 71, 70) !important;
-  border-right: none !important;
-}
-
-/* ç»ˆæä¿®å¤ï¼šè®¾ç½®èœå•æ ·å¼ */
-:where(.sidebar-menu) .ant-menu-submenu-title {
-  color: rgb(68, 71, 70) !important;
-  background-color: transparent !important;
-  margin: 0 8px 4px 8px !important;
-  width: calc(100% - 16px) !important;
-  border-radius: 8px !important;
-}
-
-:where(.sidebar-menu) .ant-menu-submenu-title .ant-menu-title-content { color: inherit !important; }
-:where(.sidebar-menu) .ant-menu-submenu-title .anticon { color: inherit !important; }
-
-/* æ‚¬åœæ—¶å˜è‰² */
-:where(.sidebar-menu) .ant-menu-submenu-title:hover {
-  color: rgb(26, 26, 26) !important;
-  background-color: rgba(0, 0, 0, 0.04) !important;
-}
-
-.sidebar-menu .ant-menu-item {
-  color: rgb(68, 71, 70) !important;
-  margin-bottom: 4px !important;
-  border-radius: 8px !important;
-  width: calc(100% - 16px) !important;
-  margin-left: 8px !important;
-}
-
-.sidebar-menu .ant-menu-item-icon {
-  color: rgb(68, 71, 70) !important;
-  min-width: 18px !important;
-}
-
-/* é€‰ä¸­é¡¹ */
-.sidebar-menu .ant-menu-item-selected {
-  background-color: rgba(0, 0, 0, 0.06) !important;
-  color: rgb(26, 26, 26) !important;
-}
-
-/* æ‚¬åœé¡¹ */
-.sidebar-menu .ant-menu-item:hover {
-  background-color: rgba(0, 0, 0, 0.04) !important;
-  color: rgb(26, 26, 26) !important;
-}
-
-/* ç®­å¤´é¢œè‰² */
-.sidebar-menu .ant-menu-submenu-arrow {
-  color: rgba(68, 71, 70, 0.6) !important;
-}
-.sidebar-menu .ant-menu-submenu-arrow::before,
-.sidebar-menu .ant-menu-submenu-arrow::after {
-  background: rgba(68, 71, 70, 0.6) !important;
 }
 
 
@@ -420,15 +357,55 @@
     display: none;
   }
 }
-  
-/* ===== ÖÕ¼«ÑÕÉ«Ç¿ÖÆĞŞÕı (Nuclear Option) ===== */  
-/* 1. Ç¿ÖÆËùÓĞ²Ëµ¥²ã¼¶±³¾°Í¸Ã÷ */  
-.sidebar-menu, .sidebar-menu * { background-color: transparent !important; background: transparent !important; }  
-/* 2. Ç¿ÖÆÎÄ×ÖÑÕÉ« (Gemini Grey) */  
-.sidebar-menu .ant-menu-title-content, .sidebar-menu .anticon { color: rgb(68, 71, 70) !important; }  
-/* 3. ĞüÍ£/Ñ¡ÖĞÊ±µÄÌØÊâ´¦Àí (±³¾°µ­»Ò£¬ÎÄ×ÖÉîºÚ) */  
-.sidebar-menu .ant-menu-submenu-title:hover { background-color: rgba(0, 0, 0, 0.04) !important; }  
-.sidebar-menu .ant-menu-submenu-title:hover .ant-menu-title-content, .sidebar-menu .ant-menu-submenu-title:hover .anticon { color: rgb(26, 26, 26) !important; }  
-/* 4. ĞŞ¸´¼ıÍ· */  
-.sidebar-menu .ant-menu-submenu-arrow { color: rgb(68, 71, 70) !important; }  
-.sidebar-menu .ant-menu-submenu-arrow::before, .sidebar-menu .ant-menu-submenu-arrow::after { background: rgb(68, 71, 70) !important; } 
+
+
+/* ===== 13. æŠ˜å çŠ¶æ€ä¸‹çš„è®¾ç½®å›¾æ ‡ ===== */
+
+.sidebar-collapsed-settings {
+  position: fixed;
+  bottom: 16px;
+  left: 12px;
+  z-index: 999;
+}
+
+.sidebar-settings-icon {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  outline: none;
+  cursor: pointer;
+  color: rgb(68, 71, 70);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-settings-icon:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+  color: rgb(26, 26, 26);
+}
+
+:global(.dark) .sidebar-settings-icon {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+:global(.dark) .sidebar-settings-icon:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 1);
+}
+
+/* ===== ï¿½Õ¼ï¿½ï¿½ï¿½É«Ç¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ (Nuclear Option) ===== */
+/* 1. Ç¿ï¿½ï¿½ï¿½ï¿½ï¿½Ğ²Ëµï¿½ï¿½ã¼¶ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ */
+.sidebar-menu, .sidebar-menu * { background-color: transparent !important; background: transparent !important; }
+/* 2. Ç¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É« (Gemini Grey) */
+.sidebar-menu .ant-menu-title-content, .sidebar-menu .anticon { color: rgb(68, 71, 70) !important; }
+/* 3. ï¿½ï¿½Í£/Ñ¡ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½â´¦ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½) */
+.sidebar-menu .ant-menu-submenu-title:hover { background-color: rgba(0, 0, 0, 0.04) !important; }
+.sidebar-menu .ant-menu-submenu-title:hover .ant-menu-title-content, .sidebar-menu .ant-menu-submenu-title:hover .anticon { color: rgb(26, 26, 26) !important; }
+/* 4. ï¿½Ş¸ï¿½ï¿½ï¿½Í· */
+.sidebar-menu .ant-menu-submenu-arrow { color: rgb(68, 71, 70) !important; }
+.sidebar-menu .ant-menu-submenu-arrow::before, .sidebar-menu .ant-menu-submenu-arrow::after { background: rgb(68, 71, 70) !important; }

@@ -1,0 +1,224 @@
+/* ===== SettingsMenu 样式表 ===== */
+/* Popover 下拉菜单风格（参考 Gemini） */
+
+.settings-menu-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+:global(.dark) .settings-menu-container {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ===== 触发按钮 ===== */
+
+.settings-menu-trigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  background-color: transparent;
+  color: rgb(68, 71, 70);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  text-align: left;
+  flex: 1;
+}
+
+.settings-menu-trigger:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  color: rgb(26, 26, 26);
+}
+
+.settings-menu-trigger:active {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+:global(.dark) .settings-menu-trigger {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+:global(.dark) .settings-menu-trigger:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 1);
+}
+
+.settings-menu-trigger-icon {
+  flex-shrink: 0;
+  font-size: 16px;
+  color: inherit;
+}
+
+/* ===== 下拉菜单容器 ===== */
+
+.settings-menu-dropdown {
+  position: absolute;
+  left: 100%;
+  bottom: 0;
+  margin-left: 12px;
+  width: 280px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.06);
+  padding: 8px;
+  z-index: 1000;
+  transform-origin: bottom left;
+  animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:global(.dark) .settings-menu-dropdown {
+  background-color: #2a2a2a;
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===== 菜单分组 ===== */
+
+.settings-menu-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ===== 菜单分组标题 ===== */
+
+.settings-menu-group-title {
+  display: block;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(68, 71, 70, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  user-select: none;
+}
+
+:global(.dark) .settings-menu-group-title {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ===== 菜单项容器 ===== */
+
+.settings-menu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ===== 菜单项 ===== */
+
+.settings-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: rgb(68, 71, 70);
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.settings-menu-item:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+  color: rgb(26, 26, 26);
+}
+
+.settings-menu-item:active {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+:global(.dark) .settings-menu-item {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+:global(.dark) .settings-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 1);
+}
+
+/* ===== 菜单项图标 ===== */
+
+.settings-menu-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  font-size: 16px;
+  color: inherit;
+}
+
+/* ===== 菜单项内容 ===== */
+
+.settings-menu-item-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* ===== 菜单项标签 ===== */
+
+.settings-menu-item-label {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: inherit;
+}
+
+/* ===== 菜单项徽章 ===== */
+
+.settings-menu-item-badge {
+  flex-shrink: 0;
+}
+
+/* ===== 分隔线 ===== */
+
+.settings-menu-divider {
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.06);
+  margin: 4px 0;
+}
+
+:global(.dark) .settings-menu-divider {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ===== 焦点状态（键盘导航） ===== */
+
+.settings-menu-item:focus-visible {
+  outline: 2px solid rgba(0, 0, 0, 0.15);
+  outline-offset: -2px;
+}
+
+:global(.dark) .settings-menu-item:focus-visible {
+  outline-color: rgba(255, 255, 255, 0.2);
+}
