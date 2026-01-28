@@ -1,5 +1,5 @@
-/* MainContent - 主内容区域响应式优化（保守版本） */
-/* 改进依据：保持原有布局，仅在大屏幕上增加留白 */
+/* MainContent - 主内容区域响应式优化（沉浸式/ChatGPT风格） */
+/* 改进依据：去除外层框和边距，使对话直接呈现在底层画布上 */
 
 /* ===== 主内容容器 ===== */
 
@@ -7,8 +7,8 @@
   display: flex;
   flex-direction: column;
   height: calc(100vh - 52px); /* 减去 Header 高度 */
-  padding: 16px 24px; /* 保持原有padding */
-  background-color: #f5f5f5;
+  padding: 0; /* ❌ 移除内边距，实现全屏沉浸感 */
+  background-color: white; /* ✅ 统一背景色为白色，去除灰底 */
 }
 
 /* ===== 消息列表区域 ===== */
@@ -16,28 +16,39 @@
 .main-content-message-area {
   flex: 1;
   overflow: auto;
-  background-color: white;
-  border-radius: 8px;
-  border: 1px solid #f0f0f0;
-  margin-bottom: 16px;
+  background-color: transparent; /* ✅ 透明背景，融入父容器 */
+  border-radius: 0; /* ❌ 移除圆角 */
+  border: none; /* ❌ 移除边框 */
+  margin-bottom: 0; /* ❌ 移除底部边距 */
+
+  /* Centering for empty state */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative; /* Position context for floating scroll button */
 }
 
 /* ===== 输入框区域 ===== */
 
 .main-content-input-area {
-  max-width: 100%;
+  width: 100%;
+  max-width: 100%; /* 允许全宽，但通常 Input 组件自身有 max-width 控制 */
+  padding: 0 24px 24px 24px; /* ✅ 增加底部 padding，让输入框不贴底 */
+  background-color: white; /* 确保背景覆盖 */
 }
 
-/* ===== 响应式断点（保守版本） ===== */
+/* ===== 响应式断点 ===== */
 
-/* 大屏桌面（1440px+）- 仅在超大屏幕上增加留白 */
+/* 大屏桌面（1440px+） */
 @media (min-width: 1440px) {
+  /* 沉浸式布局不需要额外的外部 padding，内容居中由内部组件控制 */
   .main-content-container {
-    padding: 20px 32px;
+    padding: 0;
   }
 
   .main-content-message-area {
-    margin-bottom: 20px;
+    margin-bottom: 0;
   }
 }
 

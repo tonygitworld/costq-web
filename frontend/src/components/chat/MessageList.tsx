@@ -206,17 +206,15 @@ export const MessageList: FC = () => {
 
   if (!currentChatId || currentMessages.length === 0) {
     return (
-      <div className="message-list-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Empty
-          description={<Text type="secondary">{currentChatId ? t('message.startChat') : t('message.emptyState')}</Text>}
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-        />
-      </div>
+      <Empty
+        description={<Text type="secondary">{currentChatId ? t('message.startChat') : t('message.emptyState')}</Text>}
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
+      />
     );
   }
 
   return (
-    <div className="message-list-wrapper">
+    <>
       <div
         ref={containerRef}
         onScroll={handleScroll}
@@ -242,6 +240,6 @@ export const MessageList: FC = () => {
         onClick={() => scrollToBottom('smooth')}
         aria-label="Scroll to bottom"
       />
-    </div>
+    </>
   );
 };

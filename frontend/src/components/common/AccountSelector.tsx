@@ -85,6 +85,21 @@ export const AccountSelector: FC<AccountSelectorProps> = ({
       optionLabelProp="label"
       size="middle"
       disabled={loading || accounts.length === 0}
+      // ✅ 启用搜索功能
+      showSearch
+      filterOption={(input, option) => {
+        const account = accounts.find(acc => acc.id === option?.value);
+        if (!account) return false;
+        const searchText = input.toLowerCase();
+        return (
+          account.alias.toLowerCase().includes(searchText) ||
+          (account.account_id || '').toLowerCase().includes(searchText) ||
+          (account.region || '').toLowerCase().includes(searchText)
+        );
+      }}
+      // ✅ 下拉框宽度自适应，显示完整信息
+      popupMatchSelectWidth={false}
+      dropdownStyle={{ minWidth: 360, maxWidth: 480 }}
       notFoundContent={
         loading ? (
           <div style={{ textAlign: 'center', padding: '20px' }}>
@@ -109,17 +124,32 @@ export const AccountSelector: FC<AccountSelectorProps> = ({
             </Space>
           }
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Space>
-              <CloudOutlined style={{ color: '#1890ff' }} />
-              <span style={{ fontWeight: 500 }}>{account.alias}</span>
+          {/* ✅ 紧凑布局：左右对齐，信息更紧凑 */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: '100%',
+            gap: '12px'
+          }}>
+            {/* 左侧：账号名称 + 验证图标 */}
+            <Space size={6}>
+              <CloudOutlined style={{ color: '#1890ff', fontSize: '14px' }} />
+              <span style={{ fontWeight: 500, fontSize: '14px' }}>{account.alias}</span>
               {account.is_verified && (
-                <CheckCircleOutlined style={{ color: '#52c41a' }} />
+                <CheckCircleOutlined style={{ color: '#52c41a', fontSize: '14px' }} />
               )}
             </Space>
-            <Space direction="vertical" size={0} style={{ fontSize: '12px', color: '#999' }}>
-              <span>{t('aws.accountId')}: {account.account_id || 'N/A'}</span>
-              <span>{t('aws.region')}: {account.region}</span>
+
+            {/* 右侧：账号详细信息 */}
+            <Space direction="vertical" size={0} style={{
+              fontSize: '12px',
+              color: '#999',
+              textAlign: 'right',
+              lineHeight: 1.4
+            }}>
+              <span>{account.account_id || 'N/A'}</span>
+              <span>{account.region}</span>
             </Space>
           </div>
         </Option>

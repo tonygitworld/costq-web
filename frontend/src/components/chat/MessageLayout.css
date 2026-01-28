@@ -111,17 +111,20 @@
   font-weight: 600;
 }
 
+/* ✅ 修改：AI 消息卡片无框样式（沉浸式） */
 .ai-message-card {
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-md) var(--spacing-lg);
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s ease;
+  background-color: transparent; /* 去除白色背景 */
+  border: none; /* 去除边框 */
+  border-radius: 0;
+  padding: 0; /* 移除内边距，让文字自然对齐 */
+  box-shadow: none; /* 去除阴影 */
+  transition: none;
 }
 
+/* 移除 hover 效果 */
 .ai-message-card:hover {
-  box-shadow: var(--shadow-md);
+  box-shadow: none;
+  transform: none;
 }
 
 .ai-message-text-block {
@@ -134,7 +137,7 @@
   align-items: center;
   gap: var(--spacing-sm);
   padding-top: var(--spacing-sm);
-  border-top: 1px solid #f0f0f0;
+  border-top: none; /* 移除顶部分割线 */
 }
 
 .ai-message-timestamp {
@@ -169,7 +172,8 @@
   }
 
   .ai-message-card {
-    padding: 8px 12px;
+    /* 移动端也不需要 padding */
+    padding: 0;
   }
 
   .ai-message-actions {
@@ -186,7 +190,8 @@
   }
 
   .ai-message-card {
-    padding: 16px 20px;   /* Compact密度：18px 24px → 16px 20px */
+    /* 大屏也不需要 padding */
+    padding: 0;
   }
 
   .user-message-card {

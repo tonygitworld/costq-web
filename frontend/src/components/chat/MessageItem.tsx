@@ -159,8 +159,7 @@ const MessageItemComponent: FC<MessageItemProps> = ({ message }) => {
 
           {/* AI响应内容 - 仅当有内容时才显示卡片 */}
           {hasContent && (
-            <HoverStableCard
-              size="small"
+            <div
               className="ai-message-card"
             >
               {/* ✨ 思考过程摘要（仅实时查询时显示） */}
@@ -233,7 +232,7 @@ const MessageItemComponent: FC<MessageItemProps> = ({ message }) => {
                   </div>
                 </div>
               )}
-            </HoverStableCard>
+            </div>
           )}
 
           {/* ✅ 新增：取消状态警告 */}
