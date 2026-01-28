@@ -7,6 +7,7 @@ export interface ChatSession {
   updatedAt: number;
   preview?: string;
   messageCount?: number;  // ✅ 新增：消息数量（用于判断是否需要重新加载）
+  isPinned?: boolean; // ✅ 新增：会话固定/置顶状态
 }
 
 // Token 使用统计

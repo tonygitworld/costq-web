@@ -23,31 +23,36 @@ interface ChatLayoutProps {
 
 export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) => {
   const [sidebarVisible, setSidebarVisible] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);  // 移动端响应式标志
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    // 从 localStorage 读取初始状态
+    const stored = localStorage.getItem('sidebar-collapsed');
+    return stored ? JSON.parse(stored) : false;
+  });
   const accountDetails = useAccountSelectionDetails();
-  
+
   // ✅ URL 路由支持：读取 sessionId 参数
   const { sessionId } = useParams<{ sessionId?: string }>();
   const navigate = useNavigate();
   const location = useLocation();
   const { switchToChat, currentChatId, chats, messages } = useChatStore();
-  
+
   // ✅ 当 URL 中的 sessionId 变化时，切换到对应会话（优先级：URL → Store）
   // ✅ 立即切换，不等待消息加载
   useEffect(() => {
     if (sessionId && sessionId !== currentChatId) {
       // ✅ 检查当前会话是否是新建的临时会话（没有消息且没有 messageCount）
       const currentSession = currentChatId ? chats[currentChatId] : null;
-      const isNewTempSession = currentSession && 
-                                !currentSession.messageCount && 
+      const isNewTempSession = currentSession &&
+                                !currentSession.messageCount &&
                                 (currentChatId ? (messages[currentChatId]?.length || 0) : 0) === 0;
-      
+
       // ✅ 如果当前是新建的临时会话，且 URL 指向旧会话，不切换（避免覆盖新建会话）
       if (isNewTempSession && location.pathname.startsWith('/c/')) {
         logger.debug(`ℹ️ [ChatLayout] 检测到新建临时会话，忽略 URL 切换: ${currentChatId} (URL: ${sessionId})`);
         return;
       }
-      
+
       // 检查会话是否存在
       if (chats[sessionId]) {
         logger.debug(`🔄 [ChatLayout] URL 会话ID变化，立即切换到: ${sessionId}`);
@@ -64,11 +69,11 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
     // ✅ 注意：不依赖 currentChatId，避免循环更新
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, chats, switchToChat, navigate, location.pathname, messages]);
-  
+
   // ✅ 当 currentChatId 变化时，同步更新 URL（优先级：Store → URL）
   // ✅ 使用 useRef 避免循环更新
   const lastSyncedChatId = useRef<string | null>(null);
-  
+
   useEffect(() => {
     if (!currentChatId) {
       // 如果 currentChatId 为空但 URL 是会话页面，导航回主页
@@ -85,7 +90,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
     const hasMessages = (messages[currentChatId]?.length || 0) > 0;
     // ✅ 如果会话有 messageCount 字段，说明是从后端加载的，即使消息还没加载也应该更新 URL
     const isBackendSession = session?.messageCount !== undefined;
-    
+
     // 如果 currentChatId 变化且与上次同步的不同
     if (currentChatId !== lastSyncedChatId.current) {
       // ✅ 如果会话有消息，或者是后端会话（消息可能还在加载），更新 URL
@@ -111,23 +116,47 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
     }
   }, [currentChatId, navigate, location.pathname, sessionId, messages, chats]);
 
+  const handleSidebarCollapse = (newState: boolean) => {
+    setSidebarCollapsed(newState);
+    localStorage.setItem('sidebar-collapsed', JSON.stringify(newState));
+  };
+
+  // 计算侧边栏宽度（支持收缩）
+  // 调整宽度：从 280px 缩小到 240px，更符合现代审美
+  const sidebarWidth = sidebarCollapsed ? 60 : 240;
+  const contentMarginLeft = collapsed ? 0 : sidebarWidth;
+
   return (
     <Layout className={className} style={{ height: '100vh' }}>
       <Layout.Sider
-        width={260}
+        width={sidebarWidth}
         breakpoint="lg"
         collapsedWidth={0}
         onBreakpoint={(broken) => {
           setCollapsed(broken);
+          // 在移动端时，重置侧边栏折叠状态
+          if (broken) {
+            setSidebarCollapsed(false);
+          }
         }}
-        theme="dark"
+        theme="light" // 适配浅色侧边栏
         className="chat-layout-sider"
-        style={{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0, top: 0, bottom: 0 }}
+        style={{
+          overflow: 'auto',
+          height: '100vh',
+          position: 'fixed',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          backgroundColor: '#f7f8fa', // 适配现代极简风
+          borderRight: 'none', // 无边框设计
+          transition: 'width 0.35s cubic-bezier(0.4, 0, 0.2, 1)'
+        }}
       >
-        <Sidebar />
+        <Sidebar isCollapsed={sidebarCollapsed} onToggleCollapse={handleSidebarCollapse} />
       </Layout.Sider>
 
-      <Layout className="chat-layout-main" style={{ marginLeft: collapsed ? 0 : 260 }}>
+      <Layout className="chat-layout-main" style={{ marginLeft: collapsed ? 0 : contentMarginLeft, transition: 'margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1)' }}>
         {/* 顶部 Header - 账号选择和用户信息 */}
         <Layout.Header className="chat-layout-header">
           {/* 左侧：移动端菜单按钮 */}
@@ -218,11 +247,11 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
         onClose={() => setSidebarVisible(false)}
         className="chat-layout-drawer"
         styles={{
-          body: { padding: 0, backgroundColor: '#1a1f2e' },
-          header: { backgroundColor: '#1a1f2e', borderBottom: '1px solid rgba(255,255,255,0.1)' }
+          body: { padding: 0, backgroundColor: '#f7f8fa' }, // 适配现代极简风
+          header: { backgroundColor: '#f7f8fa', borderBottom: 'none' } // 无边框
         }}
       >
-        <Sidebar />
+        <Sidebar isCollapsed={false} />
       </Drawer>
     </Layout>
   );

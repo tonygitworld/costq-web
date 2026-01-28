@@ -24,6 +24,8 @@ interface ChatState {
   deleteChat: (chatId: string) => Promise<void>;  // ✅ 改为异步
   deleteChats: (chatIds: string[]) => Promise<void>;  // ✅ 改为异步
   clearAllChats: () => Promise<void>;  // ✅ 改为异步
+  togglePinChat: (chatId: string) => void; // ✅ 新增：切换固定状态
+  renameChat: (chatId: string, newTitle: string) => void; // ✅ 新增：重命名会话
 
   // 持久化
   loadFromStorage: () => Promise<void>;
@@ -270,6 +272,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
       await Promise.all(chatIds.map(chatId => deleteChatSession(chatId)));
       logger.debug(`✅ 已清空所有 ${chatIds.length} 个会话`);
 
+      // 清除本地固定状态
+      localStorage.removeItem('costq_pinned_chats');
+
       set({
         chats: {},
         messages: {},
@@ -279,6 +284,53 @@ export const useChatStore = create<ChatState>((set, get) => ({
       logger.error('❌ 清空所有会话失败:', error);
       throw error;
     }
+  },
+
+  // ✅ 实现会话固定功能 (纯前端持久化)
+  togglePinChat: (chatId: string) => {
+    set(state => {
+      const chat = state.chats[chatId];
+      if (!chat) return state;
+
+      const newIsPinned = !chat.isPinned;
+
+      // 1. 更新 State
+      const newChats = {
+        ...state.chats,
+        [chatId]: {
+          ...chat,
+          isPinned: newIsPinned,
+        },
+      };
+
+      // 2. 更新 LocalStorage (独立存储，不受后端影响)
+      try {
+        const pinnedIds = JSON.parse(localStorage.getItem('costq_pinned_chats') || '[]');
+        const newPinnedIds = newIsPinned
+          ? [...pinnedIds, chatId]
+          : pinnedIds.filter((id: string) => id !== chatId);
+        localStorage.setItem('costq_pinned_chats', JSON.stringify(newPinnedIds));
+      } catch (e) {
+        console.error('Failed to save pinned chats', e);
+      }
+
+      return { chats: newChats };
+    });
+  },
+
+  // ✅ 实现会话重命名
+  renameChat: (chatId: string, newTitle: string) => {
+    set(state => ({
+      chats: {
+        ...state.chats,
+        [chatId]: {
+          ...state.chats[chatId],
+          title: newTitle
+        }
+      }
+    }));
+    // TODO: 调用后端 API 同步标题 (如 PUT /chats/:id)
+    logger.debug(`📝 重命名会话 ${chatId} -> ${newTitle}`);
   },
 
   loadFromStorage: async () => {
@@ -313,11 +365,25 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const chats: Record<string, ChatSession> = {};
       const messages: Record<string, Message[]> = {};
 
+      // ✅ 读取本地固定状态
+      let pinnedIds: string[] = [];
+      try {
+        pinnedIds = JSON.parse(localStorage.getItem('costq_pinned_chats') || '[]');
+      } catch (e) {
+        console.error('Failed to load pinned chats', e);
+      }
+
       // ✅ 优化：只加载会话元数据，不预加载消息内容
       // 消息内容将在用户点击会话时通过 switchToChat 懒加载
       for (const backendSession of backendSessions) {
         // 转换会话
         const session = convertBackendSession(backendSession);
+
+        // ✅ 合并固定状态
+        if (pinnedIds.includes(session.id)) {
+          session.isPinned = true;
+        }
+
         chats[session.id] = session;
         logger.debug(`📝 加载会话: ${session.title} (${session.id})`);
 

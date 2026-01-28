@@ -1,212 +1,434 @@
-/* 侧边栏响应式优化（保守版本） */
-/* 改进依据：保持原有布局，仅优化hover效果 */
-/* 更新：使用 design-tokens.css 设计变量 */
+/* ==========================================================================
+   CostQ 侧边栏样式表 (Modern Clean + Gemini + Claude 融合风格)
+   最后更新：2026-01-28
+   ========================================================================== */
 
-/* ===== 侧边栏容器 ===== */
+/* ===== 1. 侧边栏容器 (Modern Clean) ===== */
 
 .sidebar-container {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: var(--bg-sidebar);
+  width: 240px;
+  position: relative;
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: #f7f8fa;
+  border-right: none;
+  color: rgb(68, 71, 70);
 }
 
-/* ===== 顶部标题区域 ===== */
+:global(.dark) .sidebar-container {
+  background-color: #202123;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.sidebar-container.sidebar-collapsed {
+  width: 0;
+  padding: 0;
+  border-right: none;
+}
+
+.sidebar-container.sidebar-collapsed > * {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sidebar-container.sidebar-collapsed .sidebar-toggle-wrapper,
+.sidebar-container.sidebar-collapsed .sidebar-collapse-floating {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+/* ===== 2. 顶部标题区域 ===== */
 
 .sidebar-header {
-  padding: 16px 16px 12px 16px;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
+  flex-shrink: 0;
+  height: 56px;
 }
 
 .sidebar-logo {
-  font-size: 24px;
+  font-size: 20px;
   line-height: 1;
-  filter: drop-shadow(0 2px 6px rgba(100, 181, 246, 0.4));
+  margin-right: 8px;
+  color: rgb(68, 71, 70);
 }
 
 .sidebar-title {
-  color: white !important;
+  color: rgb(68, 71, 70) !important;
   margin: 0 !important;
   font-size: 14px !important;
   font-weight: 600 !important;
   line-height: 1.3 !important;
-  letter-spacing: 0.3px !important;
   white-space: nowrap !important;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* ===== 新建对话按钮 ===== */
+
+/* ===== 3. 折叠/展开按钮 (Gemini 风格) ===== */
+
+.sidebar-collapse-icon {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 50%;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  outline: none;
+  cursor: pointer;
+  z-index: 10;
+  color: rgb(68, 71, 70) !important;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-collapse-icon:hover {
+  background-color: rgba(0, 0, 0, 0.06) !important;
+  color: rgb(55, 53, 47) !important;
+}
+
+.sidebar-collapse-floating {
+  position: fixed;
+  top: 12px !important;
+  left: 12px !important;
+  z-index: 1000;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.sidebar-new-chat-floating {
+  top: 56px !important;
+}
+
+.sidebar-toggle-glyph {
+  display: none !important;
+}
+
+
+/* ===== 4. 新建对话按钮 ===== */
 
 .sidebar-new-chat-wrapper {
-  padding: 0 16px 12px 16px;
+  padding: 0 12px 16px 12px;
+  flex-shrink: 0;
 }
 
 .sidebar-new-chat-button {
-  height: 36px !important;
-  font-size: 13px !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 16px !important;
+  border-radius: 100px !important;
+  border: 0.666667px solid rgba(0, 0, 0, 0.08) !important;
+  background-color: #ffffff !important;
+  color: rgb(68, 71, 70) !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
   font-weight: 500 !important;
-  border-radius: 8px !important;
-  box-shadow: 0 2px 8px rgba(64, 169, 255, 0.2) !important;
-  transition: all 0.3s ease !important;
+  line-height: 25px !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+  cursor: pointer !important;
+  transition: box-shadow 0.3s ease !important;
 }
 
 .sidebar-new-chat-button:hover {
-  transform: translateY(-1px) !important;
-  box-shadow: 0 4px 12px rgba(64, 169, 255, 0.3) !important;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.08) !important;
+  transform: none !important;
 }
 
-.sidebar-new-chat-button:active {
-  transform: translateY(0) !important;
-}
 
-/* ===== 分隔线 ===== */
+/* ===== 5. 分隔线 ===== */
 
 .sidebar-divider {
-  margin: 0 0 12px 0 !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  margin: 0 !important;
+  border-color: transparent !important;
 }
 
 .sidebar-divider-bottom {
-  margin: 12px 0 !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  display: none !important;
 }
 
-/* ===== 对话历史区域 ===== */
+
+/* ===== 6. 对话历史区域 ===== */
 
 .sidebar-history-wrapper {
   flex: 1;
   overflow: hidden;
-  padding: 0 12px;
+  padding: 0 8px;
   display: flex;
   flex-direction: column;
 }
 
-/* ===== 滚动条样式 ===== */
-
 .sidebar-scrollable {
   flex: 1;
   overflow-y: auto;
-  overflow-x: hidden; /* ✅ 隐藏横向滚动条 */
+  overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05);
+  scrollbar-color: transparent transparent;
 }
 
-.sidebar-scrollable::-webkit-scrollbar {
-  width: 4px;
-  height: 0; /* ✅ 隐藏横向滚动条 */
+.sidebar-scrollable:hover {
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
-.sidebar-scrollable::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 2px;
-}
 
-.sidebar-scrollable::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 2px;
-  transition: background 0.2s ease;
-}
-
-.sidebar-scrollable::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-/* ===== 设置菜单 ===== */
-
-.sidebar-menu-wrapper {
-  padding: 0 9px 12px 9px;
-}
-
-.sidebar-menu {
-  background-color: transparent !important;
-  border: none !important;
-  font-size: 12px !important;
-}
-
-/* ===== 聊天历史项样式 ===== */
+/* ===== 7. 聊天历史项 (ChatGPT 胶囊风格) ===== */
 
 .chat-history-item {
-  padding: 8px 12px !important;
-  margin-bottom: 4px !important;
-  border-radius: 6px !important;
-  cursor: pointer !important;
+  position: relative; /* 关键：用于绝对定位子元素 */
+  padding: 6px 10px !important;
+  margin: 0 6px 2px 6px !important;
+  border-radius: 10px !important;
+  min-height: 36px !important;
+  color: rgb(68, 71, 70) !important;
+  border: none !important;
+  box-shadow: none !important;
+  background-color: transparent;
   transition: all 0.2s ease !important;
-  background-color: transparent !important;
 }
 
 .chat-history-item:hover {
-  background-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(0, 0, 0, 0.04) !important;
 }
 
 .chat-history-item-active {
-  background-color: rgba(64, 169, 255, 0.15) !important;
-  border-left: 3px solid #40a9ff !important;
-}
-
-.chat-history-item-active:hover {
-  background-color: rgba(64, 169, 255, 0.2) !important;
+  background-color: rgba(0, 0, 0, 0.06) !important;
+  color: rgb(26, 26, 26) !important;
+  font-weight: 500;
 }
 
 .chat-history-item-title {
-  font-size: 13px !important;
-  color: rgba(255, 255, 255, 0.85) !important;
-  font-weight: 500 !important;
-  line-height: 1.5 !important;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: inherit;
 }
 
+/* 时间/日期 (位于标题下方) */
 .chat-history-item-time {
-  font-size: 11px !important;
-  color: rgba(255, 255, 255, 0.45) !important;
-  margin-top: 4px !important;
+  position: static !important;
+  opacity: 1 !important;
+  transform: none !important;
+  transition: opacity 0.2s ease;
 }
 
-/* ===== 响应式断点（保守版本） ===== */
-
-/* 大屏桌面（1440px+）- 仅在超大屏幕上略微调整 */
-@media (min-width: 1440px) {
-  .sidebar-header {
-    padding: 18px 18px 14px 18px;
-  }
-
-  .sidebar-logo {
-    font-size: 26px;
-  }
-
-  .sidebar-title {
-    font-size: 15px !important;
-  }
-
-  .sidebar-new-chat-wrapper {
-    padding: 0 18px 14px 18px;
-  }
-
-  .sidebar-new-chat-button {
-    height: 38px !important;
-    font-size: 14px !important;
-  }
-
-  .sidebar-history-wrapper {
-    padding: 0 14px;
-  }
-
-  .chat-history-item {
-    padding: 10px 14px !important;
-    margin-bottom: 6px !important;
-  }
-
-  .chat-history-item-title {
-    font-size: 14px !important;
-  }
-
-  .chat-history-item-time {
-    font-size: 12px !important;
-  }
+/* 悬停时：时间照常显示 (不隐藏) */
+.chat-history-item:hover .chat-history-item-time {
+  opacity: 1 !important;
 }
 
-/* ===== 打印优化 ===== */
+/* 右侧操作区 (图钉 & 三个点) */
+.pin-icon-wrapper {
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+
+.trailing-group {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* 交互逻辑：悬停时，图钉消失，三个点出现 */
+.chat-history-item:hover .pin-icon-wrapper {
+  opacity: 0 !important;
+}
+
+.chat-history-item:hover .trailing-group {
+  opacity: 1 !important;
+}
+
+.action-button:hover {
+  background-color: rgba(0,0,0,0.06);
+  color: rgb(26, 26, 26) !important;
+}
+
+
+/* ===== 8. 底部用户/设置区域 (Ant Design Menu 覆盖) ===== */
+
+.sidebar-menu-wrapper {
+  padding: 12px 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  background-color: transparent !important;
+}
+
+/* 强制清除所有 AntD 默认背景，适配 Light Theme */
+:where(.sidebar-menu).ant-menu-light,
+:where(.sidebar-menu).ant-menu-light .ant-menu-sub,
+:where(.sidebar-menu).ant-menu-light .ant-menu-item,
+:where(.sidebar-menu).ant-menu-light .ant-menu-submenu-title {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: rgb(68, 71, 70) !important;
+  border-right: none !important;
+}
+
+/* 终极修复：设置菜单样式 */
+:where(.sidebar-menu) .ant-menu-submenu-title {
+  color: rgb(68, 71, 70) !important;
+  background-color: transparent !important;
+  margin: 0 8px 4px 8px !important;
+  width: calc(100% - 16px) !important;
+  border-radius: 8px !important;
+}
+
+:where(.sidebar-menu) .ant-menu-submenu-title .ant-menu-title-content { color: inherit !important; }
+:where(.sidebar-menu) .ant-menu-submenu-title .anticon { color: inherit !important; }
+
+/* 悬停时变色 */
+:where(.sidebar-menu) .ant-menu-submenu-title:hover {
+  color: rgb(26, 26, 26) !important;
+  background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+.sidebar-menu .ant-menu-item {
+  color: rgb(68, 71, 70) !important;
+  margin-bottom: 4px !important;
+  border-radius: 8px !important;
+  width: calc(100% - 16px) !important;
+  margin-left: 8px !important;
+}
+
+.sidebar-menu .ant-menu-item-icon {
+  color: rgb(68, 71, 70) !important;
+  min-width: 18px !important;
+}
+
+/* 选中项 */
+.sidebar-menu .ant-menu-item-selected {
+  background-color: rgba(0, 0, 0, 0.06) !important;
+  color: rgb(26, 26, 26) !important;
+}
+
+/* 悬停项 */
+.sidebar-menu .ant-menu-item:hover {
+  background-color: rgba(0, 0, 0, 0.04) !important;
+  color: rgb(26, 26, 26) !important;
+}
+
+/* 箭头颜色 */
+.sidebar-menu .ant-menu-submenu-arrow {
+  color: rgba(68, 71, 70, 0.6) !important;
+}
+.sidebar-menu .ant-menu-submenu-arrow::before,
+.sidebar-menu .ant-menu-submenu-arrow::after {
+  background: rgba(68, 71, 70, 0.6) !important;
+}
+
+
+/* ===== 9. Gemini 风格下拉菜单 (Google Material 3) ===== */
+
+.gemini-dropdown-menu .ant-dropdown-menu {
+  width: 160px !important;
+  padding: 6px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgb(229, 231, 235) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+.gemini-dropdown-menu .ant-dropdown-menu-item {
+  height: 40px !important;
+  padding: 0 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  border-radius: 4px !important;
+}
+
+.gemini-dropdown-menu .ant-dropdown-menu-item:hover {
+  background-color: rgba(68, 71, 70, 0.08) !important;
+}
+
+.gemini-dropdown-menu .ant-dropdown-menu-title-content {
+  flex: 1;
+  font-weight: 500;
+  font-size: 14px;
+  color: rgb(31, 31, 31);
+}
+
+.gemini-dropdown-menu .anticon {
+  font-size: 20px !important;
+  color: rgb(68, 71, 70);
+}
+
+
+/* ===== 10. Claude 风格确认对话框 ===== */
+
+.claude-modal .ant-modal-content {
+  background-color: rgb(250, 249, 245) !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(31, 30, 29, 0.15) !important;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1) !important;
+  padding: 24px !important;
+}
+
+.claude-modal .ant-modal-confirm-title {
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  color: rgb(20, 20, 19) !important;
+  margin-bottom: 8px !important;
+}
+
+.claude-modal .ant-modal-confirm-content {
+  color: rgba(31, 30, 29, 0.6) !important;
+  font-size: 14px !important;
+}
+
+.claude-modal .ant-modal-confirm-btns {
+  margin-top: 24px !important;
+}
+
+.claude-modal .ant-btn {
+  height: 36px !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  box-shadow: none !important;
+}
+
+.claude-modal .ant-btn-primary {
+  background-color: #d93025 !important;
+  border-color: #d93025 !important;
+}
+
+.claude-modal .ant-btn-default {
+  border: 1px solid rgba(0,0,0,0.15) !important;
+  background: transparent !important;
+}
+
+
+/* ===== 11. 全局 AntD 组件适配 ===== */
+
+.ant-typography { color: rgb(68, 71, 70) !important; }
+.ant-btn-text { color: rgba(26, 26, 26, 0.65) !important; }
+.ant-layout-sider-light { border-right: none !important; background-color: #f7f8fa !important; }
+.ant-menu-light { border-right: none !important; }
+
+
+/* ===== 12. 打印优化 ===== */
 @media print {
   .sidebar-container {
     display: none;
   }
 }
+  
+/* ===== �ռ���ɫǿ������ (Nuclear Option) ===== */  
+/* 1. ǿ�����в˵��㼶����͸�� */  
+.sidebar-menu, .sidebar-menu * { background-color: transparent !important; background: transparent !important; }  
+/* 2. ǿ��������ɫ (Gemini Grey) */  
+.sidebar-menu .ant-menu-title-content, .sidebar-menu .anticon { color: rgb(68, 71, 70) !important; }  
+/* 3. ��ͣ/ѡ��ʱ�����⴦�� (�������ң��������) */  
+.sidebar-menu .ant-menu-submenu-title:hover { background-color: rgba(0, 0, 0, 0.04) !important; }  
+.sidebar-menu .ant-menu-submenu-title:hover .ant-menu-title-content, .sidebar-menu .ant-menu-submenu-title:hover .anticon { color: rgb(26, 26, 26) !important; }  
+/* 4. �޸���ͷ */  
+.sidebar-menu .ant-menu-submenu-arrow { color: rgb(68, 71, 70) !important; }  
+.sidebar-menu .ant-menu-submenu-arrow::before, .sidebar-menu .ant-menu-submenu-arrow::after { background: rgb(68, 71, 70) !important; } 
