@@ -61,3 +61,6 @@ docker-compose.override.yml
 tmp/
 temp/
 *.tmp
+
+# Deployment Scripts (contain sensitive info)
+deployment/scripts/*.sh
