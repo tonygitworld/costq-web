@@ -17,9 +17,11 @@ const { TabPane } = Tabs;
 interface Props {
   visible: boolean;
   onClose: () => void;
+  onSelect?: (template: any) => void;
+  zIndex?: number;
 }
 
-export const AllTemplatesModal: React.FC<Props> = ({ visible, onClose }) => {
+export const AllTemplatesModal: React.FC<Props> = ({ visible, onClose, onSelect, zIndex }) => {
   const {
     systemTemplates,
     userTemplates,
@@ -83,6 +85,7 @@ export const AllTemplatesModal: React.FC<Props> = ({ visible, onClose }) => {
       onCancel={onClose}
       footer={null}
       width={900}
+      zIndex={zIndex}
       styles={{ body: { maxHeight: '70vh', overflowY: 'auto' } }}
     >
       {/* 搜索框 */}

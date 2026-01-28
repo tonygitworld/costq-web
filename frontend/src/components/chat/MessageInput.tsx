@@ -1,27 +1,24 @@
-// MessageInput component - Message input area
-import { type FC, useState, useRef, useCallback } from 'react';
+import { type FC, useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Input, Button, Typography, Tooltip } from 'antd';
-import { SendOutlined, StopOutlined } from '@ant-design/icons';
+import { Popover } from 'antd';
+import { SendOutlined, StopOutlined, BulbOutlined } from '@ant-design/icons';
 import { useChatStore } from '../../stores/chatStore';
 import { useSSEContext } from '../../contexts/SSEContext';
 import { useAccountStore } from '../../stores/accountStore';
 import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import { MessageInputContainer } from './MessageInputContainer';
-import { PromptTemplatesSection } from './PromptTemplatesSection';
+import { PromptTemplatesPopoverContent } from './PromptTemplatesPopoverContent';
 import { useHasSelectedAccount } from '../../hooks/useAccountSelection';
 import { useI18n } from '../../hooks/useI18n';
 import { createChatSession, convertBackendSession } from '../../services/chatApi';
 import { logger } from '../../utils/logger';
+import '../styles/AIChatInput.css';
 import './MessageInput.css';
-
-const { Text } = Typography;
-
-const { TextArea } = Input;
 
 export const MessageInput: FC = () => {
   const [message, setMessage] = useState('');
-  const [, setIsFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
   const navigate = useNavigate();
   const { currentChatId, addMessage, createNewChat, messages } = useChatStore();
   const { sendQuery, currentQueryId, cancelGeneration, isCancelling } = useSSEContext();
@@ -35,13 +32,29 @@ export const MessageInput: FC = () => {
   // ✅ 直接从 currentQueryId 派生 loading 状态（单一数据源）
   const loading = !!currentQueryId;
 
+  // 自适应高度处理
+  useEffect(() => {
+    if (textAreaRef.current) {
+      textAreaRef.current.style.height = 'auto';
+      // 计算内容高度，最大 384px (max-h-96)
+      const scrollHeight = textAreaRef.current.scrollHeight;
+      const maxHeight = 384;
+
+      if (scrollHeight > maxHeight) {
+        textAreaRef.current.style.height = `${maxHeight}px`;
+        textAreaRef.current.style.overflowY = 'auto';
+      } else {
+        textAreaRef.current.style.height = `${scrollHeight}px`;
+        textAreaRef.current.style.overflowY = 'hidden';
+      }
+    }
+  }, [message]);
+
   // ✅ 停止生成处理
   const handleStop = useCallback(() => {
     logger.debug('🔴 [handleStop] 点击了停止按钮');
     logger.debug('🔴 [handleStop] currentQueryId:', currentQueryId);
-    logger.debug('🔴 [handleStop] cancelGeneration:', typeof cancelGeneration);
     if (currentQueryId) {
-      logger.debug('🛑 [handleStop] 调用 cancelGeneration - Query:', currentQueryId);
       cancelGeneration(currentQueryId);
     } else {
       logger.warn('⚠️ [handleStop] currentQueryId 为空，无法取消');
@@ -69,19 +82,14 @@ export const MessageInput: FC = () => {
         chatId = createNewChat();  // ✅ 同步创建临时会话
       }
 
-      // ✅ 检查是否是第一条消息（需要创建后端会话）
+      // ✅ 检查是否是第一条消息
       const chatMessages = messages[chatId] || [];
       const isFirstMessage = chatMessages.length === 0;
 
       if (isFirstMessage) {
-        // ✅ 发送第一条消息时，创建后端会话
         try {
-          logger.debug(`📤 [MessageInput] 第一条消息，创建后端会话: ${chatId}`);
           const title = message.trim().slice(0, 20) + (message.trim().length > 20 ? '...' : '');
           const backendSession = await createChatSession(title, chatId);
-          logger.debug(`✅ [MessageInput] 后端会话创建成功: ${chatId}`);
-
-          // ✅ 更新前端会话信息（使用后端返回的数据）
           const convertedSession = convertBackendSession(backendSession);
           useChatStore.setState(state => ({
             chats: {
@@ -89,15 +97,10 @@ export const MessageInput: FC = () => {
               [chatId]: convertedSession
             }
           }));
-
-          // ✅ 保存到 localStorage（现在有消息了，应该显示在历史列表）
           useChatStore.getState().saveToStorage();
-
-          // ✅ 更新 URL 到会话页面（第一条消息发送后）
           navigate(`/c/${chatId}`, { replace: true });
         } catch (error) {
           logger.error(`❌ [MessageInput] 创建后端会话失败: ${error}`);
-          // ✅ 即使后端创建失败，也继续发送消息（后端会在发送时创建）
         }
       }
 
@@ -121,37 +124,24 @@ export const MessageInput: FC = () => {
       // 清空输入框
       const currentMessage = message.trim();
       setMessage('');
+      if (textAreaRef.current) {
+        textAreaRef.current.style.height = 'auto';
+      }
 
-      // ✅ 新架构：每个查询都会创建新的 SSE 连接，无需检查连接状态
-
-      // ✅ 现在 chatId 总是真实UUID（前端生成），直接传递
-      // ✅ 后端会验证UUID是否存在，如果不存在则使用此UUID创建新会话
-      const sessionIdToSend = chatId;  // 总是传递真实UUID
-
-      logger.debug('📤 准备发送查询:', {
-        chatId,
-        sessionIdToSend: sessionIdToSend,  // 总是真实UUID
-        isFirstMessage,
-      });
-
-      // ✅ sendQuery 会设置 currentQueryId，自动触发 loading = true
-      // 每个查询都会创建新的 SSE 连接，无需检查连接状态
+      const sessionIdToSend = chatId;
       const queryId = sendQuery(
         currentMessage,
-        selectedAccountIds,  // AWS 账号列表
-        selectedGCPAccountIds,  // GCP 账号列表
-        sessionIdToSend  // ✅ 传递前端生成的UUID
+        selectedAccountIds,
+        selectedGCPAccountIds,
+        sessionIdToSend
       );
-      logger.debug('📤 已发送查询，Query ID:', queryId, 'Session ID:', sessionIdToSend);
-      logger.debug('🟢 [MessageInput] currentQueryId 已设置，loading 自动变为 true');
+      logger.debug('📤 已发送查询，Query ID:', queryId);
     } catch (error) {
       logger.error('发送消息失败:', error);
     }
   };
 
-
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -165,73 +155,84 @@ export const MessageInput: FC = () => {
       preventScrollJump={true}
       debugMode={process.env.NODE_ENV === 'development'}
       className="message-input-container"
+      style={{
+        padding: '0 16px 24px 16px', // 给底部留一些空间
+        backgroundColor: 'transparent'
+      }}
     >
-      {/* 新增：Prompt Templates Section */}
-      <PromptTemplatesSection />
+      {/* Claude Style Input */}
+      <div className={`ai-chat-input-container ${isFocused ? 'focused' : ''}`}>
+        {/* 1. 输入区域 */}
+        <div className="ai-chat-input-area">
+          <textarea
+            ref={textAreaRef}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onFocus={handleFocusChange}
+            onBlur={handleBlurChange}
+            onKeyDown={handleKeyDown}
+            placeholder={
+              hasSelectedAccount
+                ? t('input.placeholder')
+                : t('input.placeholderNoAccount')
+            }
+            className="ai-chat-textarea"
+            rows={1}
+            disabled={loading && !isCancelling} // 加载中禁用输入，除非正在取消
+          />
+        </div>
 
-      <div style={{
-        padding: '16px 24px',
-        backgroundColor: '#ffffff',
-        borderTop: '1px solid #e8e8e8',
-        boxShadow: '0 -2px 8px rgba(0,0,0,0.04)'
-      }}>
-        <TextArea
-          ref={textAreaRef}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyPress={handleKeyPress}
-          placeholder={
-            hasSelectedAccount
-              ? t('input.placeholder')
-              : t('input.placeholderNoAccount')
-          }
-          autoSize={{ minRows: 2, maxRows: 6 }}
-          className={`message-input-textarea ${
-            hasSelectedAccount ? 'message-input-textarea-enabled' : 'message-input-textarea-disabled'
-          }`}
-          disabled={loading || !hasSelectedAccount}
-        />
+        {/* 2. 工具栏区域 */}
+        <div className="ai-chat-input-toolbar">
+          {/* 左侧：成本优化助手 */}
+          <div className="toolbar-left">
+            <Popover
+              content={<PromptTemplatesPopoverContent onClose={() => setPopoverOpen(false)} />}
+              title="成本优化助手"
+              trigger="click"
+              open={popoverOpen}
+              onOpenChange={setPopoverOpen}
+              placement="topLeft"
+              overlayStyle={{ width: 350 }}
+              align={{ offset: [-14, 0] }}
+            >
+              <button className="icon-btn" title="成本优化助手">
+                <BulbOutlined style={{ fontSize: 18 }} />
+              </button>
+            </Popover>
+          </div>
 
-        <div className="message-input-actions">
-          {/* 左侧：空白占位 */}
-          <div className="message-input-actions-left" />
+          {/* 中间模型选择 */}
+          <div className="toolbar-center">
+            <button className="model-selector-btn">
+              <span>Claude 3.5 Sonnet</span>
+            </button>
+          </div>
 
-          {/* 右侧：字数统计 + 发送按钮 */}
-          <div className="message-input-actions-right">
-            <Text type="secondary" className="message-input-char-count">
-              {t('input.characterCount', { count: message.length })}
-            </Text>
-
-            {/* ✅ 停止按钮（生成中时显示） */}
+          {/* 右侧发送/停止按钮 */}
+          <div className="toolbar-right">
             {loading ? (
-              <Tooltip title={t('input.stopButton')}>
-                <Button
-                  danger
-                  icon={<StopOutlined />}
-                  onClick={handleStop}
-                  loading={isCancelling}
-                  className="message-input-button"
-                >
-                  {isCancelling ? t('input.stopping') : t('input.stopButton')}
-                </Button>
-              </Tooltip>
+              <button
+                className="send-btn active"
+                onClick={handleStop}
+                disabled={isCancelling}
+                aria-label="Stop generation"
+              >
+                <div style={{ backgroundColor: '#da7756', width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <StopOutlined style={{ color: '#fff', fontSize: '14px' }} />
+                </div>
+              </button>
             ) : (
-              <Button
-                type="primary"
-                icon={<SendOutlined />}
+              <button
+                className={`send-btn ${message.trim() && hasSelectedAccount ? 'active' : ''}`}
                 onClick={handleSend}
                 disabled={!message.trim() || !hasSelectedAccount}
-                className="message-input-button"
+                aria-label="Send message"
               >
-                {t('input.sendButton')}
-              </Button>
-            )}
-
-            {/* 🐛 调试信息 - 生产环境请删除 */}
-            {process.env.NODE_ENV === 'development' && (
-              <span className="message-input-debug">
-                v2.1 loading={loading ? '✅' : '❌'}
-              </span>
+                 <div style={{ backgroundColor: message.trim() && hasSelectedAccount ? '#da7756' : '#f0f0f0', width: '32px', height: '32px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background-color 0.2s' }}>
+                    <SendOutlined style={{ color: message.trim() && hasSelectedAccount ? '#fff' : '#a0a0a0' }} />
+                 </div>
+              </button>
             )}
           </div>
         </div>

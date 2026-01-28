@@ -25,9 +25,10 @@ interface TemplateFormValues {
 interface Props {
   visible: boolean;
   onClose: () => void;
+  zIndex?: number;
 }
 
-export const CustomTemplateManager: React.FC<Props> = ({ visible, onClose }) => {
+export const CustomTemplateManager: React.FC<Props> = ({ visible, onClose, zIndex }) => {
   const {
     userTemplates,
     loadUserTemplates,
@@ -154,6 +155,7 @@ export const CustomTemplateManager: React.FC<Props> = ({ visible, onClose }) => 
       }}
       footer={null}
       width={700}
+      zIndex={zIndex}
       styles={{ body: { maxHeight: '70vh', overflowY: 'auto' } }}
     >
       {/* 创建按钮 */}

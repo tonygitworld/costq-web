@@ -1,0 +1,217 @@
+/* ===== AI Chat 风格输入框样式 ===== */
+
+.ai-chat-input-container {
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 100%; /* 铺满父容器，不再限制 768px */
+  margin: 0 auto;
+  padding: 14px;
+  box-sizing: border-box;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+
+  /* 核心阴影与边框模拟 (常态) */
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.035),
+    0 0 0 0.5px rgba(0, 0, 0, 0.08); /* 浅边框 */
+}
+
+/* 深色模式适配 */
+:global(.dark) .ai-chat-input-container {
+  background-color: #2a2a2a;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.2),
+    0 0 0 0.5px rgba(255, 255, 255, 0.1);
+}
+
+/* Hover 状态 */
+.ai-chat-input-container:hover {
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.035),
+    0 0 0 0.5px rgba(0, 0, 0, 0.15); /* 边框加深 */
+}
+
+:global(.dark) .ai-chat-input-container:hover {
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.2),
+    0 0 0 0.5px rgba(255, 255, 255, 0.2);
+}
+
+/* Focus 状态 (当输入框聚焦时) */
+.ai-chat-input-container.focused {
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.075),
+    0 0 0 0.5px rgba(0, 0, 0, 0.2);
+}
+
+:global(.dark) .ai-chat-input-container.focused {
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    0 0 0 0.5px rgba(255, 255, 255, 0.3);
+}
+
+/* ===== 输入区域 ===== */
+.ai-chat-input-area {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.ai-chat-textarea {
+  width: 100%;
+  min-height: 24px;
+  max-height: 384px; /* max-h-96 */
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.5;
+  color: rgb(31, 31, 31);
+  padding: 0;
+  margin: 0;
+  overflow-y: hidden; /* 默认隐藏滚动条，由 JS 控制自适应高度 */
+}
+
+:global(.dark) .ai-chat-textarea {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.ai-chat-textarea::placeholder {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+:global(.dark) .ai-chat-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ===== 工具栏区域 ===== */
+.ai-chat-input-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 32px;
+}
+
+/* 左侧占位 (如果以后需要加东西) */
+.toolbar-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 4px;
+}
+
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background-color: transparent;
+  color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.icon-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.8);
+}
+
+:global(.dark) .icon-btn {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+:global(.dark) .icon-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* 中间模型选择器 */
+.toolbar-center {
+  display: flex;
+  justify-content: center;
+}
+
+.model-selector-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 6px;
+  border: none;
+  background-color: transparent;
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+:global(.dark) .model-selector-btn {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.model-selector-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 0.8);
+}
+
+:global(.dark) .model-selector-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* 右侧发送按钮 */
+.toolbar-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.send-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background-color: transparent;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+/* 发送按钮 - 激活状态 (有内容时) */
+.send-btn.active {
+  background-color: #da7756;
+}
+
+.send-btn.active:hover {
+  background-color: #cc6645;
+}
+
+/* 发送按钮 - 禁用状态 */
+.send-btn:disabled {
+  background-color: transparent;
+  color: rgba(0, 0, 0, 0.2);
+  cursor: default;
+}
+
+:global(.dark) .send-btn:disabled {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.send-icon {
+  font-size: 16px;
+}
