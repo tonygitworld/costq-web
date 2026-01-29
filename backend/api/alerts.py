@@ -303,8 +303,9 @@ async def update_alert_endpoint(
     # 权限检查
     await check_alert_permission(alert_id, current_user, db)
 
-    # 设置告警 ID 和组织 ID
+    # 设置告警 ID、用户 ID 和组织 ID
     params.alert_id = alert_id
+    params.user_id = current_user["id"]
     params.org_id = current_user["org_id"]
 
     try:

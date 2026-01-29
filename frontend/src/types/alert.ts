@@ -41,9 +41,9 @@ export interface CreateAlertRequest {
 export interface UpdateAlertRequest {
   query_description?: string;
   display_name?: string;
-  is_active?: boolean;
-  account_id?: string;  // ⭐ 新增：关联的账号ID
-  account_type?: string;  // ⭐ 新增：账号类型
+  check_frequency?: string;   // ✅ 新增：检查频率
+  account_id?: string;        // ⭐ 关联的账号ID
+  account_type?: string;      // ⭐ 账号类型
 }
 
 export interface ListAlertsParams {
