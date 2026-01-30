@@ -6,13 +6,14 @@
 
 import { useEffect } from 'react';
 import { useChatStore } from '../stores/chatStore';
-import { useSSEContext } from '../contexts/SSEContext';
+import { useSSEContextOptional } from '../contexts/SSEContext';
 
 import { logger } from '../utils/logger';
 
 export const useBeforeUnload = () => {
   const { messages, currentChatId } = useChatStore();
-  const { currentQueryId } = useSSEContext();
+  const sseContext = useSSEContextOptional();
+  const currentQueryId = sseContext?.currentQueryId ?? null;
 
   useEffect(() => {
     const handleBeforeUnload = () => {

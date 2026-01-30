@@ -27,7 +27,8 @@
     "generationStoppedDesc": "您已停止此次生成，以上为部分生成的内容",
     "interruptedByRefresh": "生成因页面刷新中断",
     "interruptedDesc": "页面在 {{time}} 被刷新，以上为已生成的内容",
-    "emptyState": "选择一个对话或创建新对话开始聊天"
+    "emptyState": "选择一个对话或创建新对话开始聊天",
+    "startChat": "输入问题开始对话"
   },
   "template": {
     "title": "💰 成本优化助手",

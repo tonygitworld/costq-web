@@ -10,6 +10,9 @@ export default defineConfig({
       '@': resolve(__dirname, './src'),
     },
   },
+  optimizeDeps: {
+    include: [],
+  },
   build: {
     outDir: '../static/react-build',
     emptyOutDir: true,

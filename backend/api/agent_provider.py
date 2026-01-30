@@ -152,6 +152,7 @@ class AWSBedrockAgentProvider(AgentProvider):
                     "type": "error",
                     "content": "并发查询数达到上限，请等待当前查询完成",
                     "query_id": query_id,
+                    "session_id": session_id,
                     "timestamp": time.time(),
                 }
                 return
@@ -174,6 +175,8 @@ class AWSBedrockAgentProvider(AgentProvider):
                         yield {
                             "type": "error",
                             "content": f"❌ 您没有访问以下AWS账号的权限: {', '.join(unauthorized_aws[:3])}{'...' if len(unauthorized_aws) > 3 else ''}",
+                            "query_id": query_id,
+                            "session_id": session_id,
                             "timestamp": time.time(),
                         }
                         return
@@ -186,6 +189,8 @@ class AWSBedrockAgentProvider(AgentProvider):
                         yield {
                             "type": "error",
                             "content": f"❌ 您没有访问以下GCP账号的权限: {', '.join(unauthorized_gcp[:3])}{'...' if len(unauthorized_gcp) > 3 else ''}",
+                            "query_id": query_id,
+                            "session_id": session_id,
                             "timestamp": time.time(),
                         }
                         return
@@ -358,6 +363,8 @@ class AWSBedrockAgentProvider(AgentProvider):
                 yield {
                     "type": "error",
                     "content": f"获取账号信息失败: {str(e)}",
+                    "query_id": query_id,
+                    "session_id": session_id,
                     "timestamp": time.time(),
                 }
                 return
@@ -620,12 +627,15 @@ class AWSBedrockAgentProvider(AgentProvider):
                     "type": "error",
                     "content": f"查询失败: {str(e)}",
                     "query_id": query_id,
+                    "session_id": session_id,
                 }
         except Exception as e:
             logger.error("❌ 处理查询失败 - User: %s, QueryID: %s, Error: %s", username, query_id, e, exc_info=True)
             yield {
                 "type": "error",
                 "content": f"处理请求失败: {str(e)}",
+                "query_id": query_id,
+                "session_id": session_id,
                 "timestamp": time.time(),
             }
         finally:

@@ -40,6 +40,11 @@ export const useSSEContext = () => {
   return context;
 };
 
+// ✅ 可选版本：HMR 期间不抛出错误，返回 null
+export const useSSEContextOptional = () => {
+  return useContext(SSEContext);
+};
+
 interface SSEProviderProps {
   children: React.ReactNode;
 }

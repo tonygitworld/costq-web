@@ -798,11 +798,18 @@ export class MessageHandler {
     const { error } = message;
     // ✅ 已移除 flushUpdates 调用，不再需要批处理机制
 
-    logger.debug('❌ [messageHandler.handleError] 收到错误:', error, 'session_id:', message.session_id);
+    const errorMessage = error || '未知错误';
+    const sessionId = message.session_id || '无';
+
+    logger.debug('❌ [messageHandler.handleError] 收到错误:', {
+      error: errorMessage,
+      session_id: sessionId,
+      fullMessage: message
+    });
 
     notification.error({
       message: '处理失败',
-      description: error,
+      description: errorMessage,
       duration: 5
     });
 
@@ -812,7 +819,6 @@ export class MessageHandler {
     }
 
     // 如果有当前消息，标记为失败
-    const sessionId = message?.session_id;
     const currentChatId = sessionId || this.currentMessageBuilder.chatId || this.chatStore.currentChatId;
 
     if (currentChatId && this.currentMessageBuilder.messageId) {

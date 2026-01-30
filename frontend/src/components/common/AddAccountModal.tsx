@@ -83,7 +83,7 @@ export const AddAccountModal: FC<AddAccountModalProps> = ({
       okText={activeTab === 'aksk' ? t('modal.verifyAndAdd') : undefined}
       cancelText={t('common:button.cancel')}
       width={800}
-      destroyOnClose
+      destroyOnHidden
       footer={activeTab === 'iam_role' ? null : undefined}
     >
       <Tabs

@@ -20,6 +20,8 @@ botocore>=1.35.0
 
 # === GCP SDK ===
 google-auth>=2.29.0
+google-cloud-billing>=1.12.0
+google-cloud-resource-manager>=1.12.0
 
 # === 认证和安全 ===
 python-jose>=3.3.0

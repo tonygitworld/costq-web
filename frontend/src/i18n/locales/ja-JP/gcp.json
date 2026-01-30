@@ -1,4 +1,8 @@
 {
+  "modal": {
+    "uploadSuccess": "ファイルが正常にアップロードされました",
+    "uploadFailed": "ファイルのアップロードに失敗しました"
+  },
   "account": {
     "title": "GCP アカウント管理",
     "addButton": "GCP アカウントを追加",

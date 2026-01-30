@@ -27,7 +27,8 @@
     "generationStoppedDesc": "生成を停止しました。上記は部分的に生成された内容です。",
     "interruptedByRefresh": "ページの更新により生成が中断されました",
     "interruptedDesc": "{{time}}にページが更新されました。上記はこれまでに生成された内容です。",
-    "emptyState": "会話を選択するか、新しい会話を作成してください"
+    "emptyState": "会話を選択するか、新しい会話を作成してください",
+    "startChat": "メッセージを入力して会話を開始"
   },
   "template": {
     "title": "💰 コスト最適化アシスタント",

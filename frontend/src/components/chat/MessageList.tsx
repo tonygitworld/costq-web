@@ -130,22 +130,21 @@ export const MessageList: FC = () => {
     if (!content || !container) return;
 
     const resizeObserver = new ResizeObserver(() => {
-      // 🔧 关键修复：只在流式输出时才响应高度变化
-      // 非流式状态下，用户可能在展开/折叠详情，不应该自动滚动
-      if (!isStreaming) {
+      // 🔧 修复：同时考虑流式状态和用户在底部的状态
+      // 如果用户明确离开底部（autoScrollEnabled=false）且距离较远，才不滚动
+      const { scrollHeight, scrollTop, clientHeight } = container;
+      const distanceToBottom = scrollHeight - scrollTop - clientHeight;
+      const isCloseEnough = distanceToBottom < THRESHOLD_FORCE_STREAM;
+
+      // 逻辑：
+      // 1. 流式输出时（isStreaming=true）：按原逻辑滚动
+      // 2. 非流式但用户在底部（autoScrollEnabled=true 或 isCloseEnough）：也滚动
+      // 3. 非流式且用户明确离开底部：不滚动（用户在看历史）
+      if (!isStreaming && !autoScrollEnabledRef.current && !isCloseEnough) {
         return;
       }
 
-      const { scrollHeight, scrollTop, clientHeight } = container;
-      const distanceToBottom = scrollHeight - scrollTop - clientHeight;
-
-      // 逻辑：
-      // 1. 如果当前处于“吸附状态” (autoScrollEnabledRef.current === true) -> 必须滚到底部
-      // 2. 如果当前 distanceToBottom 很小 (说明用户就在底部，只是还没滚) -> 必须滚到底部
-      // 3. 强力模式：如果正在 isStreaming，且用户没有跑得太远 (比如 < 150px)，强制吸附！
-
-      const isCloseEnough = distanceToBottom < THRESHOLD_FORCE_STREAM;
-
+      // 满足滚动条件：吸附状态 或 距离底部够近
       if (autoScrollEnabledRef.current || isCloseEnough) {
         // 记录新的高度，防止 handleScroll 误判
         lastScrollHeightRef.current = container.scrollHeight;
@@ -200,6 +199,29 @@ export const MessageList: FC = () => {
       requestAnimationFrame(() => scrollToBottom('instant'));
     }
   }, [currentChatId, scrollToBottom]);
+
+  // ✅ 场景4：监听AI消息内容变化（兜底方案）
+  // 当消息内容更新但 ResizeObserver 未触发时，确保滚动到底部
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const lastMessage = currentMessages[currentMessages.length - 1];
+
+    // 只有AI消息且启用了自动滚动时才处理
+    if (lastMessage?.type !== 'assistant') return;
+    if (!autoScrollEnabledRef.current) return;
+
+    const { scrollHeight, scrollTop, clientHeight } = container;
+    const distanceToBottom = scrollHeight - scrollTop - clientHeight;
+
+    // 如果距离底部不远，自动滚动
+    if (distanceToBottom < THRESHOLD_NEW_MSG) {
+      requestAnimationFrame(() => {
+        container.scrollTo({ top: container.scrollHeight, behavior: 'instant' });
+      });
+    }
+  }, [currentMessages]); // 监听消息数组变化
 
 
   // --- 渲染层 ---

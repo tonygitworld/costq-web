@@ -1,4 +1,4 @@
-import { type FC, useState, useRef, useCallback, useEffect } from 'react';
+import { type FC, useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Popover } from 'antd';
 import { SendOutlined, StopOutlined, BulbOutlined } from '@ant-design/icons';
@@ -8,26 +8,58 @@ import { useAccountStore } from '../../stores/accountStore';
 import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import { MessageInputContainer } from './MessageInputContainer';
 import { PromptTemplatesPopoverContent } from './PromptTemplatesPopoverContent';
-import { useHasSelectedAccount } from '../../hooks/useAccountSelection';
 import { useI18n } from '../../hooks/useI18n';
 import { createChatSession, convertBackendSession } from '../../services/chatApi';
 import { logger } from '../../utils/logger';
 import '../styles/AIChatInput.css';
 import './MessageInput.css';
+import { CloudServiceSelector } from './CloudServiceSelector';
+import CloudIcon from '../icons/CloudIcon';
 
 export const MessageInput: FC = () => {
   const [message, setMessage] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [popoverOpen, setPopoverOpen] = useState(false);
+
   const navigate = useNavigate();
   const { currentChatId, addMessage, createNewChat, messages } = useChatStore();
   const { sendQuery, currentQueryId, cancelGeneration, isCancelling } = useSSEContext();
-  const { selectedAccountIds } = useAccountStore(); // AWS 账号
-  const { selectedAccountIds: selectedGCPAccountIds } = useGCPAccountStore(); // GCP 账号
-  const hasSelectedAccount = useHasSelectedAccount(); // 账号选择状态
+  const { accounts: rawAwsAccounts } = useAccountStore(); // AWS 账号列表
+  const { accounts: rawGcpAccounts } = useGCPAccountStore(); // GCP 账号列表
   const { t } = useI18n('chat');
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  // 存储账号+服务组合
+  const [accountServicePairs, setAccountServicePairs] = useState<Array<{
+    accountId: string;        // 前端内部ID
+    realAccountId: string;    // 真实的云服务账号ID（AWS: 12位数字）
+    accountName: string;
+    serviceName: string;
+    serviceId: string;
+    type: 'aws' | 'gcp';
+  }>>([]);
+
+  // 检查是否已选择账号+服务组合
+  const hasSelectedAccount = accountServicePairs.length > 0;
+
+  // Map accounts to common format for display
+  const awsAccounts = useMemo(() => rawAwsAccounts.map(acc => ({
+    id: acc.id,
+    name: acc.alias || acc.id,
+    icon: <CloudIcon className="text-sm" />,
+    accountId: acc.account_id, // Add account_id
+    region: acc.region // Add region
+  })), [rawAwsAccounts]);
+
+  const gcpAccounts = useMemo(() => rawGcpAccounts.map(acc => ({
+    id: acc.id,
+    name: acc.account_name || acc.id,
+    icon: <CloudIcon className="text-sm" />,
+    // GCP 特有字段：使用 project_id 作为 accountId，service_account_email_masked 作为附加信息
+    accountId: acc.project_id,           // 使用项目 ID 作为显示标识
+    region: acc.service_account_email_masked?.split('@')[0]  // 显示服务账号前缀作为"区域"信息
+  })), [rawGcpAccounts]);
 
   // ✅ 直接从 currentQueryId 派生 loading 状态（单一数据源）
   const loading = !!currentQueryId;
@@ -70,10 +102,57 @@ export const MessageInput: FC = () => {
     setIsFocused(false);
   }, []);
 
+  const handleSelectionChange = useCallback((selectedAccountIds: string[]) => {
+    // 从selectedAccountIds重建accountServicePairs
+    const newPairs: Array<{
+      accountId: string;
+      realAccountId: string;
+      accountName: string;
+      serviceName: string;
+      serviceId: string;
+      type: 'aws' | 'gcp';
+    }> = [];
+
+    selectedAccountIds.forEach(accountId => {
+      const awsAccount = rawAwsAccounts.find(acc => acc.id === accountId);
+      const gcpAccount = rawGcpAccounts.find(acc => acc.id === accountId);
+
+      if (awsAccount) {
+        newPairs.push({
+          accountId,
+          realAccountId: awsAccount.account_id || awsAccount.id,
+          accountName: awsAccount.alias || awsAccount.id,
+          serviceName: 'AWS',
+          serviceId: 'aws',
+          type: 'aws'
+        });
+      } else if (gcpAccount) {
+        newPairs.push({
+          accountId,
+          realAccountId: gcpAccount.id,
+          accountName: gcpAccount.account_name || gcpAccount.id,
+          serviceName: 'GCP',
+          serviceId: 'gcp',
+          type: 'gcp'
+        });
+      }
+    });
+
+    setAccountServicePairs(newPairs);
+  }, [rawAwsAccounts, rawGcpAccounts]);
+
   const handleSend = async () => {
     if (!message.trim() || loading) return;
 
+    // ✅ 检查是否已选择账号+服务组合
+    if (accountServicePairs.length === 0) {
+      logger.warn('⚠️ [MessageInput] 未选择任何云服务账号，无法发送消息');
+      // 可以在这里显示提示信息
+      return;
+    }
+
     logger.debug('🟢 [MessageInput] 点击发送');
+    logger.debug('📊 [MessageInput] 当前选择的账号+服务组合:', accountServicePairs);
 
     try {
       // 如果没有当前聊天，创建一个新的（临时状态）
@@ -129,15 +208,32 @@ export const MessageInput: FC = () => {
       }
 
       const sessionIdToSend = chatId;
+
+      // 从 accountServicePairs 中提取 AWS 和 GCP 账号 ID（使用数据库记录 ID）
+      const awsAccountIds = accountServicePairs
+        .filter(pair => pair.type === 'aws')
+        .map(pair => pair.accountId);  // 使用数据库 UUID
+      const gcpAccountIds = accountServicePairs
+        .filter(pair => pair.type === 'gcp')
+        .map(pair => pair.accountId);  // 使用数据库 UUID
+
+      logger.debug('📤 [MessageInput] 准备发送查询:', {
+        message: currentMessage,
+        awsAccountIds,
+        gcpAccountIds,
+        sessionId: sessionIdToSend,
+        note: '发送数据库记录 ID（UUID），后端会查找对应的 AWS 账号 ID'
+      });
+
       const queryId = sendQuery(
         currentMessage,
-        selectedAccountIds,
-        selectedGCPAccountIds,
+        awsAccountIds,
+        gcpAccountIds,
         sessionIdToSend
       );
-      logger.debug('📤 已发送查询，Query ID:', queryId);
+      logger.debug('📤 [MessageInput] 已发送查询，Query ID:', queryId);
     } catch (error) {
-      logger.error('发送消息失败:', error);
+      logger.error('❌ [MessageInput] 发送消息失败:', error);
     }
   };
 
@@ -188,7 +284,14 @@ export const MessageInput: FC = () => {
           <div className="toolbar-left">
             <Popover
               content={<PromptTemplatesPopoverContent onClose={() => setPopoverOpen(false)} />}
-              title="成本优化助手"
+              title={
+                <span>
+                  成本优化助手
+                  <span style={{ marginLeft: 8, fontSize: 12, fontWeight: 'normal', color: '#999' }}>
+                    选择模板快速分析 AWS/GCP 成本
+                  </span>
+                </span>
+              }
               trigger="click"
               open={popoverOpen}
               onOpenChange={setPopoverOpen}
@@ -202,15 +305,21 @@ export const MessageInput: FC = () => {
             </Popover>
           </div>
 
-          {/* 中间模型选择 */}
-          <div className="toolbar-center">
-            <button className="model-selector-btn">
-              <span>Claude 3.5 Sonnet</span>
-            </button>
-          </div>
+          {/* 右侧：云服务选择 + 发送按钮 */}
+          <div className="toolbar-right" style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            {/* 云服务选择器 - 新的Drawer组件 */}
+            <CloudServiceSelector
+              awsAccounts={awsAccounts}
+              gcpAccounts={gcpAccounts}
+              onSelectionChange={handleSelectionChange}
+              initialSelectedAccountIds={accountServicePairs.map(p => p.accountId)}
+            />
 
-          {/* 右侧发送/停止按钮 */}
-          <div className="toolbar-right">
+            {/* 发送/停止按钮 */}
             {loading ? (
               <button
                 className="send-btn active"

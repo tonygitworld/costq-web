@@ -179,13 +179,13 @@ class AgentCoreResponseParser:
         if "error" in data:
             error_msg = data["error"]
             logger.error("Runtime : %s", error_msg)
-            messages.append(
-                {
-                    "type": "error",
-                    "content": f"Runtime 错误: {error_msg}",
-                    "timestamp": timestamp,
-                }
-            )
+            error_message = {
+                "type": "error",
+                "content": f"Runtime 错误: {error_msg}",
+                "timestamp": timestamp,
+            }
+            # ✅ 为错误消息添加 session_id
+            messages.append(self._add_session_id(error_message))
             return messages
 
         # ⭐ 处理 Token 统计事件（Runtime 流式结束后发送）

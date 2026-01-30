@@ -242,6 +242,7 @@ async def sse_query_endpoint_v2(
                 "type": "error",
                 "content": f"查询处理失败: {str(e)}",
                 "query_id": query_id,
+                "session_id": query_request.session_id,
                 "timestamp": time.time(),
             }
             yield f"data: {json.dumps(error_event)}\n\n"

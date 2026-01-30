@@ -142,7 +142,7 @@ export const PromptTemplatesPopoverContent: React.FC<{ onClose?: () => void }> =
         open={!!selectedTemplate}
         onOk={onModalOk}
         onCancel={closeVariableForm}
-        destroyOnClose
+        destroyOnHidden
         zIndex={1100}
         width={400}
       >

@@ -138,6 +138,8 @@
 .toolbar-center {
   display: flex;
   justify-content: center;
+  flex-shrink: 0; /* 防止被左右两侧挤压 */
+  z-index: 10; /* 确保在最上层 */
 }
 
 .model-selector-btn {

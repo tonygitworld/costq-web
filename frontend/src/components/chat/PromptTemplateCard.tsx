@@ -61,15 +61,17 @@ export const PromptTemplateCard: React.FC<Props> = ({ template, onClick }) => {
           cursor: 'pointer',
           position: 'relative'
         }}
-        bodyStyle={{
-          padding: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          textAlign: 'center',
-          gap: 6,
-          height: '100%'
+        styles={{
+          body: {
+            padding: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'center',
+            gap: 6,
+            height: '100%'
+          }
         }}
         className={isVipTemplate ? "template-card template-card-vip" : "template-card"}
       >

@@ -27,7 +27,8 @@
     "generationStoppedDesc": "You have stopped this generation. Above is the partially generated content.",
     "interruptedByRefresh": "Generation interrupted by page refresh",
     "interruptedDesc": "Page was refreshed at {{time}}. Above is the content generated so far.",
-    "emptyState": "Select a chat or create a new one to get started"
+    "emptyState": "Select a chat or create a new one to get started",
+    "startChat": "Type a message to start chatting"
   },
   "template": {
     "title": "💰 Cost Optimization Assistant",

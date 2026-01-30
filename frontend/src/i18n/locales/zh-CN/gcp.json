@@ -1,4 +1,8 @@
 {
+  "modal": {
+    "uploadSuccess": "文件上传成功",
+    "uploadFailed": "文件上传失败"
+  },
   "account": {
     "title": "GCP 账号管理",
     "addButton": "添加 GCP 账号",
@@ -70,6 +74,9 @@
     },
     "selector": {
       "placeholder": "选择要查询的 GCP 账号"
+    },
+    "validation": {
+      "invalidJson": "无效的 JSON 格式"
     }
   }
 }

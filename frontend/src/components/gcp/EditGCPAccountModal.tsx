@@ -88,7 +88,7 @@ export const EditGCPAccountModal: FC<EditGCPAccountModalProps> = ({
       okText={t('common:button.save')}
       cancelText={t('common:button.cancel')}
       width={700}
-      destroyOnClose
+      destroyOnHidden
     >
       <Alert
         message={t('gcp:account.editModal.tip')}
