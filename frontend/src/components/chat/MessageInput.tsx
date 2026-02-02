@@ -273,11 +273,11 @@ export const MessageInput: FC = () => {
             placeholder={
               hasSelectedAccount
                 ? t('input.placeholder')
-                : t('input.placeholderNoAccount')
+                : "⚠️ 请先在右下角选择云账号以开始成本分析"
             }
-            className="ai-chat-textarea"
+            className={`ai-chat-textarea ${!hasSelectedAccount ? 'warning-placeholder' : ''}`}
             rows={1}
-            disabled={loading && !isCancelling} // 加载中禁用输入，除非正在取消
+            disabled={(loading && !isCancelling) || !hasSelectedAccount} // 加载中或未选择账号时禁用输入
           />
         </div>
 
@@ -355,13 +355,17 @@ export const MessageInput: FC = () => {
       <div style={{
         marginTop: '12px',
         fontSize: '12px',
-        color: 'rgba(0, 0, 0, 0.45)',
         textAlign: 'center',
         width: '100%',
-        pointerEvents: 'none', // 防止干扰点击
-        userSelect: 'none'      // 防止误选中
+        pointerEvents: 'none',
+        userSelect: 'none',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '4px'
       }}>
-        AI 生成内容仅供参考，请核实关键成本信息。
+        <div style={{ color: 'rgba(0, 0, 0, 0.45)' }}>
+          AI 生成内容仅供参考，请核实关键成本信息。
+        </div>
       </div>
     </MessageInputContainer>
   );
