@@ -45,6 +45,12 @@ export const ChatHistory: FC = () => {
 
   useEffect(() => {
     const loadChats = async () => {
+      // ✅ 优化：如果已经有会话数据，不再重新加载，避免闪烁和状态干扰
+      if (Object.keys(chats).length > 0) {
+        logger.debug('ℹ️ ChatHistory: 聊天历史已存在，跳过初始化加载');
+        return;
+      }
+
       try {
         await loadFromStorage();
         logger.debug('✅ ChatHistory: 聊天历史加载完成');

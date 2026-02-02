@@ -112,6 +112,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
   }, [currentChatId, navigate, location.pathname, sessionId, messages, chats]);
 
   const handleSidebarCollapse = (newState: boolean) => {
+    logger.debug(`Toggle sidebar collapse: ${newState}`);
     setSidebarCollapsed(newState);
     localStorage.setItem('sidebar-collapsed', JSON.stringify(newState));
   };

@@ -392,13 +392,13 @@ export const useChatStore = create<ChatState>((set, get) => ({
         messages[session.id] = [];
       }
 
-      set({
+      set(state => ({
         chats,
         messages,
-        currentChatId: null  // 不自动选中，让用户手动选择
-      });
+        currentChatId: state.currentChatId // ✅ 保持当前会话 ID，不重置为 null
+      }));
 
-      logger.debug(`✅ 从后端加载了 ${Object.keys(chats).length} 个聊天会话`);
+      logger.debug(`✅ 从后端加载了 ${Object.keys(chats).length} 个聊天会话，保持当前会话: ${get().currentChatId}`);
     } catch (error) {
       logger.error('❌ Failed to load chat data from backend:', error);
       // 回退到空状态

@@ -57,7 +57,11 @@ export const Sidebar: FC<SidebarProps> = ({ isCollapsed = false, onToggleCollaps
     }, 10);
   };
 
-  const handleToggleCollapse = () => {
+  const handleToggleCollapse = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     const newState = !isCollapsed;
     if (onToggleCollapse) {
       onToggleCollapse(newState);
