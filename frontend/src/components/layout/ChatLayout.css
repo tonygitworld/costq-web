@@ -12,15 +12,15 @@
   bottom: 0;
 }
 
-/* 侧边栏宽度 - 保持原有宽度 */
+/* 侧边栏宽度 - 280px 标准 */
 .chat-layout-sider-width {
-  width: 260px;
+  width: 280px;
 }
 
 /* ===== 主布局区域 ===== */
 
 .chat-layout-main {
-  margin-left: 260px;
+  margin-left: 280px;
   transition: margin-left 0.2s ease;
 }
 
@@ -28,26 +28,7 @@
   margin-left: 0;
 }
 
-/* ===== Header 样式 ===== */
-
-.chat-layout-header {
-  background-color: #fff;
-  padding: 0 18px;
-  height: 52px;
-  border-bottom: 1px solid #f0f0f0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 999;
-}
-
-.chat-layout-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
+/* ===== Header 样式已移除 - 使用侧边栏设置菜单 ===== */
 
 .chat-layout-account-section {
   display: flex;
@@ -119,14 +100,7 @@
     margin-left: 280px;
   }
 
-  .chat-layout-header {
-    padding: 0 24px;
-    height: 56px;
-  }
-
-  .chat-layout-header-actions {
-    gap: 16px;
-  }
+  /* Header 样式已移除 */
 
   .chat-layout-account-label {
     font-size: 12px;
@@ -143,8 +117,7 @@
 
 /* ===== 打印优化 ===== */
 @media print {
-  .chat-layout-sider,
-  .chat-layout-header {
+  .chat-layout-sider {
     display: none;
   }
 

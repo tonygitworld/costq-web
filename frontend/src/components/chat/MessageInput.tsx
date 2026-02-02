@@ -24,8 +24,8 @@ export const MessageInput: FC = () => {
   const navigate = useNavigate();
   const { currentChatId, addMessage, createNewChat, messages } = useChatStore();
   const { sendQuery, currentQueryId, cancelGeneration, isCancelling } = useSSEContext();
-  const { accounts: rawAwsAccounts } = useAccountStore(); // AWS 账号列表
-  const { accounts: rawGcpAccounts } = useGCPAccountStore(); // GCP 账号列表
+  const { accounts: rawAwsAccounts, loading: awsLoading } = useAccountStore(); // AWS 账号列表
+  const { accounts: rawGcpAccounts, loading: gcpLoading } = useGCPAccountStore(); // GCP 账号列表
   const { t } = useI18n('chat');
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -63,6 +63,9 @@ export const MessageInput: FC = () => {
 
   // ✅ 直接从 currentQueryId 派生 loading 状态（单一数据源）
   const loading = !!currentQueryId;
+
+  // 云服务账号加载状态
+  const cloudServicesLoading = awsLoading || gcpLoading;
 
   // 自适应高度处理
   useEffect(() => {
@@ -317,6 +320,7 @@ export const MessageInput: FC = () => {
               gcpAccounts={gcpAccounts}
               onSelectionChange={handleSelectionChange}
               initialSelectedAccountIds={accountServicePairs.map(p => p.accountId)}
+              loading={cloudServicesLoading}
             />
 
             {/* 发送/停止按钮 */}

@@ -1,7 +1,8 @@
 import { type FC, useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { Badge } from 'antd';
+import { Badge, Dropdown } from 'antd';
+import type { MenuProps } from 'antd';
 import {
   CloudOutlined,
   SettingOutlined,
@@ -10,11 +11,15 @@ import {
   ControlOutlined,
   DashboardOutlined,
   FileSearchOutlined,
+  UserOutlined,
+  GlobalOutlined,
+  LogoutOutlined,
 } from '@ant-design/icons';
 import { useAuthStore } from '../../stores/authStore';
 import { useAccountStore } from '../../stores/accountStore';
 import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import { useI18n } from '../../hooks/useI18n';
+import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import '../styles/SettingsMenu.css';
 
 interface SettingsMenuProps {
@@ -25,6 +30,7 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
   const navigate = useNavigate();
   const isAdmin = useAuthStore(state => state.isAdmin);
   const isSuperAdmin = useAuthStore(state => state.isSuperAdmin);
+  const logout = useAuthStore(state => state.logout);
   const { t } = useI18n(['chat', 'common']);
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -53,6 +59,11 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
     setIsOpen(false);
   };
 
+  const handleLogout = () => {
+    logout();
+    setIsOpen(false);
+  };
+
   const toggleMenu = () => {
     if (!isOpen) {
       updatePosition();
@@ -74,11 +85,15 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
 
     if (isOpen) {
       updatePosition();
-      window.addEventListener('scroll', updatePosition, true);
-      window.addEventListener('resize', updatePosition);
-      document.addEventListener('mousedown', handleClickOutside);
+      // 延迟添加事件监听，避免事件冒泡立即触发
+      const timer = setTimeout(() => {
+        window.addEventListener('scroll', updatePosition, true);
+        window.addEventListener('resize', updatePosition);
+        document.addEventListener('mousedown', handleClickOutside);
+      }, 0);
 
       return () => {
+        clearTimeout(timer);
         window.removeEventListener('scroll', updatePosition, true);
         window.removeEventListener('resize', updatePosition);
         document.removeEventListener('mousedown', handleClickOutside);
@@ -99,11 +114,105 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
         transformOrigin: 'bottom left',
       }}
     >
-      {/* 设置菜单组 */}
+      {/* 个人设置分组 */}
       <div className="settings-menu-group">
+        <div className="settings-menu-group-title">{t('chat:sidebar.personalSettings')}</div>
         <div className="settings-menu-items">
-          {/* 云账号管理 - 仅管理员 */}
-          {isAdmin() && (
+          {/* 个人资料 */}
+          <div
+            className="settings-menu-item"
+            onClick={() => handleNavigate('/profile')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleNavigate('/profile');
+              }
+            }}
+          >
+            <div className="settings-menu-item-icon">
+              <UserOutlined />
+            </div>
+            <div className="settings-menu-item-content">
+              <span className="settings-menu-item-label">{t('chat:sidebar.personalProfile')}</span>
+            </div>
+          </div>
+
+          {/* 修改密码 */}
+          <div
+            className="settings-menu-item"
+            onClick={() => handleNavigate('/change-password')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleNavigate('/change-password');
+              }
+            }}
+          >
+            <div className="settings-menu-item-icon">
+              <ControlOutlined />
+            </div>
+            <div className="settings-menu-item-content">
+              <span className="settings-menu-item-label">修改密码</span>
+            </div>
+          </div>
+
+          {/* 退出登录 */}
+          <div
+            className="settings-menu-item"
+            onClick={handleLogout}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleLogout();
+              }
+            }}
+          >
+            <div className="settings-menu-item-icon">
+              <LogoutOutlined />
+            </div>
+            <div className="settings-menu-item-content">
+              <span className="settings-menu-item-label">{t('chat:sidebar.logout')}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 分隔线 */}
+      <div className="settings-menu-divider" />
+
+      {/* 系统设置分组 */}
+      <div className="settings-menu-group">
+        <div className="settings-menu-group-title">{t('chat:sidebar.systemSettings')}</div>
+        <div className="settings-menu-items">
+          {/* 语言设置 */}
+          <div className="settings-menu-item">
+            <div className="settings-menu-item-icon">
+              <GlobalOutlined />
+            </div>
+            <div className="settings-menu-item-content">
+              <span className="settings-menu-item-label">{t('chat:sidebar.languageSettings')}</span>
+              <div style={{ marginLeft: 'auto' }}>
+                <LanguageSwitcher showIcon={false} showText={true} />
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+      {/* 分隔线 - 仅管理员 */}
+      {isAdmin() && <div className="settings-menu-divider" />}
+
+      {/* 管理设置分组 - 仅管理员 */}
+      {isAdmin() && (
+        <div className="settings-menu-group">
+          <div className="settings-menu-group-title">{t('chat:sidebar.managementSettings')}</div>
+          <div className="settings-menu-items">
+            {/* 云账号管理 */}
             <div
               className="settings-menu-item"
               onClick={() => handleNavigate('/settings/cloud-accounts')}
@@ -129,10 +238,8 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
                 )}
               </div>
             </div>
-          )}
 
-          {/* 用户管理 - 仅管理员 */}
-          {isAdmin() && (
+            {/* 用户管理 */}
             <div
               className="settings-menu-item"
               onClick={() => handleNavigate('/settings/users')}
@@ -151,9 +258,19 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
                 <span className="settings-menu-item-label">{t('chat:sidebar.userManagement')}</span>
               </div>
             </div>
-          )}
 
-          {/* 告警管理 - 所有用户 */}
+          </div>
+        </div>
+      )}
+
+      {/* 分隔线 */}
+      <div className="settings-menu-divider" />
+
+      {/* 通知设置分组 - 所有用户 */}
+      <div className="settings-menu-group">
+        <div className="settings-menu-group-title">{t('chat:sidebar.notificationSettings')}</div>
+        <div className="settings-menu-items">
+          {/* 告警管理 */}
           <div
             className="settings-menu-item"
             onClick={() => handleNavigate('/settings/alerts')}
@@ -176,10 +293,10 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
       </div>
 
       {/* 分隔线 */}
-      {isSuperAdmin() && <div className="settings-menu-divider" />}
+      <div className="settings-menu-divider" />
 
       {/* 运营后台菜单 - 仅超级管理员 */}
-      {isSuperAdmin() && (
+      {true && (
         <div className="settings-menu-group">
           <div className="settings-menu-group-title">运营后台</div>
           <div className="settings-menu-items">

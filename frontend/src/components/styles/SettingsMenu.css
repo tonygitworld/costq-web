@@ -64,12 +64,13 @@
   left: 100%;
   bottom: 0;
   margin-left: 12px;
-  width: 280px;
+  width: 300px;
+  max-width: 90vw;
   background-color: #ffffff;
   border-radius: 12px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.06);
-  padding: 8px;
+  padding: 6px;
   z-index: 1000;
   transform-origin: bottom left;
   animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -97,14 +98,15 @@
 .settings-menu-group {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
+  margin-bottom: 8px;
 }
 
 /* ===== 菜单分组标题 ===== */
 
 .settings-menu-group-title {
   display: block;
-  padding: 4px 12px;
+  padding: 8px 14px 4px 14px;
   font-size: 12px;
   font-weight: 600;
   color: rgba(68, 71, 70, 0.6);
@@ -131,32 +133,61 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 10px 14px;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.15s ease;
-  color: rgb(68, 71, 70);
+  transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  color: rgba(0, 0, 0, 0.87);
   outline: none;
   user-select: none;
   -webkit-user-select: none;
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  flex-wrap: nowrap;
+  margin-bottom: 1px;
 }
 
-.settings-menu-item:hover {
-  background-color: rgba(0, 0, 0, 0.06);
-  color: rgb(26, 26, 26);
+.settings-menu-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: currentColor;
+  opacity: 0;
+  transition: opacity 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+  border-radius: inherit;
+  pointer-events: none;
 }
 
-.settings-menu-item:active {
-  background-color: rgba(0, 0, 0, 0.1);
+.settings-menu-item:hover::before {
+  opacity: 0.04;
+}
+
+.settings-menu-item:focus::before {
+  opacity: 0.08;
+}
+
+.settings-menu-item:active::before {
+  opacity: 0.12;
 }
 
 :global(.dark) .settings-menu-item {
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.87);
 }
 
-:global(.dark) .settings-menu-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 1);
+:global(.dark) .settings-menu-item:hover::before {
+  opacity: 0.08;
+}
+
+:global(.dark) .settings-menu-item:focus::before {
+  opacity: 0.12;
+}
+
+:global(.dark) .settings-menu-item:active::before {
+  opacity: 0.16;
 }
 
 /* ===== 菜单项图标 ===== */
@@ -192,12 +223,204 @@
   overflow: hidden;
   text-overflow: ellipsis;
   color: inherit;
+  flex: 1;
+  min-width: 0;
 }
 
 /* ===== 菜单项徽章 ===== */
 
 .settings-menu-item-badge {
   flex-shrink: 0;
+}
+
+/* ===== 菜单项箭头 (Google Material Design 风格) ===== */
+
+.settings-menu-item-arrow {
+  margin-left: auto;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-menu-item-arrow svg {
+  width: 5px;
+  height: 10px;
+  fill: rgba(0, 0, 0, 0.54);
+  transition: fill 0.2s ease;
+}
+
+:global(.dark) .settings-menu-item-arrow svg {
+  fill: rgba(255, 255, 255, 0.54);
+}
+
+.settings-menu-item:hover .settings-menu-item-arrow svg {
+  fill: rgba(0, 0, 0, 0.87);
+}
+
+:global(.dark) .settings-menu-item:hover .settings-menu-item-arrow svg {
+  fill: rgba(255, 255, 255, 0.87);
+}
+
+/* ===== 二级菜单项样式增强 ===== */
+
+.settings-menu-item.submenu-trigger {
+  position: relative;
+}
+
+.settings-menu-item.submenu-trigger::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border: 4px solid transparent;
+  border-left-color: rgba(0, 0, 0, 0.54);
+  transition: border-left-color 0.2s ease;
+}
+
+:global(.dark) .settings-menu-item.submenu-trigger::after {
+  border-left-color: rgba(255, 255, 255, 0.54);
+}
+
+.settings-menu-item.submenu-trigger:hover::after {
+  border-left-color: rgba(0, 0, 0, 0.87);
+}
+
+:global(.dark) .settings-menu-item.submenu-trigger:hover::after {
+  border-left-color: rgba(255, 255, 255, 0.87);
+}
+
+/* ===== 二级菜单覆盖层样式 ===== */
+
+:global(.settings-submenu-overlay) {
+  z-index: 9999 !important;
+}
+
+:global(.settings-submenu-overlay .ant-dropdown-menu) {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08),
+              0 3px 6px -4px rgba(0, 0, 0, 0.12),
+              0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  border: none;
+  padding: 4px 0;
+  min-width: 160px;
+}
+
+:global(.dark .settings-submenu-overlay .ant-dropdown-menu) {
+  background: #1f1f1f;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.24),
+              0 3px 6px -4px rgba(0, 0, 0, 0.16),
+              0 9px 28px 8px rgba(0, 0, 0, 0.1);
+}
+
+:global(.settings-submenu-overlay .ant-dropdown-menu-item) {
+  padding: 8px 16px;
+  margin: 0;
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 14px;
+  line-height: 22px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+:global(.dark .settings-submenu-overlay .ant-dropdown-menu-item) {
+  color: rgba(255, 255, 255, 0.87);
+}
+
+:global(.settings-submenu-overlay .ant-dropdown-menu-item:hover) {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+:global(.dark .settings-submenu-overlay .ant-dropdown-menu-item:hover) {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+:global(.settings-submenu-overlay .ant-dropdown-menu-item-icon) {
+  margin-right: 8px;
+  font-size: 16px;
+}
+
+:global(.settings-submenu-overlay .ant-dropdown-menu-item-divider) {
+  background-color: rgba(0, 0, 0, 0.06);
+  margin: 4px 0;
+}
+
+:global(.dark .settings-submenu-overlay .ant-dropdown-menu-item-divider) {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ===== 自定义二级菜单样式 ===== */
+
+.settings-menu-item.submenu-trigger {
+  position: relative;
+}
+
+.settings-submenu {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08),
+              0 3px 6px -4px rgba(0, 0, 0, 0.12),
+              0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  border: none;
+  padding: 4px 0;
+  min-width: 160px;
+  z-index: 1001;
+  margin-left: 8px;
+}
+
+:global(.dark) .settings-submenu {
+  background: #1f1f1f;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.24),
+              0 3px 6px -4px rgba(0, 0, 0, 0.16),
+              0 9px 28px 8px rgba(0, 0, 0, 0.1);
+}
+
+.settings-submenu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 14px;
+  line-height: 22px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+:global(.dark) .settings-submenu-item {
+  color: rgba(255, 255, 255, 0.87);
+}
+
+.settings-submenu-item:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+:global(.dark) .settings-submenu-item:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.settings-submenu-item span {
+  font-size: 14px;
+}
+
+.settings-submenu-divider {
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.06);
+  margin: 4px 0;
+}
+
+:global(.dark) .settings-submenu-divider {
+  background-color: rgba(255, 255, 255, 0.12);
 }
 
 /* ===== 分隔线 ===== */

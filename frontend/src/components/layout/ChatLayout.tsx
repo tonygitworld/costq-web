@@ -2,15 +2,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Layout, Button, Drawer } from 'antd';
-import { MenuOutlined, CloudOutlined, GoogleOutlined, WarningOutlined } from '@ant-design/icons';
+import { MenuOutlined } from '@ant-design/icons';
 import { Sidebar } from './Sidebar';
 import { MainContent } from './MainContent';
 import { ScrollIssueReporter } from '../common/ScrollIssueReporter';
-import { UserDropdown } from '../common/UserDropdown';
-import { AccountSelector } from '../common/AccountSelector';
-import { GCPAccountSelector } from '../gcp/GCPAccountSelector';
-import { LanguageSwitcher } from '../common/LanguageSwitcher';
-import { useAccountSelectionDetails } from '../../hooks/useAccountSelection';
 import { useChatStore } from '../../stores/chatStore';
 import './ChatLayout.css';
 
@@ -29,7 +24,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
     const stored = localStorage.getItem('sidebar-collapsed');
     return stored ? JSON.parse(stored) : false;
   });
-  const accountDetails = useAccountSelectionDetails();
+
 
   // ✅ URL 路由支持：读取 sessionId 参数
   const { sessionId } = useParams<{ sessionId?: string }>();
@@ -123,7 +118,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
 
   // 计算侧边栏宽度（支持收缩）
   // 调整宽度：从 280px 缩小到 240px，更符合现代审美
-  const sidebarWidth = sidebarCollapsed ? 60 : 240;
+  const sidebarWidth = sidebarCollapsed ? 60 : 280;
   const contentMarginLeft = collapsed ? 0 : sidebarWidth;
 
   return (
@@ -157,73 +152,27 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
       </Layout.Sider>
 
       <Layout className="chat-layout-main" style={{ marginLeft: collapsed ? 0 : contentMarginLeft, transition: 'margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1)' }}>
-        {/* 顶部 Header - 账号选择和用户信息 */}
-        <Layout.Header className="chat-layout-header">
-          {/* 左侧：移动端菜单按钮 */}
-          <div>
-            {collapsed && (
-              <Button
-                type="text"
-                icon={<MenuOutlined />}
-                onClick={() => setSidebarVisible(true)}
-                size="large"
-              />
-            )}
+        {/* 移动端菜单按钮 - 浮动显示 */}
+        {collapsed && (
+          <div style={{ position: 'absolute', top: 16, left: 16, zIndex: 1000 }}>
+            <Button
+              type="text"
+              icon={<MenuOutlined />}
+              onClick={() => setSidebarVisible(true)}
+              size="large"
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                backdropFilter: 'blur(8px)',
+                border: '1px solid rgba(0, 0, 0, 0.08)',
+                borderRadius: '8px',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+              }}
+            />
           </div>
-
-          {/* 右侧：账号选择器 + 用户信息 */}
-          <div className="chat-layout-header-actions">
-            {/* 未选择账号时的警告图标 */}
-            {!accountDetails.hasAny && (
-              <WarningOutlined className="chat-layout-warning-icon" />
-            )}
-
-            {/* AWS 账号 */}
-            {accountDetails.hasAWSAccounts && (
-              <div className="chat-layout-account-section">
-                <span className="chat-layout-account-label">
-                  <CloudOutlined style={{ fontSize: '14px', color: '#FF9900' }} />
-                  AWS
-                </span>
-                <div className="chat-layout-account-selector">
-                  <AccountSelector />
-                </div>
-              </div>
-            )}
-
-            {/* GCP 账号 */}
-            {accountDetails.hasGCPAccounts && (
-              <div className="chat-layout-account-section">
-                <span className="chat-layout-account-label">
-                  <GoogleOutlined style={{ fontSize: '14px', color: '#4285F4' }} />
-                  GCP
-                </span>
-                <div className="chat-layout-account-selector">
-                  <GCPAccountSelector />
-                </div>
-              </div>
-            )}
-
-            {/* 分隔线 */}
-            <div className="chat-layout-divider" />
-
-            {/* 语言切换器 */}
-            <div>
-              <LanguageSwitcher showIcon={false} showText={true} />
-            </div>
-
-            {/* 分隔线 */}
-            <div className="chat-layout-divider" />
-
-            {/* 用户信息 */}
-            <div>
-              <UserDropdown />
-            </div>
-          </div>
-        </Layout.Header>
+        )}
 
         {/* 主内容区域 */}
-        <Layout.Content style={{ position: 'relative' }}>
+        <Layout.Content style={{ position: 'relative', height: '100vh' }}>
           {children || <MainContent />}
 
           {/* 连接状态已移到输入框左侧，此处不再显示 */}

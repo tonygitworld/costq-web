@@ -1,6 +1,22 @@
 // d:\costq\web\costq-web\frontend\src\components\chat\CloudServiceSelector.tsx
 
 import React, { useState, useEffect, useMemo } from 'react';
+
+// 添加旋转动画样式
+const spinKeyframes = `
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
+// 注入样式到页面
+if (typeof document !== 'undefined' && !document.querySelector('#spin-animation')) {
+  const style = document.createElement('style');
+  style.id = 'spin-animation';
+  style.textContent = spinKeyframes;
+  document.head.appendChild(style);
+}
 import { Popover } from 'antd';
 import CloudIcon from '../icons/CloudIcon';
 import AWSLogo from '../icons/AWSLogo';
@@ -26,6 +42,7 @@ export interface CloudServiceSelectorProps {
   gcpAccounts: Account[];
   onSelectionChange: (selectedAccountIds: string[]) => void;
   initialSelectedAccountIds?: string[];
+  loading?: boolean;
 }
 
 type ViewType = 'providers' | 'accounts';
@@ -47,6 +64,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
   gcpAccounts,
   onSelectionChange,
   initialSelectedAccountIds = [],
+  loading = false,
 }) => {
   // 从localStorage加载已选择的账号ID
   const loadSelectedAccounts = (): string[] => {
@@ -132,6 +150,29 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
 
   // 渲染触发按钮内容
   const renderTriggerContent = () => {
+    // 加载状态：显示加载动画和文本
+    if (loading) {
+      return (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          color: 'rgba(0, 0, 0, 0.45)',
+          fontSize: '13px'
+        }}>
+          <div style={{
+            width: '14px',
+            height: '14px',
+            border: '2px solid #f3f3f3',
+            borderTop: '2px solid #1890ff',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }} />
+          <span>正在加载云服务...</span>
+        </div>
+      );
+    }
+
     if (selectedAccountsCount === 0) {
       // 未选择：显示默认文本
       return (
@@ -464,8 +505,9 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
     <Popover
       content={renderContent()}
       trigger="click"
-      open={isPopoverOpen}
+      open={isPopoverOpen && !loading}
       onOpenChange={(visible) => {
+        if (loading) return; // 加载时不允许操作
         setIsPopoverOpen(visible);
         if (!visible) {
           // 关闭时重置视图
@@ -492,24 +534,29 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
           justifyContent: 'space-between',
           width: '180px',              // 固定宽度
           height: '32px',
-          backgroundColor: '#ffffff',
-          border: '1px solid #d9d9d9',
+          backgroundColor: loading ? '#f5f5f5' : '#ffffff',
+          border: `1px solid ${loading ? '#e0e0e0' : '#d9d9d9'}`,
           borderRadius: '6px',
           padding: '0 8px',
-          cursor: 'pointer',
+          cursor: loading ? 'not-allowed' : 'pointer',
           transition: 'all 0.2s',
           boxShadow: '0 2px 0 rgba(0, 0, 0, 0.02)',
           flexShrink: 0,             // 防止被压缩
+          opacity: loading ? 0.7 : 1,
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.borderColor = '#4096ff';
-          e.currentTarget.style.boxShadow = '0 0 0 2px rgba(5, 145, 255, 0.06)';
+          if (!loading) {
+            e.currentTarget.style.borderColor = '#4096ff';
+            e.currentTarget.style.boxShadow = '0 0 0 2px rgba(5, 145, 255, 0.06)';
+          }
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.borderColor = '#d9d9d9';
-          e.currentTarget.style.boxShadow = '0 2px 0 rgba(0, 0, 0, 0.02)';
+          if (!loading) {
+            e.currentTarget.style.borderColor = '#d9d9d9';
+            e.currentTarget.style.boxShadow = '0 2px 0 rgba(0, 0, 0, 0.02)';
+          }
         }}
-        title="选择云服务"
+        title={loading ? "正在加载云服务..." : "选择云服务"}
       >
         {renderTriggerContent()}
 
