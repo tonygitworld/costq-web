@@ -48,6 +48,11 @@
       "passwordMismatch": "パスワードが一致しません",
       "sameAsOld": "新しいパスワードは現在のパスワードと同じにはできません"
     },
+    "modal": {
+      "successTitle": "パスワードを変更しました",
+      "successContent": "アカウントのセキュリティのため、新しいパスワードで再度ログインしてください",
+      "successOkText": "ログイン画面へ"
+    },
     "message": {
       "changeSuccess": "パスワードを変更しました。再度ログインしてください。",
       "changeFailed": "パスワードの変更に失敗しました"

@@ -47,17 +47,7 @@ export const AlertDetail: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { modal } = App.useApp();
-  const { t, i18n } = useI18n('alert');
-
-  // 根据当前语言设置 dayjs 语言
-  React.useEffect(() => {
-    const dayjsLocaleMap: Record<string, string> = {
-      'zh-CN': 'zh-cn',
-      'en-US': 'en',
-      'ja-JP': 'ja'
-    };
-    dayjs.locale(dayjsLocaleMap[i18n.language] || 'en');
-  }, [i18n.language]);
+  const { t } = useI18n('alert');
 
   const {
     currentAlert,

@@ -6,13 +6,19 @@
     "settings": "設定",
     "personalSettings": "個人設定",
     "personalProfile": "個人プロフィール",
+    "changePassword": "パスワード変更",
     "languageSettings": "言語設定",
     "logout": "ログアウト",
     "systemSettings": "システム設定",
     "managementSettings": "管理設定",
     "notificationSettings": "通知設定",
     "cloudAccounts": "クラウドアカウント管理",
-    "userManagement": "ユーザー管理"
+    "userManagement": "ユーザー管理",
+    "alertManagement": "アラート管理",
+    "opsBackend": "運用バックエンド",
+    "opsDashboard": "運用ダッシュボード",
+    "tenantManagement": "テナント管理",
+    "auditLogs": "監査ログ"
   },
   "input": {
     "placeholder": "ご質問を入力してください... (Enterで送信、Shift+Enterで改行)",

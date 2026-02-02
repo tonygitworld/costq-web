@@ -35,9 +35,9 @@ export const ChangePassword: React.FC = () => {
 
       // 提示用户重新登录
       modal.success({
-        title: '密码修改成功',
-        content: '为了您的账号安全，需要使用新密码重新登录',
-        okText: '前往登录',
+        title: t('changePassword.modal.successTitle'),
+        content: t('changePassword.modal.successContent'),
+        okText: t('changePassword.modal.successOkText'),
         centered: true,
         onOk: () => {
           form.resetFields();

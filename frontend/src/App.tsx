@@ -1,6 +1,6 @@
 import React, { type FC } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { ConfigProvider, App as AntdApp } from 'antd';
+import { App as AntdApp } from 'antd';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ChatLayout } from './components/layout/ChatLayout';
 import { CloudAccountManagement } from './components/settings/CloudAccountManagement';
@@ -21,7 +21,7 @@ import { I18nProvider } from './components/common/I18nProvider';
 import { useAuthStore } from './stores/authStore';
 import { useAccountStore } from './stores/accountStore';
 import { useGCPAccountStore } from './stores/gcpAccountStore';
-import { antdTheme } from './styles/antd-theme';
+
 import { useBeforeUnload } from './hooks/useBeforeUnload';
 import { ensureTokenValid } from './utils/tokenUtils';
 import { setAuthMessageListener, setAuthRedirectListener } from './utils/authNotifications';
@@ -68,7 +68,8 @@ const AppContent: FC = () => {
   useBeforeUnload();
 
   return (
-    <Routes>
+    <AntdApp>
+      <Routes>
       {/* 登录页面 */}
       <Route
         path="/login"
@@ -274,7 +275,8 @@ const AppContent: FC = () => {
           }
         />
       </Route>
-    </Routes>
+        </Routes>
+      </AntdApp>
   );
 };
 
@@ -322,15 +324,11 @@ const App: FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider>
-        <ConfigProvider theme={antdTheme}>
-          <AntdApp>
-            <BrowserRouter>
-              <SSEProvider>
-                <AppContent />
-              </SSEProvider>
-            </BrowserRouter>
-          </AntdApp>
-        </ConfigProvider>
+        <BrowserRouter>
+          <SSEProvider>
+            <AppContent />
+          </SSEProvider>
+        </BrowserRouter>
       </I18nProvider>
     </QueryClientProvider>
   );

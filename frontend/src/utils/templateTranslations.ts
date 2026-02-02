@@ -225,6 +225,22 @@ export const templateDescTranslations: Record<string, TemplateTranslation> = {
 };
 
 /**
+ * 语言代码规范化
+ */
+const normalizeLanguage = (lng: string): string => {
+  const normalized = lng.toLowerCase().replace('_', '-');
+  const mapping: Record<string, string> = {
+    'zh': 'zh-CN',
+    'zh-cn': 'zh-CN',
+    'en': 'en-US',
+    'en-us': 'en-US',
+    'ja': 'ja-JP',
+    'ja-jp': 'ja-JP'
+  };
+  return mapping[normalized] || normalized;
+};
+
+/**
  * 翻译模板标题
  * @param title - 原始标题（中文）
  * @param language - 目标语言
@@ -233,10 +249,11 @@ export const templateDescTranslations: Record<string, TemplateTranslation> = {
 export const translateTemplateTitle = (title: string, language: string): string => {
   const translation = templateTitleTranslations[title];
   if (!translation) {
-    return title; // 找不到翻译时返回原标题
+    return title;
   }
 
-  return translation[language as keyof TemplateTranslation] || title;
+  const normalizedLng = normalizeLanguage(language);
+  return translation[normalizedLng as keyof TemplateTranslation] || title;
 };
 
 /**
@@ -250,8 +267,9 @@ export const translateTemplateDescription = (description: string | undefined, la
 
   const translation = templateDescTranslations[description];
   if (!translation) {
-    return description; // 找不到翻译时返回原描述
+    return description;
   }
 
-  return translation[language as keyof TemplateTranslation];
+  const normalizedLng = normalizeLanguage(language);
+  return translation[normalizedLng as keyof TemplateTranslation];
 };

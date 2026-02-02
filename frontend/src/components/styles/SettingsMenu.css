@@ -148,6 +148,19 @@
   margin-bottom: 1px;
 }
 
+/* 静态菜单项 - 不可点击，用于嵌套其他交互组件 */
+.settings-menu-item-static {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  color: rgba(0, 0, 0, 0.87);
+  min-width: 0;
+  flex-wrap: nowrap;
+  margin-bottom: 1px;
+}
+
 .settings-menu-item::before {
   content: '';
   position: absolute;

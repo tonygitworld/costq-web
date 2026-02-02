@@ -8,17 +8,6 @@ import { GlobalOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { Flag } from './FlagIcons';
-import dayjs from 'dayjs';
-
-// 导入dayjs语言包
-import 'dayjs/locale/zh-cn';
-import 'dayjs/locale/en';
-import 'dayjs/locale/ja';
-
-// 导入Ant Design语言包
-import zhCN from 'antd/locale/zh_CN';
-import enUS from 'antd/locale/en_US';
-import jaJP from 'antd/locale/ja_JP';
 
 // 语言配置
 const languages = [
@@ -26,58 +15,63 @@ const languages = [
     key: 'zh-CN' as const,
     label: '简体中文',
     shortLabel: '中文',
-    antdLocale: zhCN,
-    dayjsLocale: 'zh-cn'
   },
   {
     key: 'en-US' as const,
     label: 'English',
     shortLabel: 'English',
-    antdLocale: enUS,
-    dayjsLocale: 'en'
   },
   {
     key: 'ja-JP' as const,
     label: '日本語',
     shortLabel: '日本語',
-    antdLocale: jaJP,
-    dayjsLocale: 'ja'
   }
 ];
 
 interface LanguageSwitcherProps {
-  onLocaleChange?: (locale: typeof zhCN | typeof enUS | typeof jaJP) => void;
   type?: 'dropdown' | 'buttons';
   showIcon?: boolean;
   showText?: boolean;
 }
 
 export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
-  onLocaleChange,
   type = 'dropdown',
   showIcon = true,
   showText = true
 }) => {
   const { i18n } = useTranslation();
-  const currentLanguage = i18n.language || 'zh-CN';
 
-  const handleLanguageChange = (langKey: string) => {
-    const lang = languages.find(l => l.key === langKey);
-    if (!lang) return;
+  // 语言代码规范化
+  const normalizeLanguage = (lang: string): string => {
+    const normalized = lang.toLowerCase().replace('_', '-');
+    const mapping: Record<string, string> = {
+      'zh': 'zh-CN',
+      'zh-cn': 'zh-CN',
+      'en': 'en-US',
+      'en-us': 'en-US',
+      'ja': 'ja-JP',
+      'ja-jp': 'ja-JP'
+    };
+    return mapping[normalized] || lang;
+  };
 
-    // 1. 切换i18next语言
-    i18n.changeLanguage(langKey);
+  const currentLanguage = normalizeLanguage(i18n.language || 'zh-CN');
 
-    // 2. 切换dayjs语言（用于日期格式化）
-    dayjs.locale(lang.dayjsLocale);
+  const handleLanguageChange = async (langKey: string) => {
+    try {
+      // 切换 i18next 语言
+      // react-i18next 会自动通知所有订阅了翻译的组件重新渲染
+      await i18n.changeLanguage(langKey);
 
-    // 3. 通知父组件更新Ant Design语言
-    if (onLocaleChange) {
-      onLocaleChange(lang.antdLocale);
+      // I18nProvider 会自动处理：
+      // - Ant Design locale 更新
+      // - dayjs locale 更新
+      // - HTML lang 属性更新
+
+      // localStorage 会由 i18next-browser-languagedetector 自动保存
+    } catch (error) {
+      console.error('[LanguageSwitcher] 语言切换失败:', error);
     }
-
-    // 4. 保存到localStorage（i18next会自动处理，这里是确保）
-    localStorage.setItem('i18nextLng', langKey);
   };
 
   const currentLang = languages.find(l => l.key === currentLanguage) || languages[0];
@@ -94,15 +88,19 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
             <span style={{ color: '#52c41a', marginLeft: '4px' }}>✓</span>
           )}
         </Space>
-      ),
-      onClick: () => handleLanguageChange(lang.key)
+      )
     }));
+
+    const handleMenuClick: MenuProps['onClick'] = (info) => {
+      handleLanguageChange(info.key);
+    };
 
     return (
       <Dropdown
-        menu={{ items: menuItems }}
+        menu={{ items: menuItems, onClick: handleMenuClick }}
         trigger={['click']}
         placement="bottomRight"
+        getPopupContainer={(triggerNode) => triggerNode.parentNode as HTMLElement}
       >
         <Button
           type="text"

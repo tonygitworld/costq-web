@@ -48,6 +48,11 @@
       "passwordMismatch": "两次输入的密码不一致",
       "sameAsOld": "新密码不能与当前密码相同"
     },
+    "modal": {
+      "successTitle": "密码修改成功",
+      "successContent": "为了您的账号安全，需要使用新密码重新登录",
+      "successOkText": "前往登录"
+    },
     "message": {
       "changeSuccess": "密码修改成功，请重新登录",
       "changeFailed": "密码修改失败"

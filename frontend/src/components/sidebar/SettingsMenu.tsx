@@ -31,7 +31,11 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
   const isAdmin = useAuthStore(state => state.isAdmin);
   const isSuperAdmin = useAuthStore(state => state.isSuperAdmin);
   const logout = useAuthStore(state => state.logout);
-  const { t } = useI18n(['chat', 'common']);
+  const { t, language } = useI18n(['chat', 'common']);
+
+  // 调试：显示当前语言
+  console.log('🔍 [SettingsMenu] 当前语言:', language);
+  console.log('🔍 [SettingsMenu] 翻译示例:', t('chat:sidebar.settings'));
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -121,12 +125,12 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
           {/* 个人资料 */}
           <div
             className="settings-menu-item"
-            onClick={() => handleNavigate('/profile')}
+            onClick={() => handleNavigate('/user/profile')}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
-                handleNavigate('/profile');
+                handleNavigate('/user/profile');
               }
             }}
           >
@@ -141,12 +145,12 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
           {/* 修改密码 */}
           <div
             className="settings-menu-item"
-            onClick={() => handleNavigate('/change-password')}
+            onClick={() => handleNavigate('/user/change-password')}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
-                handleNavigate('/change-password');
+                handleNavigate('/user/change-password');
               }
             }}
           >
@@ -154,7 +158,7 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
               <ControlOutlined />
             </div>
             <div className="settings-menu-item-content">
-              <span className="settings-menu-item-label">修改密码</span>
+              <span className="settings-menu-item-label">{t('chat:sidebar.changePassword')}</span>
             </div>
           </div>
 
@@ -188,14 +192,21 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
         <div className="settings-menu-group-title">{t('chat:sidebar.systemSettings')}</div>
         <div className="settings-menu-items">
           {/* 语言设置 */}
-          <div className="settings-menu-item">
+          <div className="settings-menu-item-static">
             <div className="settings-menu-item-icon">
               <GlobalOutlined />
             </div>
             <div className="settings-menu-item-content">
               <span className="settings-menu-item-label">{t('chat:sidebar.languageSettings')}</span>
-              <div style={{ marginLeft: 'auto' }}>
-                <LanguageSwitcher showIcon={false} showText={true} />
+              <div
+                style={{ marginLeft: 'auto' }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <LanguageSwitcher
+                  showIcon={false}
+                  showText={true}
+                  type="dropdown"
+                />
               </div>
             </div>
           </div>
@@ -286,7 +297,7 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
               <BellOutlined />
             </div>
             <div className="settings-menu-item-content">
-              <span className="settings-menu-item-label">告警管理</span>
+              <span className="settings-menu-item-label">{t('chat:sidebar.alertManagement')}</span>
             </div>
           </div>
         </div>
@@ -298,7 +309,7 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
       {/* 运营后台菜单 - 仅超级管理员 */}
       {true && (
         <div className="settings-menu-group">
-          <div className="settings-menu-group-title">运营后台</div>
+          <div className="settings-menu-group-title">{t('chat:sidebar.opsBackend')}</div>
           <div className="settings-menu-items">
             {/* 运营 Dashboard */}
             <div
@@ -316,7 +327,7 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
                 <DashboardOutlined />
               </div>
               <div className="settings-menu-item-content">
-                <span className="settings-menu-item-label">运营 Dashboard</span>
+                <span className="settings-menu-item-label">{t('chat:sidebar.opsDashboard')}</span>
               </div>
             </div>
 
@@ -336,7 +347,7 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
                 <TeamOutlined />
               </div>
               <div className="settings-menu-item-content">
-                <span className="settings-menu-item-label">租户管理</span>
+                <span className="settings-menu-item-label">{t('chat:sidebar.tenantManagement')}</span>
               </div>
             </div>
 
@@ -356,7 +367,7 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
                 <FileSearchOutlined />
               </div>
               <div className="settings-menu-item-content">
-                <span className="settings-menu-item-label">审计日志</span>
+                <span className="settings-menu-item-label">{t('chat:sidebar.auditLogs')}</span>
               </div>
             </div>
           </div>

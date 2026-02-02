@@ -6,13 +6,19 @@
     "settings": "设置",
     "personalSettings": "个人设置",
     "personalProfile": "个人资料",
+    "changePassword": "修改密码",
     "languageSettings": "语言设置",
     "logout": "退出登录",
     "systemSettings": "系统设置",
     "managementSettings": "管理设置",
     "notificationSettings": "通知设置",
     "cloudAccounts": "云账号管理",
-    "userManagement": "用户管理"
+    "userManagement": "用户管理",
+    "alertManagement": "告警管理",
+    "opsBackend": "运营后台",
+    "opsDashboard": "运营 Dashboard",
+    "tenantManagement": "租户管理",
+    "auditLogs": "审计日志"
   },
   "input": {
     "placeholder": "输入您的问题... (Enter 发送, Shift+Enter 换行)",

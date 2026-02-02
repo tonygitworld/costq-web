@@ -8,7 +8,7 @@ import React from 'react';
 import { Card, Tooltip, Tag } from 'antd';
 import type { PromptTemplate, UserPromptTemplate } from '../../types/promptTemplate';
 import { translateTemplateTitle, translateTemplateDescription } from '../../utils/templateTranslations';
-import { useTranslation } from 'react-i18next';
+import { useI18n } from '../../hooks/useI18n';
 
 interface Props {
   template: PromptTemplate | UserPromptTemplate;
@@ -16,13 +16,14 @@ interface Props {
 }
 
 export const PromptTemplateCard: React.FC<Props> = ({ template, onClick }) => {
-  const { i18n } = useTranslation();
+  const { language } = useI18n('common'); // 订阅语言变化以触发重新渲染
+
   // 判断是否为用户模板
   const isUserTemplate = 'user_id' in template;
 
   // 翻译模板标题和描述
-  const translatedTitle = translateTemplateTitle(template.title, i18n.language);
-  const translatedDescription = template.description ? translateTemplateDescription(template.description, i18n.language) : undefined;
+  const translatedTitle = translateTemplateTitle(template.title, language);
+  const translatedDescription = template.description ? translateTemplateDescription(template.description, language) : undefined;
 
   // 判断是否为VIP模板（成本洞察报告 + RI/SP 利用率分析）
   const isVipTemplate = template.id === 'pt-001' || template.id === 'pt-016';

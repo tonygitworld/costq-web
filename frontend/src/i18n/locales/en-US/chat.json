@@ -6,13 +6,19 @@
     "settings": "Settings",
     "personalSettings": "Personal Settings",
     "personalProfile": "Personal Profile",
+    "changePassword": "Change Password",
     "languageSettings": "Language Settings",
     "logout": "Logout",
     "systemSettings": "System Settings",
     "managementSettings": "Management Settings",
     "notificationSettings": "Notification Settings",
     "cloudAccounts": "Cloud Accounts",
-    "userManagement": "User Management"
+    "userManagement": "User Management",
+    "alertManagement": "Alert Management",
+    "opsBackend": "Operations Backend",
+    "opsDashboard": "Operations Dashboard",
+    "tenantManagement": "Tenant Management",
+    "auditLogs": "Audit Logs"
   },
   "input": {
     "placeholder": "Type your question... (Enter to send, Shift+Enter for new line)",

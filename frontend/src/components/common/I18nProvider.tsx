@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { ConfigProvider } from 'antd';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
+import { antdTheme } from '../../styles/antd-theme';
 
 // Ant Design语言包
 import zhCN from 'antd/locale/zh_CN';
@@ -16,6 +17,20 @@ import jaJP from 'antd/locale/ja_JP';
 import 'dayjs/locale/zh-cn';
 import 'dayjs/locale/en';
 import 'dayjs/locale/ja';
+
+// 语言代码规范化函数
+const normalizeLanguage = (lng: string): string => {
+  const normalized = lng.toLowerCase().replace('_', '-');
+  const mapping: Record<string, string> = {
+    'zh': 'zh-CN',
+    'zh-cn': 'zh-CN',
+    'en': 'en-US',
+    'en-us': 'en-US',
+    'ja': 'ja-JP',
+    'ja-jp': 'ja-JP'
+  };
+  return mapping[normalized] || normalized;
+};
 
 const antdLocales: Record<string, typeof zhCN> = {
   'zh-CN': zhCN,
@@ -37,17 +52,20 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   const { i18n } = useTranslation();
   const [antdLocale, setAntdLocale] = useState(antdLocales[i18n.language] || zhCN);
 
-  // 监听语言变化
   useEffect(() => {
     const handleLanguageChange = (lng: string) => {
+      const normalizedLng = normalizeLanguage(lng);
+
       // 更新Ant Design语言
-      setAntdLocale(antdLocales[lng] || zhCN);
+      const newLocale = antdLocales[normalizedLng] || zhCN;
+      setAntdLocale(newLocale);
 
       // 更新dayjs语言
-      dayjs.locale(dayjsLocales[lng] || 'zh-cn');
+      const dayjsLng = dayjsLocales[normalizedLng] || 'zh-cn';
+      dayjs.locale(dayjsLng);
 
-      // 更新HTML lang属性（SEO和可访问性）
-      document.documentElement.lang = lng;
+      // 更新HTML lang属性
+      document.documentElement.lang = normalizedLng;
     };
 
     // 初始化
@@ -62,7 +80,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({ children }) => {
   }, [i18n]);
 
   return (
-    <ConfigProvider locale={antdLocale}>
+    <ConfigProvider locale={antdLocale} theme={antdTheme}>
       {children}
     </ConfigProvider>
   );

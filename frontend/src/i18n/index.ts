@@ -7,61 +7,62 @@ import zhCN from './locales/zh-CN';
 import enUS from './locales/en-US';
 import jaJP from './locales/ja-JP';
 
+// 语言代码规范化：将短代码映射到完整代码
+const normalizeLanguageCode = (lng: string): string => {
+  const normalized = lng.toLowerCase().replace('_', '-');
+  const mapping: Record<string, string> = {
+    'zh': 'zh-CN',
+    'zh-cn': 'zh-CN',
+    'en': 'en-US',
+    'en-us': 'en-US',
+    'ja': 'ja-JP',
+    'ja-jp': 'ja-JP'
+  };
+  return mapping[normalized] || lng;
+};
+
+// 清理旧的 localStorage 语言数据
+const cleanupOldLanguageData = () => {
+  const storedLng = localStorage.getItem('i18nextLng');
+  if (storedLng) {
+    const normalized = normalizeLanguageCode(storedLng);
+    if (storedLng !== normalized) {
+      localStorage.setItem('i18nextLng', normalized);
+    }
+  }
+};
+
 // 配置i18next
+cleanupOldLanguageData();
+
 i18n
-  // 使用语言检测器（自动检测浏览器语言）
   .use(LanguageDetector)
-  // 使用react-i18next
   .use(initReactI18next)
-  // 初始化配置
   .init({
-    // 语言资源
     resources: {
       'zh-CN': zhCN,
       'en-US': enUS,
       'ja-JP': jaJP
     },
 
-    // 默认语言
     fallbackLng: 'zh-CN',
 
-    // 调试模式（生产环境设为false）
     debug: process.env.NODE_ENV === 'development',
 
-    // 默认命名空间
     defaultNS: 'common',
 
-    // 语言检测配置
     detection: {
-      // 检测顺序：localStorage > 浏览器语言 > HTML lang属性
       order: ['localStorage', 'navigator', 'htmlTag'],
-      // 缓存用户选择的语言
       caches: ['localStorage'],
-      // localStorage的key名
       lookupLocalStorage: 'i18nextLng',
+      convertDetectedLanguage: normalizeLanguageCode
     },
 
-    // 插值配置
     interpolation: {
-      // React已经默认转义，不需要再转义
       escapeValue: false,
-      // 格式化函数
-      format: (value, format, lng) => {
-        // 日期格式化
-        if (format === 'date') {
-          return new Date(value).toLocaleDateString(lng);
-        }
-        // 时间格式化
-        if (format === 'datetime') {
-          return new Date(value).toLocaleString(lng);
-        }
-        return value;
-      }
     },
 
-    // React配置
     react: {
-      // 使用Suspense异步加载
       useSuspense: false
     }
   });

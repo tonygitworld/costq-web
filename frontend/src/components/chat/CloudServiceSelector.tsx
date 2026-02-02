@@ -518,11 +518,13 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
       placement="top"
       arrow={false}
       overlayStyle={{ padding: 0 }}
-      overlayInnerStyle={{
-        padding: '8px 0',
-        borderRadius: '12px',
-        overflow: 'hidden',
-        boxShadow: '0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05)'
+      styles={{
+        container: {
+          padding: '8px 0',
+          borderRadius: '12px',
+          overflow: 'hidden',
+          boxShadow: '0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 9px 28px 8px rgba(0, 0, 0, 0.05)'
+        }
       }}
     >
       {/* 触发按钮 */}

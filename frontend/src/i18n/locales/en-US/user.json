@@ -48,6 +48,11 @@
       "passwordMismatch": "Passwords do not match",
       "sameAsOld": "New password cannot be the same as current password"
     },
+    "modal": {
+      "successTitle": "Password Changed Successfully",
+      "successContent": "For your account security, please sign in again with your new password",
+      "successOkText": "Go to Sign In"
+    },
     "message": {
       "changeSuccess": "Password changed successfully. Please sign in again.",
       "changeFailed": "Failed to change password"
