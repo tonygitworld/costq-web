@@ -138,7 +138,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
         theme="light" // 适配浅色侧边栏
         className="chat-layout-sider"
         style={{
-          overflow: 'auto',
+          overflow: 'hidden', // ✅ 关键修复：改为 hidden 防止折叠时出现滚动条
           height: '100vh',
           position: 'fixed',
           left: 0,

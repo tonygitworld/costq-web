@@ -17,7 +17,7 @@
   background-color: #f7f8fa;
   border-right: none;
   color: rgb(68, 71, 70);
-  overflow: hidden;
+  overflow: hidden; /* ✅ 确保子元素溢出时不显示滚动条 */
 }
 
 :global(.dark) .sidebar-container {
