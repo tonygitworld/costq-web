@@ -9,6 +9,8 @@
     "changePassword": "修改密码",
     "languageSettings": "语言设置",
     "logout": "退出登录",
+    "logoutConfirm": "确定要退出登录吗？退出后需要重新登录才能继续使用。",
+    "logoutButton": "退出登录",
     "systemSettings": "系统设置",
     "managementSettings": "管理设置",
     "notificationSettings": "通知设置",

@@ -9,6 +9,8 @@
     "changePassword": "Change Password",
     "languageSettings": "Language Settings",
     "logout": "Logout",
+    "logoutConfirm": "Are you sure you want to log out? You will need to sign in again to continue.",
+    "logoutButton": "Log Out",
     "systemSettings": "System Settings",
     "managementSettings": "Management Settings",
     "notificationSettings": "Notification Settings",

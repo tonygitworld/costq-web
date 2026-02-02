@@ -9,6 +9,8 @@
     "changePassword": "パスワード変更",
     "languageSettings": "言語設定",
     "logout": "ログアウト",
+    "logoutConfirm": "ログアウトしてもよろしいですか？ログアウト後は再度ログインする必要があります。",
+    "logoutButton": "ログアウト",
     "systemSettings": "システム設定",
     "managementSettings": "管理設定",
     "notificationSettings": "通知設定",

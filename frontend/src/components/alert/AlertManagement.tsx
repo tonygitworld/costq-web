@@ -24,7 +24,8 @@ import {
   EditOutlined,
   DeleteOutlined,
   EyeOutlined,
-  PlayCircleOutlined
+  PlayCircleOutlined,
+  ArrowLeftOutlined
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
@@ -271,10 +272,19 @@ export const AlertManagement: React.FC = () => {
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%', padding: '24px' }}>
-      {/* 标题 */}
-      <Title level={3}>
-        <BellOutlined /> {t('title')}
-      </Title>
+      {/* 返回按钮和标题 */}
+      <Space style={{ width: '100%' }}>
+        <Button
+          icon={<ArrowLeftOutlined />}
+          onClick={() => navigate(-1)}
+          type="text"
+        >
+          {t('common:button.back')}
+        </Button>
+        <Title level={3} style={{ margin: 0 }}>
+          <BellOutlined /> {t('title')}
+        </Title>
+      </Space>
 
       {/* 主卡片 */}
       <Card>

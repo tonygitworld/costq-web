@@ -1,7 +1,7 @@
 import { type FC, useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { Badge, Dropdown } from 'antd';
+import { Badge, Dropdown, Modal } from 'antd';
 import type { MenuProps } from 'antd';
 import {
   CloudOutlined,
@@ -33,9 +33,6 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
   const logout = useAuthStore(state => state.logout);
   const { t, language } = useI18n(['chat', 'common']);
 
-  // 调试：显示当前语言
-  console.log('🔍 [SettingsMenu] 当前语言:', language);
-  console.log('🔍 [SettingsMenu] 翻译示例:', t('chat:sidebar.settings'));
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -64,8 +61,18 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
   };
 
   const handleLogout = () => {
-    logout();
-    setIsOpen(false);
+    Modal.confirm({
+      title: t('chat:sidebar.logout'),
+      content: t('chat:sidebar.logoutConfirm'),
+      okText: t('chat:sidebar.logoutButton'),
+      cancelText: t('common:button.cancel'),
+      okButtonProps: { danger: true },
+      centered: true,
+      onOk: () => {
+        logout();
+        setIsOpen(false);
+      }
+    });
   };
 
   const toggleMenu = () => {
