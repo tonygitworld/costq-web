@@ -303,7 +303,10 @@ export const ChatHistory: FC = () => {
             <div
               key={chat.id}
               className={`chat-history-item ${isActive ? 'chat-history-item-active' : ''} ${isSelected ? 'chat-history-item-selected' : ''}`}
-              onClick={() => {
+              onClick={(e) => {
+                // ✅ 关键修复：如果已经在当前会话，避免重复切换（防抖）
+                if (isActive) return;
+
                 if (isSelectionMode) {
                   toggleChatSelection(chat.id);
                 } else {
@@ -328,7 +331,15 @@ export const ChatHistory: FC = () => {
                 )}
 
                 <div style={{ flex: 1, minWidth: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                  <div className="chat-history-item-title" onClick={e => e.stopPropagation()}>
+                  <div
+                    className="chat-history-item-title"
+                    onClick={e => {
+                      // 如果正在编辑，阻止点击事件冒泡
+                      if (editingChatId === chat.id) {
+                        e.stopPropagation();
+                      }
+                    }}
+                  >
                     {editingChatId === chat.id ? (
                       <Input
                         value={editTitle}
@@ -373,8 +384,15 @@ export const ChatHistory: FC = () => {
               )}
 
               {!isSelectionMode && (
-                <div className={`trailing-group ${chat.isPinned ? 'pinned' : ''}`} onClick={(e) => e.stopPropagation()} style={{
-                  position: 'absolute',
+                <div
+                  className={`trailing-group ${chat.isPinned ? 'pinned' : ''}`}
+                  onClick={(e) => {
+                    // ✅ 关键修复：完全阻止事件冒泡到父级 chat-history-item
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  style={{
+                    position: 'absolute',
                   right: '6px',
                   top: '50%',
                   transform: 'translateY(-50%)',

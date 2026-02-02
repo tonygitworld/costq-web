@@ -201,6 +201,7 @@
   background-color: transparent;
   transition: all 0.2s ease !important;
   cursor: pointer !important; /* ✅ 关键修复：添加点击小手指针 */
+  z-index: 1; /* 基础层级 */
 }
 
 .chat-history-item:hover {
@@ -389,6 +390,8 @@
   cursor: pointer;
   color: rgb(68, 71, 70);
   transition: background-color 0.2s ease, color 0.2s ease;
+  z-index: 1001; /* ✅ 提升层级，确保在折叠状态下可点击 */
+  position: relative;
 }
 
 .sidebar-settings-icon:hover {
