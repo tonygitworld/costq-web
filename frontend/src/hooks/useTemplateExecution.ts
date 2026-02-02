@@ -22,7 +22,7 @@ type TemplateVariables = Record<string, string | number | boolean>;
 export const useTemplateExecution = () => {
   const [selectedTemplate, setSelectedTemplate] = useState<PromptTemplate | UserPromptTemplate | null>(null);
   const [variableForm] = Form.useForm();
-  const { sendMessage } = useSSEContext();
+  const { sendQuery } = useSSEContext();
   const { currentChatId, createNewChat, addMessage } = useChatStore();
   const { selectedAccountIds } = useAccountStore();
   const { selectedAccountIds: selectedGCPAccountIds } = useGCPAccountStore();
@@ -55,12 +55,13 @@ export const useTemplateExecution = () => {
         }
       });
 
-      // 发送渲染后的 Prompt 到 SSE
-      sendMessage({
-        content: result.rendered_prompt,
-        account_ids: selectedAccountIds,
-        gcp_account_ids: selectedGCPAccountIds
-      });
+      // 发送渲染后的 Prompt 到 SSE (改用 sendQuery)
+      sendQuery(
+        result.rendered_prompt,
+        selectedAccountIds,
+        selectedGCPAccountIds,
+        chatId
+      );
 
       message.success('✅ 模板已发送');
       logger.debug(`✅ 模板执行并发送成功 - Template: ${templateId}, Prompt: ${result.rendered_prompt}`);

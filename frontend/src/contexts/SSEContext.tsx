@@ -59,19 +59,19 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
   // ✅ V2 架构：存储每个查询的 AbortController，用于取消查询
   const queryAbortControllers = useRef<Map<string, AbortController>>(new Map());
 
-  // ✅ 用于发送确认响应等消息（通过 HTTP POST）
-  // ✅ 统一使用 apiClient，自动处理 Token 刷新和 401 错误
+  // ⚠️ 已废弃：后端已移除 /api/sse/message 端点
+  // 如需发送新查询，请使用 sendQuery
   const sendMessage = async (message: string | object) => {
+    logger.warn('⚠️ [SSE] sendMessage 已废弃，后端不再支持此端点:', message);
+    /*
     try {
       const messageStr = typeof message === 'string' ? message : JSON.stringify(message);
-
-      // ✅ 使用 apiClient.post，自动处理 Token 刷新和 401 错误
       await apiClient.post('/sse/message', messageStr);
       logger.debug('✅ [SSE] 消息已通过 HTTP POST 发送成功');
     } catch (error) {
       logger.error('❌ [SSE] 发送消息失败:', error);
-      // ✅ apiClient 已经处理了 401 错误和 Token 刷新
     }
+    */
   };
 
   const sendQuery = (content: string, accountIds?: string[], gcpAccountIds?: string[], sessionId?: string): string => {
