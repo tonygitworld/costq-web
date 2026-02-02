@@ -200,6 +200,7 @@
   box-shadow: none !important;
   background-color: transparent;
   transition: all 0.2s ease !important;
+  cursor: pointer !important; /* ✅ 关键修复：添加点击小手指针 */
 }
 
 .chat-history-item:hover {
