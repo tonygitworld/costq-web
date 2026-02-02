@@ -314,7 +314,7 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
       <div className="settings-menu-divider" />
 
       {/* 运营后台菜单 - 仅超级管理员 */}
-      {true && (
+      {isSuperAdmin() && (
         <div className="settings-menu-group">
           <div className="settings-menu-group-title">{t('chat:sidebar.opsBackend')}</div>
           <div className="settings-menu-items">
