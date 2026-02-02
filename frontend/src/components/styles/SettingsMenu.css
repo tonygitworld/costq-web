@@ -5,12 +5,13 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 12px 8px;
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 12px 12px 20px 12px; /* 减小顶部 padding，增加底部 padding */
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.01));
 }
 
 :global(.dark) .settings-menu-container {
-  border-top-color: rgba(255, 255, 255, 0.1);
+  border-top-color: rgba(255, 255, 255, 0.05);
 }
 
 /* ===== 触发按钮 ===== */
@@ -19,42 +20,55 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 12px;
-  border-radius: 8px;
+  padding: 10px 16px; /* 增加点击区域 */
+  border-radius: 12px; /* 更现代的圆角 */
   border: none;
-  background-color: transparent;
-  color: rgb(68, 71, 70);
+  background-color: rgba(0, 0, 0, 0.02); /* 默认带一点极浅的底色 */
+  color: #444746;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   outline: none;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: left;
   flex: 1;
+  position: relative;
+  overflow: hidden;
 }
 
 .settings-menu-trigger:hover {
-  background-color: rgba(0, 0, 0, 0.04);
-  color: rgb(26, 26, 26);
+  background-color: rgba(0, 0, 0, 0.06);
+  color: #1a1a1a;
+  transform: translateY(-1px); /* 悬停轻微浮起 */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .settings-menu-trigger:active {
-  background-color: rgba(0, 0, 0, 0.08);
+  transform: scale(0.97); /* 点击时的物理按压感 */
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 :global(.dark) .settings-menu-trigger {
+  background-color: rgba(255, 255, 255, 0.03);
   color: rgba(255, 255, 255, 0.85);
 }
 
 :global(.dark) .settings-menu-trigger:hover {
   background-color: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .settings-menu-trigger-icon {
   flex-shrink: 0;
-  font-size: 16px;
+  font-size: 18px; /* 稍微放大图标 */
   color: inherit;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.settings-menu-trigger:hover .settings-menu-trigger-icon {
+  transform: rotate(45deg); /* 悬停时齿轮旋转 */
+  color: #5568d3;
 }
 
 /* ===== 下拉菜单容器 ===== */

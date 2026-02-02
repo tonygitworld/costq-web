@@ -5,7 +5,7 @@
 
 .user-message-container {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-end; /* 恢复靠右 */
   width: 100%;
   margin-bottom: var(--message-spacing);
   padding-right: var(--spacing-sm);
@@ -14,7 +14,7 @@
 .user-message-wrapper {
   display: flex;
   align-items: flex-start;
-  max-width: 60%;  /* 保持原有的60%宽度 */
+  max-width: 85%;  /* 增加比例，使其更好地适应窗口 */
   flex-direction: row-reverse;
 }
 
@@ -74,18 +74,18 @@
 
 .ai-message-container {
   display: flex;
-  justify-content: flex-start;
+  justify-content: flex-start; /* 恢复靠左 */
   width: 100%;
   margin-bottom: var(--message-spacing);
-  padding-left: 28px;   /* Compact密度：32px → 28px */
-  padding-right: 58px;  /* Compact密度：65px → 58px */
+  padding-left: 28px;
+  padding-right: 58px;
 }
 
 .ai-message-wrapper {
   display: flex;
   align-items: flex-start;
   width: 100%;
-  /* 移除max-width限制，让内容自然填充 */
+  /* 移除固定宽度限制，自然填充窗口 */
 }
 
 .ai-avatar {

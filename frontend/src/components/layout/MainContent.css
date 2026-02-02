@@ -6,7 +6,7 @@
 .main-content-container {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 52px); /* 减去 Header 高度 */
+  height: 100vh; /* 移除 Header 高度减法，使用全屏 */
   padding: 0; /* ❌ 移除内边距，实现全屏沉浸感 */
   background-color: white; /* ✅ 统一背景色为白色，去除灰底 */
 }
@@ -34,7 +34,7 @@
 .main-content-input-area {
   width: 100%;
   max-width: 100%; /* 允许全宽，但通常 Input 组件自身有 max-width 控制 */
-  padding: 0 24px 24px 24px; /* ✅ 增加底部 padding，让输入框不贴底 */
+  padding: 0 24px 8px 24px; /* ✅ 减小底部 padding，使输入框贴近底端 */
   background-color: white; /* 确保背景覆盖 */
 }
 

@@ -13,6 +13,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  padding-top: 48px; /* 增加顶部内边距，从 24px 增加到 48px，使对话区域进一步下移 */
   /* ❌ 移除 scroll-behavior: auto/smooth，完全由 JS 控制 */
   /* scroll-behavior: auto; */
 

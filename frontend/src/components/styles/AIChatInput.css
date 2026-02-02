@@ -6,7 +6,7 @@
   background-color: #ffffff;
   border-radius: 20px;
   width: 100%;
-  max-width: 100%; /* 铺满父容器，不再限制 768px */
+  max-width: 100%; /* 恢复为铺满容器，适应窗口宽度 */
   margin: 0 auto;
   padding: 14px;
   box-sizing: border-box;

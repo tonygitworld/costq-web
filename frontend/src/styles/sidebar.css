@@ -265,7 +265,7 @@
 .sidebar-menu-wrapper {
   flex: 0 0 auto;
   background-color: transparent !important;
-  padding: 8px 6px 16px 6px;
+  padding: 8px 6px 4px 6px; /* 减小底部内边距，使其移动到最底端 */
 }
 
 

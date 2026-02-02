@@ -29,7 +29,13 @@ export const UserProfile: React.FC = () => {
         {/* 返回按钮 */}
         <Button
           icon={<ArrowLeftOutlined />}
-          onClick={() => navigate(-1)}
+          onClick={() => {
+            if (window.history.length > 1) {
+              navigate(-1);
+            } else {
+              navigate('/');
+            }
+          }}
           type="text"
         >
           {t('common:button.back')}

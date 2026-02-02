@@ -255,7 +255,7 @@ export const MessageInput: FC = () => {
       debugMode={process.env.NODE_ENV === 'development'}
       className="message-input-container"
       style={{
-        padding: '0 16px 24px 16px', // 给底部留一些空间
+        padding: '0 16px 8px 16px', // 减小底部间距，使对话框更靠底
         backgroundColor: 'transparent'
       }}
     >
