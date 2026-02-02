@@ -350,6 +350,19 @@ export const MessageInput: FC = () => {
           </div>
         </div>
       </div>
+
+      {/* AI 生成内容提示 */}
+      <div style={{
+        marginTop: '12px',
+        fontSize: '12px',
+        color: 'rgba(0, 0, 0, 0.45)',
+        textAlign: 'center',
+        width: '100%',
+        pointerEvents: 'none', // 防止干扰点击
+        userSelect: 'none'      // 防止误选中
+      }}>
+        AI 生成内容仅供参考，请核实关键成本信息。
+      </div>
     </MessageInputContainer>
   );
 };
