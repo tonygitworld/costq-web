@@ -276,13 +276,7 @@ export const AlertManagement: React.FC = () => {
       <Space style={{ width: '100%' }}>
         <Button
           icon={<ArrowLeftOutlined />}
-          onClick={() => {
-            if (window.history.length > 1) {
-              navigate(-1);
-            } else {
-              navigate('/');
-            }
-          }}
+          onClick={() => navigate('/')}
           type="text"
         >
           {t('common:button.back')}
