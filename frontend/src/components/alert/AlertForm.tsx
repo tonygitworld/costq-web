@@ -10,9 +10,9 @@ import {
   Button,
   Space,
   Typography,
-  message,
   Alert,
-  Select
+  Select,
+  App
 } from 'antd';
 import { ArrowLeftOutlined, SaveOutlined, SendOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -28,6 +28,7 @@ const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 
 export const AlertForm: React.FC = () => {
+  const { message } = App.useApp(); // ✅ 修复Ant Design警告：使用App上下文
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [form] = Form.useForm();

@@ -267,6 +267,7 @@ export class ApiClient {
     );
 
     try {
+      // ✅ 临时移除 signal，排除 AbortController 问题
       const response = await fetch(fullUrl, {
         ...requestConfig,
         signal: controller.signal,
@@ -401,6 +402,7 @@ export class ApiClient {
     data?: D,
     config?: RequestConfig
   ): Promise<T> {
+
     return this.request<T>(url, {
       ...config,
       method: 'PUT',

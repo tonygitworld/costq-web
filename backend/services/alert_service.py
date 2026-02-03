@@ -26,10 +26,10 @@ from backend.services.audit_logger import get_audit_logger
 logger = logging.getLogger(__name__)
 
 # ============ 常量配置 ============
+
 DEFAULT_CHECK_FREQUENCY = "daily"
 MAX_ALERTS_PER_USER = 100
 MAX_ALERTS_PER_ORG = 500
-
 CHECK_FREQUENCIES = {"hourly": "每小时", "daily": "每天", "weekly": "每周", "monthly": "每月"}
 
 ERROR_MESSAGES = {
@@ -199,7 +199,6 @@ class AlertService:
                 }
             finally:
                 db.close()
-
         except ValueError as e:
             logger.warning("创建告警失败（参数错误）: {str(e)}")
             return {"success": False, "error": str(e)}
@@ -224,6 +223,7 @@ class AlertService:
                     .options(joinedload(MonitoringConfig.user), joinedload(MonitoringConfig.organization))
                     .filter(MonitoringConfig.org_id == params.org_id)
                 )
+
                 query = query.filter(MonitoringConfig.user_id == params.user_id)
 
                 if params.status_filter == "active":
@@ -248,15 +248,15 @@ class AlertService:
     @staticmethod
     async def update_alert(params: "AlertService.UpdateAlertParams") -> dict[str, Any]:
         try:
-            logger.info(": alert_id=%s, user_id=%s", params.alert_id, params.user_id)
+            logger.info("update_alert: alert_id=%s, org_id=%s", params.alert_id, params.org_id)
             db = next(get_db())
             try:
+                # 权限检查已在API层完成，这里只需通过ID和组织ID查询
                 alert = (
                     db.query(MonitoringConfig)
                     .filter(
                         MonitoringConfig.id == params.alert_id,
                         MonitoringConfig.org_id == params.org_id,
-                        MonitoringConfig.user_id == params.user_id,
                     )
                     .first()
                 )
@@ -449,8 +449,8 @@ class AlertService:
                 runtime_arn=settings.AGENTCORE_RUNTIME_ARN,
                 region=settings.AGENTCORE_REGION,
             )
-            parser = AgentCoreResponseParser(session_id=None)
 
+            parser = AgentCoreResponseParser(session_id=None)
             assistant_response: list[str] = []
             event_count = 0
             timeout_seconds = 600
@@ -535,6 +535,7 @@ class AlertService:
 
         account_storage = AccountStoragePostgreSQL()
         account_dict = account_storage.get_account(account_id=account_id, org_id=org_id)
+
         if not account_dict:
             raise ValueError(f"账号不存在或无权限访问: {account_id}")
 
@@ -608,7 +609,6 @@ class AlertService:
             log.error_message = result.get("error")
             log.execution_duration_ms = execution_time
             log.completed_at = datetime.now(UTC)
-
             db.commit()
         finally:
             db.close()
@@ -623,7 +623,6 @@ class AlertService:
         is_test: bool,
     ) -> str:
         account_type = account_info.get("account_type", "aws")
-
         max_subject_length = 78
         email_subject = f"[测试] {alert_name}" if is_test else alert_name
         if len(email_subject) > max_subject_length:
@@ -641,6 +640,7 @@ class AlertService:
 
 告警ID: {alert_id}
 组织ID: {org_id}
+
 {"模式: 测试模式" if is_test else "模式: 正常执行"}
 
 ⚠️ 重要：发送邮件时，请使用上述"告警名称"作为邮件主题（subject）。
@@ -658,6 +658,7 @@ class AlertService:
 
 告警ID: {alert_id}
 组织ID: {org_id}
+
 {"模式: 测试模式" if is_test else "模式: 正常执行"}
 
 ⚠️ 重要：发送邮件时，请使用上述"告警名称"作为邮件主题（subject）。
@@ -714,7 +715,6 @@ class AlertService:
 
         if _depth > 100:
             return "<RecursionLimitExceeded>"
-
         if obj is None:
             return None
         if isinstance(obj, UUID):

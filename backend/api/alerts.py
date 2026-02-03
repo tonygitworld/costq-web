@@ -20,6 +20,7 @@ from ..database import get_db
 import logging
 
 logger = logging.getLogger(__name__)
+
 from ..models.monitoring import MonitoringConfig  # 使用全局的数据库模型
 from ..services.alert_service import AlertService
 from ..utils.auth import get_current_admin_user, get_current_user
@@ -37,7 +38,6 @@ class SendTestEmailRequest(BaseModel):
 
 
 # ========== 辅助函数 ==========
-
 
 
 async def check_alert_permission(
@@ -303,8 +303,9 @@ async def update_alert_endpoint(
     # 权限检查
     await check_alert_permission(alert_id, current_user, db)
 
-    # 设置告警 ID 和组织 ID
+    # 设置告警 ID、用户 ID 和组织 ID
     params.alert_id = alert_id
+    params.user_id = current_user["id"]
     params.org_id = current_user["org_id"]
 
     try:
@@ -390,6 +391,7 @@ async def delete_alert_endpoint(
             )
 
         logger.info("告警删除成功 - ID: %s", alert_id)
+
         return result
 
     except HTTPException:
@@ -555,7 +557,9 @@ async def send_test_email_endpoint(
     """执行告警检查（通过 AgentCore Runtime）
 
     **权限**: 所有登录用户
+
     **预计执行时间**: 30-90 秒
+
     **说明**: 执行完成后请检查您的邮箱
 
     **新特性**:
@@ -641,9 +645,7 @@ async def get_scheduler_status(current_user: dict = Depends(get_current_admin_us
         from backend.services.alert_scheduler import alert_scheduler
 
         status = alert_scheduler.get_status()
-
         logger.info("管理员查询调度器状态: %s", current_user["username"])
-
         return {"success": True, "scheduler": status}
     except Exception as e:
         logger.error("获取调度器状态失败: %s", e, exc_info=True)
@@ -680,6 +682,7 @@ async def trigger_manual_scan(current_user: dict = Depends(get_current_admin_use
         )
 
         return {"success": True, "message": "扫描已完成", "result": result}
+
     except Exception as e:
         logger.error("手动扫描失败: %s", e, exc_info=True)
         raise HTTPException(
