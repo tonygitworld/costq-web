@@ -623,16 +623,23 @@ class AgentCoreResponseParser:
                 # - "tool_use": 工具调用后继续（不应该发送 complete）
                 # - "max_tokens": 超出 token 限制（应该发送 complete）
                 # - "stop_sequence": 遇到停止序列（应该发送 complete）
+
+                # ✅ 修复：不在这里发送 complete 事件，让外层的 agent_provider.py 统一发送
+                # 这样可以确保 complete 事件包含完整的 token_usage 数据
+                # if stop_reason in ["end_turn", "max_tokens", "stop_sequence"]:
+                #     messages.append(
+                #         {
+                #             "type": "complete",
+                #             "stop_reason": stop_reason,
+                #             "timestamp": timestamp,
+                #             "success": True,
+                #         }
+                #     )
+                #     logger.info("complete - stopReason: %s", stop_reason)
+
+                # ✅ 只记录日志，complete 事件由外层发送
                 if stop_reason in ["end_turn", "max_tokens", "stop_sequence"]:
-                    messages.append(
-                        {
-                            "type": "complete",
-                            "stop_reason": stop_reason,
-                            "timestamp": timestamp,
-                            "success": True,
-                        }
-                    )
-                    logger.info("complete - stopReason: %s", stop_reason)
+                    logger.info("messageStop - stopReason: %s (complete 事件将由外层发送)", stop_reason)
                 elif stop_reason == "tool_use":
                     logger.info(
                         f"ℹ️  工具调用完成，等待 Agent 继续生成响应 - stopReason: {stop_reason}"
