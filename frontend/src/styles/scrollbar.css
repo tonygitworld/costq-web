@@ -1,0 +1,74 @@
+/**
+ * 全局滚动条样式
+ * 适用于 Webkit 内核浏览器（Chrome、Safari、Edge 等）
+ */
+
+/* 滚动条整体样式 */
+.scrollable-container::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* 滚动条轨道 */
+.scrollable-container::-webkit-scrollbar-track,
+*::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+/* 滚动条滑块 */
+.scrollable-container::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+/* 滚动条滑块悬停状态 */
+.scrollable-container::-webkit-scrollbar-thumb:hover,
+*::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 滚动条滑块激活状态 */
+.scrollable-container::-webkit-scrollbar-thumb:active,
+*::-webkit-scrollbar-thumb:active {
+  background: #787878;
+}
+
+/* 表格内部滚动条样式（更细一些） */
+.ant-table-body::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.ant-table-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ant-table-body::-webkit-scrollbar-thumb {
+  background: #d9d9d9;
+  border-radius: 3px;
+}
+
+.ant-table-body::-webkit-scrollbar-thumb:hover {
+  background: #bfbfbf;
+}
+
+/* Firefox 滚动条样式 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+.ant-table-body {
+  scrollbar-width: thin;
+  scrollbar-color: #d9d9d9 transparent;
+}
+
+/* 移动端滚动优化 */
+.scrollable-container,
+.ant-table-body {
+  -webkit-overflow-scrolling: touch;
+}

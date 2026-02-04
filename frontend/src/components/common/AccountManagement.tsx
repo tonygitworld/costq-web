@@ -273,7 +273,13 @@ export const AccountManagement: FC = () => {
               total: accounts.length,
               showTotal: (total) => `共 ${total} 个账号`,
             }}
-            scroll={{ x: 1200 }}
+            scroll={{
+              x: 1200,
+              y: 'calc(100vh - 450px)'
+            }}
+            sticky={{
+              offsetHeader: 0
+            }}
           />
         )}
       </Card>
