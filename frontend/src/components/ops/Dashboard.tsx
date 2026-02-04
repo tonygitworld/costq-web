@@ -112,8 +112,8 @@ export const OpsDashboard: React.FC = () => {
   return (
     <div style={{
       padding: 24,
-      minHeight: '100vh',
-      overflowY: 'auto',
+      height: '100vh',
+      overflow: 'auto',
       backgroundColor: '#f0f2f5'
     }}>
       {/* 标题栏 */}
