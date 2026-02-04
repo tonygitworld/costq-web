@@ -156,7 +156,12 @@ export const TenantList: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: 24 }}>
+    <div style={{
+      padding: 24,
+      height: '100vh',
+      overflow: 'auto',
+      backgroundColor: '#f0f2f5'
+    }}>
       {contextHolder}
       <Title level={4}>{t('tenant.list.title')}</Title>
 
@@ -186,6 +191,14 @@ export const TenantList: React.FC = () => {
         dataSource={data?.items}
         rowKey="id"
         loading={isLoading}
+        scroll={{
+          x: 1200,
+          y: 'calc(100vh - 250px)',
+          scrollToFirstRowOnChange: true
+        }}
+        sticky={{
+          offsetHeader: 0
+        }}
         pagination={{
           current: params.page,
           pageSize: params.page_size,

@@ -218,7 +218,12 @@ export const AuditLogs: React.FC = () => {
 
 
   return (
-    <div style={{ padding: 24 }}>
+    <div style={{
+      padding: 24,
+      height: '100vh',
+      overflow: 'auto',
+      backgroundColor: '#f0f2f5'
+    }}>
       <Title level={4}>{t('audit.title')}</Title>
 
       {/* 筛选栏 */}
@@ -301,7 +306,14 @@ export const AuditLogs: React.FC = () => {
           expandedRowRender,
           expandRowByClick: true,
         }}
-        scroll={{ y: 'calc(100vh - 320px)' }}
+        scroll={{
+          x: 1400,
+          y: 'calc(100vh - 350px)',
+          scrollToFirstRowOnChange: true
+        }}
+        sticky={{
+          offsetHeader: 0
+        }}
         pagination={{
           current: params.page,
           pageSize: params.page_size,

@@ -52,21 +52,21 @@ class AgentCoreClient:
     def stop_runtime_session(self, runtime_session_id: str, qualifier: str = "DEFAULT") -> bool:
         """
         停止正在运行的 Runtime Session
-        
+
         使用 AWS Bedrock AgentCore 的 StopRuntimeSession API 来立即终止活跃的 session
         并停止任何正在进行的流式响应。
-        
+
         参考文档：
         - https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-stop-session.html
         - https://docs.aws.amazon.com/bedrock-agentcore/latest/APIReference/API_StopRuntimeSession.html
-        
+
         Args:
             runtime_session_id: Runtime Session ID（就是我们的 session_id）
             qualifier: 限定符（可选，默认 'DEFAULT'）
-        
+
         Returns:
             bool: 是否成功停止（如果 session 不存在或已终止，返回 False）
-        
+
         Raises:
             Exception: 如果停止失败（除了 ResourceNotFoundException）
         """
@@ -170,7 +170,7 @@ class AgentCoreClient:
             chunk_count = 0
 
             try:
-                logger.info("🔵 [线程] 线程函数开始执行")
+                logger.debug("🔵 [线程] 线程函数开始执行")
                 # 构建 payload
                 payload = {
                     "prompt": prompt,
@@ -312,7 +312,7 @@ class AgentCoreClient:
                             chunk_count += 1
                             bytes_read += len(chunk)
                             buffer += chunk
-                            
+
                             # ✅ 诊断：记录第一个 chunk 的内容（用于调试空响应问题）
                             if not first_chunk_received and chunk:
                                 first_chunk_received = True
@@ -483,7 +483,7 @@ class AgentCoreClient:
                                 "diagnosis": "可能原因：1) Runtime 返回空响应 2) 响应格式不正确 3) 响应被截断 4) iter_chunks() 提前结束"
                             }
                         )
-                    
+
                     logger.info(
                         "✅ [Agent Runtime调用] Runtime 调用完成",
                         extra={
@@ -556,13 +556,13 @@ class AgentCoreClient:
         # 启动线程
         thread = threading.Thread(target=_invoke_in_thread, daemon=True)
         thread.start()
-        logger.info("🚀 [invoke_streaming] 后台线程已启动")
+        logger.debug("🚀 [invoke_streaming] 后台线程已启动")
 
         # 异步消费队列
         queue_start_time = time.time()
         first_event_time = None
         event_count = 0
-        logger.info(
+        logger.debug(
             f"⏳ [invoke_streaming] 开始等待事件（队列启动时间: {queue_start_time:.3f}）",
             extra={
                 "queue_start_time": queue_start_time,
@@ -570,7 +570,7 @@ class AgentCoreClient:
         )
         while True:
             wait_start = time.time()
-            logger.info(
+            logger.debug(
                 f"⏳ [invoke_streaming] 等待事件（已等待 {wait_start - queue_start_time:.2f} 秒，事件数: {event_count}）",
                 extra={
                     "queue_wait_duration": f"{wait_start - queue_start_time:.2f}秒",
@@ -579,7 +579,7 @@ class AgentCoreClient:
             )
             event = await event_queue.get()
             wait_duration = time.time() - wait_start
-            logger.info(
+            logger.debug(
                 f"📥 [invoke_streaming] 从队列获取到事件（等待了 {wait_duration:.3f} 秒）",
                 extra={
                     "wait_duration": f"{wait_duration:.3f}秒",
@@ -588,7 +588,7 @@ class AgentCoreClient:
                     "event_count": event_count,
                 }
             )
-            
+
             if first_event_time is None:
                 first_event_time = time.time()
                 queue_wait_duration = first_event_time - queue_start_time
