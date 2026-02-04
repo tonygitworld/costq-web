@@ -85,7 +85,12 @@ export const TenantDetail: React.FC = () => {
   }
 
   return (
-    <div style={{ padding: 24 }}>
+    <div style={{
+      padding: 24,
+      height: '100vh',
+      overflow: 'auto',
+      backgroundColor: '#f0f2f5'
+    }}>
       {contextHolder}
       {/* 返回按钮 */}
       <Button

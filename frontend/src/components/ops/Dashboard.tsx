@@ -110,7 +110,12 @@ export const OpsDashboard: React.FC = () => {
     : [];
 
   return (
-    <div style={{ padding: 24 }}>
+    <div style={{
+      padding: 24,
+      height: '100vh',
+      overflow: 'auto',
+      backgroundColor: '#f0f2f5'
+    }}>
       {/* 标题栏 */}
       <div
         style={{
@@ -208,7 +213,13 @@ export const OpsDashboard: React.FC = () => {
             dataSource={trendTableData}
             pagination={false}
             size="small"
-            scroll={{ y: 240 }}
+            scroll={{
+              y: 'calc(40vh - 100px)',
+              scrollToFirstRowOnChange: true
+            }}
+            sticky={{
+              offsetHeader: 0
+            }}
           />
         </Spin>
       </Card>

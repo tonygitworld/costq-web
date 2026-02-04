@@ -92,6 +92,14 @@ export const TenantUserList: React.FC<TenantUserListProps> = ({ tenantId }) => {
         rowKey="id"
         loading={isLoading}
         size="small"
+        scroll={{
+          x: 1000,
+          y: 'calc(50vh - 150px)',
+          scrollToFirstRowOnChange: true
+        }}
+        sticky={{
+          offsetHeader: 0
+        }}
         pagination={{
           current: params.page,
           pageSize: params.page_size,
