@@ -159,7 +159,7 @@ export const TenantList: React.FC = () => {
     <div style={{
       padding: 24,
       height: '100vh',
-      overflow: 'auto',
+      overflowY: 'auto',
       backgroundColor: '#f0f2f5'
     }}>
       {contextHolder}
