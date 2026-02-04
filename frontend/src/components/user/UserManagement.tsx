@@ -234,7 +234,12 @@ export const UserManagement: React.FC = () => {
   );
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div style={{
+      padding: '24px',
+      height: '100vh',
+      overflow: 'auto',
+      backgroundColor: '#f0f2f5'
+    }}>
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
         {/* 返回按钮 */}
         <Button
@@ -285,7 +290,13 @@ export const UserManagement: React.FC = () => {
               total: filteredUsers.length,
               showTotal: (total) => `共 ${total} 条`,
             }}
-            scroll={{ x: 1200 }}
+            scroll={{
+              x: 1200,
+              y: 'calc(100vh - 400px)'
+            }}
+            sticky={{
+              offsetHeader: 0
+            }}
           />
         </Card>
       </Space>

@@ -335,6 +335,15 @@ export class MessageHandler {
     const messageId = this.getCurrentMessageId();
 
     logger.debug('✅ [messageHandler.handleCompletion] 收到 complete 事件, success:', success, 'error:', error);
+    logger.debug('🔍 [handleCompletion] complete 事件完整内容:', message);
+
+    // ✅ 检查 complete 事件中是否包含 token_usage
+    const tokenUsageFromComplete = (message as any).token_usage;
+    if (tokenUsageFromComplete) {
+      logger.debug('📊 [handleCompletion] complete 事件包含 token_usage:', tokenUsageFromComplete);
+    } else {
+      logger.warn('⚠️ [handleCompletion] complete 事件缺少 token_usage 字段');
+    }
 
     if (messageId) {
       // 更新消息状态
@@ -346,7 +355,8 @@ export class MessageHandler {
           // 保持原有内容不变，错误信息通过 Alert 组件显示
           const updatedContent = currentMessage.content;
 
-          this.chatStore.updateMessage(currentChatId, messageId, {
+          // ✅ 构建更新对象
+          const updateData: any = {
             content: updatedContent,
             meta: {
               ...currentMessage.meta,
@@ -364,7 +374,22 @@ export class MessageHandler {
             showStatus: false,
             statusType: undefined,
             statusMessage: undefined
-          });
+          };
+
+          // ✅ 如果 complete 事件包含 token_usage，添加到消息中
+          if (tokenUsageFromComplete) {
+            updateData.tokenUsage = {
+              input_tokens: tokenUsageFromComplete.input_tokens || 0,
+              output_tokens: tokenUsageFromComplete.output_tokens || 0,
+              cache_read_tokens: tokenUsageFromComplete.cache_read_tokens || 0,
+              cache_write_tokens: tokenUsageFromComplete.cache_write_tokens || 0,
+              input_cache_hit_rate: tokenUsageFromComplete.input_cache_hit_rate || 0,
+              output_cache_hit_rate: tokenUsageFromComplete.output_cache_hit_rate || 0
+            };
+            logger.debug('✅ [handleCompletion] Token 统计已添加到消息');
+          }
+
+          this.chatStore.updateMessage(currentChatId, messageId, updateData);
         }
       }
     }

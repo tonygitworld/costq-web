@@ -179,8 +179,18 @@ export const CloudAccountManagement: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: '24px', height: '100%', overflow: 'auto' }}>
-      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+    <div style={{
+      padding: '24px',
+      minHeight: '100vh',
+      maxHeight: '100vh',
+      overflow: 'auto',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
+      <Space direction="vertical" size="large" style={{
+        width: '100%',
+        flex: 1
+      }}>
         {/* 返回按钮 */}
         <Button
           icon={<ArrowLeftOutlined />}
@@ -197,7 +207,12 @@ export const CloudAccountManagement: React.FC = () => {
         <Row gutter={24}>
           {/* 左侧：云厂商选择 */}
           <Col xs={24} sm={24} md={8} lg={6} xl={6}>
-            <div style={{ position: 'sticky', top: 24 }}>
+            <div style={{
+              position: 'sticky',
+              top: 24,
+              maxHeight: 'calc(100vh - 200px)',
+              overflow: 'auto'
+            }}>
               <Title level={5} style={{ marginBottom: 16 }}>{t('management.selectProvider')}</Title>
               {providers.map(provider => renderProviderCard(provider))}
             </div>
@@ -205,7 +220,12 @@ export const CloudAccountManagement: React.FC = () => {
 
           {/* 右侧：账号列表 */}
           <Col xs={24} sm={24} md={16} lg={18} xl={18}>
-            {renderContent()}
+            <div style={{
+              maxHeight: 'calc(100vh - 200px)',
+              overflow: 'auto'
+            }}>
+              {renderContent()}
+            </div>
           </Col>
         </Row>
       </Space>

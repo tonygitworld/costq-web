@@ -150,6 +150,43 @@
 }
 
 
+/* ===== 4.5 告警管理按钮 ===== */
+
+.sidebar-alert-wrapper {
+  padding: 0 12px 20px 12px;
+  flex-shrink: 0;
+}
+
+.sidebar-alert-button {
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 16px !important;
+  border-radius: 100px !important;
+  border: 0.666667px solid rgba(0, 0, 0, 0.08) !important;
+  background-color: #ffffff !important;
+  color: rgb(68, 71, 70) !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 25px !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+  cursor: pointer !important;
+  transition: box-shadow 0.3s ease !important;
+}
+
+.sidebar-alert-button:hover {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.08) !important;
+  transform: none !important;
+  background-color: #f8f9fa !important;
+}
+
+.sidebar-alert-floating {
+  top: 100px !important;
+}
+
+
 /* ===== 5. 分隔线 ===== */
 
 .sidebar-divider {

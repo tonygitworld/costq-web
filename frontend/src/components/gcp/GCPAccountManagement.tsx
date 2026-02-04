@@ -314,7 +314,13 @@ export const GCPAccountManagement: FC = () => {
               total: accounts.length,
               showTotal: (total) => t('common:pagination.total', { total }),
             }}
-            scroll={{ x: 1400 }}
+            scroll={{
+              x: 1400,
+              y: 'calc(100vh - 450px)'
+            }}
+            sticky={{
+              offsetHeader: 0
+            }}
           />
         )}
       </Card>

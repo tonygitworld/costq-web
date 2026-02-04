@@ -7,7 +7,6 @@ import {
   CloudOutlined,
   SettingOutlined,
   TeamOutlined,
-  BellOutlined,
   ControlOutlined,
   DashboardOutlined,
   FileSearchOutlined,
@@ -284,34 +283,7 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
       {/* 分隔线 */}
       <div className="settings-menu-divider" />
 
-      {/* 通知设置分组 - 所有用户 */}
-      <div className="settings-menu-group">
-        <div className="settings-menu-group-title">{t('chat:sidebar.notificationSettings')}</div>
-        <div className="settings-menu-items">
-          {/* 告警管理 */}
-          <div
-            className="settings-menu-item"
-            onClick={() => handleNavigate('/settings/alerts')}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                handleNavigate('/settings/alerts');
-              }
-            }}
-          >
-            <div className="settings-menu-item-icon">
-              <BellOutlined />
-            </div>
-            <div className="settings-menu-item-content">
-              <span className="settings-menu-item-label">{t('chat:sidebar.alertManagement')}</span>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* 分隔线 */}
-      <div className="settings-menu-divider" />
 
       {/* 运营后台菜单 - 仅超级管理员 */}
       {isSuperAdmin() && (

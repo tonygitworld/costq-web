@@ -526,17 +526,27 @@ class AWSBedrockAgentProvider(AgentProvider):
                         # 解析SSE事件 → 消息
                         ws_messages = parser.parse_event(event)
 
-                        # 直接 yield 消息
+                        # ✅ 先捕获 token_usage 数据（在 yield 之前）
                         for ws_msg in ws_messages:
-                            yield ws_msg
-
                             if ws_msg.get("type") == "token_usage":
                                 token_usage_data = ws_msg.get("usage")
+                                logger.info(
+                                    "📊 [AgentProvider] 捕获到 token_usage 数据",
+                                    extra={
+                                        "query_id": query_id,
+                                        "input_tokens": token_usage_data.get("input_tokens", 0) if token_usage_data else 0,
+                                        "output_tokens": token_usage_data.get("output_tokens", 0) if token_usage_data else 0,
+                                    }
+                                )
 
                             if ws_msg.get("type") == "chunk":
                                 assistant_response.append(ws_msg["content"])
                             elif ws_msg.get("type") == "error":
                                 assistant_response.append(ws_msg["content"])
+
+                        # ✅ 然后 yield 消息（包括 token_usage 事件，供前端兼容处理）
+                        for ws_msg in ws_messages:
+                            yield ws_msg
                     except StopAsyncIteration:
                         iteration_duration = time.time() - iteration_start_time
                         logger.info(
@@ -600,8 +610,8 @@ class AWSBedrockAgentProvider(AgentProvider):
                         except Exception as e:
                             logger.error(": %s", e)
 
-                    # 发送成功complete事件
-                    yield {
+                    # 发送成功complete事件（包含 token_usage）
+                    complete_event = {
                         "type": "complete",
                         "success": True,
                         "query_id": query_id,
@@ -612,6 +622,20 @@ class AWSBedrockAgentProvider(AgentProvider):
                             "response_length": len(response),
                         }
                     }
+
+                    # ✅ 如果有 Token 统计数据，直接包含在 complete 事件中
+                    if token_usage_data:
+                        complete_event["token_usage"] = token_usage_data
+                        logger.info(
+                            "📊 [AgentProvider] complete 事件包含 token_usage",
+                            extra={
+                                "query_id": query_id,
+                                "input_tokens": token_usage_data.get("input_tokens", 0),
+                                "output_tokens": token_usage_data.get("output_tokens", 0),
+                            }
+                        )
+
+                    yield complete_event
 
                 # 记录查询性能
                 from ..utils.metrics import get_metrics

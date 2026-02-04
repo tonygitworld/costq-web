@@ -5,6 +5,7 @@ import { Typography, Button, Divider } from 'antd';
 import {
   PlusOutlined,
   SettingOutlined,
+  BellOutlined,
 } from '@ant-design/icons';
 import { ChatHistory } from '../sidebar/ChatHistory';
 import { SettingsMenu } from '../sidebar/SettingsMenu';
@@ -55,6 +56,10 @@ export const Sidebar: FC<SidebarProps> = ({ isCollapsed = false, onToggleCollaps
         }, 50);
       }
     }, 10);
+  };
+
+  const handleAlerts = () => {
+    navigate('/settings/alerts');
   };
 
   const handleToggleCollapse = (e?: React.MouseEvent) => {
@@ -122,6 +127,17 @@ export const Sidebar: FC<SidebarProps> = ({ isCollapsed = false, onToggleCollaps
               <path d="M8 0.599609C3.91309 0.599609 0.599609 3.91309 0.599609 8C0.599609 9.13376 0.855461 10.2098 1.3125 11.1719L1.5918 11.7588L2.76562 11.2012L2.48633 10.6143C2.11034 9.82278 1.90039 8.93675 1.90039 8C1.90039 4.63106 4.63106 1.90039 8 1.90039C11.3689 1.90039 14.0996 4.63106 14.0996 8C14.0996 11.3689 11.3689 14.0996 8 14.0996C7.31041 14.0996 6.80528 14.0514 6.35742 13.9277C5.91623 13.8059 5.49768 13.6021 4.99707 13.2529C4.26492 12.7422 3.21611 12.5616 2.35156 13.1074L2.33789 13.1162L2.32422 13.126L1.58789 13.6436L2.01953 14.9297L3.0459 14.207C3.36351 14.0065 3.83838 14.0294 4.25293 14.3184C4.84547 14.7317 5.39743 15.011 6.01172 15.1807C6.61947 15.3485 7.25549 15.4004 8 15.4004C12.0869 15.4004 15.4004 12.0869 15.4004 8C15.4004 3.91309 12.0869 0.599609 8 0.599609ZM7.34473 4.93945V7.34961H4.93945V8.65039H7.34473V11.0605H8.64551V8.65039H11.0605V7.34961H8.64551V4.93945H7.34473Z" fill="currentColor"></path>
             </svg>
           </button>
+
+          {/* 折叠状态下的悬浮按钮 - 告警管理 (显示在新建对话按钮下方) */}
+          <button
+            type="button"
+            className="sidebar-collapse-icon sidebar-collapse-floating sidebar-alert-floating"
+            onClick={handleAlerts}
+            aria-label="Alert Management"
+            style={{ top: '100px' }} // 位于新建对话按钮下方 (56px + 34px + 10px 间距)
+          >
+            <BellOutlined style={{ fontSize: '16px' }} />
+          </button>
         </>
       )}
 
@@ -143,6 +159,19 @@ export const Sidebar: FC<SidebarProps> = ({ isCollapsed = false, onToggleCollaps
               className="sidebar-new-chat-button"
             >
               {t('chat:sidebar.newChat')}
+            </Button>
+          </div>
+
+          {/* 告警管理按钮 */}
+          <div className="sidebar-alert-wrapper">
+            <Button
+              type="default"
+              icon={<BellOutlined />}
+              block
+              onClick={handleAlerts}
+              className="sidebar-alert-button"
+            >
+              {t('chat:sidebar.alertManagement')}
             </Button>
           </div>
 

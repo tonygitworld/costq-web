@@ -271,9 +271,15 @@ export const AlertManagement: React.FC = () => {
   ];
 
   return (
-    <Space direction="vertical" size="large" style={{ width: '100%', padding: '24px' }}>
-      {/* 返回按钮和标题 */}
-      <Space style={{ width: '100%' }}>
+    <div style={{
+      padding: '24px',
+      height: '100vh',
+      overflow: 'auto',
+      backgroundColor: '#f0f2f5'
+    }}>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        {/* 返回按钮和标题 */}
+        <Space style={{ width: '100%' }}>
         <Button
           icon={<ArrowLeftOutlined />}
           onClick={() => navigate('/')}
@@ -360,9 +366,16 @@ export const AlertManagement: React.FC = () => {
             total: filteredAlerts.length,
             showTotal: (total) => t('table.total', { count: total }),
           }}
-          scroll={{ x: 1000 }}
+          scroll={{
+            x: 1000,
+            y: 'calc(100vh - 400px)'
+          }}
+          sticky={{
+            offsetHeader: 0
+          }}
         />
       </Card>
-    </Space>
+      </Space>
+    </div>
   );
 };
