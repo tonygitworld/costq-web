@@ -26,7 +26,7 @@ interface ChatState {
   deleteChats: (chatIds: string[]) => Promise<void>;  // ✅ 改为异步
   clearAllChats: () => Promise<void>;  // ✅ 改为异步
   togglePinChat: (chatId: string) => void; // ✅ 新增：切换固定状态
-  renameChat: (chatId: string, newTitle: string) => void; // ✅ 新增：重命名会话
+  renameChat: (chatId: string, newTitle: string) => Promise<void>; // ✅ 异步重命名会话（支持后端同步）
 
   // 持久化
   loadFromStorage: () => Promise<void>;
@@ -324,19 +324,46 @@ export const useChatStore = create<ChatState>((set, get) => ({
     });
   },
 
-  // ✅ 实现会话重命名
-  renameChat: (chatId: string, newTitle: string) => {
+  // ✅ 实现会话重命名（支持后端同步）
+  renameChat: async (chatId: string, newTitle: string) => {
+    const originalTitle = get().chats[chatId]?.title;
+
+    // 1. 乐观更新 - 立即更新UI
     set(state => ({
       chats: {
         ...state.chats,
         [chatId]: {
           ...state.chats[chatId],
-          title: newTitle
+          title: newTitle,
+          updatedAt: Date.now()
         }
       }
     }));
-    // TODO: 调用后端 API 同步标题 (如 PUT /chats/:id)
-    logger.debug(`📝 重命名会话 ${chatId} -> ${newTitle}`);
+
+    logger.debug(`📝 重命名会话 ${chatId}: "${originalTitle}" -> "${newTitle}"`);
+
+    // 2. 调用后端 API 同步标题
+    try {
+      const { updateChatSession } = await import('../services/chatApi');
+      await updateChatSession(chatId, newTitle);
+      logger.debug(`✅ 后端同步成功: ${chatId}`);
+    } catch (error) {
+      logger.error('❌ 重命名会话失败，回滚到原标题:', error);
+
+      // 3. 失败回滚 - 恢复原标题
+      set(state => ({
+        chats: {
+          ...state.chats,
+          [chatId]: {
+            ...state.chats[chatId],
+            title: originalTitle || '新对话'
+          }
+        }
+      }));
+
+      // 重新抛出错误，让调用方处理（显示错误提示）
+      throw error;
+    }
   },
 
   loadFromStorage: async () => {

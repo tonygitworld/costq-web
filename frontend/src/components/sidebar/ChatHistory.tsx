@@ -32,14 +32,36 @@ export const ChatHistory: FC = () => {
     setEditTitle(currentTitle);
   };
 
-  // 处理重命名提交
-  const handleSubmitRename = () => {
-    if (editingChatId && editTitle.trim()) {
-      renameChat(editingChatId, editTitle.trim());
+  // 处理重命名提交（异步）
+  const handleSubmitRename = async () => {
+    const trimmedTitle = editTitle.trim();
+
+    // 空标题或未更改，取消编辑
+    if (!editingChatId || !trimmedTitle) {
       setEditingChatId(null);
-      message.success('重命名成功');
-    } else {
-      setEditingChatId(null); // 空标题取消编辑
+      setEditTitle('');
+      return;
+    }
+
+    const originalTitle = chats[editingChatId]?.title;
+
+    // 标题未改变，直接退出
+    if (trimmedTitle === originalTitle) {
+      setEditingChatId(null);
+      setEditTitle('');
+      return;
+    }
+
+    try {
+      // ✅ 调用异步 renameChat（乐观更新 + 后端同步）
+      await renameChat(editingChatId, trimmedTitle);
+      setEditingChatId(null);
+      setEditTitle('');
+      message.success(t('history.renameSuccess') || '重命名成功');
+    } catch (error) {
+      logger.error('❌ 重命名失败:', error);
+      message.error(t('history.renameFailed') || '重命名失败，请重试');
+      // 注意：标题已在 chatStore 中自动回滚
     }
   };
 
@@ -333,11 +355,20 @@ export const ChatHistory: FC = () => {
                 <div style={{ flex: 1, minWidth: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                   <div
                     className="chat-history-item-title"
+                    onDoubleClick={(e) => {
+                      e.stopPropagation();
+                      if (!isSelectionMode && editingChatId !== chat.id) {
+                        handleStartRename(chat.id, chat.title);
+                      }
+                    }}
                     onClick={e => {
                       // 如果正在编辑，阻止点击事件冒泡
                       if (editingChatId === chat.id) {
                         e.stopPropagation();
                       }
+                    }}
+                    style={{
+                      cursor: editingChatId === chat.id ? 'text' : 'pointer'
                     }}
                   >
                     {editingChatId === chat.id ? (
@@ -348,9 +379,19 @@ export const ChatHistory: FC = () => {
                         onBlur={handleSubmitRename}
                         autoFocus
                         size="small"
+                        maxLength={100}
+                        style={{
+                          fontSize: '13px',
+                          fontWeight: 500,
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          border: '2px solid #1890ff',
+                          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                        }}
                         onKeyDown={(e) => {
                           if (e.key === 'Escape') {
                             setEditingChatId(null);
+                            setEditTitle('');
                           }
                           e.stopPropagation();
                         }}
@@ -420,7 +461,7 @@ export const ChatHistory: FC = () => {
                           className: 'gemini-menu-item',
                           onClick: (e) => {
                             e.domEvent.stopPropagation();
-                            message.info('重命名功能开发中...');
+                            handleStartRename(chat.id, chat.title);
                           }
                         },
                         {

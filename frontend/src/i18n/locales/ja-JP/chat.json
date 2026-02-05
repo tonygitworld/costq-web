@@ -91,7 +91,12 @@
     "confirmDeleteSelectedDesc": "選択した{{count}}件の会話を削除してもよろしいですか？",
     "confirmClearAll": "すべてクリア",
     "confirmClearAllDesc": "すべての会話履歴をクリアしてもよろしいですか？この操作は取り消せません。",
-    "analyzing": "分析中"
+    "analyzing": "分析中",
+    "rename": "名前を変更",
+    "renameSuccess": "名前の変更が成功しました",
+    "renameFailed": "名前の変更に失敗しました。もう一度お試しください",
+    "renamePlaceholder": "新しいタイトルを入力...",
+    "doubleClickToRename": "ダブルクリックで名前を変更"
   },
   "connection": {
     "connected": "接続済み",
