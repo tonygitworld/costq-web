@@ -80,6 +80,17 @@ class Settings(BaseSettings):
         default="ap-northeast-1", description="AgentCore Runtime 所在区域"
     )
 
+    # ==================== Bedrock Prompt Management ====================
+    DIALOG_AWS_PROMPT_ARN: str = Field(
+        default="", description="AWS 对话场景的 Bedrock Prompt ARN"
+    )
+    DIALOG_GCP_PROMPT_ARN: str = Field(
+        default="", description="GCP 对话场景的 Bedrock Prompt ARN"
+    )
+    ALERT_PROMPT_ARN: str = Field(
+        default="", description="告警场景的 Bedrock Prompt ARN"
+    )
+
     # ==================== 日志配置 ====================
     LOG_LEVEL: str = Field(default="INFO", description="日志级别")
 
