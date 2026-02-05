@@ -111,12 +111,14 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
 
     // 如果 currentChatId 变化且与上次同步的不同
     if (currentChatId !== lastSyncedChatId.current) {
-      // ✅ 如果会话有消息，或者是后端会话（消息可能还在加载），更新 URL
-      if (hasMessages || isBackendSession) {
+      // ✅ 仅当处于根路径或会话路径时才同步 URL，避免干扰其他功能页面（如告警管理）
+      const isChatPath = location.pathname === '/' || location.pathname.startsWith('/c/');
+
+      if (isChatPath && (hasMessages || isBackendSession)) {
         const expectedPath = `/c/${currentChatId}`;
         // 只有当 URL 不匹配时才更新（避免与 URL → Store 的更新冲突）
         if (location.pathname !== expectedPath) {
-          logger.debug(`🔄 [ChatLayout] currentChatId 变化，同步 URL: ${expectedPath} (hasMessages: ${hasMessages}, isBackendSession: ${isBackendSession})`);
+          logger.debug(`🔄 [ChatLayout] currentChatId 变化，同步 URL: ${expectedPath}`);
           navigate(expectedPath, { replace: true });
           lastSyncedChatId.current = currentChatId;
         } else {
@@ -124,9 +126,8 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
           lastSyncedChatId.current = currentChatId;
         }
       } else {
-        // ✅ 新建但未发送消息的会话（前端临时创建），不更新 URL（保持在主页）
-        logger.debug(`ℹ️ [ChatLayout] 新建会话但无消息，不更新 URL: ${currentChatId}`);
-        lastSyncedChatId.current = currentChatId;  // 更新 ref，避免重复检查
+        // 非聊天路径或新会话，只更新同步锁
+        lastSyncedChatId.current = currentChatId;
       }
     } else if (currentChatId === sessionId) {
       // ✅ 如果 currentChatId 与 URL 中的 sessionId 匹配，更新 lastSyncedChatId

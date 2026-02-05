@@ -113,7 +113,9 @@ const AppContent: FC = () => {
         path="/settings/accounts"
         element={
           <ProtectedRoute>
-            <CloudAccountManagement />
+            <ChatLayout>
+              <CloudAccountManagement />
+            </ChatLayout>
           </ProtectedRoute>
         }
       />
@@ -123,7 +125,9 @@ const AppContent: FC = () => {
         path="/settings/profile"
         element={
           <ProtectedRoute>
-            <UserProfile />
+            <ChatLayout>
+              <UserProfile />
+            </ChatLayout>
           </ProtectedRoute>
         }
       />
@@ -133,7 +137,9 @@ const AppContent: FC = () => {
         path="/settings/password"
         element={
           <ProtectedRoute>
-            <ChangePassword />
+            <ChatLayout>
+              <ChangePassword />
+            </ChatLayout>
           </ProtectedRoute>
         }
       />
@@ -143,47 +149,57 @@ const AppContent: FC = () => {
         path="/settings/users"
         element={
           <ProtectedRoute requireAdmin>
-            <UserManagement />
+            <ChatLayout>
+              <UserManagement />
+            </ChatLayout>
           </ProtectedRoute>
         }
       />
 
       {/* 告警管理列表 */}
       <Route
-        path="/alerts"
+        path="/settings/alerts"
         element={
           <ProtectedRoute>
-            <AlertManagement />
+            <ChatLayout>
+              <AlertManagement />
+            </ChatLayout>
           </ProtectedRoute>
         }
       />
 
       {/* 创建告警 */}
       <Route
-        path="/alerts/new"
+        path="/settings/alerts/new"
         element={
           <ProtectedRoute>
-            <AlertForm />
+            <ChatLayout>
+              <AlertForm />
+            </ChatLayout>
           </ProtectedRoute>
         }
       />
 
       {/* 编辑告警 */}
       <Route
-        path="/alerts/edit/:id"
+        path="/settings/alerts/edit/:id"
         element={
           <ProtectedRoute>
-            <AlertForm />
+            <ChatLayout>
+              <AlertForm />
+            </ChatLayout>
           </ProtectedRoute>
         }
       />
 
       {/* 告警详情 */}
       <Route
-        path="/alerts/:id"
+        path="/settings/alerts/:id"
         element={
           <ProtectedRoute>
-            <AlertDetail />
+            <ChatLayout>
+              <AlertDetail />
+            </ChatLayout>
           </ProtectedRoute>
         }
       />
@@ -197,13 +213,16 @@ const AppContent: FC = () => {
           </ProtectedRoute>
         }
       >
-        <Route path="dashboard" element={<OpsDashboard />} />
-        <Route path="tenants" element={<TenantList />} />
-        <Route path="tenants/:id" element={<TenantDetail />} />
-        <Route path="audit-logs" element={<AuditLogs />} />
+        <Route path="dashboard" element={<ChatLayout><OpsDashboard /></ChatLayout>} />
+        <Route path="tenants" element={<ChatLayout><TenantList /></ChatLayout>} />
+        <Route path="tenants/:id" element={<ChatLayout><TenantDetail /></ChatLayout>} />
+        <Route path="audit-logs" element={<ChatLayout><AuditLogs /></ChatLayout>} />
         {/* 默认跳转 */}
         <Route path="" element={<Navigate to="dashboard" replace />} />
       </Route>
+
+      {/* 为了兼容旧路径，添加重定向 */}
+      <Route path="/alerts" element={<Navigate to="/settings/alerts" replace />} />
 
       {/* 404 跳转 */}
       <Route path="*" element={<Navigate to="/" replace />} />
