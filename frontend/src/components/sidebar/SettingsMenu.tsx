@@ -1,8 +1,7 @@
 import { type FC, useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { Badge, Dropdown, Modal } from 'antd';
-import type { MenuProps } from 'antd';
+import { Badge, Modal } from 'antd';
 import {
   CloudOutlined,
   SettingOutlined,
@@ -30,7 +29,7 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
   const isAdmin = useAuthStore(state => state.isAdmin);
   const isSuperAdmin = useAuthStore(state => state.isSuperAdmin);
   const logout = useAuthStore(state => state.logout);
-  const { t, language } = useI18n(['chat', 'common']);
+  const { t } = useI18n(['chat', 'common']);
 
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
