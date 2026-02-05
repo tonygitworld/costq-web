@@ -50,10 +50,6 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
     <div className="welcome-screen-container">
       {/* 图标与文字 */}
       <div className="welcome-header-row">
-        <div className="welcome-icon-pure">
-          ☁️
-        </div>
-
         <h1 className="welcome-title-serif">
           {showReadyState ? (
             <>{greeting}</>
