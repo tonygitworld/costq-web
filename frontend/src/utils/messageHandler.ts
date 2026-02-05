@@ -922,7 +922,8 @@ export class MessageHandler {
       chatId: undefined
     };
 
-    // 显示通知
+    // ⚠️ 注意：使用静态 notification API 会有警告，但在工具类中这是可接受的
+    // 如需消除警告，需要重构为通过 Context 注入 notification 实例
     notification.info({
       message: '已停止生成',
       description: reason,
@@ -976,7 +977,23 @@ export class MessageHandler {
       }
     }
 
-    // 创建新的 Assistant 消息
+    // ✅ 检查是否已存在占位消息（由 MessageInput 创建）
+    // 查找最后一个助手消息，如果是待处理状态，则复用它
+    const messages = this.chatStore.messages[currentChatId] || [];
+    const lastMessage = messages[messages.length - 1];
+
+    if (lastMessage &&
+        lastMessage.type === 'assistant' &&
+        (lastMessage.meta?.status === 'pending' || lastMessage.meta?.status === 'streaming') &&
+        lastMessage.content === '') {
+      // 复用现有的占位消息
+      this.currentMessageBuilder.messageId = lastMessage.id;
+      this.currentMessageBuilder.chatId = currentChatId;
+      logger.debug(`♻️  复用占位消息 - chatId: ${currentChatId}, messageId: ${lastMessage.id}`);
+      return;
+    }
+
+    // 创建新的 Assistant 消息（只在没有占位消息时）
     const messageId = Date.now().toString() + '_' + Math.random().toString(36).slice(2, 11);
     this.currentMessageBuilder.messageId = messageId;
     this.currentMessageBuilder.chatId = currentChatId;  // ✅ 记录消息归属的 chatId

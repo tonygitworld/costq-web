@@ -13,24 +13,29 @@
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  padding-top: 48px; /* 增加顶部内边距，从 24px 增加到 48px，使对话区域进一步下移 */
-  /* ❌ 移除 scroll-behavior: auto/smooth，完全由 JS 控制 */
-  /* scroll-behavior: auto; */
-
-  /* ✅ 性能优化：告知浏览器此元素将发生滚动变化 */
+  padding-top: 48px; /* 增加顶部内边距 */
   will-change: scroll-position;
-  /* ✅ 隔离布局计算，提升滚动性能 */
   contain: layout style paint;
-
-  /* 🔧 修复：禁用浏览器滚动锚定，防止展开详情时窗口跳动 */
   overflow-anchor: none;
-
-  /* ✅ Firefox 兼容性支持 */
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+
+  /* ✅ 新增：内容淡入动画，配合欢迎页切换 */
+  animation: fadeInContent 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* ✅ 自定义滚动条样式 (WebKit: Chrome/Edge/Safari) */
+@keyframes fadeInContent {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ✅ 自定义滚动条样式 (WebKit) */
 .message-list-container::-webkit-scrollbar {
   width: 6px;
 }
@@ -48,54 +53,37 @@
   background: rgba(0, 0, 0, 0.2);
 }
 
-/* ✅ 滚动到底部按钮样式 - 现代化悬浮设计（水平居中） */
+/* 回到底部按钮 */
 .scroll-to-bottom-btn {
-  position: absolute !important;
-  left: 50% !important;
-  bottom: 24px !important;
-  z-index: 50;
-  width: 40px !important;
-  height: 40px !important;
-  min-width: 40px !important;
-  max-width: 40px !important;
-  border-radius: 50% !important;
-  background-color: #ffffff !important;
-  border: 1px solid rgba(0, 0, 0, 0.06) !important;
-  color: #555555 !important;
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #eee;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  padding: 0 !important;
-  margin: 0 !important;
-
-  /* 初始隐藏状态 - 包含水平居中 */
   opacity: 0;
-  visibility: hidden;
-  transform: translateX(-50%) translateY(10px) scale(0.9);
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  z-index: 100;
   pointer-events: none;
+  color: #666;
 }
 
-/* 显式类名控制显示 - 保持水平居中 */
 .scroll-to-bottom-btn.visible {
   opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0) scale(1);
+  transform: translateY(0);
   pointer-events: auto;
 }
 
 .scroll-to-bottom-btn:hover {
-  background-color: #ffffff !important;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16) !important;
-  transform: translateX(-50%) translateY(-2px) !important;
-  border-color: rgba(0, 0, 0, 0.12) !important;
-  color: #000000 !important;
-}
-
-.scroll-to-bottom-btn .anticon {
-  font-size: 18px !important;
-  line-height: 1 !important;
-  display: block !important;
+  background: #f8f8f8;
+  color: #333;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }

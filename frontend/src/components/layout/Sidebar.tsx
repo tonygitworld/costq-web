@@ -34,28 +34,16 @@ export const Sidebar: FC<SidebarProps> = ({ isCollapsed = false, onToggleCollaps
   const handleNewChat = () => {
     const oldChatId = useChatStore.getState().currentChatId;
 
-    // ✅ 第一步：先导航到主页，确保 URL 立即更新（避免 URL → Store 同步逻辑切换回旧会话）
-    navigate('/', { replace: true });
+    logger.debug(`🆕 [Sidebar] 开始新对话，清除旧会话: ${oldChatId}`);
 
-    // ✅ 第二步：清除当前会话（在导航后，避免 URL 同步逻辑干扰）
+    // ✅ 第一步：清除当前会话（设置为 null 触发欢迎页面）
     useChatStore.setState({ currentChatId: null });
 
-    // ✅ 第三步：创建新对话（使用 setTimeout 确保导航和状态清除完成后再创建）
-    // ✅ 使用较长的延迟，确保 URL 更新完成，避免 URL → Store 同步逻辑干扰
-    setTimeout(() => {
-      // ✅ 再次检查 URL，确保已经是主页
-      if (location.pathname === '/') {
-        const newChatId = createNewChat();
-        logger.debug(`🆕 [Sidebar] 创建新会话: ${newChatId}，清除旧会话: ${oldChatId}，导航到主页（等待用户发送第一条消息）`);
-      } else {
-        logger.warn(`⚠️ [Sidebar] URL 还未更新到主页，延迟创建新会话: ${location.pathname}`);
-        // 如果 URL 还没更新，再等一会儿
-        setTimeout(() => {
-          const newChatId = createNewChat();
-          logger.debug(`🆕 [Sidebar] 延迟创建新会话: ${newChatId}，清除旧会话: ${oldChatId}`);
-        }, 50);
-      }
-    }, 10);
+    // ✅ 第二步：导航到主页
+    navigate('/', { replace: true });
+
+    // ✅ 不再调用 createNewChat()
+    // ✅ MessageInput 会在用户发送第一条消息时自动创建新会话
   };
 
   const handleAlerts = () => {

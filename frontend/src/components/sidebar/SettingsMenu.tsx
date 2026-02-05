@@ -131,12 +131,12 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
           {/* 个人资料 */}
           <div
             className="settings-menu-item"
-            onClick={() => handleNavigate('/user/profile')}
+            onClick={() => handleNavigate('/settings/profile')}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
-                handleNavigate('/user/profile');
+                handleNavigate('/settings/profile');
               }
             }}
           >
@@ -151,12 +151,12 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
           {/* 修改密码 */}
           <div
             className="settings-menu-item"
-            onClick={() => handleNavigate('/user/change-password')}
+            onClick={() => handleNavigate('/settings/password')}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
-                handleNavigate('/user/change-password');
+                handleNavigate('/settings/password');
               }
             }}
           >
@@ -232,12 +232,12 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
             {/* 云账号管理 */}
             <div
               className="settings-menu-item"
-              onClick={() => handleNavigate('/settings/cloud-accounts')}
+              onClick={() => handleNavigate('/settings/accounts')}
               role="button"
               tabIndex={0}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
-                  handleNavigate('/settings/cloud-accounts');
+                  handleNavigate('/settings/accounts');
                 }
               }}
             >

@@ -15,6 +15,7 @@ interface ChatState {
 
   // 加载状态
   isLoadingChats: boolean;
+  isLoadingMessages: boolean; // ✅ 新增：消息加载状态
 
   // 操作方法
   createNewChat: () => string;  // ✅ 改为同步，只创建前端临时状态
@@ -40,6 +41,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   currentChatId: null,
   messages: {},
   isLoadingChats: false,
+  isLoadingMessages: false, // ✅ 初始化
 
   createNewChat: () => {
     // ✅ 重构：只创建前端临时状态，不调用后端 API
@@ -72,28 +74,30 @@ export const useChatStore = create<ChatState>((set, get) => ({
   switchToChat: async (chatId: string) => {
     logger.debug(`🔄 切换到会话: ${chatId}`);
 
-    // ✅ 第一步：立即更新 currentChatId（立即切换，不等待）
-    set({ currentChatId: chatId });
-
     // ✅ 跳过临时会话ID的后端加载（等待后端返回真实UUID）
     const isTemporaryId = chatId.startsWith('temp_');
     if (isTemporaryId) {
       logger.debug(`⏳ 临时会话ID，等待后端返回真实UUID: ${chatId}`);
+      set({ currentChatId: chatId });
       return;
     }
 
-    // ✅ 第二步：异步加载消息（不阻塞 UI，在后台进行）
-    // 使用立即执行的异步函数，不阻塞当前函数返回
+    // ✅ 预检查：是否需要加载消息
+    const state = get();
+    const messages = state.messages[chatId];
+    const session = state.chats[chatId];
+    const shouldReload = !messages || messages.length === 0 ||
+                         (session && session.messageCount && messages.length < session.messageCount);
+
+    // ✅ 立即更新状态
+    set({
+      currentChatId: chatId,
+      isLoadingMessages: shouldReload
+    });
+
+    // ✅ 异步加载消息（不阻塞 UI，在后台进行）
     (async () => {
       try {
-        const state = get();
-        const messages = state.messages[chatId];
-
-        // 如果没有消息或消息数量与数据库不一致，重新加载
-        const session = state.chats[chatId];
-        const shouldReload = !messages || messages.length === 0 ||
-                             (session && session.messageCount && messages.length < session.messageCount);
-
         if (shouldReload) {
           logger.debug(`📡 从后端加载会话消息: ${chatId}`);
           const backendMessages = await getChatMessages(chatId, 100);
@@ -106,7 +110,8 @@ export const useChatStore = create<ChatState>((set, get) => ({
               messages: {
                 ...state.messages,
                 [chatId]: convertedMessages
-              }
+              },
+              isLoadingMessages: false // ✅ 加载完成
             }));
 
             logger.debug(`✅ 加载了 ${convertedMessages.length} 条消息`);
@@ -118,13 +123,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
           }
         } else {
           logger.debug(`ℹ️  使用缓存的消息 (${messages.length}条)`);
+          // 即使不需要加载，也要确保状态重置（虽然上面已经设为 false/shouldReload）
+          set({ isLoadingMessages: false });
         }
       } catch (error) {
         logger.error(`❌ 加载消息失败:`, error);
+        set({ isLoadingMessages: false });
       }
     })();
-
-    // ✅ 函数立即返回，不等待消息加载
   },
 
   addMessage: (chatId: string, messageData) => {

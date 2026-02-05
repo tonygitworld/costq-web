@@ -7,6 +7,8 @@ import { Sidebar } from './Sidebar';
 import { MainContent } from './MainContent';
 import { ScrollIssueReporter } from '../common/ScrollIssueReporter';
 import { useChatStore } from '../../stores/chatStore';
+import { useAccountStore } from '../../stores/accountStore';
+import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import './ChatLayout.css';
 
 import { logger } from '../../utils/logger';
@@ -31,6 +33,27 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
   const navigate = useNavigate();
   const location = useLocation();
   const { switchToChat, currentChatId, chats, messages } = useChatStore();
+
+  // ✅ 初始化：加载云账号数据（仅执行一次）
+  useEffect(() => {
+    logger.debug('🚀 [ChatLayout] 初始化：加载云账号数据');
+
+    // ✅ 使用 getState() 获取最新的函数引用，避免依赖项变化导致循环
+    const fetchAWSAccounts = useAccountStore.getState().fetchAccounts;
+    const fetchGCPAccounts = useGCPAccountStore.getState().fetchAccounts;
+
+    Promise.all([
+      fetchAWSAccounts().catch(err => {
+        logger.warn('❌ [ChatLayout] 加载 AWS 账号失败:', err);
+      }),
+      fetchGCPAccounts().catch(err => {
+        logger.warn('❌ [ChatLayout] 加载 GCP 账号失败:', err);
+      })
+    ]).then(() => {
+      logger.debug('✅ [ChatLayout] 云账号数据加载完成');
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 空依赖数组，仅在组件挂载时执行一次
 
   // ✅ 当 URL 中的 sessionId 变化时，切换到对应会话（优先级：URL → Store）
   // ✅ 立即切换，不等待消息加载

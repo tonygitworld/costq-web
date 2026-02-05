@@ -1,0 +1,74 @@
+/* LoadingScreen.css - 骨架屏加载状态 */
+
+.loading-screen-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding: 24px 32px; /* 与 MessageList 的 padding 保持一致 */
+  box-sizing: border-box;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* 通用骨架动画：扫光效果 */
+.skeleton {
+  background: #f0f0f0;
+  background-image: linear-gradient(
+    90deg,
+    #f0f0f0 0px,
+    #f8f8f8 80px,
+    #f0f0f0 160px
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite linear;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* 模拟用户消息 (右侧气泡) */
+.skeleton-user-message {
+  align-self: flex-end; /* 靠右 */
+  width: 180px;
+  height: 48px;
+  border-radius: 12px;
+  margin-bottom: 32px; /* 与下方 AI 回复的间距 */
+  border-bottom-right-radius: 2px; /* 模拟气泡尖角 */
+  background-color: #f2f2f2; /* 稍深一点，区分度 */
+}
+
+/* 模拟 AI 回复 (多行文本) */
+.skeleton-ai-response {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 800px; /* 限制最大宽度，阅读体验更好 */
+  align-self: flex-start; /* 靠左 */
+}
+
+/* 每一行文本 */
+.skeleton-text-line {
+  height: 16px;
+  border-radius: 8px;
+}
+
+/* 给不同行设置不同宽度，看起来更像真实文本 */
+.skeleton-text-line:nth-child(1) { width: 95%; }
+.skeleton-text-line:nth-child(2) { width: 88%; }
+.skeleton-text-line:nth-child(3) { width: 92%; }
+.skeleton-text-line:nth-child(4) { width: 75%; }
+.skeleton-text-line:nth-child(5) { width: 85%; }
+.skeleton-text-line:nth-child(6) { width: 60%; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
