@@ -231,6 +231,16 @@ export const MessageInput: FC = () => {
 
       const sessionIdToSend = chatId;
 
+      // 🔧 修复：立即添加用户消息到消息列表，触发自动滚动
+      addMessage(sessionIdToSend, {
+        id: `user_msg_${Date.now()}`,
+        type: 'user',
+        content: currentMessage,
+        timestamp: Date.now(),
+        meta: {}
+      });
+      logger.debug('✅ [MessageInput] 已添加用户消息到列表');
+
       // 从 accountServicePairs 中提取 AWS 和 GCP 账号 ID（使用数据库记录 ID）
       const awsAccountIds = accountServicePairs
         .filter(pair => pair.type === 'aws')
