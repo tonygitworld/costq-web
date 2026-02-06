@@ -202,25 +202,28 @@ export const MessageInput: FC = () => {
         }
       });
 
-      // ✅ 立即添加 AI 占位消息，确保 UI 显示 Loading 状态
-      // 这解决了"发送后下方不显示正在加载"的问题
-      addMessage(chatId, {
-        chatId,
-        type: 'assistant',
-        content: '', // 初始内容为空
-        statusMessage: '正在分析您的请求...', // 触发 StatusCard 显示
-        statusEstimatedSeconds: 5, // 初始预估时间
-        meta: {
-          status: 'pending', // 标记为等待中
-          isStreaming: true, // 标记为流式传输
-          streamingProgress: 0,
-          retryCount: 0,
-          maxRetries: 0,
-          canRetry: false,
-          canEdit: false,
-          canDelete: false
-        }
-      });
+      // 🔧 修复：延迟添加 AI 占位消息，确保 useLayoutEffect 先检测到用户消息并滚动
+      // 使用 setTimeout(0) 将 AI 消息添加推迟到下一个事件循环
+      setTimeout(() => {
+        // ✅ 立即添加 AI 占位消息，确保 UI 显示 Loading 状态
+        addMessage(chatId, {
+          chatId,
+          type: 'assistant',
+          content: '', // 初始内容为空
+          statusMessage: '正在分析您的请求...', // 触发 StatusCard 显示
+          statusEstimatedSeconds: 5, // 初始预估时间
+          meta: {
+            status: 'pending', // 标记为等待中
+            isStreaming: true, // 标记为流式传输
+            streamingProgress: 0,
+            retryCount: 0,
+            maxRetries: 0,
+            canRetry: false,
+            canEdit: false,
+            canDelete: false
+          }
+        });
+      }, 0);
 
       // 清空输入框
       const currentMessage = message.trim();
@@ -230,16 +233,6 @@ export const MessageInput: FC = () => {
       }
 
       const sessionIdToSend = chatId;
-
-      // 🔧 修复：立即添加用户消息到消息列表，触发自动滚动
-      addMessage(sessionIdToSend, {
-        id: `user_msg_${Date.now()}`,
-        type: 'user',
-        content: currentMessage,
-        timestamp: Date.now(),
-        meta: {}
-      });
-      logger.debug('✅ [MessageInput] 已添加用户消息到列表');
 
       // 从 accountServicePairs 中提取 AWS 和 GCP 账号 ID（使用数据库记录 ID）
       const awsAccountIds = accountServicePairs
