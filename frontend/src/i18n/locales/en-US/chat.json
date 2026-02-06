@@ -109,5 +109,11 @@
     "title": "AI Assistant Response",
     "generatedAt": "Generated at",
     "dateFormat": "MMMM D, YYYY HH:mm:ss"
+  },
+  "noAccount": {
+    "title": "Welcome to CostQ",
+    "subtitle": "Before starting, please configure your cloud accounts",
+    "description": "After configuring cloud accounts, you can use CostQ for cost analysis, optimization recommendations, and billing management",
+    "configureButton": "Configure Cloud Account"
   }
 }

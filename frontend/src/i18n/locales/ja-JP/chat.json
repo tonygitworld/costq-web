@@ -109,5 +109,11 @@
     "title": "AIアシスタントの回答",
     "generatedAt": "生成日時",
     "dateFormat": "YYYY年MM月DD日 HH:mm:ss"
+  },
+  "noAccount": {
+    "title": "CostQへようこそ",
+    "subtitle": "開始する前に、クラウドアカウントを設定してください",
+    "description": "クラウドアカウントを設定すると、CostQを使用してコスト分析、最適化の推奨事項、および請求管理を行うことができます",
+    "configureButton": "クラウドアカウントを設定"
   }
 }

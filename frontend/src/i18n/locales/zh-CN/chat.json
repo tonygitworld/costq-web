@@ -110,5 +110,11 @@
     "title": "AI助手回复",
     "generatedAt": "生成时间",
     "dateFormat": "YYYY年MM月DD日 HH:mm:ss"
+  },
+  "noAccount": {
+    "title": "欢迎使用 CostQ",
+    "subtitle": "开始之前，请先配置您的云账号",
+    "description": "配置云账号后，您可以使用 CostQ 进行成本分析、优化建议和账单管理",
+    "configureButton": "配置云账号"
   }
 }
