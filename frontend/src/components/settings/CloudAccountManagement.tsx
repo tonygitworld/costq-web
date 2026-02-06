@@ -194,14 +194,16 @@ export const CloudAccountManagement: React.FC = () => {
         flexDirection: 'column',
         gap: '24px'
       }}>
-        {/* 返回按钮 */}
-        <Button
-          icon={<ArrowLeftOutlined />}
-          onClick={() => navigate('/')}
-          type="text"
-        >
-          {t('common:button.back')}
-        </Button>
+        {/* 返回按钮 - 左上角对齐 */}
+        <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+          <Button
+            icon={<ArrowLeftOutlined />}
+            onClick={() => navigate('/')}
+            type="text"
+          >
+            {t('common:button.back')}
+          </Button>
+        </div>
 
         {/* 标题 */}
         <Title level={3}>{t('management.title')}</Title>
