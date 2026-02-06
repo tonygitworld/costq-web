@@ -27,12 +27,14 @@ export const getSystemTemplates = async (params?: {
   category?: string;
   cloud_provider?: string;
 }, config?: RequestConfig): Promise<PromptTemplate[]> => {
+  // 只包含有值的参数
+  const queryParams: Record<string, string> = {};
+  if (params?.category) queryParams.category = params.category;
+  if (params?.cloud_provider) queryParams.cloud_provider = params.cloud_provider;
+
   return apiClient.get<PromptTemplate[]>('/prompt-templates', {
     ...config,
-    params: params ? {
-      category: params.category,
-      cloud_provider: params.cloud_provider
-    } : undefined
+    params: Object.keys(queryParams).length > 0 ? queryParams : undefined
   });
 };
 
