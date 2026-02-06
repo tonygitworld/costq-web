@@ -263,6 +263,10 @@ export const MessageInput: FC = () => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    // ✅ 修复 Mac 中文输入法问题：如果在输入法组合中，不触发发送
+    if (e.nativeEvent.isComposing) {
+      return;
+    }
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
