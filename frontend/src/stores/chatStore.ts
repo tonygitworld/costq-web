@@ -328,14 +328,14 @@ export const useChatStore = create<ChatState>((set, get) => ({
   renameChat: async (chatId: string, newTitle: string) => {
     const originalTitle = get().chats[chatId]?.title;
 
-    // 1. 乐观更新 - 立即更新UI
+    // 1. 乐观更新 - 立即更新UI（不更新 updatedAt，保持原有排序位置）
     set(state => ({
       chats: {
         ...state.chats,
         [chatId]: {
           ...state.chats[chatId],
-          title: newTitle,
-          updatedAt: Date.now()
+          title: newTitle
+          // 注意：不重命名时不更新 updatedAt，保持会话在列表中的原有位置
         }
       }
     }));
