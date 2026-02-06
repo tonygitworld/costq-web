@@ -15,14 +15,6 @@ const getShortTitle = (title: string) => {
 
   if (title.includes('成本洞察')) return 'AWS 成本洞察';
   if (title.includes('RI/SP') && title.includes('数据')) return 'RI/SP 数据洞察';
-  if (title.includes('多账户')) return '多账户成本对比';
-  if (title.includes('归因')) return '成本归因分析';
-  if (title.includes('利用率')) return 'RI/SP 利用率分析';
-  if (title.includes('异常')) return '成本异常波动检测';
-  if (title.includes('Savings Plans') || title.includes('购买建议')) return 'Savings Plans 购买建议';
-  if (title.includes('未使用') || title.includes('闲置')) return '检测未使用的资源';
-  if (title.includes('EC2') && title.includes('优化')) return 'EC2 实例优化建议';
-  if (title.includes('本月') || title.includes('趋势')) return '查看本月成本趋势';
 
   return title;
 };
