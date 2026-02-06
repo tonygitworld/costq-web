@@ -1,7 +1,6 @@
 // ChatHistory component - Chat history list
 import { type FC, useEffect, useState } from 'react';
-// useNavigate, useLocation - 保留用于未来功能扩展
-import 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Flex, Typography, Empty, Button, Checkbox, Space, App, message, Dropdown, Input } from 'antd';
 import { DeleteOutlined, CheckSquareOutlined, CloseSquareOutlined, MoreOutlined, EditOutlined, PushpinOutlined } from '@ant-design/icons';
 import { useChatStore } from '../../stores/chatStore';
@@ -16,6 +15,8 @@ dayjs.extend(relativeTime);
 const { Text } = Typography;
 
 export const ChatHistory: FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { modal } = App.useApp();
   const { chats, currentChatId, switchToChat, loadFromStorage, deleteChat, deleteChats, clearAllChats, messages, togglePinChat, renameChat } = useChatStore();
   const [isSelectionMode, setIsSelectionMode] = useState(false);
@@ -326,12 +327,19 @@ export const ChatHistory: FC = () => {
               key={chat.id}
               className={`chat-history-item ${isActive ? 'chat-history-item-active' : ''} ${isSelected ? 'chat-history-item-selected' : ''}`}
               onClick={(e) => {
-                // ✅ 关键修复：如果已经在当前会话，避免重复切换（防抖）
-                if (isActive) return;
+                const isChatPath = location.pathname === '/' || location.pathname.startsWith('/c/');
+
+                // ✅ 关键修复：只有在聊天页面且是当前会话时才跳过（防抖）
+                // 在设置页面等非聊天页面时，即使点击当前会话也应该导航回去
+                if (isActive && isChatPath) return;
 
                 if (isSelectionMode) {
                   toggleChatSelection(chat.id);
                 } else {
+                  // ✅ 修复：如果在设置页面等非聊天页面，先导航到聊天页面
+                  if (!isChatPath) {
+                    navigate('/');
+                  }
                   switchToChat(chat.id);
                 }
               }}
