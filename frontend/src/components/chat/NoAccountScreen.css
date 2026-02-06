@@ -1,0 +1,89 @@
+.no-account-screen {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 100%;
+  padding: 0 24px 24px 24px;
+  /* 与有账号时的欢迎模式保持一致，向上位移 */
+  transform: translateY(-48vh);
+}
+
+.no-account-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 480px;
+  /* 底部对齐，与有账号时一致 */
+  justify-content: flex-end;
+}
+
+.no-account-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 16px 0;
+  letter-spacing: -0.5px;
+}
+
+.no-account-subtitle {
+  font-size: 18px;
+  color: #666;
+  margin: 0 0 12px 0;
+  font-weight: 400;
+}
+
+.no-account-description {
+  font-size: 14px;
+  color: #999;
+  margin: 0 0 32px 0;
+  line-height: 1.6;
+}
+
+.no-account-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.no-account-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 24px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  outline: none;
+}
+
+.no-account-btn-primary {
+  background-color: #da7756;
+  color: #fff;
+}
+
+.no-account-btn-primary:hover {
+  background-color: #c66a4b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(218, 119, 86, 0.3);
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+  .no-account-title {
+    font-size: 24px;
+  }
+
+  .no-account-subtitle {
+    font-size: 16px;
+  }
+
+  .no-account-actions {
+    max-width: 100%;
+  }
+}

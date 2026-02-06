@@ -92,7 +92,12 @@
     "confirmClearAll": "确认清空",
     "confirmClearAllDesc": "确定要清空所有对话历史吗？此操作不可撤销",
     "deleteFailed": "删除失败，请重试",
-    "analyzing": "正在分析"
+    "analyzing": "正在分析",
+    "rename": "重命名",
+    "renameSuccess": "重命名成功",
+    "renameFailed": "重命名失败，请重试",
+    "renamePlaceholder": "输入新的标题...",
+    "doubleClickToRename": "双击可重命名"
   },
   "connection": {
     "connected": "已连接",
@@ -105,5 +110,11 @@
     "title": "AI助手回复",
     "generatedAt": "生成时间",
     "dateFormat": "YYYY年MM月DD日 HH:mm:ss"
+  },
+  "noAccount": {
+    "title": "欢迎使用 CostQ",
+    "subtitle": "开始之前，请先配置您的云账号",
+    "description": "配置云账号后，您可以使用 CostQ 进行成本分析、优化建议和账单管理",
+    "configureButton": "配置云账号"
   }
 }

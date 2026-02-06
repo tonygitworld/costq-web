@@ -10,7 +10,6 @@ import {
   Space,
   Input,
   Select,
-  message,
   Typography,
   Tag,
   App,
@@ -49,7 +48,8 @@ const { Search } = Input;
 
 export const AlertManagement: React.FC = () => {
   const navigate = useNavigate();
-  const { modal } = App.useApp();
+  // ✅ 使用 App.useApp() 获取 message, modal, notification 实例，解决静态方法无法获取上下文的问题
+  const { modal, message } = App.useApp();
   const currentUser = useAuthStore(state => state.user);
   const { t } = useI18n('alert');
 
@@ -58,20 +58,20 @@ export const AlertManagement: React.FC = () => {
     loading,
     fetchAlerts,
     deleteAlert,
-    triggerScheduler, // ⭐ 新增
+    triggerScheduler,
   } = useAlertStore();
 
-  // ✅ 加载账号信息
+  // 加载账号信息
   const { accounts: awsAccounts, fetchAccounts: fetchAWSAccounts } = useAccountStore();
   const { accounts: gcpAccounts, fetchAccounts: fetchGCPAccounts } = useGCPAccountStore();
 
   const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [creatorFilter, setCreatorFilter] = useState<'all' | 'me'>('all');
-  const [triggering, setTriggering] = useState(false); // ⭐ 触发状态
+  const [triggering, setTriggering] = useState(false);
   const { paginationProps } = usePagination(10);
 
-  const isAdmin = currentUser?.role === 'admin'; // ⭐ 判断管理员
+  const isAdmin = currentUser?.role === 'admin';
 
   // 加载告警列表和账号列表
   useEffect(() => {
@@ -90,7 +90,7 @@ export const AlertManagement: React.FC = () => {
     }
   };
 
-  // ⭐ 手动触发处理函数
+  // 手动触发处理函数
   const handleManualTrigger = async () => {
     setTriggering(true);
     try {
@@ -108,7 +108,6 @@ export const AlertManagement: React.FC = () => {
 
   // 过滤告警
   const filteredAlerts = alerts.filter(alert => {
-    // 搜索过滤
     if (searchText) {
       const search = searchText.toLowerCase();
       if (
@@ -119,11 +118,9 @@ export const AlertManagement: React.FC = () => {
       }
     }
 
-    // 状态过滤
     if (statusFilter === 'active' && !alert.is_active) return false;
     if (statusFilter === 'inactive' && alert.is_active) return false;
 
-    // 创建者过滤
     if (creatorFilter === 'me' && alert.user_id !== currentUser?.id) return false;
 
     return true;
@@ -137,11 +134,10 @@ export const AlertManagement: React.FC = () => {
     if (!alert.last_executed_at) {
       return <Tag color="default">⏳ {t('table.statusNeverExecuted')}</Tag>;
     }
-    // 这里简化处理，实际应该从历史记录获取最后执行状态
     return <Tag color="success">✅ {dayjs(alert.last_executed_at).fromNow()}</Tag>;
   };
 
-  // ✅ 获取账号名称
+  // 获取账号名称
   const getAccountName = (accountId?: string, accountType?: string) => {
     if (!accountId) {
       return <Tag color="default">{t('table.notSet')}</Tag>;
@@ -156,7 +152,6 @@ export const AlertManagement: React.FC = () => {
       );
     }
 
-    // AWS
     const awsAccount = awsAccounts.find(a => a.id === accountId);
     return (
       <Tag color="orange" icon={<span>☁️</span>}>
@@ -216,7 +211,6 @@ export const AlertManagement: React.FC = () => {
             <span style={{ color: '#999' }}>
               👤 {record.created_by_username || t('table.unknown')} | 📅 {dayjs(record.created_at).fromNow()}
             </span>
-            {/* ✅ 显示账号信息 */}
             {record.account_id && (
               <>
                 <span style={{ color: '#999' }}>|</span>
@@ -273,12 +267,11 @@ export const AlertManagement: React.FC = () => {
   return (
     <div style={{
       padding: '24px',
-      height: '100vh',
+      height: 'calc(100vh - 0px)', // 修改为自适应高度
       overflow: 'auto',
       backgroundColor: '#f0f2f5'
     }}>
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
-        {/* 返回按钮和标题 */}
         <Space style={{ width: '100%' }}>
         <Button
           icon={<ArrowLeftOutlined />}
@@ -292,9 +285,7 @@ export const AlertManagement: React.FC = () => {
         </Title>
       </Space>
 
-      {/* 主卡片 */}
       <Card>
-        {/* 筛选栏 */}
         <Space style={{ marginBottom: 16, width: '100%', justifyContent: 'space-between' }}>
           <Space>
             <Search
@@ -332,7 +323,6 @@ export const AlertManagement: React.FC = () => {
               {t('refresh')}
             </Button>
 
-            {/* ✅ 仅管理员可见：手动触发调度器 */}
             {isAdmin && (
               <Tooltip title={t('tooltip.checkNow')}>
                 <Button
@@ -355,7 +345,6 @@ export const AlertManagement: React.FC = () => {
           </Space>
         </Space>
 
-        {/* 告警列表 */}
         <Table
           columns={columns}
           dataSource={filteredAlerts}

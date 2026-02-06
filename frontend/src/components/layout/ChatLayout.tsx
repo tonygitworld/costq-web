@@ -7,6 +7,8 @@ import { Sidebar } from './Sidebar';
 import { MainContent } from './MainContent';
 import { ScrollIssueReporter } from '../common/ScrollIssueReporter';
 import { useChatStore } from '../../stores/chatStore';
+import { useAccountStore } from '../../stores/accountStore';
+import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import './ChatLayout.css';
 
 import { logger } from '../../utils/logger';
@@ -31,6 +33,27 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
   const navigate = useNavigate();
   const location = useLocation();
   const { switchToChat, currentChatId, chats, messages } = useChatStore();
+
+  // ✅ 初始化：加载云账号数据（仅执行一次）
+  useEffect(() => {
+    logger.debug('🚀 [ChatLayout] 初始化：加载云账号数据');
+
+    // ✅ 使用 getState() 获取最新的函数引用，避免依赖项变化导致循环
+    const fetchAWSAccounts = useAccountStore.getState().fetchAccounts;
+    const fetchGCPAccounts = useGCPAccountStore.getState().fetchAccounts;
+
+    Promise.all([
+      fetchAWSAccounts().catch(err => {
+        logger.warn('❌ [ChatLayout] 加载 AWS 账号失败:', err);
+      }),
+      fetchGCPAccounts().catch(err => {
+        logger.warn('❌ [ChatLayout] 加载 GCP 账号失败:', err);
+      })
+    ]).then(() => {
+      logger.debug('✅ [ChatLayout] 云账号数据加载完成');
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 空依赖数组，仅在组件挂载时执行一次
 
   // ✅ 当 URL 中的 sessionId 变化时，切换到对应会话（优先级：URL → Store）
   // ✅ 立即切换，不等待消息加载
@@ -88,12 +111,14 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
 
     // 如果 currentChatId 变化且与上次同步的不同
     if (currentChatId !== lastSyncedChatId.current) {
-      // ✅ 如果会话有消息，或者是后端会话（消息可能还在加载），更新 URL
-      if (hasMessages || isBackendSession) {
+      // ✅ 仅当处于根路径或会话路径时才同步 URL，避免干扰其他功能页面（如告警管理）
+      const isChatPath = location.pathname === '/' || location.pathname.startsWith('/c/');
+
+      if (isChatPath && (hasMessages || isBackendSession)) {
         const expectedPath = `/c/${currentChatId}`;
         // 只有当 URL 不匹配时才更新（避免与 URL → Store 的更新冲突）
         if (location.pathname !== expectedPath) {
-          logger.debug(`🔄 [ChatLayout] currentChatId 变化，同步 URL: ${expectedPath} (hasMessages: ${hasMessages}, isBackendSession: ${isBackendSession})`);
+          logger.debug(`🔄 [ChatLayout] currentChatId 变化，同步 URL: ${expectedPath}`);
           navigate(expectedPath, { replace: true });
           lastSyncedChatId.current = currentChatId;
         } else {
@@ -101,9 +126,8 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
           lastSyncedChatId.current = currentChatId;
         }
       } else {
-        // ✅ 新建但未发送消息的会话（前端临时创建），不更新 URL（保持在主页）
-        logger.debug(`ℹ️ [ChatLayout] 新建会话但无消息，不更新 URL: ${currentChatId}`);
-        lastSyncedChatId.current = currentChatId;  // 更新 ref，避免重复检查
+        // 非聊天路径或新会话，只更新同步锁
+        lastSyncedChatId.current = currentChatId;
       }
     } else if (currentChatId === sessionId) {
       // ✅ 如果 currentChatId 与 URL 中的 sessionId 匹配，更新 lastSyncedChatId

@@ -12,7 +12,6 @@ import { useI18n } from '../../hooks/useI18n';
 import { createChatSession, convertBackendSession } from '../../services/chatApi';
 import { logger } from '../../utils/logger';
 import '../styles/AIChatInput.css';
-import './MessageInput.css';
 import { CloudServiceSelector } from './CloudServiceSelector';
 import CloudIcon from '../icons/CloudIcon';
 
@@ -203,6 +202,29 @@ export const MessageInput: FC = () => {
         }
       });
 
+      // 🔧 修复：延迟添加 AI 占位消息，确保 useLayoutEffect 先检测到用户消息并滚动
+      // 使用 setTimeout(0) 将 AI 消息添加推迟到下一个事件循环
+      setTimeout(() => {
+        // ✅ 立即添加 AI 占位消息，确保 UI 显示 Loading 状态
+        addMessage(chatId, {
+          chatId,
+          type: 'assistant',
+          content: '', // 初始内容为空
+          statusMessage: '正在分析您的请求...', // 触发 StatusCard 显示
+          statusEstimatedSeconds: 5, // 初始预估时间
+          meta: {
+            status: 'pending', // 标记为等待中
+            isStreaming: true, // 标记为流式传输
+            streamingProgress: 0,
+            retryCount: 0,
+            maxRetries: 0,
+            canRetry: false,
+            canEdit: false,
+            canDelete: false
+          }
+        });
+      }, 0);
+
       // 清空输入框
       const currentMessage = message.trim();
       setMessage('');
@@ -247,19 +269,11 @@ export const MessageInput: FC = () => {
     }
   };
 
-  return (
-    <MessageInputContainer
-      onFocus={handleFocusChange}
-      onBlur={handleBlurChange}
-      preventScrollJump={true}
-      debugMode={process.env.NODE_ENV === 'development'}
-      className="message-input-container"
-      style={{
-        padding: '0 16px 8px 16px', // 减小底部间距，使对话框更靠底
-        backgroundColor: 'transparent'
-      }}
-    >
-      {/* Claude Style Input */}
+  // ✅ 渲染标准聊天输入框
+  const renderContent = () => {
+
+    // 场景 3: 标准对话模式 - 显示底部固定输入框
+    return (
       <div className={`ai-chat-input-container ${isFocused ? 'focused' : ''}`}>
         {/* 1. 输入区域 */}
         <div className="ai-chat-input-area">
@@ -349,24 +363,40 @@ export const MessageInput: FC = () => {
             )}
           </div>
         </div>
-      </div>
 
-      {/* AI 生成内容提示 */}
-      <div style={{
-        marginTop: '12px',
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <MessageInputContainer
+        onFocus={handleFocusChange}
+        onBlur={handleBlurChange}
+        preventScrollJump={true}
+        debugMode={process.env.NODE_ENV === 'development'}
+        className="message-input-container"
+        style={{
+          padding: '0 16px 8px 16px',
+          backgroundColor: 'transparent'
+        }}
+      >
+        {renderContent()}
+      </MessageInputContainer>
+
+      {/* AI 生成内容提示 - 移到输入框外部 */}
+      <div className="ai-disclaimer" style={{
+        marginTop: '8px',
         fontSize: '12px',
         textAlign: 'center',
         width: '100%',
         pointerEvents: 'none',
         userSelect: 'none',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '4px'
+        color: 'rgba(0, 0, 0, 0.45)',
+        padding: '0 16px'
       }}>
-        <div style={{ color: 'rgba(0, 0, 0, 0.45)' }}>
-          AI 生成内容仅供参考，请核实关键成本信息。
-        </div>
+        AI 生成内容仅供参考，请核实关键成本信息。
       </div>
-    </MessageInputContainer>
+    </>
   );
 };

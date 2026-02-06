@@ -96,7 +96,7 @@ export const CloudAccountManagement: React.FC = () => {
           position: 'relative',
           opacity: isDisabled ? 0.6 : 1
         }}
-        bodyStyle={{ padding: '20px' }}
+        styles={{ body: { padding: '20px' } }}
       >
         {/* 选中角标 */}
         {isSelected && !isDisabled && (
@@ -187,18 +187,23 @@ export const CloudAccountManagement: React.FC = () => {
       display: 'flex',
       flexDirection: 'column'
     }}>
-      <Space direction="vertical" size="large" style={{
+      <div style={{
         width: '100%',
-        flex: 1
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '24px'
       }}>
-        {/* 返回按钮 */}
-        <Button
-          icon={<ArrowLeftOutlined />}
-          onClick={() => navigate('/')}
-          type="text"
-        >
-          {t('common:button.back')}
-        </Button>
+        {/* 返回按钮 - 左上角对齐 */}
+        <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+          <Button
+            icon={<ArrowLeftOutlined />}
+            onClick={() => navigate('/')}
+            type="text"
+          >
+            {t('common:button.back')}
+          </Button>
+        </div>
 
         {/* 标题 */}
         <Title level={3}>{t('management.title')}</Title>
@@ -228,7 +233,7 @@ export const CloudAccountManagement: React.FC = () => {
             </div>
           </Col>
         </Row>
-      </Space>
+      </div>
     </div>
   );
 };

@@ -19,17 +19,11 @@ import { OpsDashboard, TenantList, TenantDetail, AuditLogs } from './components/
 import { SSEProvider } from './contexts/SSEContext';
 import { I18nProvider } from './components/common/I18nProvider';
 import { useAuthStore } from './stores/authStore';
-import { useAccountStore } from './stores/accountStore';
-import { useGCPAccountStore } from './stores/gcpAccountStore';
-
 import { useBeforeUnload } from './hooks/useBeforeUnload';
-import { ensureTokenValid } from './utils/tokenUtils';
 import { setAuthMessageListener, setAuthRedirectListener } from './utils/authNotifications';
-import './i18n';  // 初始化i18n
+import './i18n';
 import 'antd/dist/reset.css';
 import './styles/account-selection.css';
-
-import { logger } from './utils/logger';
 
 // 创建 QueryClient 实例
 const queryClient = new QueryClient({
@@ -99,237 +93,154 @@ const AppContent: FC = () => {
         path="/"
         element={
           <ProtectedRoute>
-            <div className="app" style={{ height: '100vh', width: '100vw' }}>
-              <ChatLayout />
-            </div>
+            <ChatLayout />
           </ProtectedRoute>
         }
       />
 
-      {/* 会话页面 - 支持 URL 路由（类似 OpenAI /c/{conversation-id}） */}
+      {/* 聊天会话页面 - 带会话ID的聊天界面 */}
       <Route
         path="/c/:sessionId"
         element={
           <ProtectedRoute>
-            <div className="app" style={{ height: '100vh', width: '100vw' }}>
-              <ChatLayout />
-            </div>
+            <ChatLayout />
           </ProtectedRoute>
         }
       />
 
-      {/* 云账号管理（需要管理员权限） */}
+      {/* 设置页面 - 云账号管理 */}
       <Route
-        path="/settings/cloud-accounts"
+        path="/settings/accounts"
         element={
-          <ProtectedRoute requireAdmin>
-            <div className="app" style={{ height: '100vh', width: '100vw' }}>
-              <ChatLayout>
-                <CloudAccountManagement />
-              </ChatLayout>
-            </div>
+          <ProtectedRoute>
+            <ChatLayout>
+              <CloudAccountManagement />
+            </ChatLayout>
           </ProtectedRoute>
         }
       />
 
-      {/* 用户管理（需要管理员权限） */}
+      {/* 个人设置 - 个人资料 */}
+      <Route
+        path="/settings/profile"
+        element={
+          <ProtectedRoute>
+            <ChatLayout>
+              <UserProfile />
+            </ChatLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* 个人设置 - 修改密码 */}
+      <Route
+        path="/settings/password"
+        element={
+          <ProtectedRoute>
+            <ChatLayout>
+              <ChangePassword />
+            </ChatLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* 系统设置 - 用户管理 (仅管理员) */}
       <Route
         path="/settings/users"
         element={
           <ProtectedRoute requireAdmin>
-            <div className="app" style={{ height: '100vh', width: '100vw' }}>
-              <ChatLayout>
-                <UserManagement />
-              </ChatLayout>
-            </div>
+            <ChatLayout>
+              <UserManagement />
+            </ChatLayout>
           </ProtectedRoute>
         }
       />
 
-      {/* 用户基本信息（需要登录） */}
-      <Route
-        path="/user/profile"
-        element={
-          <ProtectedRoute>
-            <div className="app" style={{ height: '100vh', width: '100vw' }}>
-              <ChatLayout>
-                <UserProfile />
-              </ChatLayout>
-            </div>
-          </ProtectedRoute>
-        }
-      />
-
-      {/* 修改密码（需要登录） */}
-      <Route
-        path="/user/change-password"
-        element={
-          <ProtectedRoute>
-            <div className="app" style={{ height: '100vh', width: '100vw' }}>
-              <ChatLayout>
-                <ChangePassword />
-              </ChatLayout>
-            </div>
-          </ProtectedRoute>
-        }
-      />
-
-      {/* 告警管理（所有登录用户可访问） */}
+      {/* 告警管理列表 */}
       <Route
         path="/settings/alerts"
         element={
           <ProtectedRoute>
-            <div className="app" style={{ height: '100vh', width: '100vw' }}>
-              <ChatLayout>
-                <AlertManagement />
-              </ChatLayout>
-            </div>
+            <ChatLayout>
+              <AlertManagement />
+            </ChatLayout>
           </ProtectedRoute>
         }
       />
 
-      {/* 创建/编辑告警（所有登录用户可访问） */}
-      <Route
-        path="/settings/alerts/:id/edit"
-        element={
-          <ProtectedRoute>
-            <div className="app" style={{ height: '100vh', width: '100vw' }}>
-              <ChatLayout>
-                <AlertForm />
-              </ChatLayout>
-            </div>
-          </ProtectedRoute>
-        }
-      />
+      {/* 创建告警 */}
       <Route
         path="/settings/alerts/new"
         element={
           <ProtectedRoute>
-            <div className="app" style={{ height: '100vh', width: '100vw' }}>
-              <ChatLayout>
-                <AlertForm />
-              </ChatLayout>
-            </div>
+            <ChatLayout>
+              <AlertForm />
+            </ChatLayout>
           </ProtectedRoute>
         }
       />
 
-      {/* 告警详情（所有登录用户可访问） */}
+      {/* 编辑告警 */}
+      <Route
+        path="/settings/alerts/edit/:id"
+        element={
+          <ProtectedRoute>
+            <ChatLayout>
+              <AlertForm />
+            </ChatLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* 告警详情 */}
       <Route
         path="/settings/alerts/:id"
         element={
           <ProtectedRoute>
-            <div className="app" style={{ height: '100vh', width: '100vw' }}>
-              <ChatLayout>
-                <AlertDetail />
-              </ChatLayout>
-            </div>
+            <ChatLayout>
+              <AlertDetail />
+            </ChatLayout>
           </ProtectedRoute>
         }
       />
 
-      {/* 运营后台路由（仅超级管理员可访问） */}
-      <Route element={<SuperAdminRoute />}>
-        <Route
-          path="/ops"
-          element={<Navigate to="/ops/dashboard" replace />}
-        />
-        <Route
-          path="/ops/dashboard"
-          element={
-            <div className="app" style={{ height: '100vh', width: '100vw' }}>
-              <ChatLayout>
-                <OpsDashboard />
-              </ChatLayout>
-            </div>
-          }
-        />
-        <Route
-          path="/ops/tenants"
-          element={
-            <div className="app" style={{ height: '100vh', width: '100vw' }}>
-              <ChatLayout>
-                <TenantList />
-              </ChatLayout>
-            </div>
-          }
-        />
-        <Route
-          path="/ops/tenants/:tenantId"
-          element={
-            <div className="app" style={{ height: '100vh', width: '100vw' }}>
-              <ChatLayout>
-                <TenantDetail />
-              </ChatLayout>
-            </div>
-          }
-        />
-        <Route
-          path="/ops/audit-logs"
-          element={
-            <div className="app" style={{ height: '100vh', width: '100vw' }}>
-              <ChatLayout>
-                <AuditLogs />
-              </ChatLayout>
-            </div>
-          }
-        />
+      {/* 运营后台 - 需要超级管理员权限 */}
+      <Route
+        path="/ops/*"
+        element={
+          <ProtectedRoute>
+            <SuperAdminRoute />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="dashboard" element={<ChatLayout><OpsDashboard /></ChatLayout>} />
+        <Route path="tenants" element={<ChatLayout><TenantList /></ChatLayout>} />
+        <Route path="tenants/:id" element={<ChatLayout><TenantDetail /></ChatLayout>} />
+        <Route path="audit-logs" element={<ChatLayout><AuditLogs /></ChatLayout>} />
+        {/* 默认跳转 */}
+        <Route path="" element={<Navigate to="dashboard" replace />} />
       </Route>
-        </Routes>
-      </AntdApp>
+
+      {/* 为了兼容旧路径，添加重定向 */}
+      <Route path="/alerts" element={<Navigate to="/settings/alerts" replace />} />
+
+      {/* 404 跳转 */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AntdApp>
   );
 };
 
-const App: FC = () => {
-  // ✅ 在应用启动时检查并刷新 Token，然后加载账号数据（如果用户已登录）
-  // 确保账号选择器有数据可用，即使选择器组件因为条件渲染不显示
-  React.useEffect(() => {
-    const initializeApp = async () => {
-      // 检查用户是否已登录
-      const { isAuthenticated } = useAuthStore.getState();
-      if (!isAuthenticated) {
-        logger.debug('ℹ️ 用户未登录，跳过初始化');
-        return;
-      }
-
-      try {
-        // ✅ 第一步：检查并刷新 Token（如果过期）
-        logger.debug('🔄 [App] 检查 Token 状态...');
-        const tokenValid = await ensureTokenValid();
-
-        if (!tokenValid) {
-          logger.warn('⚠️ [App] Token 刷新失败，跳过数据加载');
-          return;
-        }
-
-        // ✅ 第二步：Token 有效后，加载账号数据
-        const { fetchAccounts: fetchAWSAccounts } = useAccountStore.getState();
-        const { fetchAccounts: fetchGCPAccounts } = useGCPAccountStore.getState();
-
-        // 并行加载，提高性能
-        await Promise.all([
-          fetchAWSAccounts().catch(err => logger.warn('加载 AWS 账号失败:', err)),
-          fetchGCPAccounts().catch(err => logger.warn('加载 GCP 账号失败:', err))
-        ]);
-
-        logger.debug('✅ 应用启动：账号数据加载完成');
-      } catch (error) {
-        logger.error('❌ 应用启动：初始化失败:', error);
-      }
-    };
-
-    initializeApp();
-  }, []);
-
+export const App: FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <I18nProvider>
-        <BrowserRouter>
+      <BrowserRouter>
+        <I18nProvider>
           <SSEProvider>
             <AppContent />
           </SSEProvider>
-        </BrowserRouter>
-      </I18nProvider>
+        </I18nProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 };

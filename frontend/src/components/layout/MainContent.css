@@ -1,72 +1,98 @@
-/* MainContent - 主内容区域响应式优化（沉浸式/ChatGPT风格） */
-/* 改进依据：去除外层框和边距，使对话直接呈现在底层画布上 */
+/* MainContent - Transform 无抖动版 */
 
 /* ===== 主内容容器 ===== */
-
 .main-content-container {
   display: flex;
   flex-direction: column;
-  height: 100vh; /* 移除 Header 高度减法，使用全屏 */
-  padding: 0; /* ❌ 移除内边距，实现全屏沉浸感 */
-  background-color: white; /* ✅ 统一背景色为白色，去除灰底 */
+  height: 100vh;
+  padding: 0;
+  background-color: white;
 }
 
 /* ===== 消息列表区域 ===== */
-
 .main-content-message-area {
   flex: 1;
   overflow: auto;
-  background-color: transparent; /* ✅ 透明背景，融入父容器 */
-  border-radius: 0; /* ❌ 移除圆角 */
-  border: none; /* ❌ 移除边框 */
-  margin-bottom: 0; /* ❌ 移除底部边距 */
-
-  /* Centering for empty state */
+  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: relative; /* Position context for floating scroll button */
+  justify-content: flex-start;
+  transition: all 0.5s ease;
 }
 
-/* ===== 输入框区域 ===== */
-
+/* ===== 输入框区域 (核心) ===== */
 .main-content-input-area {
   width: 100%;
-  max-width: 100%; /* 允许全宽，但通常 Input 组件自身有 max-width 控制 */
-  padding: 0 24px 8px 24px; /* ✅ 减小底部 padding，使输入框贴近底端 */
-  background-color: white; /* 确保背景覆盖 */
+  max-width: 100%;
+  padding: 0 24px 8px 24px;
+  background-color: white;
+  z-index: 100;
+
+  /* ✅ GPU 加速过渡动画 */
+  transition:
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    max-width 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.3s ease;
+
+  /* 默认状态：在底部，无位移 */
+  transform: translateY(0);
 }
 
-/* ===== 响应式断点 ===== */
-
-/* 大屏桌面（1440px+） */
+/* ===== 响应式 ===== */
 @media (min-width: 1440px) {
-  /* 沉浸式布局不需要额外的外部 padding，内容居中由内部组件控制 */
-  .main-content-container {
-    padding: 0;
-  }
-
-  .main-content-message-area {
-    margin-bottom: 0;
-  }
+  .main-content-container { padding: 0; }
 }
 
-/* ===== 打印优化 ===== */
-@media print {
-  .main-content-container {
-    height: auto;
-    padding: 0;
-    background-color: white;
-  }
+/* =========================================
+   欢迎模式 (居中显示 - 同步位移版)
+   ========================================= */
 
-  .main-content-message-area {
-    border: none;
-    box-shadow: none;
-    margin-bottom: 0;
-  }
+/* 1. 消息区域：改为底部对齐，为同步上移做准备 */
+.main-content-container.welcome-mode .main-content-message-area {
+  justify-content: flex-end; /* 内容靠下 */
+  align-items: center;
+  padding-bottom: 0; /* 移除之前的 padding */
+}
 
-  .main-content-input-area {
-    display: none;
-  }
+/* 2. 问候语容器：与输入框同步上移 */
+.welcome-mode .welcome-screen-container {
+  height: auto !important;
+  /* 关键：微调位置，往下来一点 (48vh) */
+  transform: translateY(-48vh);
+  /* 关键：设置与输入框的固定间距 */
+  margin-bottom: 24px;
+  /* 确保居中 */
+  justify-content: flex-end;
+}
+
+/* 3. 输入框区域：向上位移 */
+.welcome-mode .main-content-input-area {
+  /* 向上移动，与问候语同步 */
+  transform: translateY(-48vh);
+
+  /* 限制宽度，变身为卡片形态 */
+  max-width: 720px;
+  /* 居中对齐 */
+  margin: 0 auto;
+  padding: 0 16px;
+
+  /* 变为透明背景 */
+  background-color: transparent;
+}
+
+/* 4. 增强内部输入框样式 (悬浮卡片感) */
+.welcome-mode .ai-chat-input-container {
+  box-shadow:
+    0 12px 40px -12px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(0,0,0,0.04) !important;
+  border-radius: 24px !important; /* 更圆润 */
+  background-color: #fff !important;
+  padding: 16px !important;
+}
+
+/* 5. 隐藏免责声明 */
+.welcome-mode .ai-disclaimer {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
 }

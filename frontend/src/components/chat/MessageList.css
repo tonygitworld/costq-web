@@ -30,7 +30,7 @@
   scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
 }
 
-/* ✅ 自定义滚动条样式 (WebKit: Chrome/Edge/Safari) */
+/* ✅ 自定义滚动条样式 (WebKit) */
 .message-list-container::-webkit-scrollbar {
   width: 6px;
 }

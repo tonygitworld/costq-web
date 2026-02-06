@@ -91,7 +91,12 @@
     "confirmDeleteSelectedDesc": "Are you sure you want to delete {{count}} selected chat(s)?",
     "confirmClearAll": "Clear All",
     "confirmClearAllDesc": "Are you sure you want to clear all chat history? This action cannot be undone.",
-    "analyzing": "Analyzing"
+    "analyzing": "Analyzing",
+    "rename": "Rename",
+    "renameSuccess": "Renamed successfully",
+    "renameFailed": "Failed to rename, please try again",
+    "renamePlaceholder": "Enter new title...",
+    "doubleClickToRename": "Double-click to rename"
   },
   "connection": {
     "connected": "Connected",
@@ -104,5 +109,11 @@
     "title": "AI Assistant Response",
     "generatedAt": "Generated at",
     "dateFormat": "MMMM D, YYYY HH:mm:ss"
+  },
+  "noAccount": {
+    "title": "Welcome to CostQ",
+    "subtitle": "Before starting, please configure your cloud accounts",
+    "description": "After configuring cloud accounts, you can use CostQ for cost analysis, optimization recommendations, and billing management",
+    "configureButton": "Configure Cloud Account"
   }
 }
