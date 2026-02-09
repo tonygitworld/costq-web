@@ -1,6 +1,7 @@
 // d:\costq\web\costq-web\frontend\src\components\chat\CloudServiceSelector.tsx
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { Input } from 'antd';
 
 // 添加旋转动画样式
 const spinKeyframes = `
@@ -86,6 +87,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
   const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>(loadSelectedAccounts());
   const [currentView, setCurrentView] = useState<ViewType>('providers');
   const [selectedProviderId, setSelectedProviderId] = useState<string | null>(null);
+  const [searchKeyword, setSearchKeyword] = useState<string>('');
 
   // 保存到localStorage
   useEffect(() => {
@@ -132,6 +134,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
   const handleBackClick = () => {
     setCurrentView('providers');
     setSelectedProviderId(null);
+    setSearchKeyword(''); // 清空搜索关键词
   };
 
   // 处理账号点击（切换选中状态）
@@ -327,9 +330,9 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
   // 渲染内容
   const renderContent = () => {
     if (currentView === 'providers') {
-      // 渲染提供商列表
+      // 渲染提供商列表 - 紧凑布局，无多余空白
       return (
-        <div style={{ minWidth: '240px', maxHeight: '400px', overflowY: 'auto' }}>
+        <div style={{ width: '280px', padding: '4px 0' }}>
           {cloudProviders.map((provider) => (
             <div
               key={provider.id}
@@ -371,59 +374,135 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
     } else {
       // 渲染账号列表
       return (
-        <div style={{ minWidth: '280px', maxHeight: '400px', display: 'flex', flexDirection: 'column' }}>
-          {/* 返回按钮 */}
+        <div style={{ width: '280px', maxHeight: '320px', display: 'flex', flexDirection: 'column' }}>
+          {/* 搜索框和返回按钮 */}
           <div
-            onClick={handleBackClick}
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              padding: '10px 12px',
-              cursor: 'pointer',
+              gap: '8px',
+              padding: '4px 12px',
               borderBottom: '1px solid #f0f0f0',
-              transition: 'background-color 0.2s',
-              borderRadius: '6px 6px 0 0',
-              margin: '0 4px',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#f5f5f5';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
             }}
           >
-            <span style={{
-              fontWeight: 500,
-              fontSize: '13px',
-              color: '#595959',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px'
-            }}>
-              {/* 返回箭头 - 增大尺寸 */}
+            {/* 返回按钮 */}
+            <button
+              onClick={handleBackClick}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleBackClick();
+                }
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '28px',
+                height: '28px',
+                padding: 0,
+                cursor: 'pointer',
+                borderRadius: '4px',
+                border: 'none',
+                backgroundColor: 'transparent',
+                transition: 'background-color 0.2s',
+                flexShrink: 0,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#f5f5f5';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+              title="返回"
+              aria-label="返回云服务列表"
+            >
               <svg viewBox="64 64 896 896" width="16px" height="16px" fill="#595959" aria-hidden="true" style={{ display: 'inline-block' }}>
                 <path d="M872 572H266.8l144.3-144c13.8-13.8 13.8-36.2 0-50s-36.2-13.8-50 0L146.8 550.4c-13.8 13.8-13.8 36.2 0 50l213.3 213.3c13.8 13.8 36.2 13.8 50 0 13.8-13.8 13.8-36.2 0-50L266.8 620H872c19.4 0 35-15.6 35-35s-15.6-35-35-35z"></path>
               </svg>
-              返回
-            </span>
-            <span style={{
-              fontWeight: 500,
-              fontSize: '13px',
-              color: '#1890ff'
-            }}>
-              {selectedProvider?.name}
-            </span>
+            </button>
+
+            {/* 搜索框 - 使用原生 input 避免 Ant Design 焦点样式变化 */}
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '5px 10px',
+                backgroundColor: '#fff',
+                border: '1px solid #d9d9d9',
+                borderRadius: '6px',
+                fontSize: '13px',
+                height: '30px',
+              }}
+            >
+              {/* 搜索图标 */}
+              <svg viewBox="64 64 896 896" width="14px" height="14px" fill="#bfbfbf" aria-hidden="true" style={{ display: 'inline-block', flexShrink: 0 }}>
+                <path d="M909.6 854.5L649.9 594.8C690.2 542.7 712 479 712 412c0-80.2-31.3-155.4-87.9-212.1-56.6-56.7-132-87.9-212.1-87.9s-155.5 31.3-212.1 87.9C143.2 256.5 112 331.8 112 412c0 80.1 31.3 155.5 87.9 212.1C256.5 680.8 331.8 712 412 712c67 0 130.6-21.8 182.8-62l259.7 259.6a8.2 8.2 0 0011.6 0l43.6-43.5a8.2 8.2 0 000-11.6zM570.4 570.4C528 612.7 471.8 636 412 636s-116-23.3-158.4-65.6C211.3 528 188 471.8 188 412s23.3-116.1 65.6-158.4C296 211.3 352.2 188 412 188s116.1 23.2 158.4 65.6S636 352.2 636 412s-23.3 116.1-65.6 158.4z"></path>
+              </svg>
+              {/* 输入框 */}
+              <input
+                type="text"
+                placeholder="搜索云服务"
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                style={{
+                  flex: 1,
+                  border: 'none',
+                  outline: 'none',
+                  background: 'transparent',
+                  fontSize: '13px',
+                  padding: 0,
+                  margin: 0,
+                }}
+              />
+              {/* 清空按钮 */}
+              {searchKeyword && (
+                <div
+                  onClick={() => setSearchKeyword('')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                  }}
+                >
+                  <svg viewBox="64 64 896 896" width="14px" height="14px" fill="#bfbfbf" aria-hidden="true" style={{ display: 'inline-block' }}>
+                    <path d="M799.86 166.31c.02 0 .04.02.08.06l57.69 57.7c.04.03.05.05.06.08a.12.12 0 010 .06c0 .03-.02.05-.06.09L569.93 512l287.7 287.7c.04.04.05.06.06.09a.12.12 0 010 .07c0 .02-.02.04-.06.08l-57.7 57.69c-.03.04-.05.05-.07.06a.12.12 0 01-.07 0c-.03 0-.05-.02-.09-.06L512 569.93l-287.7 287.7c-.04.04-.06.05-.09.06a.12.12 0 01-.07 0c-.02 0-.04-.02-.08-.06l-57.69-57.7c-.04-.03-.05-.05-.06-.07a.12.12 0 010-.07c0-.03.02-.05.06-.09L454.07 512l-287.7-287.7c-.04-.04-.05-.06-.06-.09a.12.12 0 010-.07c0-.02.02-.04.06-.08l57.7-57.69c.03-.04.05-.05.07-.06a.12.12 0 01.07 0c.03 0 .05.02.09.06L512 454.07l287.7-287.7c.04-.04.06-.05.09-.06a.12.12 0 01.07 0z"></path>
+                  </svg>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* 账号列表 */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '4px' }}>
+          {/* 账号列表 - 自适应高度 */}
+          <div style={{ overflowY: 'auto', padding: '4px 0' }}>
             {!selectedProvider?.accounts || selectedProvider.accounts.length === 0 ? (
               <div style={{ padding: '24px 16px', textAlign: 'center', color: '#999', fontSize: '13px' }}>
                 暂无可用账号
               </div>
             ) : (
-              selectedProvider.accounts.map((account) => {
+              (() => {
+                // 根据搜索关键词过滤账号
+                const filteredAccounts = searchKeyword.trim()
+                  ? selectedProvider.accounts.filter(account =>
+                      account.name.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+                      (account.accountId && account.accountId.toLowerCase().includes(searchKeyword.toLowerCase())) ||
+                      account.id.toLowerCase().includes(searchKeyword.toLowerCase())
+                    )
+                  : selectedProvider.accounts;
+
+                if (filteredAccounts.length === 0) {
+                  return (
+                    <div style={{ padding: '24px 16px', textAlign: 'center', color: '#999', fontSize: '13px' }}>
+                      未找到匹配的账号
+                    </div>
+                  );
+                }
+
+                return filteredAccounts.map((account) => {
                 const isSelected = selectedAccountIds.includes(account.id);
                 return (
                   <div
@@ -493,7 +572,8 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
                     )}
                   </div>
                 );
-              })
+              });
+              })()
             )}
           </div>
         </div>
@@ -513,6 +593,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
           // 关闭时重置视图
           setCurrentView('providers');
           setSelectedProviderId(null);
+          setSearchKeyword(''); // 清空搜索关键词
         }
       }}
       placement="top"
