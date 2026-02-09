@@ -261,7 +261,7 @@ export const AlertDetail: React.FC = () => {
           <Space>
             <Button
               icon={<EditOutlined />}
-              onClick={() => navigate(`/settings/alerts/${id}/edit`)}
+              onClick={() => navigate(`/settings/alerts/edit/${id}`)}
             >
               {t('edit')}
             </Button>

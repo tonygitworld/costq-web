@@ -246,7 +246,7 @@ export const AlertManagement: React.FC = () => {
             type="link"
             size="small"
             icon={<EditOutlined />}
-            onClick={() => navigate(`/settings/alerts/${record.id}/edit`)}
+            onClick={() => navigate(`/settings/alerts/edit/${record.id}`)}
           >
             {t('edit')}
           </Button>
