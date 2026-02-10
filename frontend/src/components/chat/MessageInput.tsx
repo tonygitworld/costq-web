@@ -214,7 +214,9 @@ export const MessageInput: FC = () => {
           chatId,
           type: 'assistant',
           content: '', // 初始内容为空
-          statusMessage: '正在分析您的请求...', // 触发 StatusCard 显示
+          showStatus: true, // ✅ 启用状态卡片显示
+          statusType: 'initializing', // ✅ 状态类型：初始化中
+          statusMessage: '正在初始化账号连接...', // ✅ 状态消息
           statusEstimatedSeconds: 5, // 初始预估时间
           meta: {
             status: 'pending', // 标记为等待中
