@@ -1,7 +1,6 @@
 // d:\costq\web\costq-web\frontend\src\components\chat\CloudServiceSelector.tsx
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Input } from 'antd';
 
 // 添加旋转动画样式
 const spinKeyframes = `
@@ -107,13 +106,13 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
   const cloudProviders: CloudProvider[] = useMemo(() => [
     {
       id: 'aws',
-      name: 'AWS 云服务',
+      name: 'AWS 云账号',
       icon: <AWSLogo size={16} />,
       accounts: awsAccounts || [],
     },
     {
       id: 'gcp',
-      name: 'Google Cloud 云服务',
+      name: 'Google Cloud 云账号',
       icon: <GCPLogo size={16} />,
       accounts: gcpAccounts || [],
     },
@@ -171,7 +170,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
             borderRadius: '50%',
             animation: 'spin 1s linear infinite'
           }} />
-          <span>正在加载云服务...</span>
+          <span>正在加载云账号...</span>
         </div>
       );
     }
@@ -444,7 +443,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
               {/* 输入框 */}
               <input
                 type="text"
-                placeholder="搜索云服务"
+                placeholder="搜索云账号"
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
                 style={{
@@ -639,7 +638,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
             e.currentTarget.style.boxShadow = '0 2px 0 rgba(0, 0, 0, 0.02)';
           }
         }}
-        title={loading ? "正在加载云服务..." : "选择云服务"}
+        title={loading ? "正在加载云账号..." : "选择云服务"}
       >
         {renderTriggerContent()}
 
