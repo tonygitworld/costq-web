@@ -167,22 +167,26 @@ export const MessageInput: FC = () => {
       const chatMessages = messages[chatId] || [];
       const isFirstMessage = chatMessages.length === 0;
 
+      // ✅ 优化：后台异步创建后端会话，不阻塞消息发送流程
       if (isFirstMessage) {
-        try {
-          const title = message.trim().slice(0, 20) + (message.trim().length > 20 ? '...' : '');
-          const backendSession = await createChatSession(title, chatId);
-          const convertedSession = convertBackendSession(backendSession);
-          useChatStore.setState(state => ({
-            chats: {
-              ...state.chats,
-              [chatId]: convertedSession
-            }
-          }));
-          useChatStore.getState().saveToStorage();
-          navigate(`/c/${chatId}`, { replace: true });
-        } catch (error) {
-          logger.error(`❌ [MessageInput] 创建后端会话失败: ${error}`);
-        }
+        const title = message.trim().slice(0, 20) + (message.trim().length > 20 ? '...' : '');
+        // 使用 setTimeout 将后端会话创建推迟到下一个事件循环，不阻塞 UI
+        setTimeout(async () => {
+          try {
+            const backendSession = await createChatSession(title, chatId);
+            const convertedSession = convertBackendSession(backendSession);
+            useChatStore.setState(state => ({
+              chats: {
+                ...state.chats,
+                [chatId]: convertedSession
+              }
+            }));
+            useChatStore.getState().saveToStorage();
+            navigate(`/c/${chatId}`, { replace: true });
+          } catch (error) {
+            logger.error(`❌ [MessageInput] 创建后端会话失败: ${error}`);
+          }
+        }, 0);
       }
 
       // 添加用户消息
