@@ -1,0 +1,186 @@
+/* ========================================
+   Problem Section - Pain Points Analysis
+   Light Theme - Best Practices
+   ======================================== */
+
+.section {
+  position: relative;
+  width: 100%;
+  padding: 120px 24px;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FAFAFA 100%);
+  overflow: hidden;
+}
+
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ===== Header ===== */
+
+.header {
+  text-align: center;
+  margin-bottom: 80px;
+}
+
+.preTitle {
+  display: inline-block;
+  padding: 6px 16px;
+  background: #EFF6FF;
+  color: #2563EB;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 9999px;
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #111827;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: #4B5563;
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+/* ===== Grid ===== */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-bottom: 0;
+}
+
+/* ===== Card ===== */
+
+.card {
+  position: relative;
+  padding: 32px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.card:hover {
+  border-color: #3B82F6;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+  /* Transform handled by Framer Motion or remove transform from TSX if conflict */
+}
+
+/* Icon */
+.iconWrapper {
+  margin-bottom: 24px;
+  display: inline-block; /* 确保 wrapper 不占满宽度 */
+}
+
+.iconBg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: #EFF6FF; /* 统一浅色背景 */
+  color: #2563EB;      /* 统一图标颜色 */
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.card:hover .iconBg {
+  background: #2563EB;
+  color: #FFFFFF;
+  transform: scale(1.05) rotate(-3deg);
+}
+
+/* Content */
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #1F2937;
+  margin-bottom: 12px;
+}
+
+.cardDesc {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #6B7280;
+  margin-bottom: 24px;
+  flex-grow: 1;
+}
+
+/* Impact Section */
+.impact {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: #1F2937;
+  font-weight: 500;
+  padding: 16px;
+  background: #F9FAFB;
+  border-radius: 8px;
+  border: 1px solid #F3F4F6;
+  margin-top: auto; /* 推到底部 */
+}
+
+.arrow {
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: #2563EB; /* 统一箭头颜色 */
+}
+
+/* Decorative Elements */
+.decorativeLine {
+  display: none; /* 移除旧的装饰线，保持极简 */
+}
+
+/* Bottom CTA */
+.ctaHint {
+  display: none; /* 移除滚动提示，不再全屏，自然滚动即可 */
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .section {
+    padding: 80px 20px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+}

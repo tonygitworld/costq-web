@@ -8,6 +8,7 @@ import alert from './alert.json';
 import error from './error.json';
 import ops from './ops.json';
 import gcp from './gcp.json';
+import product from './product.json';
 
 export default {
   common,
@@ -19,5 +20,6 @@ export default {
   alert,
   error,
   ops,
-  gcp
+  gcp,
+  product
 };

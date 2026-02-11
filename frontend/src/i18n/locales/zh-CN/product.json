@@ -1,0 +1,225 @@
+{
+  "nav": {
+    "solution": "解决方案",
+    "features": "产品能力",
+    "cases": "客户案例",
+    "login": "登录控制台",
+    "cta": "免费试用"
+  },
+  "hero": {
+    "preTitle": "基于 Amazon Bedrock · 您的 FinOps 智能副驾驶",
+    "title": "",
+    "titleHighlight": "",
+    "subtitle": "CostQ：下一代云成本管理平台\n以 Agentic AI 驱动企业 FinOps",
+    "ctaPrimary": "立即开始",
+    "ctaDashboard": "进入控制台",
+    "ctaSecondary": "查看示例",
+    "keywords": {
+      "c": "云原生架构",
+      "o": "全链路可观测",
+      "s": "智能决策",
+      "t": "极速响应",
+      "q": "自然语言查询"
+    },
+    "ctaHelper": "无需信用卡 · 2分钟快速接入 · SOC2 合规",
+    "socialProof": "全球创新企业的共同选择",
+    "stats": {
+      "metric1": {
+        "value": "35%",
+        "label": "平均成本降幅"
+      },
+      "metric2": {
+        "value": "10x",
+        "label": "人效提升"
+      },
+      "metric3": {
+        "value": "99.9%",
+        "label": "系统可用性"
+      }
+    },
+    "realExample": {
+      "badge": "实时洞察",
+      "text": "系统检测到开发环境存在 12 个长周期闲置实例，已自动生成降本策略，预计节省 $4,800/月。"
+    }
+  },
+  "stats": {
+    "stat1": "35% 平均成本降幅",
+    "stat2": "2分钟 快速接入",
+    "stat3": "SOC2 安全合规",
+    "stat4": "7x24 智能巡检"
+  },
+  "problem": {
+    "title": "传统云成本管理面临的三大挑战",
+    "subtitle": "在云原生时代，传统成本管理模式已难以为继",
+    "pain1": {
+      "title": "账单复杂，理解困难",
+      "desc": "公有云账单充斥着复杂的技术术语和参数，即使是技术人员，也很难进行全面的成本分析。"
+    },
+    "pain2": {
+      "title": "缺少深入洞察",
+      "desc": "现有工具大多停留在“统计”层面，只能告诉你上个月花了多少钱，哪些服务成本最高。没有对于数据的分析和洞察。"
+    },
+    "pain3": {
+      "title": "缺乏有效的成本治理",
+      "desc": "成本优化考虑不全面，无法持续进行成本治理。"
+    }
+  },
+  "solution": {
+    "title": "CostQ 解决方案",
+    "subtitle": "从观测到行动的完整闭环",
+    "card1": {
+      "title": "多维成本智能归因",
+      "desc": "基于 Amazon Bedrock 的语义理解能力，自动构建资源与业务的映射关系，实现成本的精细化分摊。",
+      "highlight": "智能归因"
+    },
+    "card2": {
+      "title": "全链路实时观测",
+      "desc": "毫秒级捕捉资源状态变更。从配置漂移到异常激增，实现云成本的全天候态势感知。",
+      "highlight": "实时观测"
+    },
+    "card3": {
+      "title": "智能异常阻断",
+      "desc": "告别海量无效告警。基于 AI 的根因分析引擎，精准识别风险并推送至 IM 工具，支持一键阻断。",
+      "highlight": "精准治理"
+    },
+    "card4": {
+      "title": "自动化调优闭环",
+      "desc": "提供可执行的代码级优化建议。从资源降配到架构重构，将复杂的优化决策转化为简单的运维动作。",
+      "highlight": "自动闭环"
+    }
+  },
+  "howItWorks": {
+    "title": "接入流程",
+    "subtitle": "零侵入式部署，即刻开启治理",
+    "step1": {
+      "title": "授权接入",
+      "desc": "通过只读 IAM Role 安全连接云环境。最小权限原则，保障基础设施安全。",
+      "time": "T+0 即时"
+    },
+    "step2": {
+      "title": "全量扫描",
+      "desc": "系统自动拉取历史账单与资源拓扑，构建企业专属的成本知识图谱。",
+      "time": "5 分钟"
+    },
+    "step3": {
+      "title": "洞察交付",
+      "desc": "多端同步交付成本分析报告与风险预警，打通研发与财务的协作壁垒。",
+      "time": "持续交付"
+    },
+    "step4": {
+      "title": "策略执行",
+      "desc": "基于 AI 建议执行优化策略，验证降本效果，形成持续优化的正向循环。",
+      "time": "按需执行"
+    }
+  },
+  "features": {
+    "label": "核心价值",
+    "title": "重塑云成本管理体验",
+    "subtitle": "赋能企业构建数据驱动的决策体系",
+    "feature1": {
+      "title": "Agentic AI 引擎",
+      "desc": "摒弃基于规则的传统引擎。CostQ AI 具备自主推理能力，能够应对复杂的业务场景变化。",
+      "icon": "🧠"
+    },
+    "feature2": {
+      "title": "极速价值验证",
+      "desc": "快速部署，快速见效。帮助企业在第一周内即可识别并回收显著的闲置成本。",
+      "icon": "⚡"
+    },
+    "feature3": {
+      "title": "多云统一治理",
+      "desc": "支持 AWS、GCP、阿里云等主流云厂商。在一个控制台实现跨云资源的统一纳管与调度。",
+      "icon": "🌐"
+    },
+    "feature4": {
+      "title": "企业级安全合规",
+      "desc": "通过 SOC2 Type II 认证。数据全链路加密，支持 SSO 单点登录与审计日志。",
+      "icon": "🛡️"
+    }
+  },
+  "testimonials": {
+    "title": "客户证言",
+    "subtitle": "赋能领先企业实现精益增长",
+    "case1": {
+      "quote": "CostQ 为我们提供了前所未有的成本透明度。接入首日即发现并回收了大量僵尸资源，ROI 超出预期。",
+      "author": "陈总",
+      "role": "基础架构负责人",
+      "company": "某知名电商平台",
+      "highlight": "首日回收 $600/月"
+    },
+    "case2": {
+      "quote": "AI 驱动的自动化建议极大地释放了运维团队的精力，让我们能够专注于业务创新而非繁琐的账单分析。",
+      "author": "刘总监",
+      "role": "技术运营总监",
+      "company": "头部 SaaS 企业",
+      "highlight": "运维效率提升 90%"
+    },
+    "case3": {
+      "quote": "对于高速成长的初创团队，CostQ 就像一位资深的 FinOps 专家，帮助我们构建了健康的云财务模型。",
+      "author": "王总",
+      "role": "联合创始人 & CTO",
+      "company": "AI 独角兽企业",
+      "highlight": "构建财务模型"
+    }
+  },
+  "security": {
+    "title": "安全承诺",
+    "subtitle": "遵循最严苛的安全与合规标准",
+    "item1": "只读 IAM 权限，零侵入性",
+    "item2": "TLS 1.3 全链路数据加密",
+    "item3": "AES-256 静态数据加密",
+    "item4": "支持企业级 SSO 与审计"
+  },
+  "cta": {
+    "title": "开启您的 FinOps 之旅",
+    "subtitle": "立即体验 AI 驱动的云成本治理平台",
+    "button": "免费开始",
+    "trust": "深受 200+ 创新企业信赖"
+  },
+  "roadmap": {
+    "label": "未来愿景",
+    "title": "定义云成本管理的未来",
+    "subtitle": "不仅是工具，更是通往 Cloud FinOps 终极形态的路径",
+    "phase1": {
+      "phase": "Phase 1",
+      "title": "全域感知 (Visibility)",
+      "features": {
+        "0": "打破多云数据孤岛",
+        "1": "构建统一成本视图",
+        "2": "秒级归因，看清每一分支出"
+      },
+      "date": "已就绪"
+    },
+    "phase2": {
+      "phase": "Phase 2",
+      "title": "智能决策 (Intelligence)",
+      "features": {
+        "0": "Agent 主动挖掘优化空间",
+        "1": "自然语言交互重塑运维",
+        "2": "从被动查询转向主动建议"
+      },
+      "date": "演进中"
+    },
+    "phase3": {
+      "phase": "Phase 3",
+      "title": "自动驾驶 (Autonomy)",
+      "features": {
+        "0": "7×24小时无人值守优化",
+        "1": "成本异常自动熔断",
+        "2": "AI 自适应资源调度"
+      },
+      "date": "未来愿景"
+    }
+  },
+  "finalCTA": {
+    "title": "准备好掌控云成本了吗？",
+    "subtitle": "立即开始，体验 Agentic AI 带来的全新成本管理方式。",
+    "buttonPrimary": "免费开始试用",
+    "buttonSecondary": "联系销售团队",
+    "footer": "无需信用卡 · 14天免费试用 · 随时取消"
+  },
+  "footer": {
+    "tagline": "CostQ · 智能云成本治理平台",
+    "copyright": "© 2026 CostQ. All rights reserved."
+  }
+}

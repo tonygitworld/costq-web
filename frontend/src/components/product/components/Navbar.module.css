@@ -1,0 +1,220 @@
+/* ========================================
+   Navbar - Premium SaaS Style
+   全屏滚动适配 - 磨砂玻璃效果
+   ======================================== */
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 20px 0;
+  /* 初始状态：完全透明 */
+  background: transparent;
+  border-bottom: 1px solid transparent;
+}
+
+.header.scrolled {
+  /* 滚动状态：磨砂玻璃 */
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 12px 0;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+}
+
+/* Nav Container */
+.nav {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: grid;
+  grid-template-columns: auto 1fr auto; /* 左 Logo，中 Nav，右 Actions */
+  align-items: center;
+  gap: 24px;
+}
+
+/* ===== Logo (Left) ===== */
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  z-index: 10;
+}
+
+.logoText {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0F172A; /* 默认深色 */
+  transition: color 0.3s ease;
+}
+
+/* 渐变 Logo 效果 (可选，高端感通常用纯色或微渐变) */
+/* .logoText {
+  background: linear-gradient(135deg, #0F172A 0%, #334155 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+} */
+
+/* ===== Navigation Links (Center) ===== */
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.navLink {
+  position: relative;
+  padding: 8px 16px;
+  color: #64748B;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 100px; /* 胶囊型 */
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.navLink:hover {
+  color: #0F172A;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.navLink.activeLink {
+  color: #0F172A;
+  background: rgba(0, 0, 0, 0.06);
+  font-weight: 600;
+}
+
+/* ===== Right Actions (Lang + CTA) ===== */
+
+.rightActions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: flex-end;
+}
+
+/* Language Switcher */
+.langWrapper {
+  position: relative;
+}
+
+.langBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #64748B;
+  transition: all 0.2s ease;
+}
+
+.langBtn:hover {
+  color: #0F172A;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.langDropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 6px;
+  min-width: 140px;
+  overflow: hidden;
+  transform-origin: top right;
+}
+
+.langOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.875rem;
+  color: #475569;
+  transition: all 0.2s;
+}
+
+.langOption:hover {
+  background: #F1F5F9;
+  color: #0F172A;
+}
+
+.activeLang {
+  color: #2563EB;
+  font-weight: 600;
+  background: #EFF6FF;
+}
+
+/* Nav CTA Button */
+.navCta {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 20px;
+  background: #0F172A;
+  color: #FFFFFF;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 100px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.navCta:hover {
+  background: #1E293B;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 1024px) {
+  .nav {
+    padding: 0 24px;
+    grid-template-columns: auto 1fr; /* 隐藏 NavLinks */
+  }
+
+  .navLinks {
+    display: none;
+  }
+
+  .rightActions {
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 16px 0;
+  }
+
+  .header.scrolled {
+    padding: 12px 0;
+  }
+
+  .navCta {
+    padding: 8px 16px;
+    font-size: 0.8125rem;
+  }
+}

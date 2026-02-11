@@ -1,0 +1,274 @@
+/* ========================================
+   CostQ Design System - Color Tokens
+   基于 Tailwind + Radix + shadcn/ui 最佳实践
+   更新时间：2026年2月11日
+   ======================================== */
+
+:root {
+  /* ===== 中性色系统（Zinc - 现代企业风格）===== */
+  /* 使用 Zinc 而非 Gray，因为它更适合深色背景且更现代 */
+
+  --zinc-50: #FAFAFA;
+  --zinc-100: #F4F4F5;
+  --zinc-200: #E4E4E7;
+  --zinc-300: #D4D4D8;
+  --zinc-400: #A1A1AA;
+  --zinc-500: #71717A;
+  --zinc-600: #52525B;
+  --zinc-700: #3F3F46;
+  --zinc-800: #27272A;
+  --zinc-900: #18181B;
+  --zinc-950: #09090B;
+
+  /* ===== 品牌主色（Blue - 信任、专业）===== */
+  --blue-50: #EFF6FF;
+  --blue-100: #DBEAFE;
+  --blue-200: #BFDBFE;
+  --blue-300: #93C5FD;
+  --blue-400: #60A5FA;
+  --blue-500: #3B82F6;
+  --blue-600: #2563EB;
+  --blue-700: #1D4ED8;
+  --blue-800: #1E40AF;
+  --blue-900: #1E3A8A;
+  --blue-950: #172554;
+
+  /* ===== 功能色系统（语义化）===== */
+
+  /* Success - 使用 Emerald 而非 Green（更现代） */
+  --emerald-50: #ECFDF5;
+  --emerald-100: #D1FAE5;
+  --emerald-500: #10B981;
+  --emerald-600: #059669;
+  --emerald-700: #047857;
+
+  /* Error - 使用 Rose 而非 Red（更柔和） */
+  --rose-50: #FFF1F2;
+  --rose-100: #FFE4E6;
+  --rose-500: #F43F5E;
+  --rose-600: #E11D48;
+  --rose-700: #BE123C;
+
+  /* Warning - 使用 Amber 而非 Orange */
+  --amber-50: #FFFBEB;
+  --amber-100: #FEF3C7;
+  --amber-500: #F59E0B;
+  --amber-600: #D97706;
+  --amber-700: #B45309;
+
+  /* Info - 使用 Sky 而非 Blue（避免与主色冲突） */
+  --sky-50: #F0F9FF;
+  --sky-100: #E0F2FE;
+  --sky-500: #0EA5E9;
+  --sky-600: #0284C7;
+  --sky-700: #0369A1;
+
+  /* ===== 语义化 Token（Radix 风格）===== */
+
+  /* Backgrounds */
+  --background: white;
+  --background-subtle: var(--zinc-50);
+  --background-muted: var(--zinc-100);
+
+  /* Foreground (Text) */
+  --foreground: var(--zinc-900);
+  --foreground-subtle: var(--zinc-700);
+  --foreground-muted: var(--zinc-500);
+  --foreground-disabled: var(--zinc-400);
+
+  /* Borders */
+  --border: var(--zinc-200);
+  --border-subtle: var(--zinc-100);
+  --border-strong: var(--zinc-300);
+
+  /* Primary (Brand Color) */
+  --primary: var(--blue-600);
+  --primary-hover: var(--blue-700);
+  --primary-active: var(--blue-800);
+  --primary-subtle: var(--blue-50);
+  --primary-foreground: white;
+
+  /* Accent (略浅于主色，用于卡片高亮) */
+  --accent: var(--blue-100);
+  --accent-hover: var(--blue-200);
+  --accent-foreground: var(--blue-900);
+
+  /* Muted (灰色背景，用于禁用状态) */
+  --muted: var(--zinc-100);
+  --muted-hover: var(--zinc-200);
+  --muted-foreground: var(--zinc-600);
+
+  /* Success */
+  --success: var(--emerald-600);
+  --success-subtle: var(--emerald-50);
+  --success-foreground: white;
+
+  /* Error */
+  --error: var(--rose-600);
+  --error-subtle: var(--rose-50);
+  --error-foreground: white;
+
+  /* Warning */
+  --warning: var(--amber-600);
+  --warning-subtle: var(--amber-50);
+  --warning-foreground: var(--zinc-900);
+
+  /* Info */
+  --info: var(--sky-600);
+  --info-subtle: var(--sky-50);
+  --info-foreground: white;
+
+  /* ===== 阴影系统（分层设计）===== */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+
+  /* ===== 圆角系统 ===== */
+  --radius-sm: 0.25rem;   /* 4px */
+  --radius: 0.5rem;       /* 8px */
+  --radius-md: 0.75rem;   /* 12px */
+  --radius-lg: 1rem;      /* 16px */
+  --radius-xl: 1.5rem;    /* 24px */
+  --radius-2xl: 2rem;     /* 32px */
+  --radius-full: 9999px;
+
+  /* ===== 间距系统（8px 基数）===== */
+  --spacing-1: 0.25rem;   /* 4px */
+  --spacing-2: 0.5rem;    /* 8px */
+  --spacing-3: 0.75rem;   /* 12px */
+  --spacing-4: 1rem;      /* 16px */
+  --spacing-5: 1.25rem;   /* 20px */
+  --spacing-6: 1.5rem;    /* 24px */
+  --spacing-8: 2rem;      /* 32px */
+  --spacing-10: 2.5rem;   /* 40px */
+  --spacing-12: 3rem;     /* 48px */
+  --spacing-16: 4rem;     /* 64px */
+  --spacing-20: 5rem;     /* 80px */
+  --spacing-24: 6rem;     /* 96px */
+  --spacing-32: 8rem;     /* 128px */
+
+  /* ===== 字体系统 ===== */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+
+  /* ===== 动画 ===== */
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========================================
+   暗黑模式（Dark Mode）
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Backgrounds */
+    --background: var(--zinc-950);
+    --background-subtle: var(--zinc-900);
+    --background-muted: var(--zinc-800);
+
+    /* Foreground (Text) */
+    --foreground: var(--zinc-50);
+    --foreground-subtle: var(--zinc-300);
+    --foreground-muted: var(--zinc-500);
+    --foreground-disabled: var(--zinc-600);
+
+    /* Borders */
+    --border: var(--zinc-800);
+    --border-subtle: var(--zinc-900);
+    --border-strong: var(--zinc-700);
+
+    /* Primary - 在暗黑模式下略浅 */
+    --primary: var(--blue-500);
+    --primary-hover: var(--blue-400);
+    --primary-active: var(--blue-600);
+    --primary-subtle: var(--blue-950);
+
+    /* Accent */
+    --accent: var(--blue-900);
+    --accent-hover: var(--blue-800);
+    --accent-foreground: var(--blue-200);
+
+    /* Muted */
+    --muted: var(--zinc-800);
+    --muted-hover: var(--zinc-700);
+    --muted-foreground: var(--zinc-400);
+
+    /* Success */
+    --success: var(--emerald-500);
+    --success-subtle: var(--emerald-950);
+
+    /* Error */
+    --error: var(--rose-500);
+    --error-subtle: var(--rose-950);
+
+    /* Warning */
+    --warning: var(--amber-500);
+    --warning-subtle: var(--amber-950);
+
+    /* Info */
+    --info: var(--sky-500);
+    --info-subtle: var(--sky-950);
+
+    /* Shadows - 暗黑模式使用更深的阴影 */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+  }
+}
+
+/* ========================================
+   高对比度模式（Accessibility）
+   ======================================== */
+
+@media (prefers-contrast: high) {
+  :root {
+    --foreground: black;
+    --background: white;
+    --border: black;
+    --primary: var(--blue-800);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --foreground: white;
+      --background: black;
+      --border: white;
+      --primary: var(--blue-400);
+    }
+  }
+}
+
+/* ========================================
+   减少动画（Accessibility）
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ========================================
+   全局样式重置
+   ======================================== */
+
+* {
+  border-color: var(--border);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}

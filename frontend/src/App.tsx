@@ -1,8 +1,11 @@
-import React, { type FC } from 'react';
+import React, { type FC, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { App as AntdApp } from 'antd';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ChatLayout } from './components/layout/ChatLayout';
+
+// ★ 产品介绍页 - 懒加载（公开页面，无需登录）
+const ProductPage = React.lazy(() => import('./components/product/ProductPage'));
 import { CloudAccountManagement } from './components/settings/CloudAccountManagement';
 import { UserProfile } from './components/user/UserProfile';
 import { ChangePassword } from './components/user/ChangePassword';
@@ -64,11 +67,21 @@ const AppContent: FC = () => {
   return (
     <AntdApp>
       <Routes>
+      {/* ★ 产品介绍页 - 公开页面，作为首页 */}
+      <Route
+        path="/"
+        element={
+          <Suspense fallback={<div style={{ background: '#0B0C10', height: '100vh' }} />}>
+            <ProductPage />
+          </Suspense>
+        }
+      />
+
       {/* 登录页面 */}
       <Route
         path="/login"
         element={
-          isAuthenticated ? <Navigate to="/" replace /> : <Login />
+          isAuthenticated ? <Navigate to="/chat" replace /> : <Login />
         }
       />
 
@@ -76,7 +89,7 @@ const AppContent: FC = () => {
       <Route
         path="/register"
         element={
-          isAuthenticated ? <Navigate to="/" replace /> : <Register />
+          isAuthenticated ? <Navigate to="/chat" replace /> : <Register />
         }
       />
 
@@ -84,13 +97,13 @@ const AppContent: FC = () => {
       <Route
         path="/activate/:token"
         element={
-          isAuthenticated ? <Navigate to="/" replace /> : <Activate />
+          isAuthenticated ? <Navigate to="/chat" replace /> : <Activate />
         }
       />
 
-      {/* 主页 - 聊天界面（需要登录） */}
+      {/* 主页 - 聊天界面（需要登录） - 移动到 /chat */}
       <Route
-        path="/"
+        path="/chat"
         element={
           <ProtectedRoute>
             <ChatLayout />

@@ -1,0 +1,193 @@
+/* Hero Section - Minimal Interactive Logo Style */
+
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* 强制顶部对齐，覆盖全局的居中规则 */
+  justify-content: flex-start !important;
+  /* 调整顶部间距：导航栏高度(约80px) + 额外间距(160px) */
+  padding-top: 240px;
+  background-color: #FFFFFF;
+  overflow: hidden;
+
+  /* 升级版智能网格背景 */
+  background-image:
+    linear-gradient(#F1F5F9 1px, transparent 1px),
+    linear-gradient(90deg, #F1F5F9 1px, transparent 1px);
+  background-size: 40px 40px;
+
+  mask-image: radial-gradient(ellipse at 50% 40%, black 20%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at 50% 40%, black 20%, transparent 80%);
+
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+
+/* 呼吸光晕 */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 20%; /* 调回 20% */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
+  animation: pulse 6s ease-in-out infinite;
+  z-index: 0;
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+  50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
+}
+
+.container {
+  width: 100%;
+  max-width: 1400px;
+  padding: 0 24px;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  z-index: 10;
+}
+
+.centerVisual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.wordWrapper {
+  display: flex;
+  gap: 0;
+  cursor: default;
+  user-select: none;
+}
+
+.letter {
+  font-size: clamp(80px, 15vw, 200px);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: #FFFFFF;
+  -webkit-text-stroke: 3px #2563EB;
+  transition: color 1.5s ease-out, -webkit-text-stroke-color 1.5s ease-out;
+  position: relative;
+}
+
+.letter:hover {
+  color: var(--hover-color);
+  -webkit-text-stroke-color: var(--hover-color);
+  transition: color 0s, -webkit-text-stroke-color 0s;
+  z-index: 10;
+}
+
+/* Keyword Pop-up */
+.keywordContainer {
+  height: 48px;
+  margin-top: 24px;
+  margin-bottom: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 20;
+}
+
+.keyword {
+  font-size: 24px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  position: absolute;
+  white-space: nowrap;
+}
+
+/* Tagline Styles */
+.tagline {
+  margin-top: 16px;
+  text-align: center;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.taglineTitle {
+  font-size: clamp(16px, 2.5vw, 24px);
+  font-weight: 500;
+  color: #0F172A;
+  margin: 0;
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+  max-width: 100%;
+}
+
+/* Buttons */
+.ctaGroup {
+  margin-top: 40px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.primaryBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: #0F172A;
+  color: #FFFFFF;
+  border-radius: 100px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.primaryBtn:hover {
+  background: #000000;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.secondaryBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  background: #FFFFFF;
+  color: #0F172A;
+  border: 1px solid #E2E8F0;
+  border-radius: 100px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.secondaryBtn:hover {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+  color: #000000;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero {
+    /* 移动端也相应上移 */
+    padding-top: 100px;
+    justify-content: flex-start !important;
+    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  }
+}

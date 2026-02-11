@@ -1,0 +1,225 @@
+{
+  "nav": {
+    "solution": "Solutions",
+    "features": "Platform",
+    "cases": "Customers",
+    "login": "Sign In",
+    "cta": "Get Started"
+  },
+  "hero": {
+    "preTitle": "Powered by Amazon Bedrock · Your AI FinOps Copilot",
+    "title": "",
+    "titleHighlight": "",
+    "subtitle": "CostQ: The Next-Gen Cloud Cost Platform\nPowered by Agentic AI for Enterprise FinOps",
+    "ctaPrimary": "Start Now",
+    "ctaDashboard": "Go to Console",
+    "ctaSecondary": "See Examples",
+    "keywords": {
+      "c": "Cloud-Native",
+      "o": "Observability",
+      "s": "Smart Decision",
+      "t": "Time-saving",
+      "q": "Query & Ask"
+    },
+    "ctaHelper": "No Credit Card · 2-Min Setup · SOC2 Compliant",
+    "socialProof": "Trusted by Leading Enterprises Globally",
+    "stats": {
+      "metric1": {
+        "value": "35%",
+        "label": "Avg. Cost Savings"
+      },
+      "metric2": {
+        "value": "10x",
+        "label": "Efficiency Gain"
+      },
+      "metric3": {
+        "value": "99.9%",
+        "label": "System Uptime"
+      }
+    },
+    "realExample": {
+      "badge": "Real-time Insight",
+      "text": "Detected 12 long-running idle instances in dev. Auto-generated rightsizing policy. Estimated savings: $4,800/mo."
+    }
+  },
+  "stats": {
+    "stat1": "35% Avg. Cost Savings",
+    "stat2": "2-Min Rapid Setup",
+    "stat3": "SOC2 Compliant",
+    "stat4": "24/7 Intelligent Monitoring"
+  },
+  "problem": {
+    "title": "The Cloud Financial Management Challenge",
+    "subtitle": "Traditional cost management fails in the cloud-native era",
+    "pain1": {
+      "title": "Cost Attribution Black Box",
+      "desc": "Thousands of line items with no clear business context. Finance lacks visibility, and Engineering lacks accountability."
+    },
+    "pain2": {
+      "title": "Reactive Response Lag",
+      "desc": "Relying on monthly bills means weeks of wasted resources. Missing real-time circuit breakers for cost anomalies."
+    },
+    "pain3": {
+      "title": "Decision Paralysis",
+      "desc": "Complex RI strategies and architectural trade-offs lead to hesitation. Lack of data-driven guidance stalls optimization efforts."
+    }
+  },
+  "solution": {
+    "title": "The CostQ Solution",
+    "subtitle": "A complete loop from observability to action",
+    "card1": {
+      "title": "Intelligent Attribution",
+      "desc": "Leveraging Amazon Bedrock to map resources to business contexts automatically. Achieve granular cost allocation without manual tagging.",
+      "highlight": "AI Attribution"
+    },
+    "card2": {
+      "title": "Full-Stack Observability",
+      "desc": "Capture resource state changes in milliseconds. From configuration drift to usage spikes, gain total situational awareness.",
+      "highlight": "Real-time"
+    },
+    "card3": {
+      "title": "Smart Anomaly Detection",
+      "desc": "Eliminate alert fatigue. Our AI-driven root cause analysis engine identifies genuine risks and pushes precise alerts to your team.",
+      "highlight": "Precise Governance"
+    },
+    "card4": {
+      "title": "Automated Optimization",
+      "desc": "Code-level recommendations that are ready to execute. Transform complex optimization decisions into simple operational actions.",
+      "highlight": "Closed Loop"
+    }
+  },
+  "howItWorks": {
+    "title": "Onboarding Process",
+    "subtitle": "Zero-intrusion deployment. Start governing instantly.",
+    "step1": {
+      "title": "Authorize Access",
+      "desc": "Securely connect via read-only IAM Role. Least privilege principle ensures infrastructure security.",
+      "time": "Immediate"
+    },
+    "step2": {
+      "title": "Full Scan",
+      "desc": "Automatically ingest historical bills and resource topology to build your enterprise cost knowledge graph.",
+      "time": "5 Minutes"
+    },
+    "step3": {
+      "title": "Insight Delivery",
+      "desc": "Deliver multi-channel cost reports and risk warnings, breaking down silos between Engineering and Finance.",
+      "time": "Continuous"
+    },
+    "step4": {
+      "title": "Execute Strategy",
+      "desc": "Implement optimization strategies based on AI recommendations to realize savings and drive continuous improvement.",
+      "time": "On Demand"
+    }
+  },
+  "features": {
+    "label": "Core Value",
+    "title": "Redefining Cloud Cost Management",
+    "subtitle": "Empowering data-driven decision making",
+    "feature1": {
+      "title": "Agentic AI Engine",
+      "desc": "Beyond rule-based systems. CostQ AI possesses autonomous reasoning capabilities to handle complex business scenarios.",
+      "icon": "🧠"
+    },
+    "feature2": {
+      "title": "Rapid Time-to-Value",
+      "desc": "Deploy fast, save fast. Identify and reclaim significant idle costs within your first week of operation.",
+      "icon": "⚡"
+    },
+    "feature3": {
+      "title": "Unified Multi-Cloud Governance",
+      "desc": "Support for AWS, GCP, and Azure. Manage cross-cloud resources from a single, unified control plane.",
+      "icon": "🌐"
+    },
+    "feature4": {
+      "title": "Enterprise Security",
+      "desc": "SOC2 Type II certified. Full-link encryption, SSO support, and comprehensive audit logs.",
+      "icon": "🛡️"
+    }
+  },
+  "testimonials": {
+    "title": "Customer Stories",
+    "subtitle": "Enabling lean growth for industry leaders",
+    "case1": {
+      "quote": "CostQ provided unprecedented cost transparency. We identified and reclaimed massive zombie resources on day one.",
+      "author": "Chen",
+      "role": "Head of Infrastructure",
+      "company": "Leading E-commerce Platform",
+      "highlight": "Day 1 ROI"
+    },
+    "case2": {
+      "quote": "AI-driven automation freed our ops team to focus on innovation instead of tedious bill analysis. Efficiency skyrocketed.",
+      "author": "Liu",
+      "role": "Director of Tech Ops",
+      "company": "Top SaaS Enterprise",
+      "highlight": "90% Efficiency Gain"
+    },
+    "case3": {
+      "quote": "For a fast-growing startup, CostQ acts as a senior FinOps expert, helping us build a healthy financial model from the start.",
+      "author": "Wang",
+      "role": "Co-founder & CTO",
+      "company": "AI Unicorn",
+      "highlight": "Financial Modeling"
+    }
+  },
+  "security": {
+    "title": "Security Commitment",
+    "subtitle": "Adhering to the strictest compliance standards",
+    "item1": "Read-only IAM permissions, zero intrusion",
+    "item2": "TLS 1.3 encryption in transit",
+    "item3": "AES-256 encryption at rest",
+    "item4": "Enterprise SSO & Audit Logging"
+  },
+  "cta": {
+    "title": "Start Your FinOps Journey",
+    "subtitle": "Experience the AI-driven Cloud Cost Governance Platform",
+    "button": "Start Free",
+    "trust": "Trusted by 200+ Innovative Companies"
+  },
+  "roadmap": {
+    "label": "Future Vision",
+    "title": "Defining the Future of Cloud Cost Management",
+    "subtitle": "More than a tool, it's the path to the ultimate form of Cloud FinOps",
+    "phase1": {
+      "phase": "Phase 1",
+      "title": "Visibility",
+      "features": {
+        "0": "Break multi-cloud data silos",
+        "1": "Unified cost view",
+        "2": "Instant attribution, see every penny"
+      },
+      "date": "Ready"
+    },
+    "phase2": {
+      "phase": "Phase 2",
+      "title": "Intelligence",
+      "features": {
+        "0": "Agent proactively finds savings",
+        "1": "Conversational Ops",
+        "2": "From passive query to active advice"
+      },
+      "date": "Evolving"
+    },
+    "phase3": {
+      "phase": "Phase 3",
+      "title": "Autonomy",
+      "features": {
+        "0": "7x24 unmanned optimization",
+        "1": "Automatic cost anomaly circuit breaker",
+        "2": "AI adaptive resource scheduling"
+      },
+      "date": "Future Vision"
+    }
+  },
+  "finalCTA": {
+    "title": "Ready to Control Your Cloud Costs?",
+    "subtitle": "Start now and experience the new way of cost management with Agentic AI.",
+    "buttonPrimary": "Start Free Trial",
+    "buttonSecondary": "Contact Sales",
+    "footer": "No credit card required · 14-day free trial · Cancel anytime"
+  },
+  "footer": {
+    "tagline": "CostQ · Intelligent Cloud Cost Governance",
+    "copyright": "© 2026 CostQ. All rights reserved."
+  }
+}

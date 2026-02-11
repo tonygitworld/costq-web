@@ -1,0 +1,512 @@
+/* ===========================
+   FAQ Section - UI/UX Pro Max
+   折叠交互设计
+   =========================== */
+
+.section {
+  position: relative;
+  padding: 120px 0;
+  background: linear-gradient(180deg, #F9FAFB 0%, #FFFFFF 100%);
+  overflow: hidden;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ===========================
+   Header
+   =========================== */
+
+.header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.preTitle {
+  display: inline-block;
+  padding: 8px 20px;
+  background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-radius: 100px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+
+.title {
+  font-size: 48px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #111827;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: 20px;
+  line-height: 1.6;
+  color: #6B7280;
+  font-weight: 400;
+}
+
+/* ===========================
+   FAQ List
+   =========================== */
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 60px;
+}
+
+/* FAQ Item */
+.faqItem {
+  position: relative;
+  background: white;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.faqItem:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+.faqItemOpen {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Question Button */
+.question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 28px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s ease;
+}
+
+.question:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.faqItemOpen .question {
+  background: rgba(59, 130, 246, 0.04);
+}
+
+.questionLeft {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.iconWrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.faqItemOpen .iconWrapper {
+  transform: scale(1.05);
+}
+
+.questionText {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1F2937;
+  line-height: 1.4;
+}
+
+.toggle {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.04);
+  transition: background 0.2s ease;
+}
+
+.question:hover .toggle {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* Answer - 折叠内容 */
+.answer {
+  overflow: hidden;
+}
+
+.answerContent {
+  padding: 0 28px 28px 92px;
+}
+
+.answerContent p {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #6B7280;
+  margin: 0;
+}
+
+.answerContent p + p {
+  margin-top: 12px;
+}
+
+/* Progress Bar - 视觉反馈 */
+.progressBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  transform-origin: left;
+}
+
+/* ===========================
+   Contact Support CTA
+   =========================== */
+
+.contactSupport {
+  text-align: center;
+  padding: 48px 40px;
+  background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.supportIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background: white;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.supportText {
+  font-size: 20px;
+  color: #1F2937;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.supportLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+}
+
+.supportLink:hover {
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+  transform: translateY(-2px);
+}
+
+.supportLink svg {
+  transition: transform 0.3s ease;
+}
+
+.supportLink:hover svg {
+  transform: translateX(4px);
+}
+
+/* ===========================
+   Background Decorations
+   =========================== */
+
+.bgDecoration {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.wave1,
+.wave2 {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.06;
+}
+
+.wave1 {
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  top: -200px;
+  left: -200px;
+  animation: float 25s ease-in-out infinite;
+}
+
+.wave2 {
+  background: linear-gradient(135deg, #3B82F6 0%, #10B981 100%);
+  bottom: -200px;
+  right: -200px;
+  animation: float 30s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  33% {
+    transform: translate(40px, -40px) rotate(3deg);
+  }
+  66% {
+    transform: translate(-30px, 30px) rotate(-3deg);
+  }
+}
+
+/* ===========================
+   Responsive Design
+   =========================== */
+
+@media (max-width: 768px) {
+  .section {
+    padding: 80px 0;
+  }
+
+  .header {
+    margin-bottom: 48px;
+  }
+
+  .title {
+    font-size: 36px;
+  }
+
+  .subtitle {
+    font-size: 18px;
+  }
+
+  .faqList {
+    gap: 12px;
+    margin-bottom: 48px;
+  }
+
+  .question {
+    padding: 20px 24px;
+  }
+
+  .iconWrapper {
+    width: 40px;
+    height: 40px;
+  }
+
+  .questionText {
+    font-size: 16px;
+  }
+
+  .answerContent {
+    padding: 0 24px 24px 80px;
+  }
+
+  .answerContent p {
+    font-size: 15px;
+  }
+
+  .contactSupport {
+    padding: 36px 28px;
+  }
+
+  .supportIcon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .supportText {
+    font-size: 18px;
+  }
+
+  .supportLink {
+    padding: 12px 24px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: 60px 0;
+  }
+
+  .title {
+    font-size: 32px;
+  }
+
+  .subtitle {
+    font-size: 16px;
+  }
+
+  .question {
+    padding: 18px 20px;
+  }
+
+  .iconWrapper {
+    width: 36px;
+    height: 36px;
+  }
+
+  .questionText {
+    font-size: 15px;
+  }
+
+  .toggle {
+    width: 28px;
+    height: 28px;
+  }
+
+  .answerContent {
+    padding: 0 20px 20px 72px;
+  }
+
+  .answerContent p {
+    font-size: 14px;
+  }
+
+  .contactSupport {
+    padding: 28px 20px;
+  }
+
+  .supportIcon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .supportText {
+    font-size: 16px;
+  }
+
+  .supportLink {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+}
+
+/* ===========================
+   Dark Mode Support
+   =========================== */
+
+@media (prefers-color-scheme: dark) {
+  .section {
+    background: linear-gradient(180deg, #1F2937 0%, #111827 100%);
+  }
+
+  .title {
+    color: #F9FAFB;
+  }
+
+  .subtitle {
+    color: #D1D5DB;
+  }
+
+  .faqItem {
+    background: #1F2937;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .faqItemOpen {
+    border-color: rgba(59, 130, 246, 0.4);
+  }
+
+  .question:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .faqItemOpen .question {
+    background: rgba(59, 130, 246, 0.1);
+  }
+
+  .questionText {
+    color: #F3F4F6;
+  }
+
+  .toggle {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .question:hover .toggle {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .answerContent p {
+    color: #9CA3AF;
+  }
+
+  .contactSupport {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .supportIcon {
+    background: #1F2937;
+  }
+
+  .supportText {
+    color: #F3F4F6;
+  }
+}
+
+/* ===========================
+   Accessibility
+   =========================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .faqItem,
+  .question,
+  .toggle,
+  .supportLink,
+  .wave1,
+  .wave2 {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+.question:focus-visible {
+  outline: 2px solid #3B82F6;
+  outline-offset: 2px;
+  border-radius: 16px;
+}
+
+.supportLink:focus-visible {
+  outline: 2px solid #3B82F6;
+  outline-offset: 4px;
+}
+
+/* ARIA support */
+.question[aria-expanded="true"] .toggle {
+  background: rgba(59, 130, 246, 0.1);
+}

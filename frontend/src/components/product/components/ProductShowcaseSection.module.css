@@ -1,0 +1,129 @@
+/* ========================================
+   Features Section - 3x3 Grid Cards
+   Light Theme - Best Practices
+   ======================================== */
+
+.section {
+  position: relative;
+  width: 100%;
+  padding: 120px 24px;
+  background: linear-gradient(180deg, #FAFAFA 0%, #FFFFFF 100%);
+  overflow: hidden;
+}
+
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ===== Header ===== */
+
+.header {
+  text-align: center;
+  margin-bottom: 64px;
+}
+
+.title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #111827;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: #4B5563;
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+/* ===== Features Grid ===== */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+/* ===== Feature Card ===== */
+
+.card {
+  position: relative;
+  padding: 32px;
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: 100%;
+}
+
+.card:hover {
+  border-color: #3B82F6;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+  /* Transform is handled by Framer Motion in TSX, or can be added here if TSX is updated */
+  /* transform: translateY(-4px); */
+}
+
+/* Icon */
+.iconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 24px;
+  border-radius: 8px;
+  background: #EFF6FF;
+  color: #3B82F6;
+  transition: all 0.3s ease;
+}
+
+.card:hover .iconWrapper {
+  background: #3B82F6;
+  color: #FFFFFF;
+}
+
+/* Card Title */
+.cardTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #1F2937;
+  margin-bottom: 12px;
+}
+
+/* Card Description */
+.cardDesc {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #6B7280;
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section {
+    padding: 80px 20px;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+}

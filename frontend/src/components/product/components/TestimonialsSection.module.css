@@ -1,0 +1,237 @@
+/* ========================================
+   Testimonials Section
+   现代企业级设计 - 基于 shadcn/ui 风格
+   ======================================== */
+
+.section {
+  padding: var(--spacing-32) var(--spacing-6);
+  background: var(--background);
+  position: relative;
+  overflow: hidden;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ===== Header ===== */
+
+.header {
+  text-align: center;
+  margin-bottom: var(--spacing-20);
+}
+
+.title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--foreground);
+  margin-bottom: var(--spacing-4);
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  line-height: 1.6;
+  color: var(--foreground-subtle);
+}
+
+/* ===== Grid ===== */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: var(--spacing-8);
+}
+
+/* ===== Testimonial Card ===== */
+
+.card {
+  position: relative;
+  padding: var(--spacing-10);
+  background: var(--background);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--duration-normal) var(--easing);
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary), var(--shadow-md);
+  transform: translateY(-0.25rem);
+}
+
+/* Quote Icon */
+.quoteIcon {
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--primary);
+  opacity: 0.2;
+  margin-bottom: var(--spacing-4);
+}
+
+/* Quote Text */
+.quote {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--foreground);
+  margin-bottom: var(--spacing-6);
+  flex: 1;
+}
+
+/* Highlight */
+.highlight {
+  display: inline;
+  background: var(--accent);
+  color: var(--accent-foreground);
+  padding: 0.125rem var(--spacing-1);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+/* Author Section */
+.author {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  padding-top: var(--spacing-6);
+  border-top: 1px solid var(--border);
+}
+
+.avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-full);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.125rem;
+  flex-shrink: 0;
+  border: 2px solid var(--border);
+}
+
+.authorInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.authorName {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--foreground);
+  margin-bottom: 0.125rem;
+  line-height: 1.4;
+}
+
+.authorRole {
+  font-size: 0.8125rem;
+  color: var(--foreground-subtle);
+  line-height: 1.4;
+}
+
+.company {
+  font-size: 0.75rem;
+  color: var(--foreground-muted);
+  margin-top: 0.125rem;
+  line-height: 1.4;
+}
+
+/* Badge */
+.badge {
+  position: absolute;
+  top: var(--spacing-4);
+  right: var(--spacing-4);
+  padding: var(--spacing-1) var(--spacing-3);
+  background: var(--primary-subtle);
+  color: var(--primary);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: var(--radius-full);
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 1024px) {
+  .grid {
+    gap: var(--spacing-6);
+  }
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: var(--spacing-20) var(--spacing-4);
+  }
+
+  .header {
+    margin-bottom: var(--spacing-16);
+  }
+
+  .grid {
+    gap: var(--spacing-5);
+  }
+
+  .card {
+    padding: var(--spacing-8);
+  }
+
+  .quote {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: var(--spacing-16) var(--spacing-4);
+  }
+
+  .card {
+    padding: var(--spacing-6);
+  }
+
+  .quote {
+    font-size: 0.9375rem;
+  }
+
+  .authorName {
+    font-size: 0.875rem;
+  }
+
+  .authorRole {
+    font-size: 0.75rem;
+  }
+}
+
+/* ===== Accessibility ===== */
+
+.card:focus-within {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Quote marks styling */
+.quote::before {
+  content: '"';
+  color: var(--primary);
+  font-size: 1.5rem;
+  line-height: 0;
+  margin-right: 0.25rem;
+  vertical-align: -0.25rem;
+}
+
+.quote::after {
+  content: '"';
+  color: var(--primary);
+  font-size: 1.5rem;
+  line-height: 0;
+  margin-left: 0.25rem;
+  vertical-align: -0.25rem;
+}

@@ -1,0 +1,276 @@
+/* ========================================
+   Benefits Section
+   现代企业级设计 - 基于 shadcn/ui 风格
+   ======================================== */
+
+.section {
+  padding: var(--spacing-32) var(--spacing-6);
+  background: var(--background-subtle);
+  position: relative;
+  overflow: hidden;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+/* ===== Header ===== */
+
+.header {
+  text-align: center;
+  margin-bottom: var(--spacing-20);
+}
+
+.title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--foreground);
+  margin-bottom: var(--spacing-4);
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  line-height: 1.6;
+  color: var(--foreground-subtle);
+  max-width: 48rem;
+  margin: 0 auto;
+}
+
+/* ===== Grid (2x2) ===== */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: var(--spacing-8);
+  margin-bottom: var(--spacing-16);
+}
+
+/* ===== Card ===== */
+
+.card {
+  position: relative;
+  padding: var(--spacing-12);
+  background: var(--background);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--duration-normal) var(--easing);
+}
+
+.card:hover {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary), var(--shadow-lg);
+  transform: translateY(-0.5rem);
+}
+
+/* Icon */
+.iconWrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-6);
+  transition: transform var(--duration-normal) var(--easing);
+}
+
+.card:hover .iconWrapper {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+/* Content */
+.cardTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--foreground);
+  margin-bottom: var(--spacing-3);
+}
+
+.desc {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--foreground-subtle);
+  margin-bottom: var(--spacing-6);
+}
+
+/* Data Badge */
+.data {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4);
+  background: var(--accent);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--accent-foreground);
+}
+
+.data svg {
+  flex-shrink: 0;
+  color: var(--primary);
+}
+
+/* ===== Bottom CTA ===== */
+
+.cta {
+  text-align: center;
+  padding: var(--spacing-16) var(--spacing-10);
+  background: var(--background);
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--border);
+}
+
+.ctaTitle {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--foreground);
+  margin-bottom: var(--spacing-4);
+  line-height: 1.2;
+}
+
+.ctaSubtitle {
+  font-size: 1.125rem;
+  color: var(--foreground-subtle);
+  margin-bottom: var(--spacing-8);
+  max-width: 37.5rem;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+.ctaButtons {
+  display: flex;
+  gap: var(--spacing-4);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.primaryButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-4) var(--spacing-8);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--easing);
+}
+
+.primaryButton:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 0 0 3px var(--primary-subtle);
+  transform: translateY(-0.125rem);
+}
+
+.primaryButton:active {
+  background: var(--primary-active);
+  transform: scale(0.98);
+}
+
+.secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-4) var(--spacing-8);
+  background: transparent;
+  color: var(--foreground);
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--easing);
+}
+
+.secondaryButton:hover {
+  background: var(--muted);
+  border-color: var(--border-strong);
+  transform: translateY(-0.125rem);
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 768px) {
+  .section {
+    padding: var(--spacing-20) var(--spacing-4);
+  }
+
+  .header {
+    margin-bottom: var(--spacing-16);
+  }
+
+  .grid {
+    gap: var(--spacing-5);
+  }
+
+  .card {
+    padding: var(--spacing-8);
+  }
+
+  .cta {
+    padding: var(--spacing-12) var(--spacing-8);
+  }
+
+  .ctaTitle {
+    font-size: 1.75rem;
+  }
+
+  .ctaSubtitle {
+    font-size: 1rem;
+  }
+
+  .ctaButtons {
+    flex-direction: column;
+    gap: var(--spacing-3);
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: var(--spacing-16) var(--spacing-4);
+  }
+
+  .card {
+    padding: var(--spacing-6);
+  }
+
+  .cardTitle {
+    font-size: 1.375rem;
+  }
+
+  .cta {
+    padding: var(--spacing-10) var(--spacing-6);
+  }
+
+  .ctaTitle {
+    font-size: 1.5rem;
+  }
+}
+
+/* ===== Accessibility ===== */
+
+.card:focus-within,
+.primaryButton:focus-visible,
+.secondaryButton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
