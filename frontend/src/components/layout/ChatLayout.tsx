@@ -34,8 +34,18 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
   const location = useLocation();
   const { switchToChat, currentChatId, chats, messages } = useChatStore();
 
-  // ✅ 初始化：加载云账号数据（仅执行一次）
+  // ✅ 初始化：加载云账号数据（仅执行一次，避免与 Login 重复加载）
   useEffect(() => {
+    // ✅ 优化：如果账号已加载（列表不为空），跳过重复加载
+    const awsAccounts = useAccountStore.getState().accounts;
+    const gcpAccounts = useGCPAccountStore.getState().accounts;
+    const accountsAlreadyLoaded = awsAccounts.length > 0 || gcpAccounts.length > 0;
+
+    if (accountsAlreadyLoaded) {
+      logger.debug('ℹ️ [ChatLayout] 账号已加载，跳过重复加载');
+      return;
+    }
+
     logger.debug('🚀 [ChatLayout] 初始化：加载云账号数据');
 
     // ✅ 使用 getState() 获取最新的函数引用，避免依赖项变化导致循环

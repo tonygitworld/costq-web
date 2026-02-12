@@ -1,24 +1,32 @@
-import React, { type FC, Suspense } from 'react';
+import React, { type FC, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { App as AntdApp } from 'antd';
+import { App as AntdApp, Spin } from 'antd';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ChatLayout } from './components/layout/ChatLayout';
 
-// ★ 产品介绍页 - 懒加载（公开页面，无需登录）
-const ProductPage = React.lazy(() => import('./components/product/ProductPage'));
-import { CloudAccountManagement } from './components/settings/CloudAccountManagement';
-import { UserProfile } from './components/user/UserProfile';
-import { ChangePassword } from './components/user/ChangePassword';
-import { UserManagement } from './components/user/UserManagement';
-import { AlertManagement } from './components/alert/AlertManagement';
-import { AlertForm } from './components/alert/AlertForm';
-import { AlertDetail } from './components/alert/AlertDetail';
+// ★ P0: 首屏关键组件 - 同步加载（首屏必需）
 import { Login } from './components/auth/Login';
-import { Register } from './components/auth/Register';
-import { Activate } from './components/auth/Activate';
+import ProductPage from './components/product/ProductPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { SuperAdminRoute } from './routes/SuperAdminRoute';
-import { OpsDashboard, TenantList, TenantDetail, AuditLogs } from './components/ops';
+
+// ★ P0: 非首屏页面 - 路由级懒加载
+const ChatLayout = lazy(() => import('./components/layout/ChatLayout').then(m => ({ default: m.ChatLayout })));
+const CloudAccountManagement = lazy(() => import('./components/settings/CloudAccountManagement').then(m => ({ default: m.CloudAccountManagement })));
+const UserProfile = lazy(() => import('./components/user/UserProfile').then(m => ({ default: m.UserProfile })));
+const ChangePassword = lazy(() => import('./components/user/ChangePassword').then(m => ({ default: m.ChangePassword })));
+const UserManagement = lazy(() => import('./components/user/UserManagement').then(m => ({ default: m.UserManagement })));
+const AlertManagement = lazy(() => import('./components/alert/AlertManagement').then(m => ({ default: m.AlertManagement })));
+const AlertForm = lazy(() => import('./components/alert/AlertForm').then(m => ({ default: m.AlertForm })));
+const AlertDetail = lazy(() => import('./components/alert/AlertDetail').then(m => ({ default: m.AlertDetail })));
+const Register = lazy(() => import('./components/auth/Register').then(m => ({ default: m.Register })));
+const Activate = lazy(() => import('./components/auth/Activate').then(m => ({ default: m.Activate })));
+
+// ★ P0: 运营后台页面 - 独立 chunk (修复：使用命名导出 m.OpsDashboard，不是 m.default.OpsDashboard)
+const OpsDashboard = lazy(() => import('./components/ops').then(m => ({ default: m.OpsDashboard })));
+const TenantList = lazy(() => import('./components/ops').then(m => ({ default: m.TenantList })));
+const TenantDetail = lazy(() => import('./components/ops').then(m => ({ default: m.TenantDetail })));
+const AuditLogs = lazy(() => import('./components/ops').then(m => ({ default: m.AuditLogs })));
+
 import { SSEProvider } from './contexts/SSEContext';
 import { I18nProvider } from './components/common/I18nProvider';
 import { useAuthStore } from './stores/authStore';
@@ -27,6 +35,19 @@ import { setAuthMessageListener, setAuthRedirectListener } from './utils/authNot
 import './i18n';
 import 'antd/dist/reset.css';
 import './styles/account-selection.css';
+
+// ★ P0: 路由级 Loading 组件（避免白屏）
+const RouteFallback: FC = () => (
+  <div style={{
+    height: '100vh',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: '#f8fafc'
+  }}>
+    <Spin size="large" tip="加载中..." />
+  </div>
+);
 
 // 创建 QueryClient 实例
 const queryClient = new QueryClient({
@@ -67,178 +88,212 @@ const AppContent: FC = () => {
   return (
     <AntdApp>
       <Routes>
-      {/* ★ 产品介绍页 - 公开页面，作为首页 */}
-      <Route
-        path="/"
-        element={
-          <Suspense fallback={<div style={{ background: '#0B0C10', height: '100vh' }} />}>
-            <ProductPage />
-          </Suspense>
-        }
-      />
+        {/* ★ 产品介绍页 - 公开页面，作为首页（首屏关键） */}
+        <Route path="/" element={<ProductPage />} />
 
-      {/* 登录页面 */}
-      <Route
-        path="/login"
-        element={
-          isAuthenticated ? <Navigate to="/chat" replace /> : <Login />
-        }
-      />
+        {/* 登录页面 - 首屏关键 */}
+        <Route
+          path="/login"
+          element={isAuthenticated ? <Navigate to="/chat" replace /> : <Login />}
+        />
 
-      {/* 注册页面 */}
-      <Route
-        path="/register"
-        element={
-          isAuthenticated ? <Navigate to="/chat" replace /> : <Register />
-        }
-      />
+        {/* 注册页面 - 懒加载 */}
+        <Route
+          path="/register"
+          element={
+            isAuthenticated ? <Navigate to="/chat" replace /> : (
+              <Suspense fallback={<RouteFallback />}>
+                <Register />
+              </Suspense>
+            )
+          }
+        />
 
-      {/* 激活账号页面 */}
-      <Route
-        path="/activate/:token"
-        element={
-          isAuthenticated ? <Navigate to="/chat" replace /> : <Activate />
-        }
-      />
+        {/* 激活账号页面 - 懒加载 */}
+        <Route
+          path="/activate/:token"
+          element={
+            isAuthenticated ? <Navigate to="/chat" replace /> : (
+              <Suspense fallback={<RouteFallback />}>
+                <Activate />
+              </Suspense>
+            )
+          }
+        />
 
-      {/* 主页 - 聊天界面（需要登录） - 移动到 /chat */}
-      <Route
-        path="/chat"
-        element={
-          <ProtectedRoute>
-            <ChatLayout />
-          </ProtectedRoute>
-        }
-      />
+        {/* 主页 - 聊天界面（需要登录）- 懒加载 */}
+        <Route
+          path="/chat"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<RouteFallback />}>
+                <ChatLayout />
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
 
-      {/* 聊天会话页面 - 带会话ID的聊天界面 */}
-      <Route
-        path="/c/:sessionId"
-        element={
-          <ProtectedRoute>
-            <ChatLayout />
-          </ProtectedRoute>
-        }
-      />
+        {/* 聊天会话页面 - 懒加载 */}
+        <Route
+          path="/c/:sessionId"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<RouteFallback />}>
+                <ChatLayout />
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
 
-      {/* 设置页面 - 云账号管理 */}
-      <Route
-        path="/settings/accounts"
-        element={
-          <ProtectedRoute>
-            <ChatLayout>
-              <CloudAccountManagement />
-            </ChatLayout>
-          </ProtectedRoute>
-        }
-      />
+        {/* 设置页面 - 云账号管理 - 懒加载 */}
+        <Route
+          path="/settings/accounts"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<RouteFallback />}>
+                <ChatLayout>
+                  <CloudAccountManagement />
+                </ChatLayout>
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
 
-      {/* 个人设置 - 个人资料 */}
-      <Route
-        path="/settings/profile"
-        element={
-          <ProtectedRoute>
-            <ChatLayout>
-              <UserProfile />
-            </ChatLayout>
-          </ProtectedRoute>
-        }
-      />
+        {/* 个人设置 - 个人资料 - 懒加载 */}
+        <Route
+          path="/settings/profile"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<RouteFallback />}>
+                <ChatLayout>
+                  <UserProfile />
+                </ChatLayout>
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
 
-      {/* 个人设置 - 修改密码 */}
-      <Route
-        path="/settings/password"
-        element={
-          <ProtectedRoute>
-            <ChatLayout>
-              <ChangePassword />
-            </ChatLayout>
-          </ProtectedRoute>
-        }
-      />
+        {/* 个人设置 - 修改密码 - 懒加载 */}
+        <Route
+          path="/settings/password"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<RouteFallback />}>
+                <ChatLayout>
+                  <ChangePassword />
+                </ChatLayout>
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
 
-      {/* 系统设置 - 用户管理 (仅管理员) */}
-      <Route
-        path="/settings/users"
-        element={
-          <ProtectedRoute requireAdmin>
-            <ChatLayout>
-              <UserManagement />
-            </ChatLayout>
-          </ProtectedRoute>
-        }
-      />
+        {/* 系统设置 - 用户管理 (仅管理员) - 懒加载 */}
+        <Route
+          path="/settings/users"
+          element={
+            <ProtectedRoute requireAdmin>
+              <Suspense fallback={<RouteFallback />}>
+                <ChatLayout>
+                  <UserManagement />
+                </ChatLayout>
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
 
-      {/* 告警管理列表 */}
-      <Route
-        path="/settings/alerts"
-        element={
-          <ProtectedRoute>
-            <ChatLayout>
-              <AlertManagement />
-            </ChatLayout>
-          </ProtectedRoute>
-        }
-      />
+        {/* 告警管理列表 - 懒加载 */}
+        <Route
+          path="/settings/alerts"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<RouteFallback />}>
+                <ChatLayout>
+                  <AlertManagement />
+                </ChatLayout>
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
 
-      {/* 创建告警 */}
-      <Route
-        path="/settings/alerts/new"
-        element={
-          <ProtectedRoute>
-            <ChatLayout>
-              <AlertForm />
-            </ChatLayout>
-          </ProtectedRoute>
-        }
-      />
+        {/* 创建告警 - 懒加载 */}
+        <Route
+          path="/settings/alerts/new"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<RouteFallback />}>
+                <ChatLayout>
+                  <AlertForm />
+                </ChatLayout>
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
 
-      {/* 编辑告警 */}
-      <Route
-        path="/settings/alerts/edit/:id"
-        element={
-          <ProtectedRoute>
-            <ChatLayout>
-              <AlertForm />
-            </ChatLayout>
-          </ProtectedRoute>
-        }
-      />
+        {/* 编辑告警 - 懒加载 */}
+        <Route
+          path="/settings/alerts/edit/:id"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<RouteFallback />}>
+                <ChatLayout>
+                  <AlertForm />
+                </ChatLayout>
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
 
-      {/* 告警详情 */}
-      <Route
-        path="/settings/alerts/:id"
-        element={
-          <ProtectedRoute>
-            <ChatLayout>
-              <AlertDetail />
-            </ChatLayout>
-          </ProtectedRoute>
-        }
-      />
+        {/* 告警详情 - 懒加载 */}
+        <Route
+          path="/settings/alerts/:id"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<RouteFallback />}>
+                <ChatLayout>
+                  <AlertDetail />
+                </ChatLayout>
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
 
-      {/* 运营后台 - 需要超级管理员权限 */}
-      <Route
-        path="/ops/*"
-        element={
-          <ProtectedRoute>
-            <SuperAdminRoute />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="dashboard" element={<ChatLayout><OpsDashboard /></ChatLayout>} />
-        <Route path="tenants" element={<ChatLayout><TenantList /></ChatLayout>} />
-        <Route path="tenants/:id" element={<ChatLayout><TenantDetail /></ChatLayout>} />
-        <Route path="audit-logs" element={<ChatLayout><AuditLogs /></ChatLayout>} />
-        {/* 默认跳转 */}
-        <Route path="" element={<Navigate to="dashboard" replace />} />
-      </Route>
+        {/* 运营后台 - 需要超级管理员权限 - 懒加载 */}
+        <Route
+          path="/ops/*"
+          element={
+            <ProtectedRoute>
+              <SuperAdminRoute />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="dashboard" element={
+            <Suspense fallback={<RouteFallback />}>
+              <ChatLayout><OpsDashboard /></ChatLayout>
+            </Suspense>
+          } />
+          <Route path="tenants" element={
+            <Suspense fallback={<RouteFallback />}>
+              <ChatLayout><TenantList /></ChatLayout>
+            </Suspense>
+          } />
+          <Route path="tenants/:id" element={
+            <Suspense fallback={<RouteFallback />}>
+              <ChatLayout><TenantDetail /></ChatLayout>
+            </Suspense>
+          } />
+          <Route path="audit-logs" element={
+            <Suspense fallback={<RouteFallback />}>
+              <ChatLayout><AuditLogs /></ChatLayout>
+            </Suspense>
+          } />
+          <Route path="" element={<Navigate to="dashboard" replace />} />
+        </Route>
 
-      {/* 为了兼容旧路径，添加重定向 */}
-      <Route path="/alerts" element={<Navigate to="/settings/alerts" replace />} />
+        {/* 为了兼容旧路径，添加重定向 */}
+        <Route path="/alerts" element={<Navigate to="/settings/alerts" replace />} />
 
-      {/* 404 跳转 */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+        {/* 404 跳转 */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AntdApp>
   );

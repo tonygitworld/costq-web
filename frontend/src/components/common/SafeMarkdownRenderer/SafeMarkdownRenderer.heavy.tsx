@@ -1,4 +1,5 @@
-// SafeMarkdownRenderer component - 安全的Markdown渲染器
+// SafeMarkdownRenderer.heavy.tsx - 完整版（带语法高亮）
+// 此文件动态导入，不进入首屏 bundle
 import { type FC } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
@@ -6,7 +7,7 @@ import rehypeSanitize from 'rehype-sanitize';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { github } from 'react-syntax-highlighter/dist/esm/styles/hljs';
-import styles from '../../styles/markdown.module.css';
+import styles from '../../../styles/markdown.module.css';
 
 interface SafeMarkdownRendererProps {
   content: string;
@@ -71,3 +72,5 @@ export const SafeMarkdownRenderer: FC<SafeMarkdownRendererProps> = ({
     </div>
   );
 };
+
+export default SafeMarkdownRenderer;

@@ -1,5 +1,5 @@
 export { HoverStableCard } from './HoverStableCard';
-export { SafeMarkdownRenderer } from './SafeMarkdownRenderer';
+export { SafeMarkdownRenderer } from './SafeMarkdownRenderer/index';
 export { LanguageSwitcher } from './LanguageSwitcher';
 export { I18nProvider } from './I18nProvider';
 export { Flag, ChinaFlag, USAFlag, JapanFlag } from './FlagIcons';

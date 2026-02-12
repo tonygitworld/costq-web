@@ -5,6 +5,7 @@ import { HeroSection } from './components/HeroSection';
 // Phase 1: Core ToB Sections
 import { ProblemSection } from './components/ProblemSection';
 import { ProductShowcaseSection } from './components/ProductShowcaseSection';
+import { BenefitsSection } from './components/BenefitsSection';
 import { HowItWorksSection } from './components/HowItWorksSection';
 import { ProductRoadmapSection } from './components/ProductRoadmapSection';
 import { FinalCTASection } from './components/FinalCTASection';
@@ -21,18 +22,23 @@ const ProductPage: React.FC = () => {
     };
   }, []);
 
-  // 监听 hash 变化并滚动到对应 section
+  // 监听 hash 变化并滚动到对应 section (调试版)
   useEffect(() => {
     const handleHashChange = () => {
+      console.log('[ProductPage] hash changed to:', window.location.hash);
       const hash = window.location.hash.replace('#', '');
+      console.log('[ProductPage] looking for element:', hash);
       if (hash) {
         const element = document.getElementById(hash);
+        console.log('[ProductPage] element found:', element);
         if (element) {
           const container = document.getElementById('product-page-container');
+          console.log('[ProductPage] container found:', container);
           if (container) {
-            // 直接使用 element.offsetTop，它已经是相对于容器的位置
-            const elementTop = element.offsetTop;
+            const elementTop = element.offsetTop - container.scrollTop;
+            console.log('[ProductPage] scrolling to top:', elementTop);
             container.scrollTo({ top: elementTop, behavior: 'smooth' });
+            console.log('[ProductPage] scroll done');
           }
         }
       }
@@ -40,8 +46,10 @@ const ProductPage: React.FC = () => {
 
     handleHashChange(); // 初始检查
     window.addEventListener('hashchange', handleHashChange);
+    console.log('[ProductPage] hash listener registered');
     return () => {
       window.removeEventListener('hashchange', handleHashChange);
+      console.log('[ProductPage] hash listener cleanup');
     };
   }, []);
 
@@ -58,7 +66,10 @@ const ProductPage: React.FC = () => {
         {/* 4. Product Showcase - 产品功能展示 */}
         <ProductShowcaseSection />
 
-        {/* 5. How It Works - 工作原理 */}
+        {/* 5. Benefits Section - 核心能力 */}
+        <BenefitsSection />
+
+        {/* 6. How It Works - 工作原理 */}
         <HowItWorksSection />
 
         {/* 7. Product Roadmap - 产品规划 (独立展示) */}

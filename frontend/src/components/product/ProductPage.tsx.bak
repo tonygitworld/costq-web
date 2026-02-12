@@ -5,6 +5,7 @@ import { HeroSection } from './components/HeroSection';
 // Phase 1: Core ToB Sections
 import { ProblemSection } from './components/ProblemSection';
 import { ProductShowcaseSection } from './components/ProductShowcaseSection';
+import { BenefitsSection } from './components/BenefitsSection';
 import { HowItWorksSection } from './components/HowItWorksSection';
 import { ProductRoadmapSection } from './components/ProductRoadmapSection';
 import { FinalCTASection } from './components/FinalCTASection';
@@ -30,8 +31,7 @@ const ProductPage: React.FC = () => {
         if (element) {
           const container = document.getElementById('product-page-container');
           if (container) {
-            // 直接使用 element.offsetTop，它已经是相对于容器的位置
-            const elementTop = element.offsetTop;
+            const elementTop = element.offsetTop - container.scrollTop;
             container.scrollTo({ top: elementTop, behavior: 'smooth' });
           }
         }
@@ -39,6 +39,7 @@ const ProductPage: React.FC = () => {
     };
 
     handleHashChange(); // 初始检查
+
     window.addEventListener('hashchange', handleHashChange);
     return () => {
       window.removeEventListener('hashchange', handleHashChange);
@@ -58,7 +59,10 @@ const ProductPage: React.FC = () => {
         {/* 4. Product Showcase - 产品功能展示 */}
         <ProductShowcaseSection />
 
-        {/* 5. How It Works - 工作原理 */}
+        {/* 5. Benefits Section - 核心能力 */}
+        <BenefitsSection />
+
+        {/* 6. How It Works - 工作原理 */}
         <HowItWorksSection />
 
         {/* 7. Product Roadmap - 产品规划 (独立展示) */}

@@ -37,9 +37,6 @@ import { useI18n } from '../../hooks/useI18n';
 import type { Alert } from '../../types/alert';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import 'dayjs/locale/zh-cn';
-import 'dayjs/locale/en';
-import 'dayjs/locale/ja';
 
 dayjs.extend(relativeTime);
 

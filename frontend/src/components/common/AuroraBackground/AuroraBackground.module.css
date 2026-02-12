@@ -1,0 +1,84 @@
+/* AuroraBackground.module.css - 极光背景样式 */
+
+/* ★ P0: WebGL Canvas 样式 */
+.auroraCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* ★ 与内容层完全解耦 */
+  opacity: 0;
+  transition: opacity 0.8s ease-out;
+}
+
+.auroraCanvas.visible {
+  opacity: 1;
+}
+
+/* ★ P0: 降级模式 - CSS 动画版 */
+.auroraFallback {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s ease-out;
+
+  /* 纯 CSS 实现的简化 Aurora 效果 */
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 40%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 30%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse 70% 60% at 50% 80%, rgba(16, 185, 129, 0.08) 0%, transparent 50%);
+
+  /* 缓慢动画 */
+  animation: auroraFloat 20s ease-in-out infinite alternate;
+}
+
+.auroraFallback.visible {
+  opacity: 1;
+}
+
+@keyframes auroraFloat {
+  0% {
+    transform: translateX(-2%) translateY(-1%) scale(1);
+    filter: blur(40px);
+  }
+  50% {
+    transform: translateX(1%) translateY(0.5%) scale(1.02);
+    filter: blur(45px);
+  }
+  100% {
+    transform: translateX(2%) translateY(1%) scale(1.04);
+    filter: blur(50px);
+  }
+}
+
+/* ★ P0: 支持 prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .auroraFallback {
+    animation: none;
+    /* 静态渐变背景 */
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 40%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 40% at 80% 30%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+  }
+
+  .auroraCanvas,
+  .auroraFallback {
+    transition: none;
+  }
+}
+
+/* ★ P0: 移动端优化 */
+@media (max-width: 768px) {
+  .auroraFallback {
+    /* 移动端简化效果 */
+    background:
+      radial-gradient(ellipse 100% 60% at 30% 30%, rgba(59, 130, 246, 0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 50% at 70% 40%, rgba(139, 92, 246, 0.08) 0%, transparent 60%);
+    animation-duration: 30s; /* 更慢的动画 */
+  }
+}

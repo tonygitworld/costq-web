@@ -6,16 +6,19 @@ import { useI18n } from '@/hooks/useI18n';
 import { useAuthStore } from '@/stores/authStore';
 import styles from './Navbar.module.css';
 
-// 导航配置
-const NAV_LINKS = [
-  { id: 'hero', label: '首页', hash: '#hero' },
-  { id: 'problem', label: '痛点', hash: '#problem' },
-  { id: 'product-showcase', label: '产品展示', hash: '#product-showcase' },
-  { id: 'roadmap', label: '产品规划', hash: '#roadmap' },
-];
-
 export const Navbar: React.FC = () => {
-  const { t, language, changeLanguage } = useI18n();
+  const { t: tCommon, language, changeLanguage } = useI18n('common');
+  const { t: tProduct } = useI18n('product');
+
+  // 导航配置 - 移到组件内部以使用 i18n（使用 product 命名空间）
+  const NAV_LINKS = [
+    { id: 'hero', label: tProduct('nav.features'), hash: '#hero' },
+    { id: 'problem', label: tProduct('nav.solution'), hash: '#problem' },
+    { id: 'product-showcase', label: tProduct('nav.platform'), hash: '#product-showcase' },
+    { id: 'how-it-works', label: tProduct('nav.howItWorks'), hash: '#how-it-works' },
+    { id: 'roadmap', label: tProduct('nav.roadmap'), hash: '#roadmap' },
+    { id: 'final-cta', label: tProduct('nav.finalCTA'), hash: '#final-cta' },
+  ];
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [scrolled, setScrolled] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
@@ -88,18 +91,10 @@ export const Navbar: React.FC = () => {
     const container = document.getElementById('product-page-container');
 
     if (element && container) {
-      // 在全屏滚动容器内，使用 container.scrollTo
-      container.scrollTo({
-        top: element.offsetTop,
-        behavior: 'smooth'
-      });
-    } else if (element) {
-      // 回退
-      element.scrollIntoView({ behavior: 'smooth' });
+      // 直接使用 element.offsetTop，它已经是相对于容器的位置
+      const elementTop = element.offsetTop;
+      container.scrollTo({ top: elementTop, behavior: 'smooth' });
     }
-
-    // 手动立即更新 active 状态，提升响应感
-    setActiveSection(id);
   };
 
   return (
@@ -118,14 +113,14 @@ export const Navbar: React.FC = () => {
         {/* Center: Navigation */}
         <div className={styles.navLinks}>
           {NAV_LINKS.map((link) => (
-            <a
+            <Link
               key={link.id}
-              href={link.hash}
+              to={link.hash}
               className={`${styles.navLink} ${activeSection === link.id ? styles.activeLink : ''}`}
               onClick={(e) => handleNavClick(e, link.hash)}
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </div>
 

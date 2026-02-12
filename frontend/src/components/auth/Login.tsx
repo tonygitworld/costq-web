@@ -74,7 +74,7 @@ export const Login: React.FC = () => {
       ]);
 
       message.success(t('login.success.login'));
-      navigate('/');
+      navigate('/chat');
     } catch (error: unknown) {
       // ✅ 检查是否为租户未激活错误
       const { errorCode, errorMessage } = getApiErrorInfo(error);
