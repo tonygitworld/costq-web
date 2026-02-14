@@ -45,21 +45,6 @@
   z-index: 10;
 }
 
-.logoText {
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: #0F172A; /* 默认深色 */
-  transition: color 0.3s ease;
-}
-
-/* 渐变 Logo 效果 (可选，高端感通常用纯色或微渐变) */
-/* .logoText {
-  background: linear-gradient(135deg, #0F172A 0%, #334155 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-} */
-
 /* ===== Navigation Links (Center) ===== */
 
 .navLinks {

@@ -5,31 +5,31 @@ import { useI18n } from '@/hooks/useI18n';
 import styles from './HowItWorksSection.module.css';
 
 export const HowItWorksSection: React.FC = () => {
-  const { t } = useI18n();
+  const { t } = useI18n(['product', 'common']);
   const [activeStep, setActiveStep] = useState(0);
 
   const steps = [
     {
       id: 'agentic',
       icon: Bot,
-      title: 'Agentic 智能治理',
-      desc: '只需一句自然语言，Agent 即可自主拆解任务。从意图理解、工具调用到最终执行，全流程自动化闭环。支持复杂的逻辑推理与多工具协同。',
+      title: t('product:capabilities.step1.title'),
+      desc: t('product:capabilities.step1.desc'),
       // 请将您的图1/2重命名为 agent-workflow.png 并放入 public/images/features/
       image: '/images/features/agent-workflow.png'
     },
     {
       id: 'cost_tracking',
       icon: Table2,
-      title: '成本精准透视',
-      desc: '深入资源底层的成本追踪能力。精确解析 Amazon Bedrock 等复杂服务的内部构成，让每一分云支出的去向都清晰可见。',
+      title: t('product:capabilities.step2.title'),
+      desc: t('product:capabilities.step2.desc'),
       // 请将您的图3重命名为 cost-tracking.png 并放入 public/images/features/
       image: '/images/features/cost-tracking.png'
     },
     {
       id: 'decision',
       icon: GitBranch,
-      title: '多维智能告警',
-      desc: '告别死板的固定阈值。基于 AI 语义理解实现动态监控，监控维度无限扩展。决策逻辑全透明展示，智能判断复杂触发条件。',
+      title: t('product:capabilities.step3.title'),
+      desc: t('product:capabilities.step3.desc'),
       // 请将您的图4/6重命名为 decision-logic.png 并放入 public/images/features/
       image: '/images/features/decision-logic.png'
     }
@@ -39,8 +39,8 @@ export const HowItWorksSection: React.FC = () => {
     <section id="how-it-works" className={styles.section}>
       <div className={styles.container}>
         <div className={styles.header}>
-          <div className={styles.preTitle}>深度解析</div>
-          <h2 className={styles.title}>Agentic AI 核心能力</h2>
+          <div className={styles.preTitle}>{t('product:capabilities.preTitle')}</div>
+          <h2 className={styles.title}>{t('product:capabilities.title')}</h2>
         </div>
 
         <div className={styles.content}>

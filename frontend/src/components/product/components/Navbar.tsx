@@ -7,17 +7,16 @@ import { useAuthStore } from '@/stores/authStore';
 import styles from './Navbar.module.css';
 
 export const Navbar: React.FC = () => {
-  const { t: tCommon, language, changeLanguage } = useI18n('common');
-  const { t: tProduct } = useI18n('product');
+  const { t, language, changeLanguage } = useI18n(['product', 'common']);
 
   // 导航配置 - 移到组件内部以使用 i18n（使用 product 命名空间）
   const NAV_LINKS = [
-    { id: 'hero', label: tProduct('nav.features'), hash: '#hero' },
-    { id: 'problem', label: tProduct('nav.solution'), hash: '#problem' },
-    { id: 'product-showcase', label: tProduct('nav.platform'), hash: '#product-showcase' },
-    { id: 'how-it-works', label: tProduct('nav.howItWorks'), hash: '#how-it-works' },
-    { id: 'roadmap', label: tProduct('nav.roadmap'), hash: '#roadmap' },
-    { id: 'final-cta', label: tProduct('nav.finalCTA'), hash: '#final-cta' },
+    { id: 'hero', label: t('product:nav.home'), hash: '#hero' },
+    { id: 'problem', label: t('product:nav.painPoints'), hash: '#problem' },
+    { id: 'product-showcase', label: t('product:nav.platformIntro'), hash: '#product-showcase' },
+    { id: 'how-it-works', label: t('product:nav.coreCapabilities'), hash: '#how-it-works' },
+    { id: 'roadmap', label: t('product:nav.roadmap'), hash: '#roadmap' },
+    { id: 'final-cta', label: t('product:nav.getStarted'), hash: '#final-cta' },
   ];
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [scrolled, setScrolled] = useState(false);
@@ -107,7 +106,14 @@ export const Navbar: React.FC = () => {
       <nav className={styles.nav}>
         {/* Left: Logo */}
         <Link to="/product" className={styles.logo}>
-          <span className={styles.logoText}>CostQ</span>
+          <span style={{
+            fontSize: '28px',
+            fontWeight: 800,
+            letterSpacing: '-0.03em',
+            color: '#0f172a'
+          }}>
+            Cost<span style={{ color: '#3b82f6' }}>Q</span>
+          </span>
         </Link>
 
         {/* Center: Navigation */}

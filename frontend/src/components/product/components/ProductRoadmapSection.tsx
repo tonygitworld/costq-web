@@ -5,7 +5,7 @@ import { useI18n } from '@/hooks/useI18n';
 import styles from './ProductRoadmapSection.module.css';
 
 export const ProductRoadmapSection: React.FC = () => {
-  const { t } = useI18n();
+  const { t } = useI18n(['product', 'common']);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.3 });
 

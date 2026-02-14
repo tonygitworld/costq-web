@@ -5,7 +5,7 @@ import { useI18n } from '@/hooks/useI18n';
 import styles from './ProductShowcaseSection.module.css';
 
 export const ProductShowcaseSection: React.FC = () => {
-  const { t } = useI18n();
+  const { t } = useI18n(['product', 'common']);
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
 
@@ -13,48 +13,48 @@ export const ProductShowcaseSection: React.FC = () => {
   const features = [
     {
       icon: MessageSquareText,
-      title: '交互简单',
-      desc: '自然语言交互打破技术复杂度，实现真正的跨部门协作。',
+      title: t('product:showcase.feature1.title'),
+      desc: t('product:showcase.feature1.desc'),
     },
     {
       icon: FileBarChart,
-      title: '成本分析报告',
-      desc: '随时获取成本分析报告。',
+      title: t('product:showcase.feature2.title'),
+      desc: t('product:showcase.feature2.desc'),
     },
     {
       icon: Sparkles,
-      title: '数据洞察能力',
-      desc: '从静态数据统计到智能洞察的转变。',
+      title: t('product:showcase.feature3.title'),
+      desc: t('product:showcase.feature3.desc'),
     },
     {
       icon: DatabaseZap,
-      title: '数据准确可靠',
-      desc: '所有数据基于云成本服务官方服务接口的实时数据。',
+      title: t('product:showcase.feature4.title'),
+      desc: t('product:showcase.feature4.desc'),
     },
     {
       icon: Workflow,
-      title: '并行工具调用',
-      desc: '迅速返回结果，提升查询效率。',
+      title: t('product:showcase.feature5.title'),
+      desc: t('product:showcase.feature5.desc'),
     },
     {
       icon: BellRing,
-      title: '灵活告警设置',
-      desc: '自然语言设置告警，监控维度无限扩展，持续进行成本监控和报告发送。',
+      title: t('product:showcase.feature6.title'),
+      desc: t('product:showcase.feature6.desc'),
     },
     {
       icon: BrainCircuit,
-      title: '记忆',
-      desc: '短期记忆记住对话历史，无需重复提问；长期记忆记住用户角色，个性化数据展示。',
+      title: t('product:showcase.feature7.title'),
+      desc: t('product:showcase.feature7.desc'),
     },
     {
       icon: Bot,
-      title: '预留实例管理自动化',
-      desc: '根据利用率、覆盖率自动决定购买策略并执行。',
+      title: t('product:showcase.feature8.title'),
+      desc: t('product:showcase.feature8.desc'),
     },
     {
       icon: Smartphone,
-      title: '移动端友好',
-      desc: '自然语言交互方式让移动端查询更便捷。',
+      title: t('product:showcase.feature9.title'),
+      desc: t('product:showcase.feature9.desc'),
     },
   ];
 
@@ -99,8 +99,8 @@ export const ProductShowcaseSection: React.FC = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
         >
-          <h2 className={styles.title}>CostQ 是一个什么样的平台</h2>
-          <p className={styles.subtitle}>专为降本增效打造的智能云成本管理专家</p>
+          <h2 className={styles.title}>{t('product:showcase.title')}</h2>
+          <p className={styles.subtitle}>{t('product:showcase.subtitle')}</p>
         </motion.div>
 
         {/* Features Grid - 3x3 */}

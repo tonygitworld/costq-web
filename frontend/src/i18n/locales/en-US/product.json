@@ -1,15 +1,11 @@
 {
   "nav": {
-    "features": "Home",
-    "solution": "Pain Points",
-    "cases": "Platform",
-    "platform": "Core Capabilities",
-    "howItWorks": "How It Works",
-    "benefits": "Value & Benefits",
+    "home": "Home",
+    "painPoints": "Pain Points",
+    "platformIntro": "Platform",
+    "coreCapabilities": "Capabilities",
     "roadmap": "Roadmap",
-    "finalCTA": "Get Started",
-    "login": "Sign In",
-    "cta": "Get Started"
+    "getStarted": "Get Started"
   },
   "hero": {
     "badge": "AI-Native Cloud Cost Platform",
@@ -29,15 +25,18 @@
     "subtitle": "Traditional cost management fails in the cloud-native era",
     "pain1": {
       "title": "Cost Attribution Black Box",
-      "desc": "Thousands of line items with no clear business context. Finance lacks visibility, and Engineering lacks accountability."
+      "desc": "Thousands of line items with no clear business context. Finance lacks visibility, and Engineering lacks accountability.",
+      "impact": "Hidden costs drain budget"
     },
     "pain2": {
       "title": "Reactive Response Lag",
-      "desc": "Relying on monthly bills means weeks of wasted resources. Missing real-time circuit breakers for cost anomalies."
+      "desc": "Relying on monthly bills means weeks of wasted resources. Missing real-time circuit breakers for cost anomalies.",
+      "impact": "Hours lost in manual tracking"
     },
     "pain3": {
       "title": "Decision Paralysis",
-      "desc": "Complex RI strategies and architectural trade-offs lead to hesitation. Lack of data-driven guidance stalls optimization efforts."
+      "desc": "Complex RI strategies and architectural trade-offs lead to hesitation. Lack of data-driven guidance stalls optimization efforts.",
+      "impact": "Rising risk of budget overruns"
     }
   },
   "features": {
@@ -159,38 +158,38 @@
     "trust": "Trusted by 200+ Innovative Companies"
   },
   "roadmap": {
-    "label": "Future Vision",
-    "title": "Defining the Future of Cloud Cost Management",
-    "subtitle": "More than a tool, it's the path to the ultimate form of Cloud FinOps",
+    "label": "Vision",
+    "title": "Product Roadmap",
+    "subtitle": "Continuously evolving, defining the future of cloud cost management",
     "phase1": {
       "phase": "Phase 1",
-      "title": "Visibility",
+      "title": "Multi-Cloud Parallel Query & Analysis",
       "features": {
-        "0": "Break multi-cloud data silos",
-        "1": "Unified cost view",
-        "2": "Instant attribution, see every penny"
+        "0": "Comprehensive view of cloud resource distribution across accounts",
+        "1": "Compare costs of similar services to find optimization opportunities",
+        "2": "Improve decision-making accuracy with aggregated data"
       },
-      "date": "Ready"
+      "date": "Coming Soon"
     },
     "phase2": {
       "phase": "Phase 2",
-      "title": "Intelligence",
+      "title": "Expanded AI Operations Support",
       "features": {
-        "0": "Agent proactively finds savings",
-        "1": "Conversational Ops",
-        "2": "From passive query to active advice"
+        "0": "Rich console operations supporting diverse business scenarios",
+        "1": "AI-assisted debugging and configuration changes",
+        "2": "Achieve rapid response and agile management for innovation"
       },
-      "date": "Evolving"
+      "date": "Mid-Term"
     },
     "phase3": {
       "phase": "Phase 3",
-      "title": "Autonomy",
+      "title": "Autonomous Decision-Making",
       "features": {
-        "0": "7x24 unmanned optimization",
-        "1": "Automatic cost anomaly circuit breaker",
-        "2": "AI adaptive resource scheduling"
+        "0": "Continuous perception and analysis by intelligent agents",
+        "1": "Automated risk identification and anomaly detection",
+        "2": "Proactive risk prevention and closed-loop resolution"
       },
-      "date": "Future Vision"
+      "date": "Long-Term"
     }
   },
   "finalCTA": {
@@ -203,5 +202,61 @@
   "footer": {
     "tagline": "CostQ · Intelligent Cloud Cost Governance",
     "copyright": "© 2026 CostQ. All rights reserved."
+  },
+  "capabilities": {
+    "preTitle": "Deep Dive",
+    "title": "Agentic AI Core Capabilities",
+    "step1": {
+      "title": "Agentic Intelligence Governance",
+      "desc": "With just one natural language command, the Agent autonomously breaks down tasks. From intent understanding and tool invocation to final execution, the entire process is automated. Supports complex logical reasoning and multi-tool collaboration."
+    },
+    "step2": {
+      "title": "Precise Cost Visibility",
+      "desc": "Deep cost tracking capabilities at the resource level. Accurately parse the internal composition of complex services like Amazon Bedrock, making every cloud expenditure transparent."
+    },
+    "step3": {
+      "title": "Multi-dimensional Intelligent Alerts",
+      "desc": "Say goodbye to rigid fixed thresholds. Dynamic monitoring based on AI semantic understanding with unlimited monitoring dimensions. Transparent decision logic display and intelligent judgment of complex trigger conditions."
+    }
+  },
+  "showcase": {
+    "title": "What is CostQ Platform",
+    "subtitle": "Intelligent Cloud Cost Management Expert Built for Cost Optimization",
+    "feature1": {
+      "title": "Simple Interaction",
+      "desc": "Natural language interaction breaks down technical complexity, enabling true cross-department collaboration."
+    },
+    "feature2": {
+      "title": "Cost Analysis Reports",
+      "desc": "Get cost analysis reports anytime."
+    },
+    "feature3": {
+      "title": "Data Insights",
+      "desc": "Transform from static data statistics to intelligent insights."
+    },
+    "feature4": {
+      "title": "Accurate & Reliable Data",
+      "desc": "All data based on real-time data from official cloud cost service APIs."
+    },
+    "feature5": {
+      "title": "Parallel Tool Invocation",
+      "desc": "Quickly return results and improve query efficiency."
+    },
+    "feature6": {
+      "title": "Flexible Alert Settings",
+      "desc": "Set alerts with natural language, unlimited monitoring dimensions, continuous cost monitoring and report delivery."
+    },
+    "feature7": {
+      "title": "Memory",
+      "desc": "Short-term memory remembers conversation history, no repetitive questions; long-term memory remembers user roles, personalized data display."
+    },
+    "feature8": {
+      "title": "Reserved Instance Automation",
+      "desc": "Automatically determine purchase strategies and execute based on utilization and coverage."
+    },
+    "feature9": {
+      "title": "Mobile Friendly",
+      "desc": "Natural language interaction makes mobile queries more convenient."
+    }
   }
 }

@@ -38,9 +38,6 @@ export const FinalCTASection: React.FC = () => {
             </button>
           </div>
 
-          <p className={styles.footerNote}>
-            {t('product:finalCTA.footer')}
-          </p>
         </motion.div>
       </div>
     </section>

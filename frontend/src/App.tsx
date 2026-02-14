@@ -4,7 +4,7 @@ import { App as AntdApp, Spin } from 'antd';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // ★ P0: 首屏关键组件 - 同步加载（首屏必需）
-import { Login } from './components/auth/Login';
+import { EnterpriseLogin } from './components/auth/EnterpriseLogin';
 import ProductPage from './components/product/ProductPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { SuperAdminRoute } from './routes/SuperAdminRoute';
@@ -20,6 +20,7 @@ const AlertForm = lazy(() => import('./components/alert/AlertForm').then(m => ({
 const AlertDetail = lazy(() => import('./components/alert/AlertDetail').then(m => ({ default: m.AlertDetail })));
 const Register = lazy(() => import('./components/auth/Register').then(m => ({ default: m.Register })));
 const Activate = lazy(() => import('./components/auth/Activate').then(m => ({ default: m.Activate })));
+const ForgotPassword = lazy(() => import('./components/auth/ForgotPassword').then(m => ({ default: m.ForgotPassword })));
 
 // ★ P0: 运营后台页面 - 独立 chunk (修复：使用命名导出 m.OpsDashboard，不是 m.default.OpsDashboard)
 const OpsDashboard = lazy(() => import('./components/ops').then(m => ({ default: m.OpsDashboard })));
@@ -94,7 +95,7 @@ const AppContent: FC = () => {
         {/* 登录页面 - 首屏关键 */}
         <Route
           path="/login"
-          element={isAuthenticated ? <Navigate to="/chat" replace /> : <Login />}
+          element={isAuthenticated ? <Navigate to="/chat" replace /> : <EnterpriseLogin />}
         />
 
         {/* 注册页面 - 懒加载 */}
@@ -116,6 +117,18 @@ const AppContent: FC = () => {
             isAuthenticated ? <Navigate to="/chat" replace /> : (
               <Suspense fallback={<RouteFallback />}>
                 <Activate />
+              </Suspense>
+            )
+          }
+        />
+
+        {/* 忘记密码页面 - 懒加载 */}
+        <Route
+          path="/forgot-password"
+          element={
+            isAuthenticated ? <Navigate to="/chat" replace /> : (
+              <Suspense fallback={<RouteFallback />}>
+                <ForgotPassword />
               </Suspense>
             )
           }
