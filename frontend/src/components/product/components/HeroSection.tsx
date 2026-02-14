@@ -203,48 +203,112 @@ export const HeroSection: React.FC = () => {
                       <span>CostQ AI</span>
                     </div>
                     <div className={styles.aiContent}>
-                      <p>本月总支出 <strong>$12,450</strong>，环比下降 <strong style={{ color: '#22C55E' }}>8.3%</strong></p>
+                      <p style={{ fontSize: '13px', lineHeight: 1.6 }}>
+                        我来帮您分析本月AWS成本变化。首先获取当前日期，然后查询本月的成本数据。
+                        现在查询本月（2026年2月）的成本数据，按日粒度和服务维度进行分析：
+                      </p>
 
-                      {/* 优化建议卡片 */}
-                      <div className={styles.insightCard}>
-                        <div className={styles.insightHeader}>
-                          <TrendingDown size={16} style={{ color: '#22C55E' }} />
-                          <span>节省来源</span>
+                      <div style={{ fontWeight: 700, fontSize: 14, margin: '12px 0 8px', color: '#F59E0B' }}>
+                        🟠 AWS 成本分析 - 账号 2048
+                      </div>
+
+                      {/* 本月成本概况 */}
+                      <div style={{
+                        background: '#FEF3C7',
+                        padding: '10px 12px',
+                        borderRadius: 6,
+                        marginBottom: 12,
+                        border: '1px solid #FCD34D',
+                        fontSize: '12px'
+                      }}>
+                        <div style={{ fontWeight: 600, color: '#92400E', marginBottom: 6 }}>📊 本月成本概况（2月1日-2月14日）</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', color: '#78350F' }}>
+                          <div><strong>本月累计成本</strong>: <span style={{ color: '#DC2626', fontWeight: 700 }}>$12,450.00</span></div>
+                          <div><strong>日均成本</strong>: $889.29</div>
+                          <div><strong>上月总成本</strong>: $13,580.50</div>
+                          <div><strong>月度趋势</strong>: <span style={{ color: '#22C55E' }}>↓ 预计低于上月 8.3%</span></div>
                         </div>
-                        <div className={styles.insightList}>
-                          <div className={styles.insightItem}>
-                            <span>EC2 RI 覆盖率提升</span>
-                            <span className={styles.insightValue} style={{ color: '#22C55E' }}>-$1,200</span>
-                          </div>
-                          <div className={styles.insightItem}>
-                            <span>清理闲置 RDS</span>
-                            <span className={styles.insightValue} style={{ color: '#22C55E' }}>-$450</span>
-                          </div>
+                      </div>
+
+                      {/* 每日成本趋势 */}
+                      <div style={{ marginBottom: 12 }}>
+                        <div style={{ fontWeight: 600, fontSize: '12px', color: '#374151', marginBottom: 6 }}>📈 每日成本趋势</div>
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: '55px 55px 50px 35px',
+                          gap: '4px',
+                          fontSize: '11px',
+                          background: '#F9FAFB',
+                          padding: '6px 8px',
+                          borderRadius: 4
+                        }}>
+                          <div style={{ fontWeight: 600, color: '#6B7280' }}>日期</div>
+                          <div style={{ fontWeight: 600, color: '#6B7280' }}>成本</div>
+                          <div style={{ fontWeight: 600, color: '#6B7280' }}>环比</div>
+                          <div style={{ fontWeight: 600, color: '#6B7280' }}>趋势</div>
+
+                          {[
+                            { date: '2月1日', cost: '$945.20', change: '-', trend: '→', color: '#6B7280' },
+                            { date: '2月5日', cost: '$1,120.50', change: '+18.5%', trend: '↑', color: '#EF4444' },
+                            { date: '2月8日', cost: '$680.30', change: '-39.3%', trend: '↓', color: '#10B981' },
+                            { date: '2月12日', cost: '$1,580.00', change: '+132.2%', trend: '⚠️', color: '#DC2626' },
+                          ].map((row, i) => (
+                            <React.Fragment key={i}>
+                              <div style={{ color: '#374151' }}>{row.date}</div>
+                              <div style={{ color: row.trend === '⚠️' ? '#DC2626' : '#374151', fontWeight: row.trend === '⚠️' ? 600 : 400 }}>{row.cost}</div>
+                              <div style={{ color: row.color, fontSize: '10px' }}>{row.change}</div>
+                              <div style={{ color: row.color }}>{row.trend}</div>
+                            </React.Fragment>
+                          ))}
                         </div>
+                      </div>
+
+                      {/* 主要服务成本 */}
+                      <div style={{ marginBottom: 12 }}>
+                        <div style={{ fontWeight: 600, fontSize: '12px', color: '#374151', marginBottom: 6 }}>🎯 主要服务成本（本月累计）</div>
+                        <div style={{ fontSize: '11px', lineHeight: 1.5 }}>
+                          {[
+                            { name: 'Amazon EC2', cost: '$4,850.00', ratio: '39.0%', isMain: true },
+                            { name: 'Amazon RDS', cost: '$2,680.50', ratio: '21.5%', isMain: false },
+                            { name: 'Amazon EKS', cost: '$1,920.00', ratio: '15.4%', isMain: false },
+                            { name: '其他服务', cost: '$2,999.50', ratio: '24.1%', isMain: false },
+                          ].map((svc, i) => (
+                            <div key={i} style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              padding: '3px 0',
+                              borderBottom: i < 3 ? '1px solid #F3F4F6' : 'none'
+                            }}>
+                              <span style={{ color: svc.isMain ? '#DC2626' : '#374151', fontWeight: svc.isMain ? 600 : 400 }}>
+                                {svc.isMain ? '🔥 ' : ''}{svc.name}
+                              </span>
+                              <span style={{ color: svc.isMain ? '#DC2626' : '#6B7280', fontWeight: svc.isMain ? 600 : 400 }}>
+                                {svc.cost} ({svc.ratio})
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 关键发现 */}
+                      <div style={{
+                        background: '#F0FDF4',
+                        padding: '8px 10px',
+                        borderRadius: 6,
+                        border: '1px solid #BBF7D0',
+                        fontSize: '11px'
+                      }}>
+                        <div style={{ fontWeight: 600, color: '#16A34A', marginBottom: 4 }}>🔍 成本优化建议</div>
+                        <ul style={{ margin: 0, paddingLeft: 14, color: '#166534', lineHeight: 1.5 }}>
+                          <li>EC2 RI 覆盖率提升至 75%，可节省约 $1,200/月</li>
+                          <li>发现 3 个闲置 RDS 实例，建议清理可节省 $450/月</li>
+                          <li>本月成本控制在预算范围内，较上月优化明显</li>
+                        </ul>
                       </div>
                     </div>
                   </motion.div>
                 </motion.div>
 
-                {/* 底部图表预览 */}
-                <div className={styles.chartPreview}>
-                  <div className={styles.chartHeader}>
-                    <span className={styles.chartTitle}>成本趋势</span>
-                    <span className={styles.chartPeriod}>近 6 个月</span>
-                  </div>
-                  <div className={styles.chartBars}>
-                    {[60, 75, 45, 80, 55, 40].map((height, i) => (
-                      <motion.div
-                        key={i}
-                        className={styles.chartBar}
-                        initial={{ height: 0 }}
-                        animate={{ height: `${height}%` }}
-                        transition={{ delay: 1.8 + i * 0.1, duration: 0.6 }}
-                        style={{ background: height > 70 ? '#22C55E' : '#3B82F6' }}
-                      />
-                    ))}
-                  </div>
-                </div>
               </div>
             </div>
 

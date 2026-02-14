@@ -338,7 +338,7 @@ export const ChatHistory: FC = () => {
                 } else {
                   // ✅ 修复：如果在设置页面等非聊天页面，先导航到聊天页面
                   if (!isChatPath) {
-                    navigate('/');
+                    navigate('/chat');
                   }
                   switchToChat(chat.id);
                 }

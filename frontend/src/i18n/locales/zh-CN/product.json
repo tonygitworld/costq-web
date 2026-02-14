@@ -205,7 +205,7 @@
   },
   "capabilities": {
     "preTitle": "深度解析",
-    "title": "Agentic AI 核心能力",
+    "title": "CostQ 核心能力",
     "step1": {
       "title": "Agentic 智能治理",
       "desc": "只需一句自然语言，Agent 即可自主拆解任务。从意图理解、工具调用到最终执行，全流程自动化闭环。支持复杂的逻辑推理与多工具协同。"

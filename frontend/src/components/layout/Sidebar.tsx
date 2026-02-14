@@ -39,8 +39,8 @@ export const Sidebar: FC<SidebarProps> = ({ isCollapsed = false, onToggleCollaps
     // ✅ 第一步：清除当前会话（设置为 null 触发欢迎页面）
     useChatStore.setState({ currentChatId: null });
 
-    // ✅ 第二步：导航到主页
-    navigate('/', { replace: true });
+    // ✅ 第二步：导航到聊天页面
+    navigate('/chat', { replace: true });
 
     // ✅ 不再调用 createNewChat()
     // ✅ MessageInput 会在用户发送第一条消息时自动创建新会话

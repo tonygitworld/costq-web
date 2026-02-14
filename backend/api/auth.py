@@ -722,3 +722,165 @@ async def resend_activation(request_body: ResendActivationRequest, request: Requ
         )
     finally:
         db.close()
+
+
+# ===== 忘记密码相关端点 =====
+
+
+class ForgotPasswordRequest(BaseModel):
+    """忘记密码请求"""
+
+    email: str = Field(..., description="邮箱地址")
+
+    @field_validator("email")
+    @classmethod
+    def email_valid(cls, v):
+        if not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", v):
+            raise ValueError("邮箱格式不正确")
+        return v.lower()
+
+
+class ResetPasswordRequest(BaseModel):
+    """重置密码请求"""
+
+    email: str = Field(..., description="邮箱地址")
+    verification_code: str = Field(..., min_length=6, max_length=6, description="验证码")
+    new_password: str = Field(..., min_length=8, description="新密码")
+
+    @field_validator("email")
+    @classmethod
+    def email_valid(cls, v):
+        if not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", v):
+            raise ValueError("邮箱格式不正确")
+        return v.lower()
+
+    @field_validator("verification_code")
+    @classmethod
+    def verification_code_valid(cls, v):
+        if not v.isdigit():
+            raise ValueError("验证码必须是6位数字")
+        return v
+
+    @field_validator("new_password")
+    @classmethod
+    def password_strength(cls, v):
+        if len(v) < 8:
+            raise ValueError("密码长度至少为8位")
+        if not any(c.isupper() for c in v):
+            raise ValueError("密码必须包含至少一个大写字母")
+        if not any(c.islower() for c in v):
+            raise ValueError("密码必须包含至少一个小写字母")
+        if not any(c.isdigit() for c in v):
+            raise ValueError("密码必须包含至少一个数字")
+        return v
+
+
+@router.post("/forgot-password")
+@limiter.limit("10/hour")
+async def forgot_password(request_body: ForgotPasswordRequest, request: Request):
+    """
+    忘记密码 - 发送重置验证码
+
+    无论邮箱是否存在，都返回相同的响应（防止用户枚举攻击）
+    """
+    from backend.database import get_db
+    from backend.services.email_verification_service import get_email_verification_service
+
+    db = next(get_db())
+    verification_service = get_email_verification_service(db)
+    user_storage = get_user_storage()
+
+    try:
+        email = request_body.email
+
+        # 查找用户（静默处理，不暴露用户是否存在）
+        all_users = user_storage.get_all_users()
+        user = next((u for u in all_users if u["username"].lower() == email.lower()), None)
+
+        if user:
+            # 用户存在，发送验证码
+            result = await verification_service.send_verification_code(
+                email, purpose="reset_password"
+            )
+            if not result["success"]:
+                # 速率限制等错误仍然返回
+                if result.get("error_code") == "RATE_LIMIT_EXCEEDED":
+                    raise HTTPException(
+                        status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                        detail="发送过于频繁，请稍后再试",
+                    )
+                logger.error(f"❌ 发送重置验证码失败: {result.get('message')}")
+        else:
+            logger.info(f"忘记密码请求 - 邮箱不存在: {email}（静默处理）")
+
+        # 无论邮箱是否存在，都返回相同的成功响应
+        return {
+            "message": "如果该邮箱已注册，验证码将发送到您的邮箱",
+            "expires_in": 300,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ 忘记密码请求失败: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="服务暂时不可用，请稍后重试",
+        )
+    finally:
+        db.close()
+
+
+@router.post("/reset-password")
+@limiter.limit("5/minute")
+async def reset_password(request_body: ResetPasswordRequest, request: Request):
+    """
+    重置密码 - 验证验证码并设置新密码
+    """
+    from backend.database import get_db
+    from backend.services.email_verification_service import get_email_verification_service
+
+    db = next(get_db())
+    verification_service = get_email_verification_service(db)
+    user_storage = get_user_storage()
+
+    try:
+        email = request_body.email
+
+        # 1. 验证验证码
+        code_result = verification_service.verify_code(
+            email=email, code=request_body.verification_code, purpose="reset_password"
+        )
+
+        if not code_result["success"]:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail=code_result["message"]
+            )
+
+        # 2. 查找用户
+        all_users = user_storage.get_all_users()
+        user = next((u for u in all_users if u["username"].lower() == email.lower()), None)
+
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="验证码无效或已过期"
+            )
+
+        # 3. 更新密码
+        user_storage.update_password(user["id"], hash_password(request_body.new_password))
+
+        logger.info(f"✅ 密码重置成功 - user_id: {user['id']}, email: {email}")
+
+        return {"message": "密码重置成功，请使用新密码登录", "can_login": True}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ 密码重置失败: {str(e)}")
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"密码重置失败: {str(e)}",
+        )
+    finally:
+        db.close()
