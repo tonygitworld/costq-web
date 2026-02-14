@@ -58,13 +58,7 @@ export const ChangePassword: React.FC = () => {
         {/* 返回按钮 */}
         <Button
           icon={<ArrowLeftOutlined />}
-          onClick={() => {
-            if (window.history.length > 1) {
-              navigate(-1);
-            } else {
-              navigate('/');
-            }
-          }}
+          onClick={() => navigate('/chat')}
           type="text"
         >
           {t('common:button.back')}

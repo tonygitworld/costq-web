@@ -138,4 +138,28 @@ export const authApi = {
       skipAuth: true,
     });
   },
+
+  /**
+   * 忘记密码 - 发送重置验证码
+   */
+  async forgotPassword(email: string): Promise<{
+    message: string;
+    expires_in: number;
+  }> {
+    return apiClient.post('/auth/forgot-password', { email }, {
+      skipAuth: true,
+    });
+  },
+
+  /**
+   * 重置密码 - 验证验证码并设置新密码
+   */
+  async resetPassword(email: string, verification_code: string, new_password: string): Promise<{
+    message: string;
+    can_login: boolean;
+  }> {
+    return apiClient.post('/auth/reset-password', { email, verification_code, new_password }, {
+      skipAuth: true,
+    });
+  },
 };
