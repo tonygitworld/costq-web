@@ -46,6 +46,8 @@ export const AuditLogs: React.FC = () => {
   const [params, setParams] = useState<AuditLogListParams>({
     page: 1,
     page_size: 20,
+    start_date: dayjs().subtract(7, 'day').startOf('day').toISOString(),
+    end_date: dayjs().endOf('day').toISOString(),
   });
   const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null]>([
     dayjs().subtract(7, 'day'),
