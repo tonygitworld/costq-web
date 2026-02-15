@@ -294,6 +294,23 @@ class AuditLogger:
             details={"is_active": is_active, "display_name": display_name},
         )
 
+    def log_tenant_delete(
+        self,
+        user_id: str,
+        org_id: str,
+        tenant_name: str,
+        impact: dict,
+    ):
+        """记录删除租户"""
+        self.log(
+            user_id=user_id,
+            org_id=org_id,
+            action="tenant_delete",
+            resource_type="organization",
+            resource_id=org_id,
+            details={"tenant_name": tenant_name, "impact": impact},
+        )
+
     # 查询方法
 
     def get_user_logs(

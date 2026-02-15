@@ -3,7 +3,7 @@
  *
  * 展示租户列表，支持筛选、搜索、激活/禁用操作
  */
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Table,
   Tag,
@@ -13,8 +13,13 @@ import {
   Modal,
   message,
   Typography,
+  Space,
+  Alert,
 } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import {
+  SearchOutlined,
+  DeleteOutlined,
+} from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
@@ -22,6 +27,7 @@ import {
   opsService,
   type TenantListItem,
   type TenantListParams,
+  type TenantDeleteImpact,
 } from '../../services/opsService';
 import { useI18n } from '../../hooks/useI18n';
 
@@ -66,6 +72,22 @@ export const TenantList: React.FC = () => {
     onError: () => message.error(t('tenant.message.operationFailed')),
   });
 
+  // 删除租户
+  const deleteMutation = useMutation({
+    mutationFn: ({
+      tenantId,
+      confirmationName,
+    }: {
+      tenantId: string;
+      confirmationName: string;
+    }) => opsService.deleteTenant(tenantId, confirmationName),
+    onSuccess: () => {
+      message.success(t('tenant.message.deleteSuccess'));
+      queryClient.invalidateQueries({ queryKey: ['ops-tenants'] });
+    },
+    onError: () => message.error(t('tenant.message.operationFailed')),
+  });
+
   // 激活确认
   const handleActivate = (tenant: TenantListItem) => {
     modal.confirm({
@@ -86,6 +108,67 @@ export const TenantList: React.FC = () => {
       okButtonProps: { danger: true },
       cancelText: t('common.cancel'),
       onOk: () => deactivateMutation.mutateAsync(tenant.id),
+    });
+  };
+
+  // 删除确认（带影响预览和名称确认）
+  const deleteInputRef = useRef('');
+
+  const handleDelete = async (tenant: TenantListItem) => {
+    // 先获取影响预览
+    let impact: TenantDeleteImpact;
+    try {
+      impact = await opsService.getTenantDeleteImpact(tenant.id);
+    } catch {
+      message.error(t('tenant.message.operationFailed'));
+      return;
+    }
+
+    deleteInputRef.current = '';
+
+    modal.confirm({
+      title: t('tenant.action.confirmDelete'),
+      icon: <DeleteOutlined style={{ color: '#ff4d4f' }} />,
+      content: (
+        <div>
+          <p>
+            {t('tenant.action.confirmDeleteContent', {
+              name: tenant.name,
+            })}
+          </p>
+          <Alert
+            type="warning"
+            showIcon
+            style={{ marginBottom: 12 }}
+            message={t('tenant.action.deleteImpactWarning', {
+              userCount: impact.user_count,
+              awsCount: impact.aws_account_count,
+              gcpCount: impact.gcp_account_count,
+              monitorCount: impact.monitoring_config_count,
+              chatCount: impact.chat_session_count,
+            })}
+          />
+          <Input
+            placeholder={t('tenant.action.inputTenantName')}
+            onChange={(e) => {
+              deleteInputRef.current = e.target.value;
+            }}
+          />
+        </div>
+      ),
+      okText: t('tenant.action.delete'),
+      okButtonProps: { danger: true },
+      cancelText: t('common.cancel'),
+      onOk: async () => {
+        if (deleteInputRef.current !== tenant.name) {
+          message.error(t('tenant.message.nameNotMatch'));
+          return Promise.reject();
+        }
+        await deleteMutation.mutateAsync({
+          tenantId: tenant.id,
+          confirmationName: deleteInputRef.current,
+        });
+      },
     });
   };
 
@@ -133,25 +216,34 @@ export const TenantList: React.FC = () => {
     {
       title: t('tenant.table.actions'),
       key: 'action',
-      width: 100,
-      render: (_: unknown, record: TenantListItem) =>
-        record.is_active ? (
+      width: 180,
+      render: (_: unknown, record: TenantListItem) => (
+        <Space size="small">
+          {record.is_active ? (
+            <Button
+              danger
+              size="small"
+              onClick={() => handleDeactivate(record)}
+            >
+              {t('tenant.action.deactivate')}
+            </Button>
+          ) : (
+            <Button
+              type="primary"
+              size="small"
+              onClick={() => handleActivate(record)}
+            >
+              {t('tenant.action.activate')}
+            </Button>
+          )}
           <Button
             danger
             size="small"
-            onClick={() => handleDeactivate(record)}
-          >
-            {t('tenant.action.deactivate')}
-          </Button>
-        ) : (
-          <Button
-            type="primary"
-            size="small"
-            onClick={() => handleActivate(record)}
-          >
-            {t('tenant.action.activate')}
-          </Button>
-        ),
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record)}
+          />
+        </Space>
+      ),
     },
   ];
 

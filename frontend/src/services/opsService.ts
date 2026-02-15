@@ -71,6 +71,23 @@ export interface TenantActionResponse {
   is_active: boolean;
 }
 
+export interface TenantDeleteImpact {
+  tenant_id: string;
+  tenant_name: string;
+  is_active: boolean;
+  user_count: number;
+  aws_account_count: number;
+  gcp_account_count: number;
+  monitoring_config_count: number;
+  chat_session_count: number;
+}
+
+export interface TenantDeleteResponse {
+  message: string;
+  tenant_id: string;
+  tenant_name: string;
+}
+
 // ==================== 租户用户类型 ====================
 
 export interface TenantUserItem {
@@ -267,6 +284,28 @@ export const opsService = {
    */
   deactivateTenant: (tenantId: string): Promise<TenantActionResponse> =>
     apiClient.put<TenantActionResponse>(`/ops/tenants/${tenantId}/deactivate`),
+
+  /**
+   * 获取删除租户的影响预览
+   */
+  getTenantDeleteImpact: (tenantId: string): Promise<TenantDeleteImpact> =>
+    apiClient.get<TenantDeleteImpact>(`/ops/tenants/${tenantId}/impact`),
+
+  /**
+   * 永久删除租户
+   */
+  deleteTenant: (
+    tenantId: string,
+    confirmationName: string
+  ): Promise<TenantDeleteResponse> =>
+    apiClient.delete<TenantDeleteResponse>(
+      `/ops/tenants/${tenantId}`,
+      {
+        body: JSON.stringify({
+          confirmation_name: confirmationName,
+        }),
+      }
+    ),
 
   /**
    * 获取租户下的用户列表

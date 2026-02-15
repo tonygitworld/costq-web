@@ -34,15 +34,22 @@
     "action": {
       "activate": "Activate Tenant",
       "deactivate": "Deactivate Tenant",
+      "delete": "Delete Tenant",
       "confirmActivate": "Confirm Activation",
       "confirmDeactivate": "Confirm Deactivation",
+      "confirmDelete": "Confirm Tenant Deletion",
       "confirmActivateContent": "Are you sure you want to activate this tenant?",
-      "confirmDeactivateContent": "Are you sure you want to deactivate this tenant? All users under this tenant will be unable to log in."
+      "confirmDeactivateContent": "Are you sure you want to deactivate this tenant? All users under this tenant will be unable to log in.",
+      "confirmDeleteContent": "This will permanently delete tenant \"{{name}}\" and all its data. This action cannot be undone.",
+      "deleteImpactWarning": "Will delete: {{userCount}} users, {{awsCount}} AWS accounts, {{gcpCount}} GCP accounts, {{monitorCount}} monitoring configs, {{chatCount}} sessions",
+      "inputTenantName": "Enter tenant name to confirm deletion"
     },
     "message": {
       "activateSuccess": "Tenant activated successfully",
       "deactivateSuccess": "Tenant deactivated successfully",
-      "operationFailed": "Operation failed"
+      "deleteSuccess": "Tenant permanently deleted",
+      "operationFailed": "Operation failed",
+      "nameNotMatch": "Name does not match"
     }
   },
   "user": {
