@@ -103,6 +103,10 @@ export const AuditLogs: React.FC = () => {
         end_date: dates[1].endOf('day').toISOString(),
         page: 1,
       });
+    } else {
+      // 清除日期时，移除日期参数，查询所有日期
+      const { start_date, end_date, ...rest } = params;
+      setParams({ ...rest, page: 1 });
     }
   };
 

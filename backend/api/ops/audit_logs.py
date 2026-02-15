@@ -1,7 +1,7 @@
 """审计日志 API"""
 
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
@@ -122,16 +122,11 @@ def list_audit_logs(
     # 基础查询
     query = db.query(AuditLog)
 
-    # 时间范围筛选
+    # 时间范围筛选（不传日期则查询所有记录）
     if start_date:
         query = query.filter(AuditLog.timestamp >= start_date)
     if end_date:
         query = query.filter(AuditLog.timestamp <= end_date)
-
-    # 默认最近 7 天
-    if not start_date and not end_date:
-        default_start = datetime.now(timezone.utc) - timedelta(days=7)
-        query = query.filter(AuditLog.timestamp >= default_start)
 
     # 租户筛选
     if org_id:
