@@ -20,7 +20,8 @@
     "opsBackend": "Operations Backend",
     "opsDashboard": "Operations Dashboard",
     "tenantManagement": "Tenant Management",
-    "auditLogs": "Audit Logs"
+    "auditLogs": "Audit Logs",
+    "tokenUsage": "Token Usage"
   },
   "input": {
     "placeholder": "Type your question... (Enter to send, Shift+Enter for new line)",

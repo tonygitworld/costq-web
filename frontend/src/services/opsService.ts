@@ -140,6 +140,70 @@ export interface AuditLogListParams {
   search?: string;
 }
 
+// ==================== Token 用量类型 ====================
+
+export interface TokenUsageSummary {
+  total_input_tokens: number;
+  total_output_tokens: number;
+  total_cache_read_tokens: number;
+  total_cache_write_tokens: number;
+  total_tokens: number;
+  total_messages: number;
+  start_date: string;
+  end_date: string;
+}
+
+export interface OrgTokenUsageItem {
+  org_id: string;
+  org_name: string;
+  input_tokens: number;
+  output_tokens: number;
+  cache_read_tokens: number;
+  cache_write_tokens: number;
+  total_tokens: number;
+}
+
+export interface TokenUsageByOrgResponse {
+  total: number;
+  page: number;
+  page_size: number;
+  items: OrgTokenUsageItem[];
+}
+
+export interface UserTokenUsageItem {
+  user_id: string;
+  username: string;
+  org_id: string;
+  org_name: string;
+  input_tokens: number;
+  output_tokens: number;
+  cache_read_tokens: number;
+  cache_write_tokens: number;
+  total_tokens: number;
+}
+
+export interface TokenUsageByUserResponse {
+  total: number;
+  page: number;
+  page_size: number;
+  items: UserTokenUsageItem[];
+}
+
+export interface TokenUsageByOrgParams {
+  start_date?: string;
+  end_date?: string;
+  page?: number;
+  page_size?: number;
+}
+
+export interface TokenUsageByUserParams {
+  start_date?: string;
+  end_date?: string;
+  org_id?: string;
+  page?: number;
+  page_size?: number;
+}
+
 
 // ==================== 辅助函数 ====================
 
@@ -241,5 +305,31 @@ export const opsService = {
   getAuditLogUsers: (orgId?: string): Promise<{ options: FilterOption[] }> =>
     apiClient.get<{ options: FilterOption[] }>('/ops/audit-logs/users', {
       params: orgId ? { org_id: orgId } : {},
+    }),
+
+  // -------------------- Token 用量 --------------------
+
+  /**
+   * 获取全平台 Token 用量汇总
+   */
+  getTokenUsageSummary: (startDate?: string, endDate?: string): Promise<TokenUsageSummary> =>
+    apiClient.get<TokenUsageSummary>('/ops/token-usage/summary', {
+      params: filterParams({ start_date: startDate, end_date: endDate }),
+    }),
+
+  /**
+   * 获取按组织维度的 Token 用量
+   */
+  getTokenUsageByOrg: (params: TokenUsageByOrgParams): Promise<TokenUsageByOrgResponse> =>
+    apiClient.get<TokenUsageByOrgResponse>('/ops/token-usage/by-org', {
+      params: filterParams(params),
+    }),
+
+  /**
+   * 获取按用户维度的 Token 用量
+   */
+  getTokenUsageByUser: (params: TokenUsageByUserParams): Promise<TokenUsageByUserResponse> =>
+    apiClient.get<TokenUsageByUserResponse>('/ops/token-usage/by-user', {
+      params: filterParams(params),
     }),
 };
