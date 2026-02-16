@@ -62,6 +62,7 @@ class AuditLogItem(BaseModel):
     ip_address: str | None
     user_agent: str | None
     details: str | None  # JSON 字符串
+    session_id: str | None  # 会话ID，仅query操作有值
 
 
 class AuditLogListResponse(BaseModel):
@@ -153,8 +154,8 @@ def list_audit_logs(
             )
         ).all()
 
-        org_id_list = [str(org_id[0]) for org_id in matching_org_ids]
-        user_id_list = [str(user_id[0]) for user_id in matching_user_ids]
+        org_id_list = [str(oid[0]) for oid in matching_org_ids]
+        user_id_list = [str(uid[0]) for uid in matching_user_ids]
 
         # 构建 OR 条件
         search_conditions = [AuditLog.details.ilike(f"%{search}%")]
@@ -202,7 +203,8 @@ def list_audit_logs(
             resource_id=str(log.resource_id) if log.resource_id else None,
             ip_address=log.ip_address,
             user_agent=log.user_agent,
-            details=json.dumps(log.details) if isinstance(log.details, dict) else log.details,
+            details=log.details,  # 已经是 JSON 字符串，无需再次 dumps
+            session_id=str(log.session_id) if log.session_id else None,
         )
         for log in logs
     ]

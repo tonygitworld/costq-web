@@ -76,7 +76,10 @@
       "time": "时间",
       "tenant": "租户",
       "user": "用户",
-      "action": "操作"
+      "action": "操作",
+      "resourceType": "资源类型",
+      "resourceId": "资源 ID",
+      "sessionId": "会话 ID"
     },
     "filter": {
       "today": "今天",
@@ -86,6 +89,14 @@
       "selectUser": "选择用户",
       "actionType": "操作类型",
       "searchPlaceholder": "搜索（租户/用户/详情）"
+    },
+    "summary": {
+      "totalRecords": "共 {{total}} 条记录",
+      "totalPagination": "共 {{total}} 条"
+    },
+    "button": {
+      "reset": "重置",
+      "refresh": "刷新"
     }
   },
   "trend": {

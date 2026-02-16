@@ -76,7 +76,10 @@
       "time": "Time",
       "tenant": "Tenant",
       "user": "User",
-      "action": "Action"
+      "action": "Action",
+      "resourceType": "Resource Type",
+      "resourceId": "Resource ID",
+      "sessionId": "Session ID"
     },
     "filter": {
       "today": "Today",
@@ -86,6 +89,14 @@
       "selectUser": "Select User",
       "actionType": "Action Type",
       "searchPlaceholder": "Search (tenant/user/details)"
+    },
+    "summary": {
+      "totalRecords": "{{total}} records in total",
+      "totalPagination": "Total {{total}}"
+    },
+    "button": {
+      "reset": "Reset",
+      "refresh": "Refresh"
     }
   },
   "trend": {

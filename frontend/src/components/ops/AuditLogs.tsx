@@ -19,7 +19,6 @@ import { useQuery } from '@tanstack/react-query';
 import dayjs, { type Dayjs } from 'dayjs';
 import {
   opsService,
-  type AuditLogItem,
   type AuditLogListParams,
 } from '../../services/opsService';
 import { useI18n } from '../../hooks/useI18n';
@@ -129,33 +128,59 @@ export const AuditLogs: React.FC = () => {
       title: t('audit.table.time'),
       dataIndex: 'timestamp',
       key: 'timestamp',
-      width: 160,
+      width: 165,
       render: (ts: string) => dayjs(ts).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
       title: t('audit.table.tenant'),
       dataIndex: 'org_name',
       key: 'org_name',
-      width: 120,
+      width: 140,
+      ellipsis: true,
       render: (name: string | null) => name || '-',
     },
     {
       title: t('audit.table.user'),
       dataIndex: 'username',
       key: 'username',
-      width: 160,
+      width: 200,
+      ellipsis: true,
       render: (name: string | null) => name || '-',
     },
     {
       title: t('audit.table.action'),
       dataIndex: 'action',
       key: 'action',
-      width: 100,
+      width: 90,
       render: (action: string) => {
         const label =
           actionTypes?.actions.find((a) => a.value === action)?.label || action;
         return <Tag color={ACTION_COLORS[action] || 'default'}>{label}</Tag>;
       },
+    },
+    {
+      title: t('audit.table.resourceType'),
+      dataIndex: 'resource_type',
+      key: 'resource_type',
+      width: 120,
+      ellipsis: true,
+      render: (value: string | null) => value || '-',
+    },
+    {
+      title: t('audit.table.resourceId'),
+      dataIndex: 'resource_id',
+      key: 'resource_id',
+      width: 310,
+      ellipsis: true,
+      render: (value: string | null) => value || '-',
+    },
+    {
+      title: t('audit.table.sessionId'),
+      dataIndex: 'session_id',
+      key: 'session_id',
+      width: 310,
+      ellipsis: true,
+      render: (value: string | null) => value || '-',
     },
     {
       title: 'IP',
@@ -165,63 +190,6 @@ export const AuditLogs: React.FC = () => {
       render: (ip: string | null) => ip || '-',
     },
   ];
-
-  // 展开行渲染
-  const expandedRowRender = (record: AuditLogItem) => {
-    let detailsObj = null;
-    try {
-      if (record.details) {
-        detailsObj = JSON.parse(record.details);
-      }
-    } catch {
-      // 解析失败，显示原始字符串
-    }
-
-    return (
-      <div style={{ padding: '8px 0' }}>
-        <Space direction="vertical" size="small">
-          {record.resource_type && (
-            <Text>
-              <strong>资源类型:</strong> {record.resource_type}
-            </Text>
-          )}
-          {record.resource_id && (
-            <Text>
-              <strong>资源 ID:</strong> {record.resource_id}
-            </Text>
-          )}
-          {record.user_agent && (
-            <Text>
-              <strong>User-Agent:</strong>{' '}
-              <Text type="secondary" style={{ fontSize: 12 }}>
-                {record.user_agent}
-              </Text>
-            </Text>
-          )}
-          {record.details && (
-            <div>
-              <strong>详情:</strong>
-              <pre
-                style={{
-                  background: '#f5f5f5',
-                  padding: 8,
-                  borderRadius: 4,
-                  fontSize: 12,
-                  maxHeight: 200,
-                  overflow: 'auto',
-                }}
-              >
-                {detailsObj
-                  ? JSON.stringify(detailsObj, null, 2)
-                  : record.details}
-              </pre>
-            </div>
-          )}
-        </Space>
-      </div>
-    );
-  };
-
 
   return (
     <div style={{
@@ -291,15 +259,15 @@ export const AuditLogs: React.FC = () => {
         <Button type="primary" onClick={handleSearch}>
           {t('common:button.search')}
         </Button>
-        <Button onClick={handleReset}>重置</Button>
+        <Button onClick={handleReset}>{t('audit.button.reset')}</Button>
         <Button icon={<ReloadOutlined />} onClick={() => refetch()}>
-          刷新
+          {t('audit.button.refresh')}
         </Button>
       </Space>
 
       {/* 结果统计 */}
       <div style={{ marginBottom: 8 }}>
-        <Text type="secondary">共 {data?.total || 0} 条记录</Text>
+        <Text type="secondary">{t('audit.summary.totalRecords', { total: data?.total || 0 })}</Text>
       </div>
 
       {/* 日志表格 */}
@@ -308,12 +276,8 @@ export const AuditLogs: React.FC = () => {
         dataSource={data?.items}
         rowKey="id"
         loading={isLoading}
-        expandable={{
-          expandedRowRender,
-          expandRowByClick: true,
-        }}
         scroll={{
-          x: 1400,
+          x: 1600,
           y: 'calc(100vh - 350px)',
           scrollToFirstRowOnChange: true
         }}
@@ -326,7 +290,7 @@ export const AuditLogs: React.FC = () => {
           total: data?.total,
           showSizeChanger: true,
           pageSizeOptions: ['20', '50', '100'],
-          showTotal: (total) => `共 ${total} 条`,
+          showTotal: (total) => t('audit.summary.totalPagination', { total }),
           onChange: (page, pageSize) =>
             setParams({ ...params, page, page_size: pageSize }),
         }}

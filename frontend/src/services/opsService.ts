@@ -127,6 +127,7 @@ export interface AuditLogItem {
   ip_address: string | null;
   user_agent: string | null;
   details: string | null;
+  session_id: string | null;
 }
 
 export interface AuditLogListResponse {

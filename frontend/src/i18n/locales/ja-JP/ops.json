@@ -76,7 +76,10 @@
       "time": "時刻",
       "tenant": "テナント",
       "user": "ユーザー",
-      "action": "操作"
+      "action": "操作",
+      "resourceType": "リソースタイプ",
+      "resourceId": "リソース ID",
+      "sessionId": "セッション ID"
     },
     "filter": {
       "today": "今日",
@@ -86,6 +89,14 @@
       "selectUser": "ユーザーを選択",
       "actionType": "操作タイプ",
       "searchPlaceholder": "検索（テナント/ユーザー/詳細）"
+    },
+    "summary": {
+      "totalRecords": "全 {{total}} 件",
+      "totalPagination": "全 {{total}} 件"
+    },
+    "button": {
+      "reset": "リセット",
+      "refresh": "更新"
     }
   },
   "trend": {

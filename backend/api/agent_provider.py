@@ -123,8 +123,11 @@ class AWSBedrockAgentProvider(AgentProvider):
         """执行查询（包含所有业务逻辑）"""
 
         # ✅ 记录用户查询日志（关键日志，必须显示）
+        query_preview = query[:100] + "..." if len(query) > 100 else query
         logger.info(
-            f"💬 [聊天查询] 用户 {username} 发送查询: {query[:100]}{'...' if len(query) > 100 else ''}",
+            "💬 [聊天查询] 用户 %s 发送查询: %s",
+            username,
+            query_preview,
             extra={
                 "user_id": user_id,
                 "username": username,
@@ -147,7 +150,7 @@ class AWSBedrockAgentProvider(AgentProvider):
             # 并发查询限制检查
             resource_manager = get_resource_manager()
             if not await resource_manager.check_query_limit(user_id):
-                logger.warning("- User: %s", username)
+                logger.warning("并发查询数达到上限 - User: %s", username)
                 yield {
                     "type": "error",
                     "content": "并发查询数达到上限，请等待当前查询完成",
@@ -160,9 +163,9 @@ class AWSBedrockAgentProvider(AgentProvider):
             # 记录审计日志
             audit_logger = get_audit_logger()
             if account_ids:
-                audit_logger.log_query(user_id, org_id, query, account_ids, "aws")
+                audit_logger.log_query(user_id, org_id, query, account_ids, "aws", session_id=session_id)
             if gcp_account_ids:
-                audit_logger.log_query(user_id, org_id, query, gcp_account_ids, "gcp")
+                audit_logger.log_query(user_id, org_id, query, gcp_account_ids, "gcp", session_id=session_id)
 
             # 权限验证
             user_storage = get_user_storage()
@@ -195,7 +198,7 @@ class AWSBedrockAgentProvider(AgentProvider):
                         }
                         return
             else:
-                logger.info("- User: %s, ", username)
+                logger.info("用户无需验证 - User: %s", username)
 
             # 性能追踪
             query_start = time.time()
@@ -214,13 +217,20 @@ class AWSBedrockAgentProvider(AgentProvider):
             if role == "admin":
                 all_aws_accounts = aws_account_storage.list_accounts(org_id=org_id)
                 all_gcp_accounts = gcp_account_storage.list_accounts(org_id=org_id)
-                logger.info("- Org: %s, AWS: {len(all_aws_accounts)}, GCP: {len(all_gcp_accounts)}", org_id)
+                logger.info(
+                    "管理员账号查询 - Org: %s, AWS: %s, GCP: %s",
+                    org_id, len(all_aws_accounts), len(all_gcp_accounts),
+                )
             else:
                 authorized_aws_account_ids = user_storage.get_user_aws_accounts(user_id)
                 all_gcp_accounts = gcp_account_storage.list_accounts(org_id=org_id)
                 all_aws_accounts_raw = aws_account_storage.list_accounts(org_id=org_id)
                 all_aws_accounts = [acc for acc in all_aws_accounts_raw if acc["id"] in authorized_aws_account_ids]
-                logger.info("- Org: %s, AWS: {len(all_aws_accounts)}/{len(all_aws_accounts_raw)}, GCP: {len(all_gcp_accounts)}", org_id)
+                logger.info(
+                    "普通用户账号查询 - Org: %s, AWS: %s/%s, GCP: %s",
+                    org_id, len(all_aws_accounts),
+                    len(all_aws_accounts_raw), len(all_gcp_accounts),
+                )
 
             if not all_aws_accounts and not all_gcp_accounts:
                 yield {
@@ -299,9 +309,9 @@ class AWSBedrockAgentProvider(AgentProvider):
                             session_id = None
                         else:
                             # ✅ 如果存在且属于当前用户，复用
-                            logger.info(": %s", session_id)
+                            logger.info("复用已有会话: %s", session_id)
                     except Exception as e:
-                        logger.error("Session: %s", e)
+                        logger.error("会话验证失败: %s", e, exc_info=True)
                         session_id = None
 
                 if not session_id:
@@ -310,7 +320,7 @@ class AWSBedrockAgentProvider(AgentProvider):
                     try:
                         session = chat_storage.create_session(user_id=user_id, org_id=org_id, title=session_title)
                         session_id = session["id"]
-                        logger.info("- Session: %s", session_id)
+                        logger.info("创建新会话: %s", session_id)
 
                         yield {
                             "type": "session_created",
@@ -319,10 +329,10 @@ class AWSBedrockAgentProvider(AgentProvider):
                             "timestamp": time.time(),
                         }
                     except Exception as e:
-                        logger.error(": %s", e)
+                        logger.error("创建会话失败: %s", e, exc_info=True)
                         session_id = None
             except Exception as e:
-                logger.error(": %s", e)
+                logger.error("会话处理失败: %s", e, exc_info=True)
                 session_id = None
                 chat_storage = None
 
@@ -470,27 +480,28 @@ class AWSBedrockAgentProvider(AgentProvider):
                             first_event_received = True
                             wait_duration = time.time() - iteration_start_time
                             logger.info(
-                                f"📥 [AgentProvider] 收到第一个事件（等待了 {wait_duration:.2f} 秒） - QueryID: {query_id}",
+                                "📥 [AgentProvider] 收到第一个事件（等待了 %.2f 秒） - QueryID: %s",
+                                wait_duration,
+                                query_id,
                                 extra={
                                     "wait_duration": f"{wait_duration:.2f}秒",
                                     "query_id": query_id,
                                 }
                             )
 
-                        # ✅ 检查取消标志（在收到事件后检查，避免阻塞）
                         if cancel_event and cancel_event.is_set():
-                            logger.info("- QueryID: %s", query_id)
+                            logger.info("用户取消查询 - QueryID: %s", query_id)
 
                             # ✅ 停止 AWS Bedrock Session（如果有 session_id）
                             if session_id:
                                 try:
                                     success = client.stop_runtime_session(session_id)
                                     if success:
-                                        logger.info("AWS Bedrock Session - SessionID: %s, Query: %s", session_id, query_id)
+                                        logger.info("已停止 AWS Bedrock Session - SessionID: %s, Query: %s", session_id, query_id)
                                     else:
-                                        logger.warning("AWS Bedrock Session - SessionID: %s, Query: %s", session_id, query_id)
+                                        logger.warning("停止 AWS Bedrock Session 失败 - SessionID: %s, Query: %s", session_id, query_id)
                                 except Exception as e:
-                                    logger.warning("AWS Bedrock Session - SessionID: %s, Query: %s, Error: %s", session_id, query_id, e)
+                                    logger.warning("停止 AWS Bedrock Session 异常 - SessionID: %s, Query: %s, Error: %s", session_id, query_id, e)
 
                             yield {
                                 "type": "generation_cancelled",
@@ -499,20 +510,19 @@ class AWSBedrockAgentProvider(AgentProvider):
                             }
                             break
 
-                        # ✅ 再次检查取消标志（双重保障）
                         if cancel_event and cancel_event.is_set():
-                            logger.info("- QueryID: %s", query_id)
+                            logger.info("二次取消检查命中 - QueryID: %s", query_id)
 
                             # ✅ 停止 AWS Bedrock Session（如果有 session_id）
                             if session_id:
                                 try:
                                     success = client.stop_runtime_session(session_id)
                                     if success:
-                                        logger.info("AWS Bedrock Session - SessionID: %s, Query: %s", session_id, query_id)
+                                        logger.info("已停止 AWS Bedrock Session - SessionID: %s, Query: %s", session_id, query_id)
                                     else:
-                                        logger.warning("AWS Bedrock Session - SessionID: %s, Query: %s", session_id, query_id)
+                                        logger.warning("停止 AWS Bedrock Session 失败 - SessionID: %s, Query: %s", session_id, query_id)
                                 except Exception as e:
-                                    logger.warning("AWS Bedrock Session - SessionID: %s, Query: %s, Error: %s", session_id, query_id, e)
+                                    logger.warning("停止 AWS Bedrock Session 异常 - SessionID: %s, Query: %s, Error: %s", session_id, query_id, e)
 
                             yield {
                                 "type": "generation_cancelled",
@@ -550,7 +560,11 @@ class AWSBedrockAgentProvider(AgentProvider):
                     except StopAsyncIteration:
                         iteration_duration = time.time() - iteration_start_time
                         logger.info(
-                            f"🛑 [AgentProvider] 迭代结束（StopAsyncIteration，总耗时: {iteration_duration:.2f}秒，事件数: {event_count}） - QueryID: {query_id}",
+                            "🛑 [AgentProvider] 迭代结束（StopAsyncIteration，"
+                            "总耗时: %.2f秒，事件数: %s） - QueryID: %s",
+                            iteration_duration,
+                            event_count,
+                            query_id,
                             extra={
                                 "iteration_duration": f"{iteration_duration:.2f}秒",
                                 "event_count": event_count,
@@ -561,7 +575,12 @@ class AWSBedrockAgentProvider(AgentProvider):
                     except Exception as e:
                         iteration_duration = time.time() - iteration_start_time
                         logger.error(
-                            f"❌ [AgentProvider] 迭代异常（耗时: {iteration_duration:.2f}秒，事件数: {event_count}） - QueryID: {query_id}, Error: {e}",
+                            "❌ [AgentProvider] 迭代异常（耗时: %.2f秒，"
+                            "事件数: %s） - QueryID: %s, Error: %s",
+                            iteration_duration,
+                            event_count,
+                            query_id,
+                            e,
                             extra={
                                 "iteration_duration": f"{iteration_duration:.2f}秒",
                                 "event_count": event_count,
@@ -577,7 +596,10 @@ class AWSBedrockAgentProvider(AgentProvider):
                 query_time = time.time() - query_start
 
                 if not response or len(response.strip()) == 0:
-                    logger.error("Runtime- Query: %s, : {query_time:.2f}, : %s", query_id, event_count)
+                    logger.error(
+                        "Runtime 返回空响应 - Query: %s, 耗时: %.2f秒, 事件数: %s",
+                        query_id, query_time, event_count,
+                    )
                     yield {
                         "type": "complete",
                         "success": False,
@@ -608,7 +630,7 @@ class AWSBedrockAgentProvider(AgentProvider):
                                 None,
                             )
                         except Exception as e:
-                            logger.error(": %s", e)
+                            logger.error("保存助手响应失败: %s", e, exc_info=True)
 
                     # 发送成功complete事件（包含 token_usage）
                     complete_event = {
@@ -643,7 +665,7 @@ class AWSBedrockAgentProvider(AgentProvider):
                 primary_account_id = account_ids[0] if account_ids else "unknown"
                 metrics.record_query_time(primary_account_id, query_time)
 
-                logger.info("%s ", query_id)
+                logger.info("查询完成 - QueryID: %s", query_id)
 
             except Exception as e:
                 logger.error("❌ Runtime 调用失败 - User: %s, QueryID: %s, Error: %s", username, query_id, e, exc_info=True)
@@ -665,13 +687,13 @@ class AWSBedrockAgentProvider(AgentProvider):
         finally:
             # ✅ 查询结束时自动清理
             await self._query_registry.unregister(query_id)
-            logger.info("- QueryID: %s", query_id)
+            logger.info("查询资源已清理 - QueryID: %s", query_id)
 
     async def cancel(self, query_id: str) -> bool:
         """取消查询"""
         info = await self._query_registry.get(query_id)
         if not info:
-            logger.warning("[AgentProvider] - QueryID: %s", query_id)
+            logger.warning("[AgentProvider] 未找到查询 - QueryID: %s", query_id)
             return False
 
         # 设置取消标志
@@ -686,11 +708,11 @@ class AWSBedrockAgentProvider(AgentProvider):
                 )
                 success = client.stop_runtime_session(info.session_id)
                 if success:
-                    logger.info("[AgentProvider] AWS Bedrock Session - SessionID: %s, Query: %s", info.session_id, query_id)
+                    logger.info("[AgentProvider] 已停止 AWS Bedrock Session - SessionID: %s, Query: %s", info.session_id, query_id)
                 else:
-                    logger.warning("[AgentProvider] AWS Bedrock Session - SessionID: %s, Query: %s", info.session_id, query_id)
+                    logger.warning("[AgentProvider] 停止 AWS Bedrock Session 失败 - SessionID: %s, Query: %s", info.session_id, query_id)
             except Exception as e:
-                logger.warning("[AgentProvider] AWS Bedrock Session - SessionID: %s, Query: %s, Error: %s", info.session_id, query_id, e)
+                logger.warning("[AgentProvider] 停止 AWS Bedrock Session 异常 - SessionID: %s, Query: %s, Error: %s", info.session_id, query_id, e)
 
         return True
 
