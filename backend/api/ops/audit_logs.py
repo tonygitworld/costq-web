@@ -203,7 +203,7 @@ def list_audit_logs(
             resource_id=str(log.resource_id) if log.resource_id else None,
             ip_address=log.ip_address,
             user_agent=log.user_agent,
-            details=log.details,  # 已经是 JSON 字符串，无需再次 dumps
+            details=json.dumps(log.details, ensure_ascii=False) if log.details else None,  # 将 dict 转为 JSON 字符串
             session_id=str(log.session_id) if log.session_id else None,
         )
         for log in logs
