@@ -161,6 +161,13 @@ def _build_base_filters(
     actual_start = start_date or (now - timedelta(days=30))
     actual_end = end_date or now
 
+    # ✅ 如果 end_date 是当天零点（前端传 YYYY-MM-DD 格式），
+    # 扩展到当天 23:59:59.999999，确保包含当天所有消息
+    if actual_end.hour == 0 and actual_end.minute == 0 and actual_end.second == 0:
+        actual_end = actual_end.replace(
+            hour=23, minute=59, second=59, microsecond=999999
+        )
+
     filters: list[Any] = [
         ChatMessage.role == "assistant",
         ChatMessage.created_at >= actual_start,
