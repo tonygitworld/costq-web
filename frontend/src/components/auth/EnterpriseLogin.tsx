@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Form, Input, Button, App as AntdApp } from 'antd';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Lock, ArrowLeft } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useI18n } from '../../hooks/useI18n';
 import { LanguageSwitcher } from '../common/LanguageSwitcher';
@@ -97,6 +97,16 @@ const EnterpriseLoginForm: React.FC = () => {
         {/* 右侧表单区 */}
         <div className={styles.formPanel}>
           <div className={styles.formContainer}>
+            {/* 返回按钮 */}
+            <button
+              onClick={() => navigate('/')}
+              className={styles.backButton}
+              aria-label="返回产品介绍"
+            >
+              <ArrowLeft size={18} strokeWidth={2} />
+              <span>返回</span>
+            </button>
+
             {/* 表单标题 */}
             <div className={styles.formHeader}>
               <h2 className={styles.formTitle}>欢迎回来</h2>

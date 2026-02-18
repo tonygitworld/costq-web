@@ -4,6 +4,39 @@
    参考：Stripe, Notion, Linear, Vercel
    ======================================== */
 
+/* ===== 返回按钮 ===== */
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 24px;
+  font-family: inherit;
+}
+
+.backButton:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+.backButton:active {
+  transform: scale(0.98);
+}
+
+.backButton:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
 /* ===== 全局容器 ===== */
 .pageWrapper {
   min-height: 100vh;
