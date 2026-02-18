@@ -243,7 +243,6 @@ const AppContent: FC = () => {
           }
         />
 
-<<<<<<< HEAD
         {/* 编辑告警 - 懒加载 */}
         <Route
           path="/settings/alerts/edit/:id"
