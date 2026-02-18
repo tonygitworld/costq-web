@@ -114,6 +114,7 @@ class AgentCoreClient:
         org_id: str | None = None,
         prompt_type: str = "dialog",
         account_type: str = "aws",
+        model_id: str | None = None,
     ) -> AsyncIterator[dict]:
         """
         异步流式调用 Runtime
@@ -132,6 +133,7 @@ class AgentCoreClient:
             account_type: 账号类型（默认: "aws"）
                 - "aws": AWS 账号
                 - "gcp": GCP 账号
+            model_id: AI 模型 ID（可选，如不提供则使用 Runtime 默认模型）
 
         Yields:
             dict: SSE 事件数据（已解析的 JSON 对象）
@@ -184,10 +186,14 @@ class AgentCoreClient:
                     payload["user_id"] = user_id
                 if org_id:
                     payload["org_id"] = org_id
+                if model_id:
+                    payload["model_id"] = model_id
 
-                # ✅ 记录 Agent Runtime 调用参数（不区分环境，包含所有身份和参数信息）
+                # ✅ 记录 Agent Runtime 调用参数（包含 model_id 追踪）
                 logger.info(
-                    "🚀 [Agent Runtime调用] 准备调用Agent Runtime",
+                    "🚀 [Agent Runtime调用] 准备调用Agent Runtime"
+                    " | model_id=%s",
+                    model_id,
                     extra={
                         "runtime_arn": self.runtime_arn,
                         "prompt_type": prompt_type,
@@ -200,6 +206,7 @@ class AgentCoreClient:
                         "has_session_id": session_id is not None,
                         "has_user_id": user_id is not None,
                         "has_org_id": org_id is not None,
+                        "model_id": model_id,
                     }
                 )
 

@@ -24,7 +24,7 @@ interface ConfirmationRequest {
 
 interface SSEContextType {
   sendMessage: (message: string | object) => Promise<void>;
-  sendQuery: (content: string, accountIds?: string[], gcpAccountIds?: string[], sessionId?: string) => string;
+  sendQuery: (content: string, accountIds?: string[], gcpAccountIds?: string[], sessionId?: string, modelId?: string) => string;
   cancelGeneration: (queryId: string) => Promise<void>;
   currentQueryId: string | null;
   isCancelling: boolean;
@@ -74,7 +74,7 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
     */
   };
 
-  const sendQuery = (content: string, accountIds?: string[], gcpAccountIds?: string[], sessionId?: string): string => {
+  const sendQuery = (content: string, accountIds?: string[], gcpAccountIds?: string[], sessionId?: string, modelId?: string): string => {
     messageHandler.resetMessageBuilder();
 
     const queryId = `query_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
@@ -85,7 +85,7 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
       return queryId;
     }
 
-    logger.debug(`🟢 [SSEContext.sendQuery] 设置 currentQueryId = ${queryId}, sessionId = ${sessionId}`);
+    logger.debug(`🟢 [SSEContext.sendQuery] 设置 currentQueryId = ${queryId}, sessionId = ${sessionId}, modelId = ${modelId}`);
     setCurrentQueryId(queryId);
 
     // ✅ V2: 创建 AbortController 用于取消请求
@@ -96,7 +96,7 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
     // ✅ 统一使用 apiClient，自动处理 Token 刷新和 401 错误
     (async () => {
       try {
-        logger.debug(`📤 [SSEContext.sendQuery] 发送查询 - QueryID: ${queryId}, SessionID: ${sessionId}`);
+        logger.debug(`📤 [SSEContext.sendQuery] 发送查询 - QueryID: ${queryId}, SessionID: ${sessionId}, ModelID: ${modelId}`);
 
         // ✅ 使用 apiClient.stream，自动处理 Token 刷新和 401 错误
         const response = await apiClient.stream('/sse/query/v2', {
@@ -105,6 +105,7 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
           session_id: sessionId,
           account_ids: accountIds || [],
           gcp_account_ids: gcpAccountIds || [],
+          model_id: modelId,  // ✅ 添加 model_id 到请求 payload
         }, {
           signal: abortController.signal,  // ✅ 支持取消
         });

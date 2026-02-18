@@ -1,0 +1,19 @@
+{
+  "selectModel": "Select Model",
+  "sonnet45": {
+    "name": "Claude Sonnet 4.5",
+    "description": "Latest flagship model with strongest reasoning"
+  },
+  "sonnet4": {
+    "name": "Claude Sonnet 4",
+    "description": "Powerful reasoning capabilities"
+  },
+  "sonnet35v2": {
+    "name": "Claude Sonnet 3.5 v2",
+    "description": "Balanced performance and cost-effectiveness"
+  },
+  "haiku35": {
+    "name": "Claude Haiku 3.5",
+    "description": "Fast response with lowest cost"
+  }
+}

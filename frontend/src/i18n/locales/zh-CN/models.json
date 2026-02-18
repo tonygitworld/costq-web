@@ -1,0 +1,19 @@
+{
+  "selectModel": "选择模型",
+  "sonnet45": {
+    "name": "Claude Sonnet 4.5",
+    "description": "最新旗舰模型，推理能力最强"
+  },
+  "sonnet4": {
+    "name": "Claude Sonnet 4",
+    "description": "强大的推理能力"
+  },
+  "sonnet35v2": {
+    "name": "Claude Sonnet 3.5 v2",
+    "description": "均衡性能，性价比高"
+  },
+  "haiku35": {
+    "name": "Claude Haiku 3.5",
+    "description": "快速响应，成本最低"
+  }
+}
