@@ -8,7 +8,6 @@ import { EnterpriseLogin } from './components/auth/EnterpriseLogin';
 import ProductPage from './components/product/ProductPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { SuperAdminRoute } from './routes/SuperAdminRoute';
-<<<<<<< HEAD
 
 // ★ P0: 非首屏页面 - 路由级懒加载
 const ChatLayout = lazy(() => import('./components/layout/ChatLayout').then(m => ({ default: m.ChatLayout })));
@@ -28,9 +27,8 @@ const OpsDashboard = lazy(() => import('./components/ops').then(m => ({ default:
 const TenantList = lazy(() => import('./components/ops').then(m => ({ default: m.TenantList })));
 const TenantDetail = lazy(() => import('./components/ops').then(m => ({ default: m.TenantDetail })));
 const AuditLogs = lazy(() => import('./components/ops').then(m => ({ default: m.AuditLogs })));
+const OpsTokenUsage = lazy(() => import('./components/ops').then(m => ({ default: m.OpsTokenUsage })));
 
-=======
->>>>>>> main
 import { SSEProvider } from './contexts/SSEContext';
 import { I18nProvider } from './components/common/I18nProvider';
 import { useAuthStore } from './stores/authStore';
