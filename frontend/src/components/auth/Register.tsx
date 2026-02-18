@@ -169,45 +169,34 @@ export const Register: React.FC = () => {
 
         {/* 右侧表单区 */}
         <div className={`${styles.formPanel} ${styles.registerPanel}`}>
+          {/* 返回按钮 - 放在白色区域左上角 */}
+          <button
+            onClick={() => navigate('/login')}
+            className={styles.backButton}
+            aria-label="返回登录"
+            style={{ position: 'absolute', top: '24px', left: '40px' }}
+          >
+            <ArrowLeft size={18} strokeWidth={2} />
+            <span>返回登录</span>
+          </button>
+
           <div className={`${styles.formContainer} ${styles.registerContainer}`}>
             {registrationSuccess ? (
-              <>
-                {/* 返回按钮 */}
-                <button
+              <div className={styles.formHeader}>
+                <h2 className={styles.formTitle}>注册申请已提交</h2>
+                <p className={styles.formSubtitle}>您的账号正在审核中，通过后将邮件通知您。</p>
+                <Button
+                  type="primary"
                   onClick={() => navigate('/login')}
-                  className={styles.backButton}
-                  aria-label="返回登录"
+                  size="large"
+                  className={styles.submitButton}
+                  style={{ marginTop: '24px' }}
                 >
-                  <ArrowLeft size={18} strokeWidth={2} />
-                  <span>返回登录</span>
-                </button>
-
-                <div className={styles.formHeader}>
-                  <h2 className={styles.formTitle}>注册申请已提交</h2>
-                  <p className={styles.formSubtitle}>您的账号正在审核中，通过后将邮件通知您。</p>
-                  <Button
-                    type="primary"
-                    onClick={() => navigate('/login')}
-                    size="large"
-                    className={styles.submitButton}
-                    style={{ marginTop: '24px' }}
-                  >
-                    返回登录
-                  </Button>
-                </div>
-              </>
+                  返回登录
+                </Button>
+              </div>
             ) : (
               <>
-                {/* 返回按钮 */}
-                <button
-                  onClick={() => navigate('/login')}
-                  className={styles.backButton}
-                  aria-label="返回登录"
-                >
-                  <ArrowLeft size={18} strokeWidth={2} />
-                  <span>返回登录</span>
-                </button>
-
                 <div className={styles.formHeader}>
                   <h2 className={styles.formTitle}>{t('register.title')}</h2>
                   <p className={styles.formSubtitle}>{t('register.subtitle')}</p>

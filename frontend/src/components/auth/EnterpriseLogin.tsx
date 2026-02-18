@@ -96,17 +96,18 @@ const EnterpriseLoginForm: React.FC = () => {
 
         {/* 右侧表单区 */}
         <div className={styles.formPanel}>
-          <div className={styles.formContainer}>
-            {/* 返回按钮 */}
-            <button
-              onClick={() => navigate('/')}
-              className={styles.backButton}
-              aria-label="返回产品介绍"
-            >
-              <ArrowLeft size={18} strokeWidth={2} />
-              <span>返回</span>
-            </button>
+          {/* 返回按钮 - 放在白色区域左上角 */}
+          <button
+            onClick={() => navigate('/')}
+            className={styles.backButton}
+            aria-label="返回产品介绍"
+            style={{ position: 'absolute', top: '24px', left: '40px' }}
+          >
+            <ArrowLeft size={18} strokeWidth={2} />
+            <span>返回</span>
+          </button>
 
+          <div className={styles.formContainer}>
             {/* 表单标题 */}
             <div className={styles.formHeader}>
               <h2 className={styles.formTitle}>欢迎回来</h2>

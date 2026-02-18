@@ -18,8 +18,8 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-bottom: 24px;
   font-family: inherit;
+  z-index: 10;
 }
 
 .backButton:hover {
@@ -237,6 +237,7 @@
   align-items: center;
   justify-content: center;
   padding: 60px 40px;
+  position: relative;
 }
 
 .registerPanel {
@@ -656,6 +657,12 @@
   .languageSwitcher {
     top: 16px;
     right: 16px;
+  }
+
+  /* 返回按钮在手机端调整位置 */
+  .backButton[style*="position: absolute"] {
+    top: 16px !important;
+    left: 20px !important;
   }
 
   .registerForm :global(.ant-form-item) {
