@@ -9,6 +9,7 @@ import error from './error.json';
 import ops from './ops.json';
 import gcp from './gcp.json';
 import product from './product.json';
+import models from './models.json';
 
 export default {
   common,
@@ -21,5 +22,6 @@ export default {
   error,
   ops,
   gcp,
-  product
+  product,
+  models
 };

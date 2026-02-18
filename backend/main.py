@@ -23,6 +23,7 @@ from .api.alerts import router as alerts_router
 from .api.auth import router as auth_router
 from .api.chat import router as chat_router
 from .api.gcp_accounts import router as gcp_accounts_router
+from .api.models import router as models_router
 
 # P2-3: 禁用监控 API（安全考虑）
 from .api.monitoring import router as monitoring_router  # Phase 4: 监控路由（简化版）
@@ -285,6 +286,7 @@ app.include_router(users_router)  # 用户管理路由
 app.include_router(chat_router)  # 聊天历史路由
 app.include_router(accounts_router)  # AWS 账号管理
 app.include_router(gcp_accounts_router)  # GCP 账号管理
+app.include_router(models_router)  # 模型管理路由
 app.include_router(prompt_templates_router)  # 提示词模板路由
 app.include_router(alerts_router)  # 告警管理路由 (Alert MCP Server)
 # P2-3: 禁用监控 API（安全考虑）

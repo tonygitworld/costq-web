@@ -1,7 +1,7 @@
 """审计日志 API"""
 
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
@@ -62,6 +62,7 @@ class AuditLogItem(BaseModel):
     ip_address: str | None
     user_agent: str | None
     details: str | None  # JSON 字符串
+    session_id: str | None  # 会话ID，仅query操作有值
 
 
 class AuditLogListResponse(BaseModel):
@@ -122,16 +123,11 @@ def list_audit_logs(
     # 基础查询
     query = db.query(AuditLog)
 
-    # 时间范围筛选
+    # 时间范围筛选（不传日期则查询所有记录）
     if start_date:
         query = query.filter(AuditLog.timestamp >= start_date)
     if end_date:
         query = query.filter(AuditLog.timestamp <= end_date)
-
-    # 默认最近 7 天
-    if not start_date and not end_date:
-        default_start = datetime.now(timezone.utc) - timedelta(days=7)
-        query = query.filter(AuditLog.timestamp >= default_start)
 
     # 租户筛选
     if org_id:
@@ -158,8 +154,8 @@ def list_audit_logs(
             )
         ).all()
 
-        org_id_list = [str(org_id[0]) for org_id in matching_org_ids]
-        user_id_list = [str(user_id[0]) for user_id in matching_user_ids]
+        org_id_list = [str(oid[0]) for oid in matching_org_ids]
+        user_id_list = [str(uid[0]) for uid in matching_user_ids]
 
         # 构建 OR 条件
         search_conditions = [AuditLog.details.ilike(f"%{search}%")]
@@ -207,7 +203,8 @@ def list_audit_logs(
             resource_id=str(log.resource_id) if log.resource_id else None,
             ip_address=log.ip_address,
             user_agent=log.user_agent,
-            details=json.dumps(log.details) if isinstance(log.details, dict) else log.details,
+            details=json.dumps(log.details, ensure_ascii=False) if log.details else None,  # 将 dict 转为 JSON 字符串
+            session_id=str(log.session_id) if log.session_id else None,
         )
         for log in logs
     ]

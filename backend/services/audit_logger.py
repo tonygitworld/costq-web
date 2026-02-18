@@ -39,7 +39,8 @@ class AuditLogger:
         details: dict | None = None,
         ip_address: str | None = None,
         user_agent: str | None = None,
-    ):
+        session_id: str | None = None,
+    ) -> None:
         """记录审计日志
 
         Args:
@@ -51,6 +52,7 @@ class AuditLogger:
             details: 详细信息(JSON)
             ip_address: IP地址
             user_agent: User-Agent
+            session_id: 会话ID，仅query操作有值
         """
         log_id = str(uuid.uuid4())
         details_json = json.dumps(details) if details else None
@@ -67,17 +69,19 @@ class AuditLogger:
                 details=details_json,
                 ip_address=ip_address,
                 user_agent=user_agent,
+                session_id=session_id,
                 timestamp=_utc_now(),
             )
             db.add(audit_log)
             db.commit()
             logger.debug(
-                f"📝 审计日志: {action} - User: {user_id}, Resource: {resource_type}/{resource_id}"
+                "📝 审计日志: %s - User: %s, Resource: %s/%s",
+                action, user_id, resource_type, resource_id,
             )
 
         except Exception as e:
             db.rollback()
-            logger.error(": %s", e)
+            logger.error("审计日志写入失败: %s", e, exc_info=True)
         finally:
             db.close()
 
@@ -111,8 +115,18 @@ class AuditLogger:
         query: str,
         account_ids: list[str],
         account_type: str = "aws",
+        session_id: str | None = None,
     ):
-        """记录查询操作（保留query参数用于兼容性，但不记录详细信息）"""
+        """记录查询操作（保留query参数用于兼容性，但不记录详细信息）
+
+        Args:
+            user_id: 用户ID
+            org_id: 组织ID
+            query: 查询内容（保留兼容性，不记录）
+            account_ids: 账号ID列表
+            account_type: 账号类型（aws/gcp）
+            session_id: 会话ID
+        """
         self.log(
             user_id=user_id,
             org_id=org_id,
@@ -120,6 +134,7 @@ class AuditLogger:
             resource_type=f"{account_type}_account",
             resource_id=",".join(account_ids[:3]) if account_ids else None,
             details=None,
+            session_id=session_id,
         )
 
     def log_account_create(
@@ -292,6 +307,23 @@ class AuditLogger:
             resource_type="alert",
             resource_id=alert_id,
             details={"is_active": is_active, "display_name": display_name},
+        )
+
+    def log_tenant_delete(
+        self,
+        user_id: str,
+        org_id: str,
+        tenant_name: str,
+        impact: dict,
+    ):
+        """记录删除租户"""
+        self.log(
+            user_id=user_id,
+            org_id=org_id,
+            action="tenant_delete",
+            resource_type="organization",
+            resource_id=org_id,
+            details={"tenant_name": tenant_name, "impact": impact},
         )
 
     # 查询方法

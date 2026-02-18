@@ -34,15 +34,22 @@
     "action": {
       "activate": "テナントを有効化",
       "deactivate": "テナントを無効化",
+      "delete": "テナントを削除",
       "confirmActivate": "有効化の確認",
       "confirmDeactivate": "無効化の確認",
+      "confirmDelete": "テナント削除の確認",
       "confirmActivateContent": "このテナントを有効化しますか？",
-      "confirmDeactivateContent": "このテナントを無効化しますか？無効化すると、このテナントのすべてのユーザーはログインできなくなります。"
+      "confirmDeactivateContent": "このテナントを無効化しますか？無効化すると、このテナントのすべてのユーザーはログインできなくなります。",
+      "confirmDeleteContent": "テナント「{{name}}」とそのすべてのデータを完全に削除します。この操作は元に戻せません。",
+      "deleteImpactWarning": "削除対象：ユーザー {{userCount}} 件、AWS アカウント {{awsCount}} 件、GCP アカウント {{gcpCount}} 件、監視設定 {{monitorCount}} 件、セッション {{chatCount}} 件",
+      "inputTenantName": "削除を確認するためテナント名を入力してください"
     },
     "message": {
       "activateSuccess": "テナントが有効化されました",
       "deactivateSuccess": "テナントが無効化されました",
-      "operationFailed": "操作に失敗しました"
+      "deleteSuccess": "テナントが完全に削除されました",
+      "operationFailed": "操作に失敗しました",
+      "nameNotMatch": "名前が一致しません"
     }
   },
   "user": {
@@ -69,7 +76,10 @@
       "time": "時刻",
       "tenant": "テナント",
       "user": "ユーザー",
-      "action": "操作"
+      "action": "操作",
+      "resourceType": "リソースタイプ",
+      "resourceId": "リソース ID",
+      "sessionId": "セッション ID"
     },
     "filter": {
       "today": "今日",
@@ -79,6 +89,14 @@
       "selectUser": "ユーザーを選択",
       "actionType": "操作タイプ",
       "searchPlaceholder": "検索（テナント/ユーザー/詳細）"
+    },
+    "summary": {
+      "totalRecords": "全 {{total}} 件",
+      "totalPagination": "全 {{total}} 件"
+    },
+    "button": {
+      "reset": "リセット",
+      "refresh": "更新"
     }
   },
   "trend": {

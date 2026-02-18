@@ -1,0 +1,11 @@
+{
+  "selectModel": "モデルを選択",
+  "sonnet45": {
+    "name": "Claude Sonnet 4.5",
+    "description": "最新のフラッグシップモデル、最強の推論能力"
+  },
+  "haiku45": {
+    "name": "Claude Haiku 4.5",
+    "description": "高速レスポンス、最低コスト"
+  }
+}

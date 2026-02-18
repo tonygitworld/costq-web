@@ -1,16 +1,22 @@
 """租户管理 API"""
 
+import logging
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
-from pydantic import BaseModel
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
+from pydantic import BaseModel, Field
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from backend.database import get_db
+from backend.models.chat import ChatSession
+from backend.models.monitoring import MonitoringConfig
+from backend.models.tables import AWSAccountTable, GCPAccountTable
 from backend.models.user import Organization, User
 from backend.services.audit_logger import get_audit_logger
 from backend.utils.auth import get_current_super_admin
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/tenants", tags=["运营-租户管理"])
 
@@ -79,6 +85,35 @@ class TenantUserListResponse(BaseModel):
     page: int
     page_size: int
     items: list[TenantUserItem]
+
+
+class TenantDeleteImpactResponse(BaseModel):
+    """删除影响预览响应"""
+
+    tenant_id: str
+    tenant_name: str
+    is_active: bool
+    user_count: int
+    aws_account_count: int
+    gcp_account_count: int
+    monitoring_config_count: int
+    chat_session_count: int
+
+
+class TenantDeleteRequest(BaseModel):
+    """删除租户请求"""
+
+    confirmation_name: str = Field(
+        ..., description="确认删除的组织名称，必须与目标组织名称完全匹配"
+    )
+
+
+class TenantDeleteResponse(BaseModel):
+    """删除租户响应"""
+
+    message: str
+    tenant_id: str
+    tenant_name: str
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -311,3 +346,174 @@ def list_tenant_users(
         page_size=page_size,
         items=items,
     )
+
+
+@router.get(
+    "/{tenant_id}/impact",
+    response_model=TenantDeleteImpactResponse,
+)
+def get_tenant_delete_impact(
+    tenant_id: str = Path(..., description="租户 ID"),
+    current_user: dict = Depends(get_current_super_admin),
+    db: Session = Depends(get_db),
+) -> TenantDeleteImpactResponse:
+    """获取删除租户的影响预览（关联数据统计）"""
+
+    tenant = (
+        db.query(Organization)
+        .filter(Organization.id == tenant_id)
+        .first()
+    )
+    if not tenant:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="租户不存在",
+        )
+
+    user_count = (
+        db.query(func.count(User.id))
+        .filter(User.org_id == tenant_id)
+        .scalar() or 0
+    )
+    aws_account_count = (
+        db.query(func.count(AWSAccountTable.id))
+        .filter(AWSAccountTable.org_id == tenant_id)
+        .scalar() or 0
+    )
+    gcp_account_count = (
+        db.query(func.count(GCPAccountTable.id))
+        .filter(GCPAccountTable.org_id == tenant_id)
+        .scalar() or 0
+    )
+    monitoring_config_count = (
+        db.query(func.count(MonitoringConfig.id))
+        .filter(MonitoringConfig.org_id == tenant_id)
+        .scalar() or 0
+    )
+    chat_session_count = (
+        db.query(func.count(ChatSession.id))
+        .filter(ChatSession.org_id == tenant_id)
+        .scalar() or 0
+    )
+
+    return TenantDeleteImpactResponse(
+        tenant_id=str(tenant.id),
+        tenant_name=tenant.name,
+        is_active=tenant.is_active,
+        user_count=user_count,
+        aws_account_count=aws_account_count,
+        gcp_account_count=gcp_account_count,
+        monitoring_config_count=monitoring_config_count,
+        chat_session_count=chat_session_count,
+    )
+
+
+@router.delete(
+    "/{tenant_id}",
+    response_model=TenantDeleteResponse,
+)
+def delete_tenant(
+    tenant_id: str = Path(..., description="租户 ID"),
+    request: TenantDeleteRequest = Body(...),
+    current_user: dict = Depends(get_current_super_admin),
+    db: Session = Depends(get_db),
+) -> TenantDeleteResponse:
+    """永久删除租户及其所有关联数据
+
+    ⚠️ 此操作不可逆，需要输入组织名称确认。
+    """
+
+    tenant = (
+        db.query(Organization)
+        .filter(Organization.id == tenant_id)
+        .first()
+    )
+    if not tenant:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="租户不存在",
+        )
+
+    # 验证确认名称
+    if request.confirmation_name != tenant.name:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="确认名称与租户名称不匹配",
+        )
+
+    tenant_name = tenant.name
+
+    try:
+        # 收集影响统计（用于审计日志）
+        impact = {
+            "user_count": (
+                db.query(func.count(User.id))
+                .filter(User.org_id == tenant_id)
+                .scalar() or 0
+            ),
+            "aws_account_count": (
+                db.query(func.count(AWSAccountTable.id))
+                .filter(AWSAccountTable.org_id == tenant_id)
+                .scalar() or 0
+            ),
+            "gcp_account_count": (
+                db.query(func.count(GCPAccountTable.id))
+                .filter(GCPAccountTable.org_id == tenant_id)
+                .scalar() or 0
+            ),
+            "monitoring_config_count": (
+                db.query(func.count(MonitoringConfig.id))
+                .filter(MonitoringConfig.org_id == tenant_id)
+                .scalar() or 0
+            ),
+            "chat_session_count": (
+                db.query(func.count(ChatSession.id))
+                .filter(ChatSession.org_id == tenant_id)
+                .scalar() or 0
+            ),
+        }
+
+        # 审计日志（删除前写入，audit_logs 无外键不会被级联删除）
+        audit_logger = get_audit_logger()
+        audit_logger.log_tenant_delete(
+            user_id=current_user["id"],
+            org_id=tenant_id,
+            tenant_name=tenant_name,
+            impact=impact,
+        )
+
+        # 手动删除无外键约束的关联表
+        db.query(AWSAccountTable).filter(
+            AWSAccountTable.org_id == tenant_id
+        ).delete(synchronize_session=False)
+        db.query(GCPAccountTable).filter(
+            GCPAccountTable.org_id == tenant_id
+        ).delete(synchronize_session=False)
+
+        # 删除 Organization（级联删除 users、monitoring_configs 等）
+        db.delete(tenant)
+        db.commit()
+
+        logger.info(
+            "✅ 租户已删除 - tenant_id: %s, name: %s, impact: %s",
+            tenant_id, tenant_name, impact,
+        )
+
+        return TenantDeleteResponse(
+            message="租户已永久删除",
+            tenant_id=tenant_id,
+            tenant_name=tenant_name,
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(
+            "❌ 删除租户失败 - tenant_id: %s, error: %s",
+            tenant_id, e, exc_info=True,
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="删除租户失败",
+        )

@@ -8,6 +8,7 @@ import { EnterpriseLogin } from './components/auth/EnterpriseLogin';
 import ProductPage from './components/product/ProductPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { SuperAdminRoute } from './routes/SuperAdminRoute';
+<<<<<<< HEAD
 
 // ★ P0: 非首屏页面 - 路由级懒加载
 const ChatLayout = lazy(() => import('./components/layout/ChatLayout').then(m => ({ default: m.ChatLayout })));
@@ -28,6 +29,8 @@ const TenantList = lazy(() => import('./components/ops').then(m => ({ default: m
 const TenantDetail = lazy(() => import('./components/ops').then(m => ({ default: m.TenantDetail })));
 const AuditLogs = lazy(() => import('./components/ops').then(m => ({ default: m.AuditLogs })));
 
+=======
+>>>>>>> main
 import { SSEProvider } from './contexts/SSEContext';
 import { I18nProvider } from './components/common/I18nProvider';
 import { useAuthStore } from './stores/authStore';
@@ -242,6 +245,7 @@ const AppContent: FC = () => {
           }
         />
 
+<<<<<<< HEAD
         {/* 编辑告警 - 懒加载 */}
         <Route
           path="/settings/alerts/edit/:id"
@@ -255,6 +259,7 @@ const AppContent: FC = () => {
             </ProtectedRoute>
           }
         />
+
 
         {/* 告警详情 - 懒加载 */}
         <Route
@@ -297,6 +302,11 @@ const AppContent: FC = () => {
           <Route path="audit-logs" element={
             <Suspense fallback={<RouteFallback />}>
               <ChatLayout><AuditLogs /></ChatLayout>
+            </Suspense>
+          } />
+          <Route path="token-usage" element={
+            <Suspense fallback={<RouteFallback />}>
+              <ChatLayout><OpsTokenUsage /></ChatLayout>
             </Suspense>
           } />
           <Route path="" element={<Navigate to="dashboard" replace />} />

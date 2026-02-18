@@ -34,15 +34,22 @@
     "action": {
       "activate": "激活租户",
       "deactivate": "禁用租户",
+      "delete": "删除租户",
       "confirmActivate": "确认激活",
       "confirmDeactivate": "确认禁用",
+      "confirmDelete": "确认删除租户",
       "confirmActivateContent": "确定要激活该租户吗？",
-      "confirmDeactivateContent": "确定要禁用该租户吗？禁用后该租户下的所有用户将无法登录。"
+      "confirmDeactivateContent": "确定要禁用该租户吗？禁用后该租户下的所有用户将无法登录。",
+      "confirmDeleteContent": "此操作将永久删除租户「{{name}}」及其所有数据，且不可恢复。",
+      "deleteImpactWarning": "将删除：{{userCount}} 个用户、{{awsCount}} 个 AWS 账号、{{gcpCount}} 个 GCP 账号、{{monitorCount}} 个监控配置、{{chatCount}} 个会话",
+      "inputTenantName": "请输入租户名称以确认删除"
     },
     "message": {
       "activateSuccess": "租户已激活",
       "deactivateSuccess": "租户已禁用",
-      "operationFailed": "操作失败"
+      "deleteSuccess": "租户已永久删除",
+      "operationFailed": "操作失败",
+      "nameNotMatch": "输入的名称不匹配"
     }
   },
   "user": {
@@ -69,7 +76,10 @@
       "time": "时间",
       "tenant": "租户",
       "user": "用户",
-      "action": "操作"
+      "action": "操作",
+      "resourceType": "资源类型",
+      "resourceId": "资源 ID",
+      "sessionId": "会话 ID"
     },
     "filter": {
       "today": "今天",
@@ -79,6 +89,14 @@
       "selectUser": "选择用户",
       "actionType": "操作类型",
       "searchPlaceholder": "搜索（租户/用户/详情）"
+    },
+    "summary": {
+      "totalRecords": "共 {{total}} 条记录",
+      "totalPagination": "共 {{total}} 条"
+    },
+    "button": {
+      "reset": "重置",
+      "refresh": "刷新"
     }
   },
   "trend": {

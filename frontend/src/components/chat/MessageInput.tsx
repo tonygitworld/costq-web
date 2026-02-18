@@ -6,6 +6,7 @@ import { useChatStore } from '../../stores/chatStore';
 import { useSSEContext } from '../../contexts/SSEContext';
 import { useAccountStore } from '../../stores/accountStore';
 import { useGCPAccountStore } from '../../stores/gcpAccountStore';
+import { useModelStore } from '../../stores/modelStore';
 import { MessageInputContainer } from './MessageInputContainer';
 import { PromptTemplatesPopoverContent } from './PromptTemplatesPopoverContent';
 import { useI18n } from '../../hooks/useI18n';
@@ -13,6 +14,7 @@ import { createChatSession, convertBackendSession } from '../../services/chatApi
 import { logger } from '../../utils/logger';
 import '../styles/AIChatInput.css';
 import { CloudServiceSelector } from './CloudServiceSelector';
+import { ModelSelector } from './ModelSelector';
 import CloudIcon from '../icons/CloudIcon';
 
 export const MessageInput: FC = () => {
@@ -25,6 +27,7 @@ export const MessageInput: FC = () => {
   const { sendQuery, currentQueryId, cancelGeneration, isCancelling } = useSSEContext();
   const { accounts: rawAwsAccounts, loading: awsLoading } = useAccountStore(); // AWS 账号列表
   const { accounts: rawGcpAccounts, loading: gcpLoading } = useGCPAccountStore(); // GCP 账号列表
+  const { selectedModelId } = useModelStore(); // 获取选中的模型ID
   const { t } = useI18n('chat');
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -214,7 +217,9 @@ export const MessageInput: FC = () => {
           chatId,
           type: 'assistant',
           content: '', // 初始内容为空
-          statusMessage: '正在分析您的请求...', // 触发 StatusCard 显示
+          showStatus: true, // ✅ 启用状态卡片显示
+          statusType: 'initializing', // ✅ 状态类型：初始化中
+          statusMessage: '正在初始化账号连接...', // ✅ 状态消息
           statusEstimatedSeconds: 5, // 初始预估时间
           meta: {
             status: 'pending', // 标记为等待中
@@ -251,6 +256,7 @@ export const MessageInput: FC = () => {
         awsAccountIds,
         gcpAccountIds,
         sessionId: sessionIdToSend,
+        modelId: selectedModelId,
         note: '发送数据库记录 ID（UUID），后端会查找对应的 AWS 账号 ID'
       });
 
@@ -258,7 +264,8 @@ export const MessageInput: FC = () => {
         currentMessage,
         awsAccountIds,
         gcpAccountIds,
-        sessionIdToSend
+        sessionIdToSend,
+        selectedModelId  // ✅ 传递选中的模型ID
       );
       logger.debug('📤 [MessageInput] 已发送查询，Query ID:', queryId);
     } catch (error) {
@@ -330,12 +337,15 @@ export const MessageInput: FC = () => {
             </Popover>
           </div>
 
-          {/* 右侧：云服务选择 + 发送按钮 */}
+          {/* 右侧：模型选择 + 云服务选择 + 发送按钮 */}
           <div className="toolbar-right" style={{
             display: 'flex',
             alignItems: 'center',
             gap: '8px'
           }}>
+            {/* 模型选择器 - 放置在云服务选择器左侧 */}
+            <ModelSelector />
+
             {/* 云服务选择器 - 新的Drawer组件 */}
             <CloudServiceSelector
               awsAccounts={awsAccounts}

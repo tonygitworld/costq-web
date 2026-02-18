@@ -144,8 +144,7 @@ const MessageItemComponent: FC<MessageItemProps> = ({ message }) => {
           {/* 流式状态提示 - 已移除，使用新格式的思考过程展示 */}
 
           {/* ✅ 新增：状态提示卡片（无进度条）*/}
-          {/* 只有在没有思考过程时才显示状态卡片，避免与 ThinkingSummary 重复 */}
-          {message.showStatus && message.statusType && message.statusMessage && !message.thinking && (
+          {message.showStatus && message.statusType && message.statusMessage && (
             <StatusCard
               statusType={message.statusType}
               message={message.statusMessage}

@@ -20,7 +20,8 @@
     "opsBackend": "運用バックエンド",
     "opsDashboard": "運用ダッシュボード",
     "tenantManagement": "テナント管理",
-    "auditLogs": "監査ログ"
+    "auditLogs": "監査ログ",
+    "tokenUsage": "Token 使用量"
   },
   "input": {
     "placeholder": "ご質問を入力してください... (Enterで送信、Shift+Enterで改行)",

@@ -1,5 +1,7 @@
 """审计日志模型"""
 
+from typing import Any
+
 from sqlalchemy import Column, DateTime, String, Text
 from sqlalchemy.sql import func
 
@@ -20,9 +22,11 @@ class AuditLog(Base):
     details = Column(Text)  # JSON string
     ip_address = Column(String(45))
     user_agent = Column(String(255))
-    timestamp = Column(DateTime, default=func.now(), index=True)
+    timestamp = Column(DateTime(timezone=True), default=func.now(), index=True)
+    session_id = Column(String(36), nullable=True, comment="会话ID，仅query操作有值")
+    account_id = Column(String(255), nullable=True, comment="账号ID")
 
-    def to_dict(self):
+    def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "user_id": self.user_id,
@@ -34,4 +38,5 @@ class AuditLog(Base):
             "ip_address": self.ip_address,
             "user_agent": self.user_agent,
             "timestamp": self.timestamp.isoformat() if self.timestamp else None,
+            "session_id": self.session_id,
         }

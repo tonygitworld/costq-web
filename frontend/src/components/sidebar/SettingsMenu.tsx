@@ -9,6 +9,7 @@ import {
   ControlOutlined,
   DashboardOutlined,
   FileSearchOutlined,
+  BarChartOutlined,
   UserOutlined,
   GlobalOutlined,
   LogoutOutlined,
@@ -346,6 +347,26 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
               </div>
               <div className="settings-menu-item-content">
                 <span className="settings-menu-item-label">{t('chat:sidebar.auditLogs')}</span>
+              </div>
+            </div>
+
+            {/* Token 用量 */}
+            <div
+              className="settings-menu-item"
+              onClick={() => handleNavigate('/ops/token-usage')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  handleNavigate('/ops/token-usage');
+                }
+              }}
+            >
+              <div className="settings-menu-item-icon">
+                <BarChartOutlined />
+              </div>
+              <div className="settings-menu-item-content">
+                <span className="settings-menu-item-label">{t('chat:sidebar.tokenUsage')}</span>
               </div>
             </div>
           </div>
