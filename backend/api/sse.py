@@ -33,6 +33,7 @@ class SSEQueryRequestV2(BaseModel):
     session_id: Optional[str] = Field(None, description="会话ID（可选，如果不提供则创建新会话）")
     account_ids: Optional[list[str]] = Field(None, description="AWS 账号ID列表")
     gcp_account_ids: Optional[list[str]] = Field(None, description="GCP 账号ID列表")
+    model_id: Optional[str] = Field(None, description="AI 模型 ID")
 
     class Config:
         json_schema_extra = {
@@ -41,7 +42,8 @@ class SSEQueryRequestV2(BaseModel):
                 "query_id": "query_1768874592989_sc4nyqmg3",
                 "session_id": "550e8400-e29b-41d4-a716-446655440000",
                 "account_ids": ["fd524247-7c81-46e7-b3c6-2697264876a0"],
-                "gcp_account_ids": []
+                "gcp_account_ids": [],
+                "model_id": "us.anthropic.claude-sonnet-4-20250514-v1:0"
             }
         }
 
@@ -102,6 +104,7 @@ async def sse_query_endpoint_v2(
             "account_ids": account_ids_list,
             "gcp_account_ids": gcp_account_ids_list,
             "account_count": len(account_ids_list) + len(gcp_account_ids_list),
+            "model_id": query_request.model_id,
         }
     )
 
@@ -223,6 +226,7 @@ async def sse_query_endpoint_v2(
                 account_ids=account_ids_list,
                 gcp_account_ids=gcp_account_ids_list,
                 session_id=query_request.session_id,
+                model_id=query_request.model_id,
                 cancel_event=cancel_event,
             ):
                 # ✅ 在每次 yield 前检查取消标志

@@ -65,6 +65,7 @@ class AgentProvider(ABC):
         account_ids: list[str],
         gcp_account_ids: list[str],
         session_id: str | None = None,
+        model_id: str | None = None,
         cancel_event: asyncio.Event | None = None,
     ) -> AsyncIterator[dict]:
         """
@@ -80,6 +81,7 @@ class AgentProvider(ABC):
             account_ids: AWS账号ID列表
             gcp_account_ids: GCP账号ID列表
             session_id: 会话ID（可选）
+            model_id: AI 模型 ID（可选）
             cancel_event: 取消事件（可选）
 
         Yields:
@@ -118,6 +120,7 @@ class AWSBedrockAgentProvider(AgentProvider):
         account_ids: list[str],
         gcp_account_ids: list[str],
         session_id: str | None = None,
+        model_id: str | None = None,
         cancel_event: asyncio.Event | None = None,
     ) -> AsyncIterator[dict]:
         """执行查询（包含所有业务逻辑）"""
@@ -125,9 +128,10 @@ class AWSBedrockAgentProvider(AgentProvider):
         # ✅ 记录用户查询日志（关键日志，必须显示）
         query_preview = query[:100] + "..." if len(query) > 100 else query
         logger.info(
-            "💬 [聊天查询] 用户 %s 发送查询: %s",
+            "💬 [聊天查询] 用户 %s 发送查询: %s | model_id=%s",
             username,
             query_preview,
+            model_id,
             extra={
                 "user_id": user_id,
                 "username": username,
@@ -139,6 +143,7 @@ class AWSBedrockAgentProvider(AgentProvider):
                 "account_ids": account_ids,
                 "gcp_account_ids": gcp_account_ids,
                 "account_count": len(account_ids) + len(gcp_account_ids),
+                "model_id": model_id,
             }
         )
 
@@ -463,6 +468,7 @@ class AWSBedrockAgentProvider(AgentProvider):
                     user_id=user_id,
                     org_id=org_id,
                     account_type=account_type,
+                    model_id=model_id,
                 )
 
                 event_iter = aiter(event_stream)
