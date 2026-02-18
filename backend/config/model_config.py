@@ -25,18 +25,8 @@ AVAILABLE_MODELS: list[ModelConfig] = [
         is_default=True,
     ),
     ModelConfig(
-        model_id="global.anthropic.claude-sonnet-4-20250514-v1:0",
-        name="sonnet4",
-        description="sonnet4",
-    ),
-    ModelConfig(
-        model_id="global.anthropic.claude-3-5-sonnet-20241022-v2:0",
-        name="sonnet35v2",
-        description="sonnet35v2",
-    ),
-    ModelConfig(
-        model_id="global.anthropic.claude-3-5-haiku-20241022-v1:0",
-        name="haiku35",
-        description="haiku35",
+        model_id="global.anthropic.claude-haiku-4-5-20251001-v1:0",
+        name="haiku45",
+        description="haiku45",
     ),
 ]
