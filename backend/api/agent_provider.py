@@ -120,8 +120,8 @@ class AWSBedrockAgentProvider(AgentProvider):
         account_ids: list[str],
         gcp_account_ids: list[str],
         session_id: str | None = None,
-        cancel_event: asyncio.Event | None = None,
         model_id: str | None = None,
+        cancel_event: asyncio.Event | None = None,
     ) -> AsyncIterator[dict]:
         """执行查询（包含所有业务逻辑）"""
 
