@@ -167,9 +167,9 @@ export const Navbar: React.FC = () => {
             </AnimatePresence>
           </div>
 
-          {/* CTA Button */}
-          <Link to={isAuthenticated ? '/chat' : '/login'} className={styles.navCta}>
-            {isAuthenticated ? '进入控制台' : '立即开始'}
+          {/* CTA Button - 始终显示"立即开始" */}
+          <Link to="/login" className={styles.navCta}>
+            立即开始
           </Link>
         </div>
       </nav>
