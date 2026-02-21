@@ -4,7 +4,7 @@
   position: relative;
   width: 100%;
   padding: 120px 24px;
-  background: linear-gradient(to bottom, #FFFFFF, #F8FAFC); /*极其微妙的渐变*/
+  background: linear-gradient(180deg, #F9FAFB 0%, #FFFFFF 100%);
   color: #0F172A;
   overflow: hidden;
 }
@@ -35,15 +35,15 @@
   display: inline-block;
   padding: 4px 12px;
   background: rgba(59, 130, 246, 0.08);
-  border-radius: 100px;
+  border-radius: 9999px;
 }
 
 .title {
-  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-size: clamp(2rem, 4vw, 2.75rem);
   font-weight: 800;
   color: #0F172A;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
   background: linear-gradient(135deg, #0F172A 0%, #334155 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -60,7 +60,7 @@
 .card {
   position: relative;
   background: #FFFFFF;
-  border-radius: 24px;
+  border-radius: 16px;
   padding: 40px 32px;
   /* 高级感的阴影：多层阴影叠加 */
   box-shadow:
@@ -119,7 +119,7 @@
 .iconWrapper {
   width: 64px;
   height: 64px;
-  border-radius: 16px;
+  border-radius: 12px;
   background: var(--icon-bg);
   color: var(--icon-color);
   display: flex;

@@ -26,7 +26,7 @@
 }
 
 .title {
-  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-size: clamp(2rem, 4vw, 2.75rem);
   font-weight: 800;
   line-height: 1.1;
   color: #111827;
@@ -62,8 +62,8 @@
   font-size: 1.125rem;
   font-weight: 600;
   color: #FFFFFF;
-  background: #000000;
-  border-radius: 9999px;
+  background: #111827;
+  border-radius: 12px;
   border: none;
   cursor: pointer;
   transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -85,7 +85,7 @@
   font-weight: 500;
   color: #374151;
   background: #F3F4F6;
-  border-radius: 9999px;
+  border-radius: 12px;
   border: 1px solid transparent;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -96,15 +96,8 @@
   color: #111827;
 }
 
-.footerNote {
-  font-size: 0.875rem;
-  color: #9CA3AF;
-  margin-top: 16px;
-  font-weight: 500;
-}
-
 /* Responsive */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .section {
     padding: 80px 20px;
   }

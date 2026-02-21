@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { CheckCircle2, CircleDashed, Loader2, Eye, Brain, Zap } from 'lucide-react';
+import { Eye, Brain, Zap } from 'lucide-react';
 import { useI18n } from '@/hooks/useI18n';
 import styles from './ProductRoadmapSection.module.css';
 

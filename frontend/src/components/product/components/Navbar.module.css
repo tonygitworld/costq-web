@@ -28,7 +28,7 @@
 
 /* Nav Container */
 .nav {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 32px;
   display: grid;
@@ -43,6 +43,17 @@
   align-items: center;
   text-decoration: none;
   z-index: 10;
+}
+
+.logoText {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #111827;
+}
+
+.logoAccent {
+  color: #3B82F6;
 }
 
 /* ===== Navigation Links (Center) ===== */
@@ -109,6 +120,11 @@
   background: rgba(0, 0, 0, 0.04);
 }
 
+.currentLang {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
 .langDropdown {
   position: absolute;
   top: calc(100% + 8px);
@@ -155,11 +171,11 @@
   display: inline-flex;
   align-items: center;
   padding: 8px 20px;
-  background: #0F172A;
+  background: #111827;
   color: #FFFFFF;
   font-size: 0.875rem;
   font-weight: 600;
-  border-radius: 100px;
+  border-radius: 12px;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -167,7 +183,7 @@
 }
 
 .navCta:hover {
-  background: #1E293B;
+  background: #1F2937;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }

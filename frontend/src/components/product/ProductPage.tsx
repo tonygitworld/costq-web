@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
 // Phase 1: Core ToB Sections
@@ -12,13 +11,13 @@ import styles from './ProductPage.module.css';
 
 const ProductPage: React.FC = () => {
   useEffect(() => {
+    const fontHref = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap';
+    // 防止重复加载
+    if (document.querySelector(`link[href="${fontHref}"]`)) return;
     const link = document.createElement('link');
-    link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap';
+    link.href = fontHref;
     link.rel = 'stylesheet';
     document.head.appendChild(link);
-    return () => {
-      document.head.removeChild(link);
-    };
   }, []);
 
   // 监听 hash 变化并滚动到对应 section

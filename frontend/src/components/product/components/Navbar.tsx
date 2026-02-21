@@ -30,53 +30,46 @@ export const Navbar: React.FC = () => {
   ];
 
   useEffect(() => {
-    // 滚动处理函数
+    let ticking = false;
+
     const handleScroll = () => {
-      const container = document.getElementById('product-page-container');
-      const scrollTop = container ? container.scrollTop : window.scrollY;
+      if (ticking) return;
+      ticking = true;
 
-      // 只有滚动超过一定距离才变色
-      setScrolled(scrollTop > 50);
+      requestAnimationFrame(() => {
+        const container = document.getElementById('product-page-container');
+        const scrollTop = container ? container.scrollTop : window.scrollY;
+        setScrolled(scrollTop > 50);
 
-      // 检测当前 Active Section (中心点距离算法)
-      const viewportHeight = window.innerHeight;
-      const viewportCenter = viewportHeight / 2;
+        // 检测当前 Active Section
+        const viewportCenter = window.innerHeight / 2;
+        let closest = 'hero';
+        let minDistance = Infinity;
 
-      let currentSection = activeSection;
-      let minDistance = Infinity;
-
-      for (const link of NAV_LINKS) {
-        const section = document.getElementById(link.id);
-        if (section) {
-          const rect = section.getBoundingClientRect();
-          // 计算 section 中心点距离视口中心的绝对距离
-          const sectionCenter = rect.top + rect.height / 2;
-          const distance = Math.abs(sectionCenter - viewportCenter);
-
-          // 找到距离视口中心最近的那个 section
-          if (distance < minDistance) {
-            minDistance = distance;
-            currentSection = link.id;
+        for (const link of NAV_LINKS) {
+          const section = document.getElementById(link.id);
+          if (section) {
+            const rect = section.getBoundingClientRect();
+            const distance = Math.abs(rect.top + rect.height / 2 - viewportCenter);
+            if (distance < minDistance) {
+              minDistance = distance;
+              closest = link.id;
+            }
           }
         }
-      }
 
-      if (currentSection !== activeSection) {
-        setActiveSection(currentSection);
-      }
+        setActiveSection(closest);
+        ticking = false;
+      });
     };
 
-    // 优先监听容器滚动
     const container = document.getElementById('product-page-container');
     const target = container || window;
-
     target.addEventListener('scroll', handleScroll, { passive: true });
-
-    // 初始化检查
     handleScroll();
 
     return () => target.removeEventListener('scroll', handleScroll);
-  }, [activeSection]); // Add activeSection to dependency to avoid stale state logic, though logic handles it.
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleLangChange = (code: string) => {
     changeLanguage(code);
@@ -106,13 +99,8 @@ export const Navbar: React.FC = () => {
       <nav className={styles.nav}>
         {/* Left: Logo */}
         <Link to="/product" className={styles.logo}>
-          <span style={{
-            fontSize: '28px',
-            fontWeight: 800,
-            letterSpacing: '-0.03em',
-            color: '#0f172a'
-          }}>
-            Cost<span style={{ color: '#3b82f6' }}>Q</span>
+          <span className={styles.logoText}>
+            Cost<span className={styles.logoAccent}>Q</span>
           </span>
         </Link>
 
@@ -167,9 +155,9 @@ export const Navbar: React.FC = () => {
             </AnimatePresence>
           </div>
 
-          {/* CTA Button - 始终显示"立即开始" */}
+          {/* CTA Button */}
           <Link to="/login" className={styles.navCta}>
-            立即开始
+            {t('product:nav.getStarted')}
           </Link>
         </div>
       </nav>

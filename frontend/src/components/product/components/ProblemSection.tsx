@@ -14,19 +14,19 @@ export const ProblemSection: React.FC = () => {
       icon: FileText,
       title: t('problem.pain1.title'),
       desc: t('problem.pain1.desc'),
-      impact: t('problem.pain1.impact', "Hidden costs drain 20% budget"),
+      impact: t('problem.pain1.impact'),
     },
     {
       icon: Search,
       title: t('problem.pain2.title'),
       desc: t('problem.pain2.desc'),
-      impact: t('problem.pain2.impact', "Hours lost in manual tracking"),
+      impact: t('problem.pain2.impact'),
     },
     {
       icon: Shield,
       title: t('problem.pain3.title'),
       desc: t('problem.pain3.desc'),
-      impact: t('problem.pain3.impact', "Risk of budget overruns"),
+      impact: t('problem.pain3.impact'),
     },
   ];
 
@@ -69,7 +69,7 @@ export const ProblemSection: React.FC = () => {
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.1 }}
           >
-            THE CHALLENGE
+            {t('problem.preTitle')}
           </motion.div>
           <motion.h2
             className={styles.title}

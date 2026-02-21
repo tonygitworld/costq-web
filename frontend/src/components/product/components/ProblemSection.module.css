@@ -7,7 +7,7 @@
   position: relative;
   width: 100%;
   padding: 120px 24px;
-  background-color: #f8fafc; /* Slate-50 */
+  background: linear-gradient(180deg, #F9FAFB 0%, #FFFFFF 100%);
   overflow: hidden;
   display: flex;
   justify-content: center;
@@ -66,7 +66,7 @@
 .container {
   position: relative;
   width: 100%;
-  max-width: 1280px;
+  max-width: 1200px;
   z-index: 1;
 }
 
@@ -82,7 +82,7 @@
   display: inline-block;
   margin-bottom: 16px;
   padding: 6px 16px;
-  border-radius: 20px;
+  border-radius: 9999px;
   background: rgba(59, 130, 246, 0.1);
   color: #2563eb;
   font-size: 0.875rem;
@@ -93,7 +93,7 @@
 }
 
 .title {
-  font-size: 3rem;
+  font-size: clamp(2rem, 4vw, 2.75rem);
   font-weight: 800;
   line-height: 1.2;
   margin-bottom: 24px;
@@ -127,7 +127,7 @@
   background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-radius: 24px;
+  border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.8);
   box-shadow:
     0 4px 6px -1px rgba(0, 0, 0, 0.05),
@@ -238,7 +238,7 @@
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .section {
     padding: 80px 20px;
   }
@@ -248,6 +248,6 @@
   }
 
   .title {
-    font-size: 2.25rem;
+    font-size: 1.75rem;
   }
 }

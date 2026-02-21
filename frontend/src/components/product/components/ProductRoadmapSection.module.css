@@ -1,11 +1,11 @@
 /* Product Roadmap Section - Vision Style */
 
 .roadmapContainer {
-  padding: 100px 0; /* 增加留白 */
+  padding: 120px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(180deg, #F9FAFB 0%, #FFFFFF 100%);
+  background: #FFFFFF;
 }
 
 .header {
@@ -29,7 +29,7 @@
 }
 
 .title {
-  font-size: 2.25rem;
+  font-size: clamp(2rem, 4vw, 2.75rem);
   font-weight: 800;
   color: #111827;
   letter-spacing: -0.02em;
@@ -188,7 +188,7 @@
 }
 
 /* Responsive */
-@media (max-width: 840px) {
+@media (max-width: 768px) {
   .stepsContainer {
     flex-direction: column;
     align-items: flex-start;
