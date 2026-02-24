@@ -4,7 +4,7 @@
   position: relative;
   width: 100%;
   padding: 120px 24px;
-  background: linear-gradient(180deg, #F9FAFB 0%, #FFFFFF 100%);
+  background: #F9FAFB;
   color: #0F172A;
   overflow: hidden;
 }
@@ -28,12 +28,11 @@
 .preTitle {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #3B82F6;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  color: #2563EB;
+  letter-spacing: 0.05em;
   margin-bottom: 16px;
   display: inline-block;
-  padding: 4px 12px;
+  padding: 6px 16px;
   background: rgba(59, 130, 246, 0.08);
   border-radius: 9999px;
 }
@@ -41,13 +40,9 @@
 .title {
   font-size: clamp(2rem, 4vw, 2.75rem);
   font-weight: 800;
-  color: #0F172A;
+  color: #111827;
   letter-spacing: -0.02em;
   line-height: 1.2;
-  background: linear-gradient(135deg, #0F172A 0%, #334155 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 /* Cards Grid */

@@ -56,10 +56,6 @@ export const ProblemSection: React.FC = () => {
 
   return (
     <section ref={sectionRef} className={styles.section} id="problem">
-      {/* 动态背景元素 - 放在 container 外部以绝对定位 */}
-      <div className={styles.glowBlob1} />
-      <div className={styles.glowBlob2} />
-
       <div className={styles.container}>
         {/* Header */}
         <div className={styles.header}>

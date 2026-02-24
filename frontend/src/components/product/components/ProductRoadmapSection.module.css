@@ -17,13 +17,12 @@
 
 .label {
   display: inline-block;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #6366f1;
-  background: #eef2ff;
-  padding: 4px 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #2563EB;
+  background: rgba(59, 130, 246, 0.08);
+  padding: 6px 16px;
   border-radius: 9999px;
   margin-bottom: 16px;
 }
@@ -99,7 +98,7 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 32px;
-  border: 6px solid #F9FAFB; /* 增加边框宽度，与背景融合 */
+  border: 6px solid #FFFFFF; /* 与白色背景融合 */
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
   z-index: 2;

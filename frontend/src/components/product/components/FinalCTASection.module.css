@@ -4,7 +4,7 @@
   position: relative;
   width: 100%;
   padding: 120px 24px;
-  background: #FFFFFF; /* 纯白背景，干净利落 */
+  background: #F9FAFB;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -32,9 +32,6 @@
   color: #111827;
   letter-spacing: -0.02em;
   margin: 0;
-  background: linear-gradient(180deg, #111827 0%, #374151 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
