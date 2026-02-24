@@ -5,7 +5,9 @@
     "platformIntro": "プラットフォーム",
     "coreCapabilities": "コア機能",
     "roadmap": "ロードマップ",
-    "getStarted": "今すぐ開始"
+    "getStarted": "今すぐ開始",
+    "menuOpen": "メニューを開く",
+    "menuClose": "メニューを閉じる"
   },
   "hero": {
     "badge": "AI 駆動型クラウドコスト管理",
@@ -13,11 +15,9 @@
     "titleHighlight": "コスト管理プラットフォーム",
     "subtitle": "Agentic AI駆動のエンタープライズFinOps — 複雑なレポートとSQLを自然言語対話で置き換え",
     "ctaPrimary": "無料トライアル開始",
-    "ctaSecondary": "デモを見る",
+    "ctaSecondary": "コア機能を見る",
     "trust": "読み取り専用アクセス · SOC2 準拠 · マルチアカウント対応",
-    "stat1Label": "平均コスト削減率",
-    "stat2Label": "クイックセットアップ",
-    "stat3Label": "セキュリティ認証"
+    "previewAlt": "CostQ 製品プレビュー"
   },
   "problem": {
     "preTitle": "課題分析",

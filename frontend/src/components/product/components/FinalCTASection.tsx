@@ -1,5 +1,6 @@
-import React, { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { useScrollAnimation } from '../hooks/useScrollAnimation';
 import { ArrowRight, MessageSquareText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useI18n } from '@/hooks/useI18n';
@@ -8,8 +9,7 @@ import styles from './FinalCTASection.module.css';
 export const FinalCTASection: React.FC = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
-  const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
+  const { ref: sectionRef, isInView } = useScrollAnimation({ once: true, amount: 0.3 });
 
   return (
     <section id="final-cta" ref={sectionRef} className={styles.section}>

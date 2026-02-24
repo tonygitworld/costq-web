@@ -1,13 +1,13 @@
-import React, { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { useScrollAnimation } from '../hooks/useScrollAnimation';
 import { FileText, Search, Shield, AlertTriangle } from 'lucide-react';
 import { useI18n } from '@/hooks/useI18n';
 import styles from './ProblemSection.module.css';
 
 export const ProblemSection: React.FC = () => {
   const { t } = useI18n('product');
-  const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
+  const { ref: sectionRef, isInView } = useScrollAnimation({ once: true, amount: 0.2 });
 
   const problems = [
     {

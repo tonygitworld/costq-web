@@ -4,8 +4,8 @@
   position: relative;
   width: 100%;
   padding: 120px 24px;
-  background: #F9FAFB;
-  color: #0F172A;
+  background: var(--color-bg-light);
+  color: var(--color-text-primary);
   overflow: hidden;
 }
 
@@ -28,19 +28,19 @@
 .preTitle {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #2563EB;
+  color: var(--color-primary);
   letter-spacing: 0.05em;
   margin-bottom: 16px;
   display: inline-block;
   padding: 6px 16px;
-  background: rgba(59, 130, 246, 0.08);
+  background: var(--color-primary-light-md);
   border-radius: 9999px;
 }
 
 .title {
   font-size: clamp(2rem, 4vw, 2.75rem);
   font-weight: 800;
-  color: #111827;
+  color: var(--color-text-primary);
   letter-spacing: -0.02em;
   line-height: 1.2;
 }
@@ -54,7 +54,7 @@
 
 .card {
   position: relative;
-  background: #FFFFFF;
+  background: var(--color-bg-white);
   border-radius: 16px;
   padding: 40px 32px;
   /* 高级感的阴影：多层阴影叠加 */
@@ -131,7 +131,7 @@
 .cardTitle {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #0F172A;
+  color: var(--color-text-primary);
   letter-spacing: -0.02em;
   margin-bottom: 16px;
   line-height: 1.2;
@@ -139,7 +139,7 @@
 
 .cardDesc {
   font-size: 1.05rem;
-  color: #64748B;
+  color: var(--color-text-muted);
   line-height: 1.7;
   font-weight: 400;
 }

@@ -1,16 +1,16 @@
-import React, { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { useScrollAnimation } from '../hooks/useScrollAnimation';
 import { MessageSquareText, FileBarChart, Sparkles, DatabaseZap, Workflow, BellRing, BrainCircuit, Bot, Smartphone } from 'lucide-react';
 import { useI18n } from '@/hooks/useI18n';
 import styles from './ProductShowcaseSection.module.css';
 
 export const ProductShowcaseSection: React.FC = () => {
   const { t } = useI18n(['product', 'common']);
-  const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
+  const { ref: sectionRef, isInView } = useScrollAnimation({ once: true, amount: 0.1 });
 
-  // 9个核心能力 - 基于图片文案
-  const features = [
+  // 9个核心能力
+  const features: Array<{ icon: React.ElementType; title: string; desc: string }> = [
     {
       icon: MessageSquareText,
       title: t('product:showcase.feature1.title'),
@@ -99,6 +99,7 @@ export const ProductShowcaseSection: React.FC = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
         >
+          <p className={styles.preTitle}>平台能力</p>
           <h2 className={styles.title}>{t('product:showcase.title')}</h2>
           <p className={styles.subtitle}>{t('product:showcase.subtitle')}</p>
         </motion.div>
@@ -117,13 +118,10 @@ export const ProductShowcaseSection: React.FC = () => {
                 key={index}
                 className={styles.card}
                 variants={cardVariants}
-                whileHover={{
-                  y: -6,
-                  transition: { duration: 0.2 },
-                }}
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
               >
                 <div className={styles.iconWrapper}>
-                  <Icon size={24} strokeWidth={1.5} />
+                  <Icon size={22} strokeWidth={1.5} />
                 </div>
                 <h3 className={styles.cardTitle}>{feature.title}</h3>
                 <p className={styles.cardDesc}>{feature.desc}</p>

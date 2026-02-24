@@ -4,7 +4,7 @@
   position: relative;
   width: 100%;
   padding: 120px 24px;
-  background: #F9FAFB;
+  background: var(--color-bg-light);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -29,7 +29,7 @@
   font-size: clamp(2rem, 4vw, 2.75rem);
   font-weight: 800;
   line-height: 1.1;
-  color: #111827;
+  color: var(--color-text-primary);
   letter-spacing: -0.02em;
   margin: 0;
 }
@@ -37,7 +37,7 @@
 .subtitle {
   font-size: 1.25rem;
   font-weight: 400;
-  color: #6B7280;
+  color: var(--color-text-gray-md);
   max-width: 600px;
   margin: 0 auto;
   line-height: 1.6;
@@ -58,8 +58,8 @@
   padding: 16px 36px;
   font-size: 1.125rem;
   font-weight: 600;
-  color: #FFFFFF;
-  background: #111827;
+  color: var(--color-bg-white);
+  background: var(--color-text-primary);
   border-radius: 12px;
   border: none;
   cursor: pointer;
@@ -80,8 +80,8 @@
   padding: 16px 36px;
   font-size: 1.125rem;
   font-weight: 500;
-  color: #374151;
-  background: #F3F4F6;
+  color: var(--color-text-medium);
+  background: var(--color-bg-gray);
   border-radius: 12px;
   border: 1px solid transparent;
   cursor: pointer;
@@ -89,8 +89,8 @@
 }
 
 .secondaryButton:hover {
-  background: #E5E7EB;
-  color: #111827;
+  background: var(--color-border-light);
+  color: var(--color-text-primary);
 }
 
 /* Responsive */

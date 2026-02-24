@@ -22,6 +22,7 @@ export const Navbar: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [langMenuOpen, setLangMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const languages = [
     { code: 'zh-CN', label: '简体中文' },
@@ -120,6 +121,18 @@ export const Navbar: React.FC = () => {
 
         {/* Right: Actions */}
         <div className={styles.rightActions}>
+          {/* Hamburger Button */}
+          <button
+            className={styles.hamburger}
+            onClick={() => setMobileMenuOpen(v => !v)}
+            aria-label={mobileMenuOpen ? t('product:nav.menuClose') : t('product:nav.menuOpen')}
+            aria-expanded={mobileMenuOpen}
+          >
+            <span className={`${styles.hamburgerLine} ${mobileMenuOpen ? styles.hamburgerOpen : ''}`} />
+            <span className={`${styles.hamburgerLine} ${mobileMenuOpen ? styles.hamburgerOpen : ''}`} />
+            <span className={`${styles.hamburgerLine} ${mobileMenuOpen ? styles.hamburgerOpen : ''}`} />
+          </button>
+
           {/* Language Switcher */}
           <div className={styles.langWrapper}>
             <button
@@ -161,6 +174,46 @@ export const Navbar: React.FC = () => {
           </Link>
         </div>
       </nav>
+
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            className={styles.mobileMenu}
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+          >
+            <div className={styles.mobileMenuInner}>
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.id}
+                  to={link.hash}
+                  className={styles.mobileNavLink}
+                  onClick={(e) => {
+                    handleNavClick(e, link.hash);
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              <div className={styles.mobileLangSection}>
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    className={`${styles.mobileLangOption} ${language === lang.code ? styles.activeLang : ''}`}
+                    onClick={() => handleLangChange(lang.code)}
+                  >
+                    {lang.label}
+                    {language === lang.code && <Check size={14} />}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   );
 };

@@ -21,7 +21,7 @@
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid var(--color-border-subtle);
   padding: 12px 0;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
 }
@@ -49,11 +49,11 @@
   font-size: 28px;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #111827;
+  color: var(--color-text-primary);
 }
 
 .logoAccent {
-  color: #3B82F6;
+  color: var(--color-primary);
 }
 
 /* ===== Navigation Links (Center) ===== */
@@ -68,7 +68,7 @@
 .navLink {
   position: relative;
   padding: 8px 16px;
-  color: #64748B;
+  color: var(--color-text-muted);
   font-size: 0.875rem;
   font-weight: 500;
   text-decoration: none;
@@ -78,13 +78,13 @@
 }
 
 .navLink:hover {
-  color: #0F172A;
-  background: rgba(0, 0, 0, 0.04);
+  color: var(--color-text-primary);
+  background: var(--color-bg-hover);
 }
 
 .navLink.activeLink {
-  color: #0F172A;
-  background: rgba(0, 0, 0, 0.06);
+  color: var(--color-text-primary);
+  background: var(--color-bg-active);
   font-weight: 600;
 }
 
@@ -111,13 +111,13 @@
   padding: 8px;
   border-radius: 8px;
   cursor: pointer;
-  color: #64748B;
+  color: var(--color-text-muted);
   transition: all 0.2s ease;
 }
 
 .langBtn:hover {
-  color: #0F172A;
-  background: rgba(0, 0, 0, 0.04);
+  color: var(--color-text-primary);
+  background: var(--color-bg-hover);
 }
 
 .currentLang {
@@ -129,10 +129,10 @@
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  background: #FFFFFF;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--color-bg-white);
+  border: 1px solid var(--color-border-medium);
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
   padding: 6px;
   min-width: 140px;
   overflow: hidden;
@@ -151,19 +151,19 @@
   cursor: pointer;
   text-align: left;
   font-size: 0.875rem;
-  color: #475569;
+  color: var(--color-text-secondary);
   transition: all 0.2s;
 }
 
 .langOption:hover {
-  background: #F1F5F9;
-  color: #0F172A;
+  background: var(--color-bg-muted);
+  color: var(--color-text-primary);
 }
 
 .activeLang {
-  color: #2563EB;
+  color: var(--color-primary);
   font-weight: 600;
-  background: #EFF6FF;
+  background: var(--color-primary-bg);
 }
 
 /* Nav CTA Button */
@@ -171,8 +171,8 @@
   display: inline-flex;
   align-items: center;
   padding: 8px 20px;
-  background: #111827;
-  color: #FFFFFF;
+  background: var(--color-text-primary);
+  color: var(--color-bg-white);
   font-size: 0.875rem;
   font-weight: 600;
   border-radius: 12px;
@@ -185,7 +185,7 @@
 .navCta:hover {
   background: #1F2937;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-lg);
 }
 
 /* ===== Responsive ===== */
@@ -217,5 +217,126 @@
   .navCta {
     padding: 8px 16px;
     font-size: 0.8125rem;
+  }
+}
+
+/* ===== Hamburger Button ===== */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.hamburger:hover {
+  background: var(--color-bg-hover);
+}
+
+.hamburgerLine {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--color-text-primary);
+  border-radius: 2px;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+  transform-origin: center;
+}
+
+/* X 形态 */
+.hamburgerLine:nth-child(1).hamburgerOpen {
+  transform: translateY(7px) rotate(45deg);
+}
+.hamburgerLine:nth-child(2).hamburgerOpen {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.hamburgerLine:nth-child(3).hamburgerOpen {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ===== Mobile Menu Panel ===== */
+.mobileMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border-subtle);
+  overflow: hidden;
+  z-index: 999;
+}
+
+.mobileMenuInner {
+  padding: 12px 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mobileNavLink {
+  display: block;
+  padding: 12px 16px;
+  color: var(--color-text-secondary);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.mobileNavLink:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+}
+
+.mobileLangSection {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px 4px;
+  border-top: 1px solid var(--color-border);
+  margin-top: 8px;
+}
+
+.mobileLangOption {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mobileLangOption:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.mobileLangOption.activeLang {
+  background: var(--color-primary-bg);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* 移动端显示汉堡按钮 */
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex;
   }
 }

@@ -1,14 +1,27 @@
 /* ========================================
-   Features Section - 3x3 Grid Cards
-   Light Theme - Best Practices
+   ProductShowcaseSection - Bento Grid
+   参考 Linear / Vercel 风格
    ======================================== */
 
 .section {
   position: relative;
   width: 100%;
   padding: 120px 24px;
-  background: #FFFFFF;
+  background: #F8FAFC;
   overflow: hidden;
+}
+
+/* 背景装饰 */
+.section::before {
+  content: '';
+  position: absolute;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(37, 99, 235, 0.06) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .container {
@@ -24,103 +37,226 @@
   margin-bottom: 64px;
 }
 
+.preTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px;
+  margin-bottom: 16px;
+  background: var(--color-primary-light);
+  border: 1px solid var(--color-primary-border);
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
 .title {
   font-size: clamp(2rem, 4vw, 2.75rem);
   font-weight: 800;
   line-height: 1.2;
-  color: #111827;
+  color: var(--color-text-primary);
   letter-spacing: -0.02em;
   margin-bottom: 1rem;
 }
 
 .subtitle {
   font-size: 1.125rem;
-  color: #4B5563;
+  color: var(--color-text-muted);
   max-width: 42rem;
   margin: 0 auto;
+  line-height: 1.7;
 }
 
-/* ===== Features Grid ===== */
+/* ===== Bento Grid ===== */
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: auto;
+  gap: 16px;
 }
 
-/* ===== Feature Card ===== */
-
+/* 卡片基础样式 */
 .card {
   position: relative;
   padding: 32px;
-  background: #FFFFFF;
-  border: 1px solid #E5E7EB;
-  border-radius: 16px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--color-bg-white);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  height: 100%;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
 }
 
 .card:hover {
-  border-color: #3B82F6;
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
-  /* Transform is handled by Framer Motion in TSX, or can be added here if TSX is updated */
-  /* transform: translateY(-4px); */
+  border-color: rgba(37, 99, 235, 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 }
 
-/* Icon */
+/* ===== Bento 布局：12列网格精确定位 ===== */
+
+/* 行 1：feature1(5列) + feature2(4列) + feature3(3列) */
+.card:nth-child(1) { grid-column: span 5; }
+.card:nth-child(2) { grid-column: span 4; }
+.card:nth-child(3) { grid-column: span 3; }
+
+/* 行 2：feature4(3列) + feature5(5列) + feature6(4列) */
+.card:nth-child(4) { grid-column: span 3; }
+.card:nth-child(5) { grid-column: span 5; }
+.card:nth-child(6) { grid-column: span 4; }
+
+/* 行 3：feature7(4列) + feature8(4列) + feature9(4列) */
+.card:nth-child(7) { grid-column: span 4; }
+.card:nth-child(8) { grid-column: span 4; }
+.card:nth-child(9) { grid-column: span 4; }
+
+/* ===== 卡片差异化风格 ===== */
+
+/* feature1 - 主打卡片：深色背景 */
+.card:nth-child(1) {
+  background: var(--color-text-primary);
+  border-color: transparent;
+  color: white;
+}
+
+.card:nth-child(1) .cardTitle {
+  color: #FFFFFF;
+  font-size: 1.375rem;
+}
+
+.card:nth-child(1) .cardDesc {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.card:nth-child(1) .iconWrapper {
+  background: rgba(255, 255, 255, 0.12);
+  color: #FFFFFF;
+}
+
+.card:nth-child(1):hover {
+  border-color: transparent;
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.3);
+}
+
+/* feature3 - 蓝色强调卡片 */
+.card:nth-child(3) {
+  background: linear-gradient(145deg, #EFF6FF 0%, #DBEAFE 100%);
+  border-color: #BFDBFE;
+}
+
+.card:nth-child(3) .iconWrapper {
+  background: var(--color-primary);
+  color: white;
+}
+
+.card:nth-child(3):hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 8px 32px rgba(37, 99, 235, 0.15);
+}
+
+/* feature5 - 渐变强调卡片 */
+.card:nth-child(5) {
+  background: linear-gradient(145deg, #F0FDF4 0%, #DCFCE7 100%);
+  border-color: #BBF7D0;
+}
+
+.card:nth-child(5) .iconWrapper {
+  background: #16A34A;
+  color: white;
+}
+
+.card:nth-child(5):hover {
+  border-color: #16A34A;
+  box-shadow: 0 8px 32px rgba(22, 163, 74, 0.12);
+}
+
+/* ===== 图标 ===== */
+
 .iconWrapper {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  margin-bottom: 24px;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 20px;
   border-radius: 12px;
-  background: #EFF6FF;
-  color: #3B82F6;
-  transition: all 0.3s ease;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  flex-shrink: 0;
+  transition: background 0.2s, color 0.2s;
 }
 
-.card:hover .iconWrapper {
-  background: #3B82F6;
-  color: #FFFFFF;
+.card:not(:nth-child(1)):not(:nth-child(3)):not(:nth-child(5)):hover .iconWrapper {
+  background: var(--color-primary);
+  color: white;
 }
 
-/* Card Title */
+/* ===== 文字 ===== */
+
 .cardTitle {
-  font-size: 1.125rem;
-  font-weight: 600;
+  font-size: 1.0625rem;
+  font-weight: 700;
   line-height: 1.4;
-  color: #1F2937;
-  margin-bottom: 12px;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
 }
 
-/* Card Description */
 .cardDesc {
-  font-size: 1rem;
-  line-height: 1.6;
-  color: #6B7280;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--color-text-muted);
+  flex: 1;
+}
+
+/* ===== 装饰性背景图案（部分卡片） ===== */
+
+.card:nth-child(1)::after {
+  content: '';
+  position: absolute;
+  bottom: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  pointer-events: none;
 }
 
 /* ===== Responsive ===== */
 
 @media (max-width: 1024px) {
   .grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
+    grid-template-columns: repeat(6, 1fr);
   }
+
+  .card:nth-child(1) { grid-column: span 4; }
+  .card:nth-child(2) { grid-column: span 2; }
+  .card:nth-child(3) { grid-column: span 3; }
+  .card:nth-child(4) { grid-column: span 3; }
+  .card:nth-child(5) { grid-column: span 4; }
+  .card:nth-child(6) { grid-column: span 2; }
+  .card:nth-child(7) { grid-column: span 2; }
+  .card:nth-child(8) { grid-column: span 2; }
+  .card:nth-child(9) { grid-column: span 2; }
 }
 
 @media (max-width: 768px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-
   .section {
     padding: 80px 20px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .card:nth-child(n) {
+    grid-column: span 1;
   }
 
   .title {

@@ -1,4 +1,43 @@
 /* ========================================
+   CSS 颜色变量系统 - Design Tokens
+   ======================================== */
+:root {
+  --color-primary: #2563EB;
+  --color-primary-dark: #1D4ED8;
+  --color-primary-light: rgba(59, 130, 246, 0.06);
+  --color-primary-border: rgba(59, 130, 246, 0.12);
+  --color-accent: #4F46E5;
+  --color-bg-white: #FFFFFF;
+  --color-bg-subtle: rgba(255, 255, 255, 0.6);
+  --color-bg-hover: rgba(0, 0, 0, 0.04);
+  --color-bg-active: rgba(0, 0, 0, 0.06);
+  --color-bg-muted: #F1F5F9;
+  --color-primary-bg: #EFF6FF;
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-muted: #64748B;
+  --color-border: #E2E8F0;
+  --color-border-subtle: rgba(0, 0, 0, 0.05);
+  --color-border-medium: rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.2);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --color-bg-light: #F9FAFB;
+  --color-primary-light-md: rgba(59, 130, 246, 0.08);
+  --color-border-light: #E5E7EB;
+  --color-text-dark: #334155;
+  --color-danger: #ef4444;
+  --color-text-gray: #4B5563;
+  --color-text-gray-md: #6B7280;
+  --color-bg-gray: #F3F4F6;
+  --color-border-gray: #E5E7EB;
+  --color-text-placeholder: #9CA3AF;
+  --color-success: #10B981;
+  --color-primary-border-light: #DBEAFE;
+  --color-text-medium: #374151;
+}
+
+/* ========================================
    Full Page Scroll Layout - 全屏滚动
    ======================================== */
 
@@ -17,13 +56,15 @@
   min-height: 100vh;
   scroll-snap-align: start;
   scroll-snap-stop: always;
+  position: relative;
+}
 
-  /* 确保内容垂直居中 */
+/* 非首屏 section 使用 flex column 居中 */
+.page main > section:not(:first-child) {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  position: relative;
 }
 
 /* Footer 的特殊处理（通常不是全屏，但在这里我们可能需要它占满或者吸附到底部） */

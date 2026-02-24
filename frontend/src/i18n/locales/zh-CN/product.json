@@ -5,19 +5,19 @@
     "platformIntro": "平台介绍",
     "coreCapabilities": "核心能力",
     "roadmap": "未来规划",
-    "getStarted": "立即开始"
+    "getStarted": "立即开始",
+    "menuOpen": "打开菜单",
+    "menuClose": "关闭菜单"
   },
   "hero": {
-    "badge": "🚀 AI 驱动的云成本管理",
-    "titleLine1": "让云成本管理",
-    "titleHighlight": "从查报表变成对话决策",
-    "subtitle": "CostQ 通过 AI 自动分析异常支出、定位资源浪费，并生成可执行的优化建议与 FinOps 报告。无需 SQL，无需复杂报表。",
+    "badge": "✦ AI 驱动的云成本管理",
+    "titleLine1": "用对话代替报表",
+    "titleHighlight": "重新定义云成本管理",
+    "subtitle": "AI 自动分析异常支出、定位浪费、生成优化建议。无需 SQL，无需复杂报表。",
     "ctaPrimary": "立即开始",
-    "ctaSecondary": "查看产品演示",
+    "ctaSecondary": "了解核心能力",
     "trust": "只读权限接入 · SOC2 合规保障 · 支持多账户统一管理",
-    "stat1Label": "平均成本降幅",
-    "stat2Label": "快速接入",
-    "stat3Label": "安全合规认证"
+    "previewAlt": "CostQ 产品界面预览"
   },
   "problem": {
     "preTitle": "痛点分析",

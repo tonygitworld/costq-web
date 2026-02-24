@@ -5,7 +5,9 @@
     "platformIntro": "Platform",
     "coreCapabilities": "Capabilities",
     "roadmap": "Roadmap",
-    "getStarted": "Get Started"
+    "getStarted": "Get Started",
+    "menuOpen": "Open menu",
+    "menuClose": "Close menu"
   },
   "hero": {
     "badge": "AI-Native Cloud Cost Platform",
@@ -13,11 +15,9 @@
     "titleHighlight": "Cost Intelligence",
     "subtitle": "Agentic AI-powered enterprise FinOps — replacing complex dashboards and SQL with natural language conversation",
     "ctaPrimary": "Start Free Trial",
-    "ctaSecondary": "View Demo",
+    "ctaSecondary": "Explore Capabilities",
     "trust": "Read-only Access · SOC2 Compliant · Multi-Account Support",
-    "stat1Label": "Avg. Cost Savings",
-    "stat2Label": "Quick Setup",
-    "stat3Label": "Security Certified"
+    "previewAlt": "CostQ Product Preview"
   },
   "problem": {
     "preTitle": "Pain Points",
