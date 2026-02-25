@@ -116,6 +116,7 @@ class AgentCoreClient:
         account_type: str = "aws",
         model_id: str | None = None,
         images: list | None = None,
+        files: list | None = None,
     ) -> AsyncIterator[dict]:
         """
         异步流式调用 Runtime
@@ -194,6 +195,12 @@ class AgentCoreClient:
                     payload["images"] = [
                         img.model_dump() if hasattr(img, 'model_dump') else img
                         for img in images
+                    ]
+                if files:
+                    # ✅ 传递文件附件数据到 Runtime（Excel 等）
+                    payload["files"] = [
+                        f.model_dump() if hasattr(f, 'model_dump') else f
+                        for f in files
                     ]
 
                 # ✅ 记录 Agent Runtime 调用参数（包含 model_id 追踪）

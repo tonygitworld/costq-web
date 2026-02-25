@@ -42,6 +42,7 @@ class SSEQueryRequestV2(BaseModel):
     gcp_account_ids: Optional[list[str]] = Field(None, description="GCP 账号ID列表")
     model_id: Optional[str] = Field(None, description="AI 模型 ID")
     images: Optional[list[ImageData]] = Field(None, description="图片附件列表（可选）")
+    files: Optional[list[ImageData]] = Field(None, description="文件附件列表（Excel 等，可选）")
 
     class Config:
         json_schema_extra = {
@@ -237,6 +238,7 @@ async def sse_query_endpoint_v2(
                 model_id=query_request.model_id,
                 cancel_event=cancel_event,
                 images=query_request.images,
+                files=query_request.files,
             ):
                 # ✅ 在每次 yield 前检查取消标志
                 if cancel_event.is_set():
