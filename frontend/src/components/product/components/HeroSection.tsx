@@ -56,16 +56,6 @@ export const HeroSection: React.FC = () => {
       <div className={styles.overlay} aria-hidden="true" />
 
       <div className={styles.content}>
-        <motion.span
-          className={styles.eyebrow}
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.05 }}
-        >
-          <i className={styles.eyebrowDot} />
-          {t('product:hero.badge')}
-        </motion.span>
-
         <h1 className={`${styles.heading} ${isEn ? styles.headingEn : ''}`}>
           {isChinese ? (
             <>

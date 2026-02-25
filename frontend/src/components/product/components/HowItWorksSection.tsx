@@ -57,15 +57,6 @@ export const HowItWorksSection: React.FC = () => {
     <section id="how-it-works" className={styles.section}>
       <div className={styles.container}>
         <div className={styles.header}>
-          <motion.div
-            className={styles.preTitle}
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            {t('product:capabilities.preTitle')}
-          </motion.div>
           <motion.h2
             className={styles.title}
             initial={{ opacity: 0, y: 10 }}

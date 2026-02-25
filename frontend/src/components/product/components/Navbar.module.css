@@ -171,11 +171,11 @@
   display: inline-flex;
   align-items: center;
   padding: 8px 20px;
-  background: var(--color-text-primary);
-  color: var(--color-bg-white);
+  background: #1d4ed8;
+  color: #ffffff;
   font-size: 0.875rem;
   font-weight: 600;
-  border-radius: 12px;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -183,9 +183,9 @@
 }
 
 .navCta:hover {
-  background: #1F2937;
+  background: #1e40af;
   transform: translateY(-1px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);
 }
 
 /* ===== Responsive ===== */

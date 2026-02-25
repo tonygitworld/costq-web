@@ -59,14 +59,6 @@ export const ProblemSection: React.FC = () => {
       <div className={styles.container}>
         {/* Header */}
         <div className={styles.header}>
-          <motion.div
-            className={styles.preTitle}
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.1 }}
-          >
-            {t('problem.preTitle')}
-          </motion.div>
           <motion.h2
             className={styles.title}
             initial={{ opacity: 0, y: 20 }}

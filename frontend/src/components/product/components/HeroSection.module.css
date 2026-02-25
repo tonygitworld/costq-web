@@ -7,7 +7,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 80px 32px 180px;
+  padding: 0 32px 200px;
+  padding-top: max(180px, 22vh);
   overflow: hidden;
 }
 
@@ -73,8 +74,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  margin: 0 0 36px;
+  gap: 8px;
+  margin: 0 0 44px;
 }
 
 .headingLine1,
@@ -138,7 +139,7 @@
 /* ── Description ── */
 .description {
   max-width: 640px;
-  margin: 0 0 28px;
+  margin: 0 0 40px;
   font-size: clamp(1rem, 1.4vw, 1.15rem);
   line-height: 1.6;
   color: #2c4a6e;
@@ -152,38 +153,38 @@
 .actions {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
 }
 
 .btnPrimary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  height: 52px;
-  padding: 0 34px;
+  height: 48px;
+  min-width: 160px;
+  padding: 0 32px;
   font-size: 15px;
   font-weight: 600;
   color: #fff;
-  background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+  background: #1d4ed8;
   border: none;
-  border-radius: 13px;
+  border-radius: 10px;
   text-decoration: none;
   cursor: pointer;
-  box-shadow:
-    0 4px 16px rgba(29, 78, 216, 0.3),
-    0 1px 3px rgba(0, 0, 0, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  transition: transform 0.18s, box-shadow 0.18s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
 }
 
 .btnPrimary:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 8px 28px rgba(29, 78, 216, 0.35),
-    0 2px 6px rgba(0, 0, 0, 0.08);
+  background: #1e40af;
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.25);
+  transform: translateY(-1px);
 }
 
-.btnPrimary:active { transform: scale(0.97); }
+.btnPrimary:active {
+  transform: scale(0.98);
+}
 
 .btnArrow { transition: transform 0.15s; }
 .btnPrimary:hover .btnArrow { transform: translateX(3px); }
@@ -191,25 +192,28 @@
 .btnGhost {
   display: inline-flex;
   align-items: center;
-  height: 52px;
-  padding: 0 28px;
+  justify-content: center;
+  height: 48px;
+  min-width: 160px;
+  padding: 0 32px;
   font-size: 15px;
   font-weight: 600;
   color: #1e3a5f;
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border-radius: 10px;
   text-decoration: none;
   cursor: pointer;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: transform 0.18s, background 0.18s, box-shadow 0.18s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
 }
 
 .btnGhost:hover {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
 }
 
 /* ── Responsive ── */

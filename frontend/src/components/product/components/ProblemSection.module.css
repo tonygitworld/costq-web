@@ -102,17 +102,17 @@
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
   margin-bottom: 24px;
-  color: #dc2626;
+  color: #2563eb;
   transition: all 0.3s;
 }
 
 .card:hover .iconWrapper {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: white;
   transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
 /* Content */
@@ -138,17 +138,17 @@
 .impact {
   margin-top: auto;
   padding: 10px 14px;
-  background: #fef2f2;
+  background: #eff6ff;
   border-radius: 10px;
   font-size: 0.8125rem;
-  color: #b91c1c;
+  color: #1e40af;
   font-weight: 600;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.impactIcon { color: #ef4444; }
+.impactIcon { color: #3b82f6; }
 
 /* Responsive */
 @media (max-width: 1024px) {

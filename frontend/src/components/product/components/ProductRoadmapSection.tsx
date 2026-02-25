@@ -51,7 +51,6 @@ export const ProductRoadmapSection: React.FC = () => {
   return (
     <section ref={ref} id="roadmap" className={styles.roadmapContainer}>
       <div className={styles.header}>
-        <span className={styles.label}>{t('product:roadmap.label')}</span>
         <h2 className={styles.title}>{t('product:roadmap.title')}</h2>
         <p className={styles.subtitle}>{t('product:roadmap.subtitle')}</p>
       </div>

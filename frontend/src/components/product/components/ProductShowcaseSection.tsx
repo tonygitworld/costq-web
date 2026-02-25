@@ -99,7 +99,6 @@ export const ProductShowcaseSection: React.FC = () => {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
         >
-          <p className={styles.preTitle}>{t('product:capabilities.preTitle')}</p>
           <h2 className={styles.title}>{t('product:showcase.title')}</h2>
           <p className={styles.subtitle}>{t('product:showcase.subtitle')}</p>
         </motion.div>
