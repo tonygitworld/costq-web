@@ -10,6 +10,10 @@ import { useModelStore } from '../../stores/modelStore';
 import { MessageInputContainer } from './MessageInputContainer';
 import { PromptTemplatesPopoverContent } from './PromptTemplatesPopoverContent';
 import { useI18n } from '../../hooks/useI18n';
+import { useImageAttachments } from '../../hooks/useImageAttachments';
+import { ImagePickerButton } from './ImagePickerButton';
+import { ImagePreviewArea } from './ImagePreviewArea';
+import { IMAGE_CONSTRAINTS } from '../../utils/imageUtils';
 import { createChatSession, convertBackendSession } from '../../services/chatApi';
 import { logger } from '../../utils/logger';
 import '../styles/AIChatInput.css';
@@ -20,6 +24,7 @@ import CloudIcon from '../icons/CloudIcon';
 export const MessageInput: FC = () => {
   const [message, setMessage] = useState('');
   const [isFocused, setIsFocused] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [popoverOpen, setPopoverOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -31,6 +36,8 @@ export const MessageInput: FC = () => {
   const { t } = useI18n('chat');
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  const { attachments, addImages, removeImage, clearAttachments, isProcessing } = useImageAttachments();
 
   // 存储账号+服务组合
   const [accountServicePairs, setAccountServicePairs] = useState<Array<{
@@ -106,6 +113,59 @@ export const MessageInput: FC = () => {
   const handleBlurChange = useCallback(() => {
     setIsFocused(false);
   }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (loading) return;
+    setIsDragging(true);
+  }, [loading]);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (loading) return;
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      // Filter to only image files silently
+      const imageFiles = Array.from(files).filter(f =>
+        IMAGE_CONSTRAINTS.ALLOWED_TYPES.includes(f.type as any)
+      );
+      if (imageFiles.length > 0) {
+        addImages(imageFiles);
+      }
+    }
+  }, [loading, addImages]);
+
+  // ✅ 剪贴板粘贴图片处理
+  const handlePaste = useCallback((e: React.ClipboardEvent) => {
+    if (loading) return;
+
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    const imageFiles: File[] = [];
+    for (const item of Array.from(items)) {
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (file) imageFiles.push(file);
+      }
+    }
+
+    if (imageFiles.length > 0) {
+      e.preventDefault(); // 阻止默认粘贴行为（仅当有图片时）
+      addImages(imageFiles);
+    }
+    // 如果没有图片，不阻止默认行为，让文本正常粘贴
+  }, [loading, addImages]);
 
   const handleSelectionChange = useCallback((selectedAccountIds: string[]) => {
     // 从selectedAccountIds重建accountServicePairs
@@ -197,6 +257,7 @@ export const MessageInput: FC = () => {
         chatId,
         type: 'user',
         content: message.trim(),
+        imageAttachments: attachments.length > 0 ? attachments : undefined,
         meta: {
           status: 'completed',
           isStreaming: false,
@@ -236,7 +297,9 @@ export const MessageInput: FC = () => {
 
       // 清空输入框
       const currentMessage = message.trim();
+      const currentAttachments = [...attachments]; // 保存当前附件引用
       setMessage('');
+      clearAttachments();
       if (textAreaRef.current) {
         textAreaRef.current.style.height = 'auto';
       }
@@ -265,7 +328,8 @@ export const MessageInput: FC = () => {
         awsAccountIds,
         gcpAccountIds,
         sessionIdToSend,
-        selectedModelId  // ✅ 传递选中的模型ID
+        selectedModelId,
+        currentAttachments.length > 0 ? currentAttachments : undefined
       );
       logger.debug('📤 [MessageInput] 已发送查询，Query ID:', queryId);
     } catch (error) {
@@ -289,9 +353,18 @@ export const MessageInput: FC = () => {
 
     // 场景 3: 标准对话模式 - 显示底部固定输入框
     return (
-      <div className={`ai-chat-input-container ${isFocused ? 'focused' : ''}`}>
+      <div
+        className={`ai-chat-input-container ${isFocused ? 'focused' : ''} ${isDragging ? 'dragging' : ''}`}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
         {/* 1. 输入区域 */}
         <div className="ai-chat-input-area">
+          <ImagePreviewArea
+            attachments={attachments}
+            onRemove={removeImage}
+          />
           <textarea
             ref={textAreaRef}
             value={message}
@@ -299,6 +372,7 @@ export const MessageInput: FC = () => {
             onFocus={handleFocusChange}
             onBlur={handleBlurChange}
             onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
             placeholder={
               hasSelectedAccount
                 ? t('input.placeholder')
@@ -335,6 +409,10 @@ export const MessageInput: FC = () => {
                 <BulbOutlined style={{ fontSize: 18 }} />
               </button>
             </Popover>
+            <ImagePickerButton
+              onFilesSelected={(files) => addImages(files)}
+              disabled={loading || !hasSelectedAccount || isProcessing}
+            />
           </div>
 
           {/* 右侧：模型选择 + 云服务选择 + 发送按钮 */}

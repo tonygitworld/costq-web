@@ -1,0 +1,56 @@
+.image-preview-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 0;
+  margin-bottom: 4px;
+}
+
+.image-preview-item {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+.image-preview-item .ant-image {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.image-preview-remove-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  color: rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  transition: color 0.2s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+
+.image-preview-remove-btn:hover {
+  color: #ff4d4f;
+}
+
+:global(.dark) .image-preview-remove-btn {
+  background: #3a3a3a;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+:global(.dark) .image-preview-remove-btn:hover {
+  color: #ff4d4f;
+}

@@ -67,6 +67,7 @@ class AgentProvider(ABC):
         session_id: str | None = None,
         model_id: str | None = None,
         cancel_event: asyncio.Event | None = None,
+        images: list | None = None,
     ) -> AsyncIterator[dict]:
         """
         执行查询并返回流式结果
@@ -83,6 +84,7 @@ class AgentProvider(ABC):
             session_id: 会话ID（可选）
             model_id: AI 模型 ID（可选）
             cancel_event: 取消事件（可选）
+            images: 图片附件列表（可选）
 
         Yields:
             dict: 查询事件（status, content, tool_call, complete, error等）
@@ -122,6 +124,7 @@ class AWSBedrockAgentProvider(AgentProvider):
         session_id: str | None = None,
         model_id: str | None = None,
         cancel_event: asyncio.Event | None = None,
+        images: list | None = None,
     ) -> AsyncIterator[dict]:
         """执行查询（包含所有业务逻辑）"""
 
@@ -469,6 +472,7 @@ class AWSBedrockAgentProvider(AgentProvider):
                     org_id=org_id,
                     account_type=account_type,
                     model_id=model_id,
+                    images=images,
                 )
 
                 event_iter = aiter(event_stream)

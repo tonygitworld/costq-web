@@ -115,6 +115,7 @@ class AgentCoreClient:
         prompt_type: str = "dialog",
         account_type: str = "aws",
         model_id: str | None = None,
+        images: list | None = None,
     ) -> AsyncIterator[dict]:
         """
         异步流式调用 Runtime
@@ -188,6 +189,12 @@ class AgentCoreClient:
                     payload["org_id"] = org_id
                 if model_id:
                     payload["model_id"] = model_id
+                if images:
+                    # ✅ 传递图片数据到 Runtime（Pydantic 模型转为 dict）
+                    payload["images"] = [
+                        img.model_dump() if hasattr(img, 'model_dump') else img
+                        for img in images
+                    ]
 
                 # ✅ 记录 Agent Runtime 调用参数（包含 model_id 追踪）
                 logger.info(

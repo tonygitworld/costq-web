@@ -25,6 +25,13 @@ logger = logging.getLogger(__name__)
 # SSE 查询接口 V2（新版本）
 # ============================================================================
 
+class ImageData(BaseModel):
+    """图片数据"""
+    file_name: str = Field(..., description="文件名")
+    mime_type: str = Field(..., description="MIME 类型")
+    base64_data: str = Field(..., description="Base64 编码数据（不含 data URI 前缀）")
+
+
 class SSEQueryRequestV2(BaseModel):
     """SSE 查询请求 V2"""
 
@@ -34,6 +41,7 @@ class SSEQueryRequestV2(BaseModel):
     account_ids: Optional[list[str]] = Field(None, description="AWS 账号ID列表")
     gcp_account_ids: Optional[list[str]] = Field(None, description="GCP 账号ID列表")
     model_id: Optional[str] = Field(None, description="AI 模型 ID")
+    images: Optional[list[ImageData]] = Field(None, description="图片附件列表（可选）")
 
     class Config:
         json_schema_extra = {
@@ -228,6 +236,7 @@ async def sse_query_endpoint_v2(
                 session_id=query_request.session_id,
                 model_id=query_request.model_id,
                 cancel_event=cancel_event,
+                images=query_request.images,
             ):
                 # ✅ 在每次 yield 前检查取消标志
                 if cancel_event.is_set():

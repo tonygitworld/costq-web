@@ -4,6 +4,7 @@ import {
   type WebSocketMessage,
   type BatchMessage,
 } from '../types/message';
+import { type ImageAttachment } from '../types/chat';
 import { messageHandler } from '../utils/messageHandler';
 import { useAuthStore } from '../stores/authStore';
 import { apiClient } from '../services/apiClient';
@@ -24,7 +25,7 @@ interface ConfirmationRequest {
 
 interface SSEContextType {
   sendMessage: (message: string | object) => Promise<void>;
-  sendQuery: (content: string, accountIds?: string[], gcpAccountIds?: string[], sessionId?: string, modelId?: string) => string;
+  sendQuery: (content: string, accountIds?: string[], gcpAccountIds?: string[], sessionId?: string, modelId?: string, imageAttachments?: ImageAttachment[]) => string;
   cancelGeneration: (queryId: string) => Promise<void>;
   currentQueryId: string | null;
   isCancelling: boolean;
@@ -74,7 +75,7 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
     */
   };
 
-  const sendQuery = (content: string, accountIds?: string[], gcpAccountIds?: string[], sessionId?: string, modelId?: string): string => {
+  const sendQuery = (content: string, accountIds?: string[], gcpAccountIds?: string[], sessionId?: string, modelId?: string, imageAttachments?: ImageAttachment[]): string => {
     messageHandler.resetMessageBuilder();
 
     const queryId = `query_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
@@ -99,14 +100,25 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
         logger.debug(`📤 [SSEContext.sendQuery] 发送查询 - QueryID: ${queryId}, SessionID: ${sessionId}, ModelID: ${modelId}`);
 
         // ✅ 使用 apiClient.stream，自动处理 Token 刷新和 401 错误
-        const response = await apiClient.stream('/sse/query/v2', {
+        const requestPayload: Record<string, unknown> = {
           query: content,
           query_id: queryId,
           session_id: sessionId,
           account_ids: accountIds || [],
           gcp_account_ids: gcpAccountIds || [],
           model_id: modelId,  // ✅ 添加 model_id 到请求 payload
-        }, {
+        };
+
+        // ✅ 仅在有图片附件时添加 images 字段，确保无图片时请求体不变
+        if (imageAttachments && imageAttachments.length > 0) {
+          requestPayload.images = imageAttachments.map(a => ({
+            file_name: a.fileName,
+            mime_type: a.mimeType,
+            base64_data: a.base64Data.replace(/^data:[^;]+;base64,/, ''),
+          }));
+        }
+
+        const response = await apiClient.stream('/sse/query/v2', requestPayload, {
           signal: abortController.signal,  // ✅ 支持取消
         });
 
