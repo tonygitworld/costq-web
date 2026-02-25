@@ -15,6 +15,7 @@ import {
   ATTACHMENT_CONSTRAINTS,
 } from '../utils/excelUtils';
 import { fileToBase64 } from '../utils/imageUtils';
+import { useI18n } from './useI18n';
 
 export interface UseExcelAttachmentsReturn {
   attachments: ExcelAttachment[];
@@ -30,6 +31,7 @@ export function useExcelAttachments(
 ): UseExcelAttachmentsReturn {
   const [attachments, setAttachments] = useState<ExcelAttachment[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const { t } = useI18n('chat');
 
   // useRef to track current attachments, avoiding stale closures
   const attachmentsRef = useRef<ExcelAttachment[]>(attachments);
@@ -55,7 +57,14 @@ export function useExcelAttachments(
           );
 
           if (!result.valid) {
-            message.warning(result.error);
+            const errorMessages: Record<string, string> = {
+              format: t('attachment.excelFormatError'),
+              size: t('attachment.excelSizeError'),
+              count: t('attachment.excelCountError', { maxCount: maxExcelCount }),
+              total_count: t('attachment.totalCountError', { maxCount: maxTotalCount }),
+            };
+            const msg = (result.errorType && errorMessages[result.errorType]) || result.error || '';
+            message.warning(msg);
             // 数量超限时，跳过剩余所有文件
             if (result.errorType === 'count' || result.errorType === 'total_count') {
               break;

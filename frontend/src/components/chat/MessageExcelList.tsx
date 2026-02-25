@@ -13,7 +13,7 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-const MessageExcelList: FC<MessageExcelListProps> = ({ attachments }) => {
+export const MessageExcelList: FC<MessageExcelListProps> = ({ attachments }) => {
   if (!attachments || attachments.length === 0) return null;
 
   return (
@@ -35,4 +35,4 @@ const MessageExcelList: FC<MessageExcelListProps> = ({ attachments }) => {
   );
 };
 
-export default MessageExcelList;
+

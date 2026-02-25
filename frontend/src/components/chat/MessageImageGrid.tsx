@@ -7,7 +7,7 @@ interface MessageImageGridProps {
   attachments: ImageAttachment[];
 }
 
-const MessageImageGrid: FC<MessageImageGridProps> = ({ attachments }) => {
+export const MessageImageGrid: FC<MessageImageGridProps> = ({ attachments }) => {
   if (!attachments || attachments.length === 0) return null;
 
   const isSingle = attachments.length === 1;
@@ -55,4 +55,4 @@ const MessageImageGrid: FC<MessageImageGridProps> = ({ attachments }) => {
   );
 };
 
-export default MessageImageGrid;
+

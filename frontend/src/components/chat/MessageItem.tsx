@@ -13,8 +13,8 @@ import dayjs from 'dayjs';
 import { ThinkingSummary } from './ThinkingSummary';
 import { ToolCallWithDetails } from './ToolCallWithDetails';
 import StatusCard from './StatusCard';
-import MessageImageGrid from './MessageImageGrid';
-import MessageExcelList from './MessageExcelList';
+import { MessageImageGrid } from './MessageImageGrid';
+import { MessageExcelList } from './MessageExcelList';
 
 // ✨ 新增：导入样式
 import './MessageItem.css';

@@ -182,7 +182,7 @@ export const MessageInput: FC = () => {
         addExcelFiles(excelFiles, imageAttachments.length);
       }
     }
-  }, [loading, addImages, addExcelFiles, imageAttachments.length, EXCEL_CONSTRAINTS]);
+  }, [loading, addImages, addExcelFiles, imageAttachments.length]);
 
   // ✅ 剪贴板粘贴图片处理
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
@@ -335,13 +335,11 @@ export const MessageInput: FC = () => {
         });
       }, 0);
 
-      // 清空输入框
+      // 清空输入框（附件在 sendQuery 之后清空，确保失败时可重试）
       const currentMessage = message.trim();
       const currentAttachments = [...imageAttachments]; // 保存当前附件引用
       const currentExcelAttachments = [...excelAttachments]; // 保存当前 Excel 附件引用
       setMessage('');
-      clearImageAttachments();
-      clearExcelAttachments();
       if (textAreaRef.current) {
         textAreaRef.current.style.height = 'auto';
       }
@@ -375,6 +373,10 @@ export const MessageInput: FC = () => {
         currentExcelAttachments.length > 0 ? currentExcelAttachments : undefined
       );
       logger.debug('📤 [MessageInput] 已发送查询，Query ID:', queryId);
+
+      // ✅ sendQuery 已通过闭包捕获附件数据，此时清空附件状态安全
+      clearImageAttachments();
+      clearExcelAttachments();
     } catch (error) {
       logger.error('❌ [MessageInput] 发送消息失败:', error);
     }

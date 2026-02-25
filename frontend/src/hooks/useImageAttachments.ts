@@ -14,6 +14,7 @@ import {
   fileToBase64,
   IMAGE_CONSTRAINTS,
 } from '../utils/imageUtils';
+import { useI18n } from './useI18n';
 
 export interface UseImageAttachmentsReturn {
   attachments: ImageAttachment[];
@@ -28,6 +29,7 @@ export function useImageAttachments(
 ): UseImageAttachmentsReturn {
   const [attachments, setAttachments] = useState<ImageAttachment[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const { t } = useI18n('chat');
 
   // useRef to track current attachments for cleanup, avoiding stale closures
   const attachmentsRef = useRef<ImageAttachment[]>(attachments);
@@ -48,10 +50,17 @@ export function useImageAttachments(
           const result = await validateImage(file, currentCount, maxCount);
 
           if (!result.valid) {
+            const errorMessages: Record<string, string> = {
+              format: t('attachment.imageFormatError'),
+              size: t('attachment.imageSizeError'),
+              count: t('attachment.imageCountError', { maxCount }),
+              corrupt: t('attachment.imageCorruptError'),
+            };
+            const msg = (result.errorType && errorMessages[result.errorType]) || result.error || '';
             if (result.errorType === 'corrupt') {
-              message.error(result.error);
+              message.error(msg);
             } else {
-              message.warning(result.error);
+              message.warning(msg);
             }
             // 数量超限时，跳过剩余所有文件
             if (result.errorType === 'count') {

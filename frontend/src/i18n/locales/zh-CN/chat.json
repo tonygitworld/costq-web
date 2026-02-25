@@ -117,5 +117,16 @@
     "subtitle": "开始之前，请先配置您的云账号",
     "description": "配置云账号后，您可以使用 CostQ 进行成本分析、优化建议和账单管理",
     "configureButton": "配置云账号"
+  },
+  "attachment": {
+    "imageFormatError": "仅支持 JPEG、PNG、GIF、WebP 格式",
+    "imageSizeError": "图片大小不能超过 10MB",
+    "imageCountError": "每条消息最多附加 {{maxCount}} 张图片",
+    "imageCorruptError": "该文件无法作为图片加载",
+    "excelFormatError": "仅支持 .xlsx 和 .xls 格式的 Excel 文件",
+    "excelSizeError": "Excel 文件大小不能超过 20MB",
+    "excelCountError": "每条消息最多附加 {{maxCount}} 个 Excel 文件",
+    "totalCountError": "每条消息最多附加 {{maxCount}} 个附件（图片 + Excel）",
+    "addAttachment": "添加附件"
   }
 }

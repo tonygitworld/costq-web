@@ -116,5 +116,16 @@
     "subtitle": "開始する前に、クラウドアカウントを設定してください",
     "description": "クラウドアカウントを設定すると、CostQを使用してコスト分析、最適化の推奨事項、および請求管理を行うことができます",
     "configureButton": "クラウドアカウントを設定"
+  },
+  "attachment": {
+    "imageFormatError": "JPEG、PNG、GIF、WebP形式のみサポートされています",
+    "imageSizeError": "画像サイズは10MBを超えることはできません",
+    "imageCountError": "1メッセージあたり最大{{maxCount}}枚の画像を添付できます",
+    "imageCorruptError": "このファイルは画像として読み込めません",
+    "excelFormatError": ".xlsxおよび.xls形式のExcelファイルのみサポートされています",
+    "excelSizeError": "Excelファイルサイズは20MBを超えることはできません",
+    "excelCountError": "1メッセージあたり最大{{maxCount}}個のExcelファイルを添付できます",
+    "totalCountError": "1メッセージあたり最大{{maxCount}}個の添付ファイル（画像 + Excel）",
+    "addAttachment": "添付ファイルを追加"
   }
 }

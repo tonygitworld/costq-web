@@ -1,5 +1,6 @@
 import { type FC, useRef } from 'react';
 import { PaperClipOutlined } from '@ant-design/icons';
+import { useI18n } from '../../hooks/useI18n';
 
 interface FilePickerButtonProps {
   onFilesSelected: (files: FileList) => void;
@@ -8,6 +9,7 @@ interface FilePickerButtonProps {
 
 export const FilePickerButton: FC<FilePickerButtonProps> = ({ onFilesSelected, disabled }) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const { t } = useI18n('chat');
 
   const handleClick = () => {
     if (!disabled) {
@@ -32,8 +34,8 @@ export const FilePickerButton: FC<FilePickerButtonProps> = ({ onFilesSelected, d
         className="icon-btn"
         onClick={handleClick}
         disabled={disabled}
-        title="添加附件"
-        aria-label="添加附件"
+        title={t('attachment.addAttachment')}
+        aria-label={t('attachment.addAttachment')}
       >
         <PaperClipOutlined style={{ fontSize: 18 }} />
       </button>

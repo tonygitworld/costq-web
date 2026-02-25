@@ -116,5 +116,16 @@
     "subtitle": "Before starting, please configure your cloud accounts",
     "description": "After configuring cloud accounts, you can use CostQ for cost analysis, optimization recommendations, and billing management",
     "configureButton": "Configure Cloud Account"
+  },
+  "attachment": {
+    "imageFormatError": "Only JPEG, PNG, GIF, and WebP formats are supported",
+    "imageSizeError": "Image size cannot exceed 10MB",
+    "imageCountError": "A maximum of {{maxCount}} images can be attached per message",
+    "imageCorruptError": "This file cannot be loaded as an image",
+    "excelFormatError": "Only .xlsx and .xls Excel files are supported",
+    "excelSizeError": "Excel file size cannot exceed 20MB",
+    "excelCountError": "A maximum of {{maxCount}} Excel files can be attached per message",
+    "totalCountError": "A maximum of {{maxCount}} attachments (images + Excel) per message",
+    "addAttachment": "Add attachment"
   }
 }
