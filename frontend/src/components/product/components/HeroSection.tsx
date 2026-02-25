@@ -115,7 +115,7 @@ export const HeroSection: React.FC = () => {
               <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </Link>
-          <a href="#capabilities" className={styles.btnGhost}>
+          <a href="#product-showcase" className={styles.btnGhost}>
             {t('product:hero.ctaSecondary')}
           </a>
         </motion.div>
