@@ -1,12 +1,10 @@
 import React, { useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
-// Phase 1: Core ToB Sections
 import { ProblemSection } from './components/ProblemSection';
 import { ProductShowcaseSection } from './components/ProductShowcaseSection';
 import { HowItWorksSection } from './components/HowItWorksSection';
 import { ProductRoadmapSection } from './components/ProductRoadmapSection';
-import { FinalCTASection } from './components/FinalCTASection';
 import styles from './ProductPage.module.css';
 
 const ProductPage: React.FC = () => {
@@ -54,17 +52,14 @@ const ProductPage: React.FC = () => {
         {/* 2. Problem Section - 用户痛点 */}
         <ProblemSection />
 
-        {/* 4. Product Showcase - 产品功能展示 */}
+        {/* 3. Product Showcase - 产品功能展示 */}
         <ProductShowcaseSection />
 
         {/* 5. How It Works - 工作原理 */}
         <HowItWorksSection />
 
-        {/* 7. Product Roadmap - 产品规划 (独立展示) */}
+        {/* 6. Product Roadmap - 产品规划 */}
         <ProductRoadmapSection />
-
-        {/* 8. Final CTA - 极简转化 */}
-        <FinalCTASection />
       </main>
     </div>
   );

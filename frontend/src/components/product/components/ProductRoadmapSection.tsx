@@ -57,42 +57,44 @@ export const ProductRoadmapSection: React.FC = () => {
       </div>
 
       <div className={styles.timelineWrapper}>
-        {/* 连接线背景 */}
-        <div className={styles.lineBase}>
-           {/* 动态进度条 */}
-           <motion.div
-             className={styles.lineProgress}
-             initial={{ width: 0 }}
-             animate={isInView ? { width: '50%' } : {}}
-             transition={{ duration: 1.5, delay: 0.5, ease: "easeInOut" }}
-           />
+        {/* Horizontal connecting line */}
+        <div className={styles.trackLine}>
+          <motion.div
+            className={styles.trackProgress}
+            initial={{ width: 0 }}
+            animate={isInView ? { width: '50%' } : {}}
+            transition={{ duration: 1.5, delay: 0.5, ease: 'easeInOut' }}
+          />
         </div>
 
-        <div className={styles.stepsContainer}>
+        <div className={styles.stepsRow}>
           {roadmapSteps.map((step, index) => (
             <motion.div
               key={index}
               className={`${styles.step} ${styles[step.status]}`}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.2 + index * 0.2 }}
+              transition={{ delay: 0.3 + index * 0.2, duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
             >
-              {/* 节点图标 */}
-              <div className={styles.iconWrapper}>
-                {/* 优先显示自定义图标，如果没有则显示状态图标 */}
-                <step.icon size={28} className={styles[`icon${step.status.charAt(0).toUpperCase() + step.status.slice(1)}`]} />
+              {/* Node */}
+              <div className={styles.node}>
+                <div className={styles.nodeInner}>
+                  <step.icon size={22} strokeWidth={1.5} />
+                </div>
               </div>
 
-              {/* 内容卡片 */}
+              {/* Card */}
               <div className={styles.card}>
-                <div className={styles.phaseBadge}>{step.phase}</div>
+                <div className={styles.cardTop}>
+                  <span className={styles.phaseBadge}>{step.phase}</span>
+                  <span className={styles.date}>{step.date}</span>
+                </div>
                 <h3 className={styles.stepTitle}>{step.title}</h3>
                 <ul className={styles.featureList}>
                   {step.features.map((f, i) => (
                     <li key={i}>{f}</li>
                   ))}
                 </ul>
-                <div className={styles.date}>{step.date}</div>
               </div>
             </motion.div>
           ))}

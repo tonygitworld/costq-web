@@ -208,11 +208,7 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
                 style={{ marginLeft: 'auto' }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <LanguageSwitcher
-                  showIcon={false}
-                  showText={true}
-                  type="dropdown"
-                />
+                <LanguageSwitcher />
               </div>
             </div>
           </div>

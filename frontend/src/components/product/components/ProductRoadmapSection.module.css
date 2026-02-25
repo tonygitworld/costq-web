@@ -1,27 +1,55 @@
-/* Product Roadmap Section - Vision Style */
+﻿/* Product Roadmap - Horizontal Timeline (Premium) */
 
 .roadmapContainer {
-  padding: 120px 0;
+  position: relative;
+  padding: 120px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: var(--color-bg-white);
+  background: linear-gradient(180deg, #fafbfc 0%, #ffffff 15%, #ffffff 100%);
+  overflow: hidden;
 }
 
+.roadmapContainer::before {
+  content: '';
+  position: absolute;
+  top: 120px;
+  right: -180px;
+  width: 450px;
+  height: 450px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.03) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.roadmapContainer::after {
+  content: '';
+  position: absolute;
+  bottom: 80px;
+  left: -180px;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.03) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Header */
 .header {
   text-align: center;
-  margin-bottom: 80px;
+  margin-bottom: 72px;
   max-width: 600px;
-  padding: 0 20px;
+  position: relative;
+  z-index: 1;
 }
 
 .label {
   display: inline-block;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
-  letter-spacing: 0.05em;
-  color: var(--color-primary);
-  background: var(--color-primary-light-md);
+  letter-spacing: 0.04em;
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.06);
   padding: 6px 16px;
   border-radius: 9999px;
   margin-bottom: 16px;
@@ -30,57 +58,56 @@
 .title {
   font-size: clamp(2rem, 4vw, 2.75rem);
   font-weight: 800;
-  color: var(--color-text-primary);
-  letter-spacing: -0.02em;
+  color: #0a0a0a;
+  letter-spacing: -0.025em;
   margin-bottom: 16px;
   line-height: 1.2;
 }
 
 .subtitle {
   font-size: 1.125rem;
-  color: var(--color-text-gray-md);
-  line-height: 1.6;
+  color: #6b7280;
+  line-height: 1.7;
 }
 
-/* Timeline Wrapper */
+/* Timeline track */
 .timelineWrapper {
   position: relative;
   width: 100%;
-  max-width: 1100px; /* 加宽一点以容纳更多内容 */
-  padding: 0 20px;
+  max-width: 1100px;
   margin: 0 auto;
+  padding: 0 20px;
 }
 
-/* Line Base */
-.lineBase {
+/* Thick gradient track bar */
+.trackLine {
   position: absolute;
-  top: 35px; /* 图标中心 */
-  left: 20px; /* 调整起始位置 */
-  right: 20px;
+  top: 26px;
+  left: 60px;
+  right: 60px;
   height: 4px;
-  background-color: var(--color-border-light);
+  background: #e5e7eb;
   z-index: 0;
   border-radius: 2px;
 }
 
-/* Line Progress */
-.lineProgress {
+.trackProgress {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-primary) 0%, #8B5CF6 100%);
+  background: linear-gradient(90deg, #10b981 0%, #3b82f6 50%, #c4b5fd 100%);
   border-radius: 2px;
   width: 0;
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.25);
 }
 
-/* Steps Container */
-.stepsContainer {
+/* Steps row */
+.stepsRow {
   display: flex;
   justify-content: space-between;
   position: relative;
   z-index: 1;
-  gap: 20px;
+  gap: 28px;
 }
 
-/* Individual Step */
 .step {
   display: flex;
   flex-direction: column;
@@ -88,145 +115,284 @@
   flex: 1;
 }
 
-/* Icon Wrapper */
-.iconWrapper {
-  width: 70px;
-  height: 70px;
-  background: var(--color-bg-white);
+/* Status classes */
+.completed { flex: 1; }
+.current { flex: 1; }
+.planned { flex: 1; }
+
+/* Node circle */
+.node {
+  margin-bottom: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.nodeInner {
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 32px;
-  border: 6px solid var(--color-bg-white); /* 与白色背景融合 */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-  z-index: 2;
+  background: #ffffff;
+  border: 2.5px solid #e5e7eb;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.step:hover .iconWrapper {
-  transform: scale(1.1);
-  border-color: var(--color-bg-white);
+.step.completed .nodeInner {
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  border-color: #34d399;
+  color: #047857;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2);
 }
 
-.iconCompleted { color: var(--color-success); }
-.iconCurrent { color: var(--color-primary); }
-.iconPlanned { color: var(--color-text-placeholder); }
+.step.current .nodeInner {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  border-color: #3b82f6;
+  color: #1d4ed8;
+  box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.12), 0 4px 14px rgba(59, 130, 246, 0.18);
+  animation: pulseNode 2.5s ease-in-out infinite;
+}
+
+@keyframes pulseNode {
+  0%, 100% { box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.12), 0 4px 14px rgba(59, 130, 246, 0.18); }
+  50% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0.06), 0 6px 20px rgba(59, 130, 246, 0.22); }
+}
+
+.step.planned .nodeInner {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  border-style: dashed;
+  color: #9ca3af;
+}
+
+.step:hover .nodeInner {
+  transform: scale(1.12);
+}
 
 /* Card */
 .card {
-  background: var(--color-bg-white);
-  border: 1px solid var(--color-border-light);
-  border-radius: 16px;
-  padding: 32px 24px;
   width: 100%;
-  text-align: center;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   position: relative;
-  height: 100%; /* 等高 */
+  overflow: hidden;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  border-radius: 16px;
+  padding: 28px 24px;
 }
 
-.step:hover .card {
-  border-color: var(--color-primary);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  transform: translateY(-8px);
+/* Completed card - soft green tint */
+.step.completed .card {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  border: 1px solid #bbf7d0;
+  box-shadow: 0 2px 12px rgba(16, 185, 129, 0.08);
 }
 
-/* Current step active style */
+.step.completed .card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  border-radius: 16px 16px 0 0;
+}
+
+/* Current card - blue glow */
 .step.current .card {
-  border-color: var(--color-primary);
-  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.1);
+  background: linear-gradient(135deg, #eff6ff 0%, #f0f7ff 100%);
+  border: 1.5px solid #93c5fd;
+  box-shadow:
+    0 0 0 1px rgba(59, 130, 246, 0.05),
+    0 4px 24px rgba(59, 130, 246, 0.12),
+    0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
-.step.current .iconWrapper {
-  border-color: var(--color-primary-border-light);
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+.step.current .card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #2563eb, #60a5fa);
+  border-radius: 16px 16px 0 0;
+}
+
+/* Planned card - muted dashed */
+.step.planned .card {
+  background: #fafbfc;
+  border: 1.5px dashed #d1d5db;
+  box-shadow: none;
+  opacity: 0.8;
+}
+
+.step.planned .card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #e5e7eb;
+  border-radius: 16px 16px 0 0;
+}
+
+/* Hover effects */
+.step.completed:hover .card {
+  box-shadow: 0 12px 40px rgba(16, 185, 129, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04);
+  transform: translateY(-6px);
+}
+
+.step.current:hover .card {
+  box-shadow:
+    0 0 0 1px rgba(59, 130, 246, 0.08),
+    0 16px 48px rgba(59, 130, 246, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+  transform: translateY(-6px);
+}
+
+.step.planned:hover .card {
+  opacity: 1;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  transform: translateY(-6px);
+}
+
+/* Card top row */
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
 }
 
 .phaseBadge {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 700;
-  color: var(--color-text-placeholder);
   text-transform: uppercase;
-  margin-bottom: 12px;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
 }
 
+.step.completed .phaseBadge { color: #047857; }
+.step.current .phaseBadge { color: #1d4ed8; }
+
+.date {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.step.completed .date {
+  color: #047857;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.step.current .date {
+  color: #1d4ed8;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.step.planned .date {
+  color: #9ca3af;
+  background: #f3f4f6;
+}
+
+/* Title */
 .stepTitle {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   font-weight: 700;
-  color: var(--color-text-primary);
-  margin-bottom: 20px;
+  color: #0a0a0a;
+  margin-bottom: 16px;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
 }
 
+.step.planned .stepTitle {
+  color: #6b7280;
+}
+
+/* Feature list */
 .featureList {
   list-style: none;
   padding: 0;
-  margin: 0 0 24px 0;
-  flex-grow: 1; /* 让内容撑开 */
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
 }
 
 .featureList li {
-  font-size: 0.9375rem;
-  color: var(--color-text-gray);
-  margin-bottom: 10px;
-  line-height: 1.5;
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.6;
+  position: relative;
+  padding-left: 20px;
 }
 
-.date {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--color-primary);
-  background: var(--color-primary-bg);
-  display: inline-block;
-  padding: 6px 16px;
-  border-radius: 9999px;
+.featureList li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #d1d5db;
+}
+
+.step.completed .featureList li::before {
+  background: #10b981;
+}
+
+.step.current .featureList li::before {
+  background: #3b82f6;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .stepsContainer {
+  .roadmapContainer {
+    padding: 80px 20px;
+  }
+
+  .stepsRow {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 40px;
-    padding-left: 20px;
+    align-items: stretch;
+    gap: 32px;
   }
 
-  .lineBase {
-    width: 4px;
-    height: 100%;
-    left: 55px; /* 调整垂直线位置 */
-    top: 0;
-    right: auto;
+  .trackLine {
+    display: none;
   }
 
-  .lineProgress {
-    width: 100%;
-    height: 40%;
+  .node {
+    margin-bottom: 16px;
+  }
+
+  .nodeInner {
+    width: 44px;
+    height: 44px;
   }
 
   .step {
-    flex-direction: row;
     align-items: flex-start;
-    width: 100%;
-    text-align: left;
-  }
-
-  .iconWrapper {
-    margin-right: 24px;
-    margin-bottom: 0;
-    flex-shrink: 0;
-    width: 60px;
-    height: 60px;
+    flex-direction: row;
+    gap: 20px;
   }
 
   .card {
-    width: 100%;
-    text-align: left;
-    align-items: flex-start;
-    padding: 24px;
+    padding: 24px 20px;
+  }
+
+  .stepTitle {
+    font-size: 1rem;
   }
 }

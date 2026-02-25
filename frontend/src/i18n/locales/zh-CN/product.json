@@ -116,7 +116,16 @@
     "stat1": "35% 平均成本降幅",
     "stat2": "2分钟 快速接入",
     "stat3": "SOC2 安全合规",
-    "stat4": "7x24 智能巡检"
+    "stat4": "7x24 智能巡检",
+    "stat1Label": "平均成本降幅",
+    "stat1Desc": "接入首月即可见效",
+    "stat2Label": "快速接入",
+    "stat2Desc": "零侵入式部署",
+    "stat3Label": "安全合规",
+    "stat3Desc": "SOC2 Type II 认证",
+    "stat4Label": "智能巡检",
+    "stat4Desc": "全天候异常监控",
+    "minuteSuffix": " 分钟"
   },
   "testimonials": {
     "title": "客户证言",
@@ -258,5 +267,16 @@
       "title": "移动端友好",
       "desc": "自然语言交互方式让移动端查询更便捷。"
     }
+  },
+  "footerSection": {
+    "ctaTitle": "准备好掌控云成本了吗？",
+    "ctaSubtitle": "立即开始，体验 Agentic AI 带来的全新成本管理方式",
+    "ctaPrimary": "免费开始使用",
+    "ctaSecondary": "联系我们",
+    "trust1": "无需信用卡",
+    "trust2": "14天免费试用",
+    "trust3": "随时取消",
+    "tagline": "智能云成本治理平台",
+    "copyright": "© 2026 CostQ. All rights reserved."
   }
 }

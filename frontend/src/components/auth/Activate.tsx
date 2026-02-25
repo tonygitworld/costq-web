@@ -166,10 +166,7 @@ export const Activate: React.FC = () => {
           border: '1px solid rgba(255, 255, 255, 0.3)',
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
         }}>
-          <LanguageSwitcher
-            showIcon={false}
-            showText={true}
-          />
+          <LanguageSwitcher />
         </div>
       </div>
 

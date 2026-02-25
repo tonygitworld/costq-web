@@ -1,15 +1,22 @@
-/* How It Works Section - Premium Core Capabilities */
+/* ========================================
+   How It Works — Clean Premium Style
+   ======================================== */
 
 .section {
   position: relative;
   width: 100%;
   padding: 120px 24px;
-  background: var(--color-bg-light);
-  color: var(--color-text-primary);
+  background:
+    linear-gradient(180deg,
+      #ffffff 0%,
+      #fafbfc 15%,
+      #fafbfc 100%
+    );
   overflow: hidden;
 }
 
 .container {
+  position: relative;
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
@@ -20,28 +27,28 @@
 
 /* Header */
 .header {
-  text-align: center; /* 居中标题更显大气 */
+  text-align: center;
   max-width: 800px;
   margin: 0 auto;
 }
 
 .preTitle {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--color-primary);
-  letter-spacing: 0.05em;
+  color: #2563eb;
+  letter-spacing: 0.04em;
   margin-bottom: 16px;
   display: inline-block;
-  padding: 6px 16px;
-  background: var(--color-primary-light-md);
+  padding: 5px 14px;
+  background: rgba(37, 99, 235, 0.06);
   border-radius: 9999px;
 }
 
 .title {
   font-size: clamp(2rem, 4vw, 2.75rem);
   font-weight: 800;
-  color: var(--color-text-primary);
-  letter-spacing: -0.02em;
+  color: #0a0a0a;
+  letter-spacing: -0.025em;
   line-height: 1.2;
 }
 
@@ -49,34 +56,31 @@
 .cardGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
+  gap: 20px;
 }
 
 .card {
   position: relative;
-  background: var(--color-bg-white);
+  background: #ffffff;
   border-radius: 16px;
   padding: 40px 32px;
-  /* 高级感的阴影：多层阴影叠加 */
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.02),
-    0 2px 4px -1px rgba(0, 0, 0, 0.02),
-    0 0 0 1px rgba(0, 0, 0, 0.04); /* 替代 border，更细腻 */
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
 .card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-4px);
   box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.05),
-    0 10px 10px -5px rgba(0, 0, 0, 0.02),
-    0 0 0 1px rgba(59, 130, 246, 0.1); /* 悬停时微弱的蓝色边框 */
+    0 12px 40px rgba(0, 0, 0, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.04);
+  border-color: #e5e5e5;
 }
 
-/* 卡片内部光晕装饰 (伪元素实现) */
+/* 卡片内部光晕 */
 .cardGlow {
   position: absolute;
   top: 0;
@@ -85,7 +89,7 @@
   height: 100%;
   background: radial-gradient(
     circle at top right,
-    var(--glow-color, rgba(59, 130, 246, 0.03)),
+    var(--glow-color, rgba(37, 99, 235, 0.03)),
     transparent 60%
   );
   opacity: 0;
@@ -93,14 +97,24 @@
   pointer-events: none;
 }
 
-.card:hover .cardGlow {
-  opacity: 1;
-}
+.card:hover .cardGlow { opacity: 1; }
 
-/* 根据主题色定义光晕颜色 */
-.card[data-theme='blue'] { --glow-color: rgba(59, 130, 246, 0.08); --icon-bg: rgba(59, 130, 246, 0.1); --icon-color: #2563EB; }
-.card[data-theme='indigo'] { --glow-color: rgba(99, 102, 241, 0.08); --icon-bg: rgba(99, 102, 241, 0.1); --icon-color: #4F46E5; }
-.card[data-theme='purple'] { --glow-color: rgba(139, 92, 246, 0.08); --icon-bg: rgba(139, 92, 246, 0.1); --icon-color: #7C3AED; }
+/* 主题色 */
+.card[data-theme='blue'] {
+  --glow-color: rgba(37, 99, 235, 0.04);
+  --icon-bg: linear-gradient(135deg, #2563eb, #3b82f6);
+  --icon-color: #fff;
+}
+.card[data-theme='indigo'] {
+  --glow-color: rgba(99, 102, 241, 0.04);
+  --icon-bg: linear-gradient(135deg, #6366f1, #818cf8);
+  --icon-color: #fff;
+}
+.card[data-theme='purple'] {
+  --glow-color: rgba(124, 58, 237, 0.04);
+  --icon-bg: linear-gradient(135deg, #7c3aed, #a855f7);
+  --icon-color: #fff;
+}
 
 .cardInner {
   position: relative;
@@ -110,62 +124,49 @@
   height: 100%;
 }
 
-/* Icon Design */
+/* Icon */
 .iconWrapper {
-  width: 64px;
-  height: 64px;
-  border-radius: 12px;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
   background: var(--icon-bg);
   color: var(--icon-color);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
   transition: transform 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .card:hover .iconWrapper {
-  transform: scale(1.1) rotate(3deg); /* 微妙的动效 */
+  transform: scale(1.05);
 }
 
 .cardTitle {
-  font-size: 1.5rem;
+  font-size: 1.375rem;
   font-weight: 700;
-  color: var(--color-text-primary);
-  letter-spacing: -0.02em;
+  color: #0a0a0a;
+  letter-spacing: -0.015em;
   margin-bottom: 16px;
-  line-height: 1.2;
+  line-height: 1.3;
 }
 
 .cardDesc {
-  font-size: 1.05rem;
-  color: var(--color-text-muted);
-  line-height: 1.7;
+  font-size: 1rem;
+  color: #6b7280;
+  line-height: 1.75;
   font-weight: 400;
 }
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .cardGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  .cardGrid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 768px) {
-  .section {
-    padding: 80px 20px;
-  }
-
-  .title {
-    font-size: 2.25rem;
-  }
-
-  .cardGrid {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
-
-  .card {
-    padding: 32px 24px;
-  }
+  .section { padding: 80px 20px; }
+  .title { font-size: 2rem; }
+  .cardGrid { grid-template-columns: 1fr; gap: 16px; }
+  .card { padding: 32px 24px; }
 }

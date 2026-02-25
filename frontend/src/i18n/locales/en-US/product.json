@@ -11,9 +11,9 @@
   },
   "hero": {
     "badge": "AI-Native Cloud Cost Platform",
-    "titleLine1": "Next-Generation Cloud",
-    "titleHighlight": "Cost Intelligence",
-    "subtitle": "Agentic AI-powered enterprise FinOps — replacing complex dashboards and SQL with natural language conversation",
+    "titleLine1": "Conversations, Not Reports",
+    "titleHighlight": "Redefine Cloud Cost",
+    "subtitle": "AI-powered FinOps — replace dashboards and SQL with natural conversation",
     "ctaPrimary": "Start Free Trial",
     "ctaSecondary": "Explore Capabilities",
     "trust": "Read-only Access · SOC2 Compliant · Multi-Account Support",
@@ -116,7 +116,16 @@
     "stat1": "35% Avg. Cost Savings",
     "stat2": "2-Min Rapid Setup",
     "stat3": "SOC2 Compliant",
-    "stat4": "24/7 Intelligent Monitoring"
+    "stat4": "24/7 Intelligent Monitoring",
+    "stat1Label": "Avg. Cost Savings",
+    "stat1Desc": "Visible results in month one",
+    "stat2Label": "Rapid Setup",
+    "stat2Desc": "Zero-intrusion deployment",
+    "stat3Label": "Compliance",
+    "stat3Desc": "SOC2 Type II certified",
+    "stat4Label": "Monitoring",
+    "stat4Desc": "Round-the-clock anomaly detection",
+    "minuteSuffix": " min"
   },
   "testimonials": {
     "title": "Customer Stories",
@@ -258,5 +267,16 @@
       "title": "Mobile Friendly",
       "desc": "Natural language interaction makes mobile queries more convenient."
     }
+  },
+  "footerSection": {
+    "ctaTitle": "Ready to Control Your Cloud Costs?",
+    "ctaSubtitle": "Start now and experience the new way of cost management with Agentic AI",
+    "ctaPrimary": "Start Free Trial",
+    "ctaSecondary": "Contact Sales",
+    "trust1": "No credit card required",
+    "trust2": "14-day free trial",
+    "trust3": "Cancel anytime",
+    "tagline": "Intelligent Cloud Cost Governance",
+    "copyright": "© 2026 CostQ. All rights reserved."
   }
 }

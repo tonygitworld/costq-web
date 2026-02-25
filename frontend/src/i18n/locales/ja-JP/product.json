@@ -13,7 +13,7 @@
     "badge": "AI 駆動型クラウドコスト管理",
     "titleLine1": "次世代クラウド",
     "titleHighlight": "コスト管理プラットフォーム",
-    "subtitle": "Agentic AI駆動のエンタープライズFinOps — 複雑なレポートとSQLを自然言語対話で置き換え",
+    "subtitle": "Agentic AI駆動のエンタープライズFinOps — レポートとSQLを自然言語対話で置き換え",
     "ctaPrimary": "無料トライアル開始",
     "ctaSecondary": "コア機能を見る",
     "trust": "読み取り専用アクセス · SOC2 準拠 · マルチアカウント対応",
@@ -116,7 +116,16 @@
     "stat1": "35% 平均コスト削減率",
     "stat2": "2分 迅速なセットアップ",
     "stat3": "SOC2 セキュリティ準拠",
-    "stat4": "24/7 インテリジェント監視"
+    "stat4": "24/7 インテリジェント監視",
+    "stat1Label": "平均コスト削減",
+    "stat1Desc": "導入初月から効果を実感",
+    "stat2Label": "迅速セットアップ",
+    "stat2Desc": "ゼロ侵襲デプロイメント",
+    "stat3Label": "セキュリティ準拠",
+    "stat3Desc": "SOC2 Type II 認証取得済み",
+    "stat4Label": "インテリジェント監視",
+    "stat4Desc": "24時間365日の異常検知",
+    "minuteSuffix": " 分"
   },
   "testimonials": {
     "title": "導入事例",
@@ -258,5 +267,16 @@
       "title": "モバイルフレンドリー",
       "desc": "自然言語インタラクション方式により、モバイルでのクエリがより便利になります。"
     }
+  },
+  "footerSection": {
+    "ctaTitle": "クラウドコストをコントロールする準備はできましたか？",
+    "ctaSubtitle": "今すぐ始めて、Agentic AI による新しいコスト管理を体験してください",
+    "ctaPrimary": "無料トライアルを開始",
+    "ctaSecondary": "営業担当に連絡",
+    "trust1": "クレジットカード不要",
+    "trust2": "14日間無料トライアル",
+    "trust3": "いつでもキャンセル可能",
+    "tagline": "インテリジェント・クラウドコストガバナンス",
+    "copyright": "© 2026 CostQ. All rights reserved."
   }
 }

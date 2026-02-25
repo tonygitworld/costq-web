@@ -1,11 +1,11 @@
 /* ========================================
-   CostQ 登录页面
-   Based on shadcn/ui pattern
+   CostQ 注册页面
+   Based on shadcn/ui signup-01 block pattern
    Type scale: 20 / 14 / 14 / 12
    Input: 36px height, 8px radius, 1px border
    ======================================== */
 
-/* 表单标题 */
+/* 标题区 */
 .formHeader {
   margin-bottom: 28px;
   text-align: center;
@@ -28,19 +28,19 @@
 }
 
 /* 表单 */
-.loginForm {
+.registerForm {
   margin-bottom: 0;
 }
 
-.loginForm :global(.ant-form-item) {
+.registerForm :global(.ant-form-item) {
   margin-bottom: 20px;
 }
 
-.loginForm :global(.ant-form-item-label) {
+.registerForm :global(.ant-form-item-label) {
   padding-bottom: 6px !important;
 }
 
-.loginForm :global(.ant-form-item-label > label) {
+.registerForm :global(.ant-form-item-label > label) {
   font-size: 14px;
   font-weight: 500;
   color: #0f172a;
@@ -50,8 +50,8 @@
 
 /* 输入框 — shadcn style: 36px, 1px border, 8px radius */
 .formInput,
-.loginForm :global(.ant-input-affix-wrapper),
-.loginForm :global(.ant-input-password) {
+.registerForm :global(.ant-input-affix-wrapper),
+.registerForm :global(.ant-input-password) {
   height: 42px !important;
   border-radius: 8px !important;
   border: 1px solid #e2e8f0 !important;
@@ -63,81 +63,102 @@
 }
 
 .formInput:hover,
-.loginForm :global(.ant-input-affix-wrapper:hover),
-.loginForm :global(.ant-input-password:hover) {
+.registerForm :global(.ant-input-affix-wrapper:hover),
+.registerForm :global(.ant-input-password:hover) {
   border-color: #cbd5e1 !important;
 }
 
 .formInput:focus,
-.loginForm :global(.ant-input-affix-wrapper:focus),
-.loginForm :global(.ant-input-affix-wrapper-focused),
-.loginForm :global(.ant-input-password:focus),
-.loginForm :global(.ant-input-password-focused) {
+.registerForm :global(.ant-input-affix-wrapper:focus),
+.registerForm :global(.ant-input-affix-wrapper-focused),
+.registerForm :global(.ant-input-password:focus),
+.registerForm :global(.ant-input-password-focused) {
   border-color: #2563eb !important;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
 }
 
 /* 输入框图标 */
 .inputIcon,
-.loginForm :global(.ant-input-prefix) {
+.registerForm :global(.ant-input-prefix) {
   color: #94a3b8;
   margin-right: 8px;
   font-size: 16px;
 }
 
 /* 输入框内文字 */
-.loginForm :global(.ant-input) {
+.registerForm :global(.ant-input) {
   font-size: 14px !important;
   line-height: 1.5 !important;
 }
 
-.loginForm :global(.ant-input::placeholder) {
+.registerForm :global(.ant-input::placeholder) {
   color: #94a3b8;
   font-size: 14px !important;
 }
 
-.loginForm :global(.ant-input-suffix) {
+.registerForm :global(.ant-input-suffix) {
   color: #64748b;
 }
 
 /* 错误状态 */
-.loginForm :global(.ant-form-item-has-error .ant-input-affix-wrapper),
-.loginForm :global(.ant-form-item-has-error .ant-input-password) {
+.registerForm :global(.ant-form-item-has-error .ant-input-affix-wrapper),
+.registerForm :global(.ant-form-item-has-error .ant-input-password) {
   border-color: #ef4444 !important;
 }
 
-.loginForm :global(.ant-form-item-has-error .ant-input-affix-wrapper:focus),
-.loginForm :global(.ant-form-item-has-error .ant-input-affix-wrapper-focused),
-.loginForm :global(.ant-form-item-has-error .ant-input-password:focus) {
+.registerForm :global(.ant-form-item-has-error .ant-input-affix-wrapper:focus),
+.registerForm :global(.ant-form-item-has-error .ant-input-affix-wrapper-focused),
+.registerForm :global(.ant-form-item-has-error .ant-input-password:focus) {
   border-color: #ef4444 !important;
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08) !important;
 }
 
-.loginForm :global(.ant-form-item-explain-error) {
+.registerForm :global(.ant-form-item-explain-error) {
   font-size: 12px;
   line-height: 1.33;
   color: #ef4444;
   margin-top: 4px;
 }
 
-/* 忘记密码链接 */
-.forgotRow {
-  text-align: right;
-  margin-top: -12px;
-  margin-bottom: 8px;
+/* 两列布局（组织名 + 姓名） */
+.twoColumnRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
-.forgotLink {
-  font-size: 13px;
-  font-weight: 500;
-  color: #2563eb;
-  text-decoration: none;
-  transition: color 0.15s ease;
+/* 发送验证码按钮 */
+.sendCodeButton {
+  min-width: 110px;
+  height: 42px !important;
+  border-radius: 8px !important;
+  border: 1px solid #bfdbfe !important;
+  background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%) !important;
+  color: #1d4ed8 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+  white-space: nowrap;
 }
 
-.forgotLink:hover {
-  color: #1d4ed8;
-  text-decoration: underline;
+.sendCodeButton:hover:not(:disabled) {
+  border-color: #93c5fd !important;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1) !important;
+}
+
+.sendCodeButton:disabled {
+  color: #94a3b8 !important;
+  border-color: #e2e8f0 !important;
+  background: #f8fafc !important;
+}
+
+/* 密码提示 */
+.passwordHint {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: -8px 0 20px 0;
+  line-height: 1.5;
 }
 
 /* 提交按钮 */
@@ -151,7 +172,7 @@
   letter-spacing: 0.01em;
   transition: opacity 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(37, 99, 235, 0.18) !important;
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
 .submitButton:hover:not(:disabled) {
@@ -163,10 +184,18 @@
   transform: translateY(0);
 }
 
+/* 注册说明 */
+.registerNote {
+  font-size: 12px;
+  color: #94a3b8;
+  text-align: center;
+  margin: 16px 0 0 0;
+  line-height: 1.6;
+}
+
 /* 表单底部 */
 .formFooter {
   text-align: center;
-  padding-top: 20px;
   margin-top: 24px;
 }
 
@@ -176,7 +205,7 @@
   margin-right: 4px;
 }
 
-.registerLink {
+.loginLink {
   font-size: 14px;
   font-weight: 500;
   color: #2563eb;
@@ -184,7 +213,7 @@
   transition: color 0.15s ease;
 }
 
-.registerLink:hover {
+.loginLink:hover {
   color: #1d4ed8;
   text-decoration: underline;
 }
@@ -197,6 +226,11 @@
   .formTitle {
     font-size: 18px;
   }
+
+  .twoColumnRow {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
 }
 
 @media (max-width: 480px) {
@@ -208,18 +242,24 @@
     font-size: 13px;
   }
 
-  .loginForm :global(.ant-form-item) {
-    margin-bottom: 14px;
+  .registerForm :global(.ant-form-item) {
+    margin-bottom: 12px;
   }
 
   .formInput,
-  .loginForm :global(.ant-input-affix-wrapper),
-  .loginForm :global(.ant-input-password) {
+  .registerForm :global(.ant-input-affix-wrapper),
+  .registerForm :global(.ant-input-password) {
     height: 40px !important;
   }
 
   .submitButton {
     height: 40px !important;
+  }
+
+  .sendCodeButton {
+    height: 40px !important;
+    min-width: 96px;
+    font-size: 13px !important;
   }
 }
 
@@ -227,8 +267,8 @@
    可访问性
    ======================================== */
 
-.loginForm :global(.ant-input-affix-wrapper:focus-visible),
-.loginForm :global(.ant-input-password:focus-visible) {
+.registerForm :global(.ant-input-affix-wrapper:focus-visible),
+.registerForm :global(.ant-input-password:focus-visible) {
   outline: 2px solid #2563eb;
   outline-offset: 2px;
 }
@@ -238,8 +278,12 @@
   outline-offset: 2px !important;
 }
 
-.forgotLink:focus-visible,
-.registerLink:focus-visible {
+.sendCodeButton:focus-visible {
+  outline: 2px solid #2563eb !important;
+  outline-offset: 2px !important;
+}
+
+.loginLink:focus-visible {
   outline: 2px solid #2563eb;
   outline-offset: 2px;
   border-radius: 2px;

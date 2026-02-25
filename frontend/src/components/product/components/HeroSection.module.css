@@ -7,7 +7,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 120px 32px 100px;
+  padding: 80px 32px 180px;
   overflow: hidden;
 }
 
@@ -73,9 +73,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   margin: 0 0 36px;
-  perspective: 600px;
 }
 
 .headingLine1,
@@ -83,7 +82,7 @@
   display: block;
   font-size: clamp(3rem, 8vw, 5.8rem);
   font-weight: 900;
-  line-height: 1.05;
+  line-height: 1.08;
   letter-spacing: -0.04em;
 }
 
@@ -92,37 +91,54 @@
   color: #1e3a5f;
 }
 
-.char {
-  display: inline-block;
-  text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.85),
-    0 0 24px rgba(255, 255, 255, 0.35);
+/* English: slightly smaller font to prevent overflow */
+.headingEn .headingLine1,
+.headingEn .headingLine2 {
+  font-size: clamp(2.6rem, 5.8vw, 4.5rem);
 }
 
-/* Line 2: blue-to-teal gradient, harmonizes with wave colors */
+/* English description: allow wrapping since text is longer */
+.descriptionEn {
+  white-space: normal;
+  text-wrap: balance;
+}
+
+.char {
+  display: inline-block;
+}
+
+/* Line 2: animated flowing gradient — Linear/Vercel style */
 .headingLine2 {
-  filter: drop-shadow(0 2px 10px rgba(37, 99, 235, 0.15));
+  position: relative;
 }
 
 .charAccent {
   display: inline-block;
-  background: linear-gradient(135deg, #1d4ed8, #0ea5e9, #06b6d4);
-  background-size: 100% 100%;
+  background: linear-gradient(
+    90deg,
+    #1d4ed8 0%,
+    #0ea5e9 25%,
+    #06b6d4 50%,
+    #0ea5e9 75%,
+    #1d4ed8 100%
+  );
+  background-size: 200% 100%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: gradientFlow 6s ease infinite;
 }
 
-/* Hover shimmer on accent chars */
-.charAccent:hover {
-  filter: brightness(1.15);
-  transition: filter 0.2s;
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 /* ── Description ── */
 .description {
   max-width: 640px;
-  margin: 0 0 48px;
+  margin: 0 0 28px;
   font-size: clamp(1rem, 1.4vw, 1.15rem);
   line-height: 1.6;
   color: #2c4a6e;
@@ -209,4 +225,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .eyebrowDot { animation: none; }
+  .charAccent { animation: none; }
 }

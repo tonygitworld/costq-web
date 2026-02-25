@@ -16,7 +16,6 @@ export const Navbar: React.FC = () => {
     { id: 'product-showcase', label: t('product:nav.platformIntro'), hash: '#product-showcase' },
     { id: 'how-it-works', label: t('product:nav.coreCapabilities'), hash: '#how-it-works' },
     { id: 'roadmap', label: t('product:nav.roadmap'), hash: '#roadmap' },
-    { id: 'final-cta', label: t('product:nav.getStarted'), hash: '#final-cta' },
   ];
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [scrolled, setScrolled] = useState(false);
