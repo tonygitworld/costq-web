@@ -14,6 +14,7 @@ import { ThinkingSummary } from './ThinkingSummary';
 import { ToolCallWithDetails } from './ToolCallWithDetails';
 import StatusCard from './StatusCard';
 import MessageImageGrid from './MessageImageGrid';
+import MessageExcelList from './MessageExcelList';
 
 // ✨ 新增：导入样式
 import './MessageItem.css';
@@ -62,6 +63,10 @@ const MessageItemComponent: FC<MessageItemProps> = ({ message }) => {
               {/* ✅ 用户消息中的图片附件展示 */}
               {message.imageAttachments && message.imageAttachments.length > 0 && (
                 <MessageImageGrid attachments={message.imageAttachments} />
+              )}
+              {/* ✅ 用户消息中的 Excel 附件展示 */}
+              {message.excelAttachments && message.excelAttachments.length > 0 && (
+                <MessageExcelList attachments={message.excelAttachments} />
               )}
             </HoverStableCard>
 
@@ -215,6 +220,10 @@ const MessageItemComponent: FC<MessageItemProps> = ({ message }) => {
               {message.imageAttachments && message.imageAttachments.length > 0 && (
                 <MessageImageGrid attachments={message.imageAttachments} />
               )}
+              {/* ✅ AI 消息中的 Excel 附件展示 */}
+              {message.excelAttachments && message.excelAttachments.length > 0 && (
+                <MessageExcelList attachments={message.excelAttachments} />
+              )}
               {message.meta.status === 'completed' && message.tokenUsage && (
                 <div className="token-usage-inline">
                   <div className="token-usage-divider"></div>
@@ -359,6 +368,7 @@ export const MessageItem = memo(MessageItemComponent, (prevProps, nextProps) => 
     prevMsg.toolCalls?.length === nextMsg.toolCalls?.length &&
     prevMsg.contentBlocks?.length === nextMsg.contentBlocks?.length &&
     prevMsg.showStatus === nextMsg.showStatus &&
-    prevMsg.imageAttachments?.length === nextMsg.imageAttachments?.length
+    prevMsg.imageAttachments?.length === nextMsg.imageAttachments?.length &&
+    prevMsg.excelAttachments?.length === nextMsg.excelAttachments?.length
   );
 });

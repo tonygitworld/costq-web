@@ -4,7 +4,7 @@ import {
   type WebSocketMessage,
   type BatchMessage,
 } from '../types/message';
-import { type ImageAttachment } from '../types/chat';
+import { type ImageAttachment, type ExcelAttachment } from '../types/chat';
 import { messageHandler } from '../utils/messageHandler';
 import { useAuthStore } from '../stores/authStore';
 import { apiClient } from '../services/apiClient';
@@ -25,7 +25,7 @@ interface ConfirmationRequest {
 
 interface SSEContextType {
   sendMessage: (message: string | object) => Promise<void>;
-  sendQuery: (content: string, accountIds?: string[], gcpAccountIds?: string[], sessionId?: string, modelId?: string, imageAttachments?: ImageAttachment[]) => string;
+  sendQuery: (content: string, accountIds?: string[], gcpAccountIds?: string[], sessionId?: string, modelId?: string, imageAttachments?: ImageAttachment[], excelAttachments?: ExcelAttachment[]) => string;
   cancelGeneration: (queryId: string) => Promise<void>;
   currentQueryId: string | null;
   isCancelling: boolean;
@@ -75,7 +75,7 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
     */
   };
 
-  const sendQuery = (content: string, accountIds?: string[], gcpAccountIds?: string[], sessionId?: string, modelId?: string, imageAttachments?: ImageAttachment[]): string => {
+  const sendQuery = (content: string, accountIds?: string[], gcpAccountIds?: string[], sessionId?: string, modelId?: string, imageAttachments?: ImageAttachment[], excelAttachments?: ExcelAttachment[]): string => {
     messageHandler.resetMessageBuilder();
 
     const queryId = `query_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
@@ -112,6 +112,15 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
         // ✅ 仅在有图片附件时添加 images 字段，确保无图片时请求体不变
         if (imageAttachments && imageAttachments.length > 0) {
           requestPayload.images = imageAttachments.map(a => ({
+            file_name: a.fileName,
+            mime_type: a.mimeType,
+            base64_data: a.base64Data.replace(/^data:[^;]+;base64,/, ''),
+          }));
+        }
+
+        // ✅ 仅在有 Excel 附件时添加 files 字段，确保无 Excel 时请求体不变
+        if (excelAttachments && excelAttachments.length > 0) {
+          requestPayload.files = excelAttachments.map(a => ({
             file_name: a.fileName,
             mime_type: a.mimeType,
             base64_data: a.base64Data.replace(/^data:[^;]+;base64,/, ''),

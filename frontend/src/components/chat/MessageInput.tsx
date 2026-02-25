@@ -11,9 +11,11 @@ import { MessageInputContainer } from './MessageInputContainer';
 import { PromptTemplatesPopoverContent } from './PromptTemplatesPopoverContent';
 import { useI18n } from '../../hooks/useI18n';
 import { useImageAttachments } from '../../hooks/useImageAttachments';
-import { ImagePickerButton } from './ImagePickerButton';
-import { ImagePreviewArea } from './ImagePreviewArea';
+import { useExcelAttachments } from '../../hooks/useExcelAttachments';
+import { FilePickerButton } from './FilePickerButton';
+import { AttachmentPreviewArea } from './AttachmentPreviewArea';
 import { IMAGE_CONSTRAINTS } from '../../utils/imageUtils';
+import { EXCEL_CONSTRAINTS } from '../../utils/excelUtils';
 import { createChatSession, convertBackendSession } from '../../services/chatApi';
 import { logger } from '../../utils/logger';
 import '../styles/AIChatInput.css';
@@ -37,7 +39,33 @@ export const MessageInput: FC = () => {
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
-  const { attachments, addImages, removeImage, clearAttachments, isProcessing } = useImageAttachments();
+  const { attachments: imageAttachments, addImages, removeImage, clearAttachments: clearImageAttachments, isProcessing: isImageProcessing } = useImageAttachments();
+  const { attachments: excelAttachments, addExcelFiles, removeExcel, clearAttachments: clearExcelAttachments, isProcessing: isExcelProcessing } = useExcelAttachments();
+
+  const isProcessing = isImageProcessing || isExcelProcessing;
+
+  // 文件选择回调：按 MIME 类型分流
+  const handleFilesSelected = useCallback((files: FileList) => {
+    const fileArray = Array.from(files);
+    const imageFiles: File[] = [];
+    const excelFiles: File[] = [];
+
+    for (const file of fileArray) {
+      if (file.type.startsWith('image/')) {
+        imageFiles.push(file);
+      } else if (EXCEL_CONSTRAINTS.ALLOWED_TYPES.includes(file.type as any)) {
+        excelFiles.push(file);
+      }
+      // Other file types are silently ignored
+    }
+
+    if (imageFiles.length > 0) {
+      addImages(imageFiles);
+    }
+    if (excelFiles.length > 0) {
+      addExcelFiles(excelFiles, imageAttachments.length);
+    }
+  }, [addImages, addExcelFiles, imageAttachments.length]);
 
   // 存储账号+服务组合
   const [accountServicePairs, setAccountServicePairs] = useState<Array<{
@@ -135,15 +163,26 @@ export const MessageInput: FC = () => {
 
     const files = e.dataTransfer.files;
     if (files.length > 0) {
-      // Filter to only image files silently
-      const imageFiles = Array.from(files).filter(f =>
-        IMAGE_CONSTRAINTS.ALLOWED_TYPES.includes(f.type as any)
-      );
+      const imageFiles: File[] = [];
+      const excelFiles: File[] = [];
+
+      for (const file of Array.from(files)) {
+        if (IMAGE_CONSTRAINTS.ALLOWED_TYPES.includes(file.type as any)) {
+          imageFiles.push(file);
+        } else if (EXCEL_CONSTRAINTS.ALLOWED_TYPES.includes(file.type as any)) {
+          excelFiles.push(file);
+        }
+        // Other file types are silently ignored
+      }
+
       if (imageFiles.length > 0) {
         addImages(imageFiles);
       }
+      if (excelFiles.length > 0) {
+        addExcelFiles(excelFiles, imageAttachments.length);
+      }
     }
-  }, [loading, addImages]);
+  }, [loading, addImages, addExcelFiles, imageAttachments.length, EXCEL_CONSTRAINTS]);
 
   // ✅ 剪贴板粘贴图片处理
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
@@ -257,7 +296,8 @@ export const MessageInput: FC = () => {
         chatId,
         type: 'user',
         content: message.trim(),
-        imageAttachments: attachments.length > 0 ? attachments : undefined,
+        imageAttachments: imageAttachments.length > 0 ? imageAttachments : undefined,
+        excelAttachments: excelAttachments.length > 0 ? excelAttachments : undefined,
         meta: {
           status: 'completed',
           isStreaming: false,
@@ -297,9 +337,11 @@ export const MessageInput: FC = () => {
 
       // 清空输入框
       const currentMessage = message.trim();
-      const currentAttachments = [...attachments]; // 保存当前附件引用
+      const currentAttachments = [...imageAttachments]; // 保存当前附件引用
+      const currentExcelAttachments = [...excelAttachments]; // 保存当前 Excel 附件引用
       setMessage('');
-      clearAttachments();
+      clearImageAttachments();
+      clearExcelAttachments();
       if (textAreaRef.current) {
         textAreaRef.current.style.height = 'auto';
       }
@@ -329,7 +371,8 @@ export const MessageInput: FC = () => {
         gcpAccountIds,
         sessionIdToSend,
         selectedModelId,
-        currentAttachments.length > 0 ? currentAttachments : undefined
+        currentAttachments.length > 0 ? currentAttachments : undefined,
+        currentExcelAttachments.length > 0 ? currentExcelAttachments : undefined
       );
       logger.debug('📤 [MessageInput] 已发送查询，Query ID:', queryId);
     } catch (error) {
@@ -361,9 +404,11 @@ export const MessageInput: FC = () => {
       >
         {/* 1. 输入区域 */}
         <div className="ai-chat-input-area">
-          <ImagePreviewArea
-            attachments={attachments}
-            onRemove={removeImage}
+          <AttachmentPreviewArea
+            imageAttachments={imageAttachments}
+            excelAttachments={excelAttachments}
+            onRemoveImage={removeImage}
+            onRemoveExcel={removeExcel}
           />
           <textarea
             ref={textAreaRef}
@@ -409,8 +454,8 @@ export const MessageInput: FC = () => {
                 <BulbOutlined style={{ fontSize: 18 }} />
               </button>
             </Popover>
-            <ImagePickerButton
-              onFilesSelected={(files) => addImages(files)}
+            <FilePickerButton
+              onFilesSelected={handleFilesSelected}
               disabled={loading || !hasSelectedAccount || isProcessing}
             />
           </div>
