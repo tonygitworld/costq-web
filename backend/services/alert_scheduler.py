@@ -22,13 +22,15 @@ import asyncio
 import logging
 import os
 import random
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any, Optional
 
 from apscheduler.events import EVENT_JOB_ERROR, EVENT_JOB_EXECUTED
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from pytz import timezone as pytz_timezone
+from sqlalchemy import or_, text
+from sqlalchemy.orm import Session
 
 from backend.database import get_db
 from backend.models.alert_execution_log import AlertExecutionLog
@@ -36,6 +38,12 @@ from backend.models.monitoring import MonitoringConfig
 from backend.services.alert_service import AlertService
 
 logger = logging.getLogger(__name__)
+
+ALERT_SCHEDULER_LOCK_ID = 8675309
+FREQUENCY_INTERVALS = {
+    "weekly": timedelta(weeks=1),
+    "monthly": timedelta(days=30),
+}
 
 
 class AlertScheduler:
@@ -86,9 +94,14 @@ class AlertScheduler:
         # 3. 并发控制：降低并发数，避免限流
         self.max_concurrent_alerts = int(os.getenv("ALERT_SCHEDULER_MAX_CONCURRENT", 5))
         self.max_retries = int(os.getenv("ALERT_SCHEDULER_MAX_RETRIES", 3))
+        self.batch_size = int(os.getenv("ALERT_SCHEDULER_BATCH_SIZE", 3))
+        self.inter_batch_delay = float(
+            os.getenv("ALERT_SCHEDULER_INTER_BATCH_DELAY", 5.0)
+        )
+        self.throttle_backoff = [10, 30, 60]
+        self.standard_backoff_base = 2
 
-        # 4. 逻辑修复：不再使用间隔小时，改用日期判断
-        # 保留此变量仅作兼容，实际逻辑已修改
+        # 4. 逻辑修复：保留仅用于状态展示
         self.check_interval_hours = int(
             os.getenv("ALERT_SCHEDULER_CHECK_INTERVAL_HOURS", 24)
         )
@@ -220,7 +233,7 @@ class AlertScheduler:
         工作流程：
         1. 查询所有启用的告警 (is_active=True)
         2. 筛选需要执行的告警 (last_checked_at >= 20小时 或 从未执行)
-        3. 批量并发执行 (最多10个同时)
+        3. 批量并发执行 (受并发配置限制)
         4. 记录执行结果
 
         Returns:
@@ -228,15 +241,39 @@ class AlertScheduler:
         """
         start_time = datetime.now(UTC)
 
+        lock_acquired, lock_db = await asyncio.to_thread(
+            self._try_acquire_advisory_lock
+        )
+        if not lock_acquired:
+            logger.info("Another Pod is executing alert scan, skipping")
+            return {
+                "total_alerts": 0,
+                "executed": 0,
+                "skipped": 0,
+                "success": 0,
+                "failed": 0,
+                "duration_seconds": 0,
+            }
+
         # 3. 性能优化：使用 asyncio.to_thread 封装数据库查询
         # 注意：这里为了简单起见，仍然使用同步查询，因为查询本身很快
         # 真正的瓶颈在 execute_single_alert 中的 API 调用
-        db = next(get_db())
+        db = None
         try:
+            db = next(get_db())
             # ============ 1️⃣ 查询所有启用的告警 ============
             alerts = (
                 db.query(MonitoringConfig)
                 .filter(MonitoringConfig.is_active == True)
+                .filter(
+                    or_(
+                        MonitoringConfig.check_frequency.in_(
+                            ["daily", "weekly", "monthly"]
+                        ),
+                        MonitoringConfig.check_frequency.is_(None),
+                        MonitoringConfig.check_frequency == "",
+                    )
+                )
                 .all()
             )
 
@@ -270,12 +307,10 @@ class AlertScheduler:
                 else:
                     skipped_count += 1
                     if alert.last_checked_at:
-                        hours_ago = (now - alert.last_checked_at).total_seconds() / 3600
-                        remaining_hours = self.check_interval_hours - hours_ago
+                        last_check_local = alert.last_checked_at.astimezone(self.tz)
                         skip_msg = (
                             f"⏭️  告警跳过: {alert.display_name} "
-                            f"(上次检查: {hours_ago:.1f}小时前, "
-                            f"还需等待: {remaining_hours:.1f}小时)"
+                            f"(上次检查: {last_check_local.strftime('%Y-%m-%d %H:%M:%S %Z')})"
                         )
                         print(skip_msg)
                         logger.info(skip_msg)
@@ -365,7 +400,10 @@ class AlertScheduler:
             logger.error("❌ 扫描和执行告警失败: %s", e, exc_info=True)
             raise
         finally:
-            db.close()
+            if db:
+                db.close()
+            if lock_db:
+                await asyncio.to_thread(self._release_advisory_lock, lock_db)
 
     def _should_execute_alert(
         self, alert: MonitoringConfig, current_time: datetime
@@ -374,8 +412,8 @@ class AlertScheduler:
 
         判断逻辑（优化版）：
         1. 如果从未执行过 (last_checked_at is None)，则执行
-        2. 检查上次执行日期 vs 当前日期（基于目标时区）
-        3. 只要今天（当地时间）没有执行过，就执行
+        2. daily: 按日期比较（保持原有行为）
+        3. weekly/monthly: 按时间间隔比较
 
         Args:
             alert: 告警配置对象
@@ -385,24 +423,24 @@ class AlertScheduler:
             bool: True表示需要执行，False表示跳过
         """
         if alert.last_checked_at is None:
-            # 新创建的告警，立即执行
             logger.debug("(): %s", alert.display_name)
             return True
 
-        # 将时间转换为目标时区（如 Asia/Tokyo）
-        last_check_local = alert.last_checked_at.astimezone(self.tz)
-        current_time_local = current_time.astimezone(self.tz)
-
-        # 比较日期
-        if last_check_local.date() < current_time_local.date():
-            logger.debug(
-                f"⏰ 告警需要执行: {alert.display_name} "
-                f"(上次检查: {last_check_local.date()}, 今天: {current_time_local.date()})"
-            )
-            return True
-        else:
-            # 今天已经执行过了
+        frequency = getattr(alert, "check_frequency", "daily") or "daily"
+        if frequency == "daily":
+            last_check_local = alert.last_checked_at.astimezone(self.tz)
+            current_time_local = current_time.astimezone(self.tz)
+            if last_check_local.date() < current_time_local.date():
+                logger.debug(
+                    f"⏰ 告警需要执行: {alert.display_name} "
+                    f"(上次检查: {last_check_local.date()}, 今天: {current_time_local.date()})"
+                )
+                return True
             return False
+
+        interval = FREQUENCY_INTERVALS.get(frequency, timedelta(days=1))
+        elapsed = current_time - alert.last_checked_at
+        return elapsed >= interval
 
     async def _batch_execute_alerts(
         self, alerts: list[MonitoringConfig]
@@ -418,43 +456,46 @@ class AlertScheduler:
         Returns:
             List[Dict[str, Any]]: 执行结果列表
         """
-        # 创建信号量，限制并发数
         semaphore = asyncio.Semaphore(self.max_concurrent_alerts)
+        results: list[dict[str, Any]] = []
 
-        async def execute_with_limit(alert: MonitoringConfig) -> dict[str, Any]:
-            """带并发限制的执行函数"""
-            # 随机延迟 0.5-3.0 秒，打散请求，避免瞬间并发
-            await asyncio.sleep(random.uniform(0.5, 3.0))
+        for i in range(0, len(alerts), self.batch_size):
+            batch = alerts[i : i + self.batch_size]
 
-            async with semaphore:
-                return await self._execute_single_alert(alert)
+            async def execute_with_limit(alert: MonitoringConfig) -> dict[str, Any]:
+                async with semaphore:
+                    await asyncio.sleep(random.uniform(0.5, 2.0))
+                    return await self._execute_single_alert(alert)
 
-        # 创建所有任务
-        tasks = [execute_with_limit(alert) for alert in alerts]
+            tasks = [execute_with_limit(alert) for alert in batch]
 
-        logger.info(
-            f"🚀 开始批量执行 {len(tasks)} 个告警 "
-            f"(最多 {self.max_concurrent_alerts} 个并发, 带随机抖动)"
-        )
+            logger.info(
+                f"🚀 开始执行告警批次 {i // self.batch_size + 1} "
+                f"({len(batch)} 个告警, 最多 {self.max_concurrent_alerts} 个并发)"
+            )
 
-        # 并发执行，捕获所有异常
-        results = await asyncio.gather(*tasks, return_exceptions=True)
+            batch_results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        # 处理异常结果
-        processed_results = []
-        for i, result in enumerate(results):
-            if isinstance(result, Exception):
-                logger.error(
-                    f"❌ 告警执行出现未捕获异常: {alerts[i].display_name}",
-                    exc_info=result,
-                )
-                processed_results.append(
-                    {"success": False, "alert_id": alerts[i].id, "error": str(result)}
-                )
-            else:
-                processed_results.append(result)
+            for j, result in enumerate(batch_results):
+                if isinstance(result, Exception):
+                    logger.error(
+                        f"❌ 告警执行出现未捕获异常: {batch[j].display_name}",
+                        exc_info=result,
+                    )
+                    results.append(
+                        {
+                            "success": False,
+                            "alert_id": batch[j].id,
+                            "error": str(result),
+                        }
+                    )
+                else:
+                    results.append(result)
 
-        return processed_results
+            if i + self.batch_size < len(alerts):
+                await asyncio.sleep(self.inter_batch_delay)
+
+        return results
 
     def _update_alert_status_sync(self, alert_id: str, result: dict[str, Any]) -> None:
         """同步更新告警状态（在线程池中运行）
@@ -520,6 +561,61 @@ class AlertScheduler:
         finally:
             db.close()
 
+    def _is_throttling_error(self, error: Exception) -> bool:
+        """判断是否为限流错误。
+
+        Args:
+            error: 捕获到的异常对象。
+
+        Returns:
+            True 表示限流错误，False 表示非限流错误。
+        """
+        error_str = str(error).lower()
+        error_type = type(error).__name__
+        return (
+            "throttl" in error_str
+            or "429" in error_str
+            or "too many requests" in error_str
+            or error_type == "ThrottlingException"
+        )
+
+    def _try_acquire_advisory_lock(self) -> tuple[bool, Session | None]:
+        """尝试获取 PostgreSQL advisory lock。
+
+        Returns:
+            (是否获取成功, 持有锁的数据库会话或 None)。
+        """
+        db = next(get_db())
+        try:
+            result = db.execute(
+                text("SELECT pg_try_advisory_lock(:lock_id)"),
+                {"lock_id": ALERT_SCHEDULER_LOCK_ID},
+            )
+            acquired = result.scalar()
+            if acquired:
+                return True, db
+            db.close()
+            return False, None
+        except Exception:
+            db.close()
+            raise
+
+    def _release_advisory_lock(self, db: Session) -> None:
+        """释放 PostgreSQL advisory lock。
+
+        Args:
+            db: 持有锁的数据库会话。
+        """
+        try:
+            db.execute(
+                text("SELECT pg_advisory_unlock(:lock_id)"),
+                {"lock_id": ALERT_SCHEDULER_LOCK_ID},
+            )
+        except Exception:
+            logger.warning("释放 advisory lock 失败", exc_info=True)
+        finally:
+            db.close()
+
     async def _execute_single_alert(self, alert: MonitoringConfig) -> dict[str, Any]:
         """执行单个告警（带指数退避重试）
 
@@ -582,11 +678,13 @@ class AlertScheduler:
 
                 except Exception as e:
                     last_error = e
-                    logger.error("❌ 详细错误堆栈: {traceback.format_exc()}")
+                    logger.error("❌ 详细错误堆栈", exc_info=True)
 
                     if attempt < self.max_retries - 1:
-                        # 指数退避：1秒、2秒、4秒
-                        wait_time = 2**attempt
+                        if self._is_throttling_error(e):
+                            wait_time = self.throttle_backoff[min(attempt, 2)]
+                        else:
+                            wait_time = self.standard_backoff_base**attempt
                         logger.warning(
                             f"⚠️  告警执行失败，{wait_time}秒后重试 "
                             f"(尝试 {attempt + 1}/{self.max_retries}): "
