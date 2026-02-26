@@ -117,5 +117,15 @@
     "subtitle": "開始する前に、クラウドアカウントを設定してください",
     "description": "クラウドアカウントを設定すると、CostQを使用してコスト分析、最適化の推奨事項、および請求管理を行うことができます",
     "configureButton": "クラウドアカウントを設定"
+  },
+  "cloudSelector": {
+    "selectService": "クラウドサービスを選択",
+    "accountsCount": "{{count}} アカウント",
+    "remove": "削除",
+    "back": "戻る",
+    "backToList": "クラウドサービス一覧に戻る",
+    "searchPlaceholder": "クラウドアカウントを検索",
+    "noAccounts": "利用可能なアカウントがありません",
+    "noMatchingAccounts": "一致するアカウントが見つかりません"
   }
 }

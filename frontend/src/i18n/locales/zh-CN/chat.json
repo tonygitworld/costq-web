@@ -117,5 +117,15 @@
     "subtitle": "开始之前，请先配置您的云账号",
     "description": "配置云账号后，您可以使用 CostQ 进行成本分析、优化建议和账单管理",
     "configureButton": "配置云账号"
+  },
+  "cloudSelector": {
+    "selectService": "选择云服务",
+    "accountsCount": "{{count}} 个账号",
+    "remove": "移除",
+    "back": "返回",
+    "backToList": "返回云服务列表",
+    "searchPlaceholder": "搜索云账号",
+    "noAccounts": "暂无可用账号",
+    "noMatchingAccounts": "未找到匹配的账号"
   }
 }

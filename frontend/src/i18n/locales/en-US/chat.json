@@ -117,5 +117,15 @@
     "subtitle": "Before starting, please configure your cloud accounts",
     "description": "After configuring cloud accounts, you can use CostQ for cost analysis, optimization recommendations, and billing management",
     "configureButton": "Configure Cloud Account"
+  },
+  "cloudSelector": {
+    "selectService": "Select Cloud Service",
+    "accountsCount": "{{count}} accounts",
+    "remove": "Remove",
+    "back": "Back",
+    "backToList": "Back to cloud services",
+    "searchPlaceholder": "Search cloud accounts",
+    "noAccounts": "No accounts available",
+    "noMatchingAccounts": "No matching accounts found"
   }
 }

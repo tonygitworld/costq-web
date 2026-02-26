@@ -1,6 +1,7 @@
 // d:\costq\web\costq-web\frontend\src\components\chat\CloudServiceSelector.tsx
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { useI18n } from '../../hooks/useI18n';
 
 // 添加旋转动画样式
 const spinKeyframes = `
@@ -66,6 +67,8 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
   initialSelectedAccountIds = [],
   loading = false,
 }) => {
+  const { t } = useI18n('chat');
+
   // 从localStorage加载已选择的账号ID
   const loadSelectedAccounts = (): string[] => {
     try {
@@ -186,7 +189,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
           fontSize: '13px'
         }}>
           <CloudIcon size="14px" color="rgba(0, 0, 0, 0.45)" />
-          <span>选择云服务</span>
+          <span>{t('cloudSelector.selectService')}</span>
         </div>
       );
     }
@@ -277,7 +280,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
               e.currentTarget.style.color = 'rgba(0, 0, 0, 0.45)';
               e.currentTarget.style.backgroundColor = 'transparent';
             }}
-            title="移除"
+            title={t('cloudSelector.remove')}
           >
             <svg viewBox="64 64 896 896" width="1em" height="1em" fill="currentColor" aria-hidden="true" style={{ display: 'inline-block' }}>
               <path d="M799.86 166.31c.02 0 .04.02.08.06l57.69 57.7c.04.03.05.05.06.08a.12.12 0 010 .06c0 .03-.02.05-.06.09L569.93 512l287.7 287.7c.04.04.05.06.06.09a.12.12 0 010 .07c0 .02-.02.04-.06.08l-57.7 57.69c-.03.04-.05.05-.07.06a.12.12 0 01-.07 0c-.03 0-.05-.02-.09-.06L512 569.93l-287.7 287.7c-.04.04-.06.05-.09.06a.12.12 0 01-.07 0c-.02 0-.04-.02-.08-.06l-57.69-57.7c-.04-.03-.05-.05-.06-.07a.12.12 0 010-.07c0-.03.02-.05.06-.09L454.07 512l-287.7-287.7c-.04-.04-.05-.06-.06-.09a.12.12 0 010-.07c0-.02.02-.04.06-.08l57.7-57.69c.03-.04.05-.05.07-.06a.12.12 0 01.07 0c.03 0 .05.02.09.06L512 454.07l287.7-287.7c.04-.04.06-.05.09-.06a.12.12 0 01.07 0z"></path>
@@ -364,7 +367,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
                 </span>
               </div>
               <span style={{ color: '#999', fontSize: '12px' }}>
-                {provider.accounts.length} 个账号
+                {t('cloudSelector.accountsCount', { count: provider.accounts.length })}
               </span>
             </div>
           ))}
@@ -413,8 +416,8 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = 'transparent';
               }}
-              title="返回"
-              aria-label="返回云服务列表"
+              title={t('cloudSelector.back')}
+              aria-label={t('cloudSelector.backToList')}
             >
               <svg viewBox="64 64 896 896" width="16px" height="16px" fill="#595959" aria-hidden="true" style={{ display: 'inline-block' }}>
                 <path d="M872 572H266.8l144.3-144c13.8-13.8 13.8-36.2 0-50s-36.2-13.8-50 0L146.8 550.4c-13.8 13.8-13.8 36.2 0 50l213.3 213.3c13.8 13.8 36.2 13.8 50 0 13.8-13.8 13.8-36.2 0-50L266.8 620H872c19.4 0 35-15.6 35-35s-15.6-35-35-35z"></path>
@@ -443,7 +446,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
               {/* 输入框 */}
               <input
                 type="text"
-                placeholder="搜索云账号"
+                placeholder={t('cloudSelector.searchPlaceholder')}
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
                 style={{
@@ -480,7 +483,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
           <div style={{ overflowY: 'auto', padding: '4px 0' }}>
             {!selectedProvider?.accounts || selectedProvider.accounts.length === 0 ? (
               <div style={{ padding: '24px 16px', textAlign: 'center', color: '#999', fontSize: '13px' }}>
-                暂无可用账号
+                {t('cloudSelector.noAccounts')}
               </div>
             ) : (
               (() => {
@@ -496,7 +499,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
                 if (filteredAccounts.length === 0) {
                   return (
                     <div style={{ padding: '24px 16px', textAlign: 'center', color: '#999', fontSize: '13px' }}>
-                      未找到匹配的账号
+                      {t('cloudSelector.noMatchingAccounts')}
                     </div>
                   );
                 }
