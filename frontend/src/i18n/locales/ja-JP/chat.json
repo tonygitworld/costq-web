@@ -96,6 +96,7 @@
     "rename": "名前を変更",
     "renameSuccess": "名前の変更が成功しました",
     "renameFailed": "名前の変更に失敗しました。もう一度お試しください",
+    "deleteFailed": "削除に失敗しました。もう一度お試しください",
     "renamePlaceholder": "新しいタイトルを入力...",
     "doubleClickToRename": "ダブルクリックで名前を変更"
   },

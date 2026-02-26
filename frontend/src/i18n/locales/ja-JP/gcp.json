@@ -74,6 +74,9 @@
     },
     "selector": {
       "placeholder": "クエリする GCP アカウントを選択"
+    },
+    "validation": {
+      "invalidJson": "JSON形式が正しくありません"
     }
   }
 }

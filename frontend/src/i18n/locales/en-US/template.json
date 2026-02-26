@@ -61,7 +61,7 @@
     "descriptionPlaceholder": "Brief description of the template purpose",
     "templateContent": "Template Content",
     "contentPlaceholder": "e.g., Check AWS costs for the last {{days}} days, focusing on {{service}} service",
-    "contentHint": "Tip: Use {{variableName}} to create dynamic templates",
+    "contentHint": "Tip: Use double curly braces {{...}} to create dynamic template variables",
     "createButton2": "Create",
     "updateButton": "Update",
     "validation": {

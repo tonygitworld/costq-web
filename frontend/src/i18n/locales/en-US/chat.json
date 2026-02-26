@@ -96,6 +96,7 @@
     "rename": "Rename",
     "renameSuccess": "Renamed successfully",
     "renameFailed": "Failed to rename, please try again",
+    "deleteFailed": "Failed to delete, please try again",
     "renamePlaceholder": "Enter new title...",
     "doubleClickToRename": "Double-click to rename"
   },
