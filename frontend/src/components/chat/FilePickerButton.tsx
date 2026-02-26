@@ -42,7 +42,7 @@ export const FilePickerButton: FC<FilePickerButtonProps> = ({ onFilesSelected, d
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/gif,image/webp,.xlsx,.xls"
+        accept="image/jpeg,image/png,image/gif,image/webp,.xlsx,.xls,.doc,.docx,.md,.txt"
         multiple
         onChange={handleChange}
         style={{ display: 'none' }}

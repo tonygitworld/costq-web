@@ -125,7 +125,10 @@
     "excelFormatError": "Only .xlsx and .xls Excel files are supported",
     "excelSizeError": "Excel file size cannot exceed 20MB",
     "excelCountError": "A maximum of {{maxCount}} Excel files can be attached per message",
-    "totalCountError": "A maximum of {{maxCount}} attachments (images + Excel) per message",
+    "documentFormatError": "Only .doc, .docx, .md, and .txt document files are supported",
+    "documentSizeError": "Document file size cannot exceed 20MB",
+    "documentCountError": "A maximum of {{maxCount}} document files can be attached per message",
+    "totalCountError": "A maximum of {{maxCount}} attachments per message",
     "addAttachment": "Add attachment"
   }
 }

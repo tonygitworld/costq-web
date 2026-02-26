@@ -13,7 +13,7 @@ export const EXCEL_CONSTRAINTS = {
 } as const;
 
 export const ATTACHMENT_CONSTRAINTS = {
-  MAX_TOTAL_COUNT: 8,  // 图片 + Excel 总数上限
+  MAX_TOTAL_COUNT: 8,  // 图片 + Excel + 文档 总数上限
 } as const;
 
 export interface ExcelValidationResult {
@@ -41,6 +41,7 @@ export function validateExcelFile(
   file: File,
   currentExcelCount: number,
   currentImageCount: number,
+  currentDocumentCount: number = 0,
   maxExcelCount: number = EXCEL_CONSTRAINTS.MAX_COUNT,
   maxTotalCount: number = ATTACHMENT_CONSTRAINTS.MAX_TOTAL_COUNT,
 ): ExcelValidationResult {
@@ -79,11 +80,11 @@ export function validateExcelFile(
     };
   }
 
-  // 4. 附件总数验证（图片 + Excel）
-  if (currentExcelCount + currentImageCount + 1 > maxTotalCount) {
+  // 4. 附件总数验证（图片 + Excel + 文档）
+  if (currentExcelCount + currentImageCount + currentDocumentCount + 1 > maxTotalCount) {
     return {
       valid: false,
-      error: `每条消息最多附加 ${maxTotalCount} 个附件（图片 + Excel）`,
+      error: `每条消息最多附加 ${maxTotalCount} 个附件`,
       errorType: 'total_count',
     };
   }

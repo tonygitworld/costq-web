@@ -1,67 +1,67 @@
 /**
- * Excel 附件生命周期管理 Hook
+ * 文档附件生命周期管理 Hook（Word / Markdown / Text）
  *
- * 封装 Excel 附件的添加、删除、清空逻辑。
+ * 封装文档附件的添加、删除、清空逻辑。
  * 附件是临时的、与单次发送绑定的局部状态。
- * 与 useImageAttachments 不同，Excel 附件无需预览 URL 和内存释放。
+ * 与 useExcelAttachments 模式一致，文档附件无需预览 URL 和内存释放。
  */
 
 import { useState, useCallback, useRef } from 'react';
 import { message } from 'antd';
-import type { ExcelAttachment } from '../types/chat';
+import type { DocumentAttachment } from '../types/chat';
 import {
-  validateExcelFile,
-  EXCEL_CONSTRAINTS,
-  ATTACHMENT_CONSTRAINTS,
-} from '../utils/excelUtils';
+  validateDocumentFile,
+  DOCUMENT_CONSTRAINTS,
+} from '../utils/documentUtils';
+import { ATTACHMENT_CONSTRAINTS } from '../utils/excelUtils';
 import { fileToBase64 } from '../utils/imageUtils';
 import { useI18n } from './useI18n';
 
-export interface UseExcelAttachmentsReturn {
-  attachments: ExcelAttachment[];
-  addExcelFiles: (files: File[], currentImageCount: number, currentDocumentCount?: number) => Promise<void>;
-  removeExcel: (id: string) => void;
+export interface UseDocumentAttachmentsReturn {
+  attachments: DocumentAttachment[];
+  addDocumentFiles: (files: File[], currentImageCount: number, currentExcelCount: number) => Promise<void>;
+  removeDocument: (id: string) => void;
   clearAttachments: () => void;
   isProcessing: boolean;
 }
 
-export function useExcelAttachments(
-  maxExcelCount: number = EXCEL_CONSTRAINTS.MAX_COUNT,
+export function useDocumentAttachments(
+  maxDocumentCount: number = DOCUMENT_CONSTRAINTS.MAX_COUNT,
   maxTotalCount: number = ATTACHMENT_CONSTRAINTS.MAX_TOTAL_COUNT,
-): UseExcelAttachmentsReturn {
-  const [attachments, setAttachments] = useState<ExcelAttachment[]>([]);
+): UseDocumentAttachmentsReturn {
+  const [attachments, setAttachments] = useState<DocumentAttachment[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const { t } = useI18n('chat');
 
   // useRef to track current attachments, avoiding stale closures
-  const attachmentsRef = useRef<ExcelAttachment[]>(attachments);
+  const attachmentsRef = useRef<DocumentAttachment[]>(attachments);
   attachmentsRef.current = attachments;
 
-  const addExcelFiles = useCallback(
-    async (files: File[], currentImageCount: number, currentDocumentCount: number = 0) => {
+  const addDocumentFiles = useCallback(
+    async (files: File[], currentImageCount: number, currentExcelCount: number) => {
       if (files.length === 0) return;
 
       setIsProcessing(true);
 
       try {
-        const newAttachments: ExcelAttachment[] = [];
-        let currentExcelCount = attachmentsRef.current.length;
+        const newAttachments: DocumentAttachment[] = [];
+        let currentDocumentCount = attachmentsRef.current.length;
 
         for (const file of files) {
-          const result = validateExcelFile(
+          const result = validateDocumentFile(
             file,
-            currentExcelCount,
-            currentImageCount,
             currentDocumentCount,
-            maxExcelCount,
+            currentImageCount,
+            currentExcelCount,
+            maxDocumentCount,
             maxTotalCount,
           );
 
           if (!result.valid) {
             const errorMessages: Record<string, string> = {
-              format: t('attachment.excelFormatError'),
-              size: t('attachment.excelSizeError'),
-              count: t('attachment.excelCountError', { maxCount: maxExcelCount }),
+              format: t('attachment.documentFormatError'),
+              size: t('attachment.documentSizeError'),
+              count: t('attachment.documentCountError', { maxCount: maxDocumentCount }),
               total_count: t('attachment.totalCountError', { maxCount: maxTotalCount }),
             };
             const msg = (result.errorType && errorMessages[result.errorType]) || result.error || '';
@@ -83,7 +83,7 @@ export function useExcelAttachments(
             base64Data,
           });
 
-          currentExcelCount++;
+          currentDocumentCount++;
         }
 
         if (newAttachments.length > 0) {
@@ -93,10 +93,10 @@ export function useExcelAttachments(
         setIsProcessing(false);
       }
     },
-    [maxExcelCount, maxTotalCount],
+    [maxDocumentCount, maxTotalCount, t],
   );
 
-  const removeExcel = useCallback((id: string) => {
+  const removeDocument = useCallback((id: string) => {
     setAttachments((prev) => prev.filter((a) => a.id !== id));
   }, []);
 
@@ -106,8 +106,8 @@ export function useExcelAttachments(
 
   return {
     attachments,
-    addExcelFiles,
-    removeExcel,
+    addDocumentFiles,
+    removeDocument,
     clearAttachments,
     isProcessing,
   };

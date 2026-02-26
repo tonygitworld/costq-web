@@ -15,6 +15,7 @@ import { ToolCallWithDetails } from './ToolCallWithDetails';
 import StatusCard from './StatusCard';
 import { MessageImageGrid } from './MessageImageGrid';
 import { MessageExcelList } from './MessageExcelList';
+import { MessageDocumentList } from './MessageDocumentList';
 
 // ✨ 新增：导入样式
 import './MessageItem.css';
@@ -67,6 +68,10 @@ const MessageItemComponent: FC<MessageItemProps> = ({ message }) => {
               {/* ✅ 用户消息中的 Excel 附件展示 */}
               {message.excelAttachments && message.excelAttachments.length > 0 && (
                 <MessageExcelList attachments={message.excelAttachments} />
+              )}
+              {/* ✅ 用户消息中的文档附件展示 */}
+              {message.documentAttachments && message.documentAttachments.length > 0 && (
+                <MessageDocumentList attachments={message.documentAttachments} />
               )}
             </HoverStableCard>
 
@@ -224,6 +229,10 @@ const MessageItemComponent: FC<MessageItemProps> = ({ message }) => {
               {message.excelAttachments && message.excelAttachments.length > 0 && (
                 <MessageExcelList attachments={message.excelAttachments} />
               )}
+              {/* ✅ AI 消息中的文档附件展示 */}
+              {message.documentAttachments && message.documentAttachments.length > 0 && (
+                <MessageDocumentList attachments={message.documentAttachments} />
+              )}
               {message.meta.status === 'completed' && message.tokenUsage && (
                 <div className="token-usage-inline">
                   <div className="token-usage-divider"></div>
@@ -369,6 +378,7 @@ export const MessageItem = memo(MessageItemComponent, (prevProps, nextProps) => 
     prevMsg.contentBlocks?.length === nextMsg.contentBlocks?.length &&
     prevMsg.showStatus === nextMsg.showStatus &&
     prevMsg.imageAttachments?.length === nextMsg.imageAttachments?.length &&
-    prevMsg.excelAttachments?.length === nextMsg.excelAttachments?.length
+    prevMsg.excelAttachments?.length === nextMsg.excelAttachments?.length &&
+    prevMsg.documentAttachments?.length === nextMsg.documentAttachments?.length
   );
 });

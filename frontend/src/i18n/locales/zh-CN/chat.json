@@ -126,7 +126,10 @@
     "excelFormatError": "仅支持 .xlsx 和 .xls 格式的 Excel 文件",
     "excelSizeError": "Excel 文件大小不能超过 20MB",
     "excelCountError": "每条消息最多附加 {{maxCount}} 个 Excel 文件",
-    "totalCountError": "每条消息最多附加 {{maxCount}} 个附件（图片 + Excel）",
+    "documentFormatError": "仅支持 .doc、.docx、.md 和 .txt 格式的文档文件",
+    "documentSizeError": "文档文件大小不能超过 20MB",
+    "documentCountError": "每条消息最多附加 {{maxCount}} 个文档文件",
+    "totalCountError": "每条消息最多附加 {{maxCount}} 个附件",
     "addAttachment": "添加附件"
   }
 }

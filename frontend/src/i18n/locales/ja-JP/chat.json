@@ -125,7 +125,10 @@
     "excelFormatError": ".xlsxおよび.xls形式のExcelファイルのみサポートされています",
     "excelSizeError": "Excelファイルサイズは20MBを超えることはできません",
     "excelCountError": "1メッセージあたり最大{{maxCount}}個のExcelファイルを添付できます",
-    "totalCountError": "1メッセージあたり最大{{maxCount}}個の添付ファイル（画像 + Excel）",
+    "documentFormatError": ".doc、.docx、.md、.txt形式のドキュメントファイルのみサポートされています",
+    "documentSizeError": "ドキュメントファイルサイズは20MBを超えることはできません",
+    "documentCountError": "1メッセージあたり最大{{maxCount}}個のドキュメントファイルを添付できます",
+    "totalCountError": "1メッセージあたり最大{{maxCount}}個の添付ファイル",
     "addAttachment": "添付ファイルを追加"
   }
 }

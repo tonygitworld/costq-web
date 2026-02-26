@@ -1,0 +1,58 @@
+.documentList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.documentCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #f5f5f5;
+  border: 1px solid #e8e8e8;
+  max-width: 280px;
+}
+
+:global(.dark) .documentCard {
+  background: #2a2a2a;
+  border-color: #434343;
+}
+
+.documentIcon {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.documentInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.documentFileName {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+:global(.dark) .documentFileName {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.documentFileSize {
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.45);
+  line-height: 1.3;
+}
+
+:global(.dark) .documentFileSize {
+  color: rgba(255, 255, 255, 0.45);
+}

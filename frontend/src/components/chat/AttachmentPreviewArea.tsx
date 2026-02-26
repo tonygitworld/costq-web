@@ -1,15 +1,18 @@
 import { type FC } from 'react';
 import { Image } from 'antd';
-import { CloseCircleFilled, FileExcelOutlined } from '@ant-design/icons';
+import { CloseCircleFilled, FileExcelOutlined, FileWordOutlined, FileMarkdownOutlined, FileTextOutlined } from '@ant-design/icons';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { ImageAttachment, ExcelAttachment } from '../../types/chat';
+import type { ImageAttachment, ExcelAttachment, DocumentAttachment } from '../../types/chat';
+import { getDocumentType } from '../../utils/documentUtils';
 import styles from './AttachmentPreviewArea.module.css';
 
 interface AttachmentPreviewAreaProps {
   imageAttachments: ImageAttachment[];
   excelAttachments: ExcelAttachment[];
+  documentAttachments: DocumentAttachment[];
   onRemoveImage: (id: string) => void;
   onRemoveExcel: (id: string) => void;
+  onRemoveDocument: (id: string) => void;
 }
 
 /**
@@ -28,13 +31,29 @@ const itemAnimation = {
   transition: { duration: 0.2 },
 };
 
+/**
+ * 根据文档子类型返回对应的图标组件和颜色
+ */
+function getDocumentIcon(docType: 'word' | 'markdown' | 'text') {
+  switch (docType) {
+    case 'word':
+      return { icon: <FileWordOutlined className={styles.documentIcon} style={{ color: '#2b579a' }} />, color: '#2b579a' };
+    case 'markdown':
+      return { icon: <FileMarkdownOutlined className={styles.documentIcon} style={{ color: '#333333' }} />, color: '#333333' };
+    case 'text':
+      return { icon: <FileTextOutlined className={styles.documentIcon} style={{ color: '#666666' }} />, color: '#666666' };
+  }
+}
+
 export const AttachmentPreviewArea: FC<AttachmentPreviewAreaProps> = ({
   imageAttachments,
   excelAttachments,
+  documentAttachments,
   onRemoveImage,
   onRemoveExcel,
+  onRemoveDocument,
 }) => {
-  if (imageAttachments.length === 0 && excelAttachments.length === 0) return null;
+  if (imageAttachments.length === 0 && excelAttachments.length === 0 && documentAttachments.length === 0) return null;
 
   return (
     <div className={styles.attachmentPreviewArea}>
@@ -101,6 +120,41 @@ export const AttachmentPreviewArea: FC<AttachmentPreviewAreaProps> = ({
             </button>
           </motion.div>
         ))}
+      </AnimatePresence>
+
+      {/* Document file cards (Word / Markdown / Text) */}
+      <AnimatePresence>
+        {documentAttachments.map((attachment) => {
+          const docType = getDocumentType(attachment.mimeType, attachment.fileName);
+          const { icon } = getDocumentIcon(docType);
+          return (
+            <motion.div
+              key={attachment.id}
+              className={styles.documentPreviewCard}
+              {...itemAnimation}
+            >
+              {icon}
+              <div className={styles.documentInfo}>
+                <span className={styles.documentFileName} title={attachment.fileName}>
+                  {attachment.fileName}
+                </span>
+                <span className={styles.documentFileSize}>
+                  {formatFileSize(attachment.fileSize)}
+                </span>
+              </div>
+              <button
+                className={styles.removeBtn}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onRemoveDocument(attachment.id);
+                }}
+                aria-label={`删除 ${attachment.fileName}`}
+              >
+                <CloseCircleFilled />
+              </button>
+            </motion.div>
+          );
+        })}
       </AnimatePresence>
     </div>
   );

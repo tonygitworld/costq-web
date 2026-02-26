@@ -12,10 +12,12 @@ import { PromptTemplatesPopoverContent } from './PromptTemplatesPopoverContent';
 import { useI18n } from '../../hooks/useI18n';
 import { useImageAttachments } from '../../hooks/useImageAttachments';
 import { useExcelAttachments } from '../../hooks/useExcelAttachments';
+import { useDocumentAttachments } from '../../hooks/useDocumentAttachments';
 import { FilePickerButton } from './FilePickerButton';
 import { AttachmentPreviewArea } from './AttachmentPreviewArea';
 import { IMAGE_CONSTRAINTS } from '../../utils/imageUtils';
 import { EXCEL_CONSTRAINTS } from '../../utils/excelUtils';
+import { isDocumentFile } from '../../utils/documentUtils';
 import { createChatSession, convertBackendSession } from '../../services/chatApi';
 import { logger } from '../../utils/logger';
 import '../styles/AIChatInput.css';
@@ -41,20 +43,24 @@ export const MessageInput: FC = () => {
 
   const { attachments: imageAttachments, addImages, removeImage, clearAttachments: clearImageAttachments, isProcessing: isImageProcessing } = useImageAttachments();
   const { attachments: excelAttachments, addExcelFiles, removeExcel, clearAttachments: clearExcelAttachments, isProcessing: isExcelProcessing } = useExcelAttachments();
+  const { attachments: documentAttachments, addDocumentFiles, removeDocument, clearAttachments: clearDocumentAttachments, isProcessing: isDocumentProcessing } = useDocumentAttachments();
 
-  const isProcessing = isImageProcessing || isExcelProcessing;
+  const isProcessing = isImageProcessing || isExcelProcessing || isDocumentProcessing;
 
   // 文件选择回调：按 MIME 类型分流
   const handleFilesSelected = useCallback((files: FileList) => {
     const fileArray = Array.from(files);
     const imageFiles: File[] = [];
     const excelFiles: File[] = [];
+    const documentFiles: File[] = [];
 
     for (const file of fileArray) {
       if (file.type.startsWith('image/')) {
         imageFiles.push(file);
       } else if (EXCEL_CONSTRAINTS.ALLOWED_TYPES.includes(file.type as any)) {
         excelFiles.push(file);
+      } else if (isDocumentFile(file)) {
+        documentFiles.push(file);
       }
       // Other file types are silently ignored
     }
@@ -63,9 +69,12 @@ export const MessageInput: FC = () => {
       addImages(imageFiles);
     }
     if (excelFiles.length > 0) {
-      addExcelFiles(excelFiles, imageAttachments.length);
+      addExcelFiles(excelFiles, imageAttachments.length, documentAttachments.length);
     }
-  }, [addImages, addExcelFiles, imageAttachments.length]);
+    if (documentFiles.length > 0) {
+      addDocumentFiles(documentFiles, imageAttachments.length, excelAttachments.length);
+    }
+  }, [addImages, addExcelFiles, addDocumentFiles, imageAttachments.length, excelAttachments.length, documentAttachments.length]);
 
   // 存储账号+服务组合
   const [accountServicePairs, setAccountServicePairs] = useState<Array<{
@@ -165,12 +174,15 @@ export const MessageInput: FC = () => {
     if (files.length > 0) {
       const imageFiles: File[] = [];
       const excelFiles: File[] = [];
+      const documentFiles: File[] = [];
 
       for (const file of Array.from(files)) {
         if (IMAGE_CONSTRAINTS.ALLOWED_TYPES.includes(file.type as any)) {
           imageFiles.push(file);
         } else if (EXCEL_CONSTRAINTS.ALLOWED_TYPES.includes(file.type as any)) {
           excelFiles.push(file);
+        } else if (isDocumentFile(file)) {
+          documentFiles.push(file);
         }
         // Other file types are silently ignored
       }
@@ -179,10 +191,13 @@ export const MessageInput: FC = () => {
         addImages(imageFiles);
       }
       if (excelFiles.length > 0) {
-        addExcelFiles(excelFiles, imageAttachments.length);
+        addExcelFiles(excelFiles, imageAttachments.length, documentAttachments.length);
+      }
+      if (documentFiles.length > 0) {
+        addDocumentFiles(documentFiles, imageAttachments.length, excelAttachments.length);
       }
     }
-  }, [loading, addImages, addExcelFiles, imageAttachments.length]);
+  }, [loading, addImages, addExcelFiles, addDocumentFiles, imageAttachments.length, excelAttachments.length, documentAttachments.length]);
 
   // ✅ 剪贴板粘贴图片处理
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
@@ -298,6 +313,7 @@ export const MessageInput: FC = () => {
         content: message.trim(),
         imageAttachments: imageAttachments.length > 0 ? imageAttachments : undefined,
         excelAttachments: excelAttachments.length > 0 ? excelAttachments : undefined,
+        documentAttachments: documentAttachments.length > 0 ? documentAttachments : undefined,
         meta: {
           status: 'completed',
           isStreaming: false,
@@ -339,6 +355,7 @@ export const MessageInput: FC = () => {
       const currentMessage = message.trim();
       const currentAttachments = [...imageAttachments]; // 保存当前附件引用
       const currentExcelAttachments = [...excelAttachments]; // 保存当前 Excel 附件引用
+      const currentDocumentAttachments = [...documentAttachments]; // 保存当前文档附件引用
       setMessage('');
       if (textAreaRef.current) {
         textAreaRef.current.style.height = 'auto';
@@ -370,13 +387,15 @@ export const MessageInput: FC = () => {
         sessionIdToSend,
         selectedModelId,
         currentAttachments.length > 0 ? currentAttachments : undefined,
-        currentExcelAttachments.length > 0 ? currentExcelAttachments : undefined
+        currentExcelAttachments.length > 0 ? currentExcelAttachments : undefined,
+        currentDocumentAttachments.length > 0 ? currentDocumentAttachments : undefined
       );
       logger.debug('📤 [MessageInput] 已发送查询，Query ID:', queryId);
 
       // ✅ sendQuery 已通过闭包捕获附件数据，此时清空附件状态安全
       clearImageAttachments();
       clearExcelAttachments();
+      clearDocumentAttachments();
     } catch (error) {
       logger.error('❌ [MessageInput] 发送消息失败:', error);
     }
@@ -409,8 +428,10 @@ export const MessageInput: FC = () => {
           <AttachmentPreviewArea
             imageAttachments={imageAttachments}
             excelAttachments={excelAttachments}
+            documentAttachments={documentAttachments}
             onRemoveImage={removeImage}
             onRemoveExcel={removeExcel}
+            onRemoveDocument={removeDocument}
           />
           <textarea
             ref={textAreaRef}
