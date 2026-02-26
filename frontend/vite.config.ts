@@ -4,6 +4,10 @@ import { resolve } from 'path'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
+  // 🌍 环境适配：
+  // - 本地开发：base = '/static/react-build/' (FastAPI 提供静态文件)
+  // - 生产环境：base = '/' (Nginx 直接提供静态文件)
+  base: mode === 'production' ? '/' : '/static/react-build/',
   plugins: [
     react(),
   ],

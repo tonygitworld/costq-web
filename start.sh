@@ -15,9 +15,9 @@ if [ ! -d "frontend/node_modules" ]; then
     cd frontend && npm install && cd ..
 fi
 
-# 构建前端
+# 构建前端（本地模式：base='/static/react-build/'，由 FastAPI 提供静态文件）
 echo "🔨 构建前端..."
-cd frontend && npm run build && cd ..
+cd frontend && npm run build:local && cd ..
 
 if [ $? -ne 0 ]; then
     echo "❌ 前端构建失败"

@@ -341,16 +341,8 @@ async def get_index(response: Response):
         response.headers["Pragma"] = "no-cache"
         response.headers["Expires"] = "0"
 
-        # 修正静态资源路径
-        html_content = html_content.replace('href="/assets/', 'href="/static/react-build/assets/')
-        html_content = html_content.replace('src="/assets/', 'src="/static/react-build/assets/')
-        html_content = html_content.replace(
-            'href="/vite.svg"', 'href="/static/react-build/vite.svg"'
-        )
-        html_content = html_content.replace(
-            'href="/cloud-icon.svg"', 'href="/static/react-build/cloud-icon.svg"'
-        )
-
+        # ✅ 本地开发环境：Vite 使用 base: '/static/react-build/'
+        # ✅ 生产环境：不使用此代码（Nginx 直接提供静态文件）
         return HTMLResponse(content=html_content)
 
     return {
