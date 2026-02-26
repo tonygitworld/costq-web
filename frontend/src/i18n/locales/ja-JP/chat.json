@@ -118,17 +118,11 @@
     "configureButton": "クラウドアカウントを設定"
   },
   "attachment": {
-    "imageFormatError": "JPEG、PNG、GIF、WebP形式のみサポートされています",
-    "imageSizeError": "画像サイズは10MBを超えることはできません",
-    "imageCountError": "1メッセージあたり最大{{maxCount}}枚の画像を添付できます",
-    "imageCorruptError": "このファイルは画像として読み込めません",
-    "excelFormatError": ".xlsxおよび.xls形式のExcelファイルのみサポートされています",
-    "excelSizeError": "Excelファイルサイズは20MBを超えることはできません",
-    "excelCountError": "1メッセージあたり最大{{maxCount}}個のExcelファイルを添付できます",
-    "documentFormatError": ".doc、.docx、.md、.txt形式のドキュメントファイルのみサポートされています",
-    "documentSizeError": "ドキュメントファイルサイズは20MBを超えることはできません",
-    "documentCountError": "1メッセージあたり最大{{maxCount}}個のドキュメントファイルを添付できます",
-    "totalCountError": "1メッセージあたり最大{{maxCount}}個の添付ファイル",
-    "addAttachment": "添付ファイルを追加"
+    "countExceeded": "追加できません：最大{{max}}個の添付ファイルまで",
+    "totalSizeExceeded": "追加できません：添付ファイルの合計サイズが{{max}}を超えています",
+    "typeNotAllowed": "サポートされていないファイル形式：{{fileName}}",
+    "limitReached": "添付ファイルの上限に達しました（最大3個）",
+    "addAttachment": "添付ファイルを追加",
+    "status": "{{count}}/3個のファイル、合計{{size}}/20MB"
   }
 }

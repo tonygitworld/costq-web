@@ -9,7 +9,7 @@ from typing import Optional
 
 from fastapi import Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from ..api.agent_provider import get_agent_provider
 from ..utils.auth import get_current_user
@@ -27,19 +27,25 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 
 # 附件限制常量
-_MAX_IMAGES = 5
-_MAX_FILES = 3
-_MAX_IMAGE_SIZE_MB = 5
-_MAX_FILE_SIZE_MB = 10
-_ALLOWED_IMAGE_MIME_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
-_ALLOWED_FILE_MIME_TYPES = {
+# 规范: 最多 3 个附件，总大小不超过 20MB
+_MAX_ATTACHMENTS = 3
+_MAX_TOTAL_SIZE_MB = 20
+_ALLOWED_MIME_TYPES = {
+    # 图片
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    # Excel
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     "application/vnd.ms-excel",
+    # 文档
     "application/pdf",
     "text/csv",
     "text/plain",
     "application/msword",
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "text/markdown",
 }
 
 
@@ -59,42 +65,84 @@ class SSEQueryRequestV2(BaseModel):
     account_ids: Optional[list[str]] = Field(None, description="AWS 账号ID列表")
     gcp_account_ids: Optional[list[str]] = Field(None, description="GCP 账号ID列表")
     model_id: Optional[str] = Field(None, description="AI 模型 ID")
-    images: Optional[list[ImageData]] = Field(None, description="图片附件列表（可选）", max_length=_MAX_IMAGES)
-    files: Optional[list[ImageData]] = Field(None, description="文件附件列表（Excel 等，可选）", max_length=_MAX_FILES)
+    images: Optional[list[ImageData]] = Field(None, description="图片附件列表（可选）")
+    files: Optional[list[ImageData]] = Field(None, description="文件附件列表（Excel/文档，可选）")
+
+    @field_validator("images", "files")
+    @classmethod
+    def validate_attachments(cls, v):
+        """验证附件：数量和总大小限制"""
+        if not v:
+            return v
+        return v
 
     @field_validator("images")
     @classmethod
-    def validate_images(cls, images):
+    def validate_images_count(cls, images, info):
+        """验证图片数量"""
         if not images:
             return images
-        max_bytes = _MAX_IMAGE_SIZE_MB * 1024 * 1024
+
+        # 获取所有附件进行统一验证
+        files = info.data.get("files") or []
+        total_count = len(images) + len(files)
+
+        if total_count > _MAX_ATTACHMENTS:
+            raise ValueError(f"附件总数超过限制（最多 {_MAX_ATTACHMENTS} 个）")
+
+        # 验证 MIME 类型
         for img in images:
-            if img.mime_type not in _ALLOWED_IMAGE_MIME_TYPES:
-                raise ValueError(f"不支持的图片类型: {img.mime_type}，允许: {_ALLOWED_IMAGE_MIME_TYPES}")
-            try:
-                size = len(base64.b64decode(img.base64_data))
-            except Exception:
-                raise ValueError(f"图片 {img.file_name} 的 base64 数据无效")
-            if size > max_bytes:
-                raise ValueError(f"图片 {img.file_name} 超过大小限制（最大 {_MAX_IMAGE_SIZE_MB}MB）")
+            if img.mime_type not in _ALLOWED_MIME_TYPES:
+                raise ValueError(f"不支持的图片类型: {img.mime_type}")
+
         return images
 
     @field_validator("files")
     @classmethod
-    def validate_files(cls, files):
+    def validate_files_count(cls, files, info):
+        """验证文件数量"""
         if not files:
             return files
-        max_bytes = _MAX_FILE_SIZE_MB * 1024 * 1024
+
+        # 获取所有附件进行统一验证
+        images = info.data.get("images") or []
+        total_count = len(images) + len(files)
+
+        if total_count > _MAX_ATTACHMENTS:
+            raise ValueError(f"附件总数超过限制（最多 {_MAX_ATTACHMENTS} 个）")
+
+        # 验证 MIME 类型
         for f in files:
-            if f.mime_type not in _ALLOWED_FILE_MIME_TYPES:
-                raise ValueError(f"不支持的文件类型: {f.mime_type}，允许: {_ALLOWED_FILE_MIME_TYPES}")
-            try:
-                size = len(base64.b64decode(f.base64_data))
-            except Exception:
-                raise ValueError(f"文件 {f.file_name} 的 base64 数据无效")
-            if size > max_bytes:
-                raise ValueError(f"文件 {f.file_name} 超过大小限制（最大 {_MAX_FILE_SIZE_MB}MB）")
+            if f.mime_type not in _ALLOWED_MIME_TYPES:
+                raise ValueError(f"不支持的文件类型: {f.mime_type}")
+
         return files
+
+    @model_validator(mode="after")
+    def validate_total_size(self):
+        """验证附件总大小"""
+        images = self.images or []
+        files = self.files or []
+        all_attachments = images + files
+
+        if not all_attachments:
+            return self
+
+        # 计算总大小
+        total_size = 0
+        max_bytes = _MAX_TOTAL_SIZE_MB * 1024 * 1024
+
+        for att in all_attachments:
+            try:
+                size = len(base64.b64decode(att.base64_data))
+                total_size += size
+            except Exception:
+                raise ValueError(f"文件 {att.file_name} 的 base64 数据无效")
+
+        if total_size > max_bytes:
+            raise ValueError(f"附件总大小超过 {_MAX_TOTAL_SIZE_MB}MB 限制")
+
+        return self
 
     class Config:
         json_schema_extra = {
