@@ -444,7 +444,7 @@ export const MessageInput: FC = () => {
             placeholder={
               hasSelectedAccount
                 ? t('input.placeholder')
-                : "⚠️ 请先在右下角选择云账号以开始成本分析"
+                : t('input.placeholderNoAccount')
             }
             className={`ai-chat-textarea ${!hasSelectedAccount ? 'warning-placeholder' : ''}`}
             rows={1}

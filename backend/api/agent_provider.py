@@ -144,7 +144,6 @@ class AWSBedrockAgentProvider(AgentProvider):
                 "org_id": org_id,
                 "query_id": query_id,
                 "session_id": session_id,
-                "query": query,
                 "query_length": len(query),
                 "account_ids": account_ids,
                 "gcp_account_ids": gcp_account_ids,
@@ -505,27 +504,6 @@ class AWSBedrockAgentProvider(AgentProvider):
 
                         if cancel_event and cancel_event.is_set():
                             logger.info("用户取消查询 - QueryID: %s", query_id)
-
-                            # ✅ 停止 AWS Bedrock Session（如果有 session_id）
-                            if session_id:
-                                try:
-                                    success = client.stop_runtime_session(session_id)
-                                    if success:
-                                        logger.info("已停止 AWS Bedrock Session - SessionID: %s, Query: %s", session_id, query_id)
-                                    else:
-                                        logger.warning("停止 AWS Bedrock Session 失败 - SessionID: %s, Query: %s", session_id, query_id)
-                                except Exception as e:
-                                    logger.warning("停止 AWS Bedrock Session 异常 - SessionID: %s, Query: %s, Error: %s", session_id, query_id, e)
-
-                            yield {
-                                "type": "generation_cancelled",
-                                "query_id": query_id,
-                                "message": "生成已取消",
-                            }
-                            break
-
-                        if cancel_event and cancel_event.is_set():
-                            logger.info("二次取消检查命中 - QueryID: %s", query_id)
 
                             # ✅ 停止 AWS Bedrock Session（如果有 session_id）
                             if session_id:

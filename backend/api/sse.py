@@ -1,14 +1,15 @@
 """SSE API端点 - 网络 Handler 层，只负责 HTTP/SSE 处理"""
 
 import asyncio
+import base64
 import json
 import time
 import uuid
 from typing import Optional
 
-from fastapi import Depends, Request
+from fastapi import Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from ..api.agent_provider import get_agent_provider
 from ..utils.auth import get_current_user
@@ -25,8 +26,25 @@ logger = logging.getLogger(__name__)
 # SSE 查询接口 V2（新版本）
 # ============================================================================
 
+# 附件限制常量
+_MAX_IMAGES = 5
+_MAX_FILES = 3
+_MAX_IMAGE_SIZE_MB = 5
+_MAX_FILE_SIZE_MB = 10
+_ALLOWED_IMAGE_MIME_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
+_ALLOWED_FILE_MIME_TYPES = {
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-excel",
+    "application/pdf",
+    "text/csv",
+    "text/plain",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+}
+
+
 class ImageData(BaseModel):
-    """图片数据"""
+    """图片/文件附件数据"""
     file_name: str = Field(..., description="文件名")
     mime_type: str = Field(..., description="MIME 类型")
     base64_data: str = Field(..., description="Base64 编码数据（不含 data URI 前缀）")
@@ -35,14 +53,48 @@ class ImageData(BaseModel):
 class SSEQueryRequestV2(BaseModel):
     """SSE 查询请求 V2"""
 
-    query: str = Field(..., description="用户查询内容", min_length=1)
+    query: str = Field(..., description="用户查询内容", min_length=1, max_length=10000)
     query_id: Optional[str] = Field(None, description="查询ID（可选，如果不提供则自动生成）")
     session_id: Optional[str] = Field(None, description="会话ID（可选，如果不提供则创建新会话）")
     account_ids: Optional[list[str]] = Field(None, description="AWS 账号ID列表")
     gcp_account_ids: Optional[list[str]] = Field(None, description="GCP 账号ID列表")
     model_id: Optional[str] = Field(None, description="AI 模型 ID")
-    images: Optional[list[ImageData]] = Field(None, description="图片附件列表（可选）")
-    files: Optional[list[ImageData]] = Field(None, description="文件附件列表（Excel 等，可选）")
+    images: Optional[list[ImageData]] = Field(None, description="图片附件列表（可选）", max_length=_MAX_IMAGES)
+    files: Optional[list[ImageData]] = Field(None, description="文件附件列表（Excel 等，可选）", max_length=_MAX_FILES)
+
+    @field_validator("images")
+    @classmethod
+    def validate_images(cls, images):
+        if not images:
+            return images
+        max_bytes = _MAX_IMAGE_SIZE_MB * 1024 * 1024
+        for img in images:
+            if img.mime_type not in _ALLOWED_IMAGE_MIME_TYPES:
+                raise ValueError(f"不支持的图片类型: {img.mime_type}，允许: {_ALLOWED_IMAGE_MIME_TYPES}")
+            try:
+                size = len(base64.b64decode(img.base64_data))
+            except Exception:
+                raise ValueError(f"图片 {img.file_name} 的 base64 数据无效")
+            if size > max_bytes:
+                raise ValueError(f"图片 {img.file_name} 超过大小限制（最大 {_MAX_IMAGE_SIZE_MB}MB）")
+        return images
+
+    @field_validator("files")
+    @classmethod
+    def validate_files(cls, files):
+        if not files:
+            return files
+        max_bytes = _MAX_FILE_SIZE_MB * 1024 * 1024
+        for f in files:
+            if f.mime_type not in _ALLOWED_FILE_MIME_TYPES:
+                raise ValueError(f"不支持的文件类型: {f.mime_type}，允许: {_ALLOWED_FILE_MIME_TYPES}")
+            try:
+                size = len(base64.b64decode(f.base64_data))
+            except Exception:
+                raise ValueError(f"文件 {f.file_name} 的 base64 数据无效")
+            if size > max_bytes:
+                raise ValueError(f"文件 {f.file_name} 超过大小限制（最大 {_MAX_FILE_SIZE_MB}MB）")
+        return files
 
     class Config:
         json_schema_extra = {
@@ -101,14 +153,15 @@ async def sse_query_endpoint_v2(
     gcp_account_ids_list = query_request.gcp_account_ids or []
 
     logger.info(
-        f"💬 [SSE查询V2] 用户 {username} 发送查询: {query_request.query[:100]}{'...' if len(query_request.query) > 100 else ''}",
+        "💬 [SSE查询V2] 用户 %s 发送查询（长度: %d）",
+        username,
+        len(query_request.query),
         extra={
             "user_id": user_id,
             "username": username,
             "org_id": org_id,
             "query_id": query_id,
             "session_id": query_request.session_id,
-            "query": query_request.query,
             "query_length": len(query_request.query),
             "account_ids": account_ids_list,
             "gcp_account_ids": gcp_account_ids_list,
