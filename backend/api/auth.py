@@ -876,11 +876,11 @@ async def reset_password(request_body: ResetPasswordRequest, request: Request):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ 密码重置失败: {str(e)}")
+        logger.error("❌ 密码重置失败", exc_info=True)
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"密码重置失败: {str(e)}",
+            detail="密码重置失败，请稍后重试",
         )
     finally:
         db.close()

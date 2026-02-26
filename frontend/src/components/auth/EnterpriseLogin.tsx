@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Form, Input, Button, App as AntdApp } from 'antd';
 import { Mail, Lock } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
+import { UnauthorizedError, ForbiddenError, ApiClientError } from '../../services/errors';
 import { useI18n } from '../../hooks/useI18n';
 import { AuthLayout } from './AuthLayout';
 import { FormCard } from './FormCard';
@@ -15,7 +16,7 @@ const EnterpriseLoginForm: React.FC = () => {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const login = useAuthStore((state) => state.login);
   const { t } = useI18n('auth');
-  const { message } = AntdApp.useApp();
+  const { message, modal } = AntdApp.useApp();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -32,12 +33,39 @@ const EnterpriseLoginForm: React.FC = () => {
       await login(values.email, values.password);
       message.success(t('login.success.login'));
       navigate('/chat');
-    } catch (error: any) {
-      message.error(t('login.errors.invalidCredentials'));
+    } catch (error: unknown) {
+      // 通过 ApiClientError.code 判断错误类型
+      const errorCode = error instanceof ApiClientError ? error.code : undefined;
+
+      if (errorCode === 'TENANT_INACTIVE') {
+        modal.warning({
+          title: t('login.errors.tenantInactive'),
+          content: error instanceof Error ? error.message : t('login.errors.tenantInactiveDesc'),
+          okText: t('login.errors.understood'),
+        });
+        return;
+      }
+
+      if (errorCode === 'USER_DISABLED' || errorCode === 'ACCOUNT_DISABLED') {
+        modal.error({
+          title: t('login.errors.accountDisabled'),
+          content: t('login.errors.accountDisabledDesc'),
+          okText: t('login.errors.understood'),
+        });
+        return;
+      }
+
+      if (error instanceof ForbiddenError) {
+        message.error(t('login.errors.accountDisabled'));
+      } else if (error instanceof UnauthorizedError) {
+        message.error(t('login.errors.invalidCredentials'));
+      } else {
+        message.error(error instanceof Error ? error.message : t('login.errors.loginFailed'));
+      }
     } finally {
       setLoading(false);
     }
-  }, [login, navigate, t, message]);
+  }, [login, navigate, t, message, modal]);
 
   return (
     <AuthLayout>
