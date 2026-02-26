@@ -132,5 +132,10 @@
     "accountId": "账号ID",
     "region": "区域",
     "verified": "已验证"
+  },
+  "forbidden": {
+    "title": "403",
+    "subTitle": "抱歉，您没有权限访问此页面",
+    "backButton": "返回上一页"
   }
 }

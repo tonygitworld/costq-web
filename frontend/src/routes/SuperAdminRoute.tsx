@@ -10,11 +10,12 @@ import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Result, Button } from 'antd';
 import { useAuthStore } from '../stores/authStore';
-
+import { useI18n } from '../hooks/useI18n';
 import { logger } from '../utils/logger';
 
 export const SuperAdminRoute: React.FC = () => {
   const location = useLocation();
+  const { t } = useI18n('common');
   const { isAuthenticated, isSuperAdmin, user } = useAuthStore();
 
   // 调试日志
@@ -35,11 +36,11 @@ export const SuperAdminRoute: React.FC = () => {
     return (
       <Result
         status="403"
-        title="403"
-        subTitle="抱歉，您没有权限访问此页面"
+        title={t('forbidden.title')}
+        subTitle={t('forbidden.subTitle')}
         extra={
           <Button type="primary" onClick={() => window.history.back()}>
-            返回上一页
+            {t('forbidden.backButton')}
           </Button>
         }
       />

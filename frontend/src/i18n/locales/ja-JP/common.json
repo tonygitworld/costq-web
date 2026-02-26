@@ -132,5 +132,10 @@
     "accountId": "アカウントID",
     "region": "リージョン",
     "verified": "検証済み"
+  },
+  "forbidden": {
+    "title": "403",
+    "subTitle": "申し訳ございません。このページにアクセスする権限がありません",
+    "backButton": "戻る"
   }
 }
