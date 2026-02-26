@@ -104,6 +104,35 @@
     "activeUsers": "アクティブユーザー",
     "queries": "クエリ数"
   },
+  "tokenUsage": {
+    "title": "トークン使用量統計",
+    "refresh": "更新",
+    "timeRanges": {
+      "7d": "過去7日間",
+      "30d": "過去30日間",
+      "custom": "カスタム"
+    },
+    "summary": {
+      "inputTokens": "入力トークン",
+      "outputTokens": "出力トークン",
+      "cacheReadTokens": "キャッシュ読み取りトークン",
+      "cacheWriteTokens": "キャッシュ書き込みトークン",
+      "totalMessages": "総メッセージ数"
+    },
+    "table": {
+      "orgName": "組織名",
+      "username": "ユーザー名",
+      "inputTokens": "入力トークン",
+      "outputTokens": "出力トークン",
+      "cacheRead": "キャッシュ読み取り",
+      "cacheWrite": "キャッシュ書き込み",
+      "total": "合計",
+      "byOrg": "組織別",
+      "byUser": "ユーザー別",
+      "filterByOrg": "組織でフィルター",
+      "totalRecords": "合計 {{total}} 件"
+    }
+  },
   "common": {
     "confirm": "確認",
     "cancel": "キャンセル",
