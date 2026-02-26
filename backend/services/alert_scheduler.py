@@ -171,7 +171,9 @@ class AlertScheduler:
                 f"📅 定时任务: 每天 {self.execution_hour:02d}:{self.execution_minute:02d} ({self.timezone_str})"
             )
             if next_run:
-                logger.info("⏰ 下次执行: {next_run.strftime('%Y-%m-%d %H:%M:%S %Z')}")
+                logger.info(
+                    f"⏰ 下次执行: {next_run.strftime('%Y-%m-%d %H:%M:%S %Z')}"
+                )
             logger.info("=" * 60)
 
         except Exception as e:
@@ -341,7 +343,7 @@ class AlertScheduler:
                 logger.info("   已执行: 0")
                 logger.info("   : %s", skipped_count)
                 logger.info("   原因: 所有告警今天已经执行过")
-                logger.info("   ⏱️  总耗时: {duration:.2f}秒")
+                logger.info(f"   ⏱️  总耗时: {duration:.2f}秒")
 
                 # ============ 列出每个被跳过的告警 ============
                 if alerts:
@@ -384,7 +386,7 @@ class AlertScheduler:
             logger.info("   : %s", skipped_count)
             logger.info("   : %s", success_count)
             logger.info("   : %s", failed_count)
-            logger.info("   ⏱️  总耗时: {duration:.2f}秒")
+            logger.info(f"   ⏱️  总耗时: {duration:.2f}秒")
             logger.info("=" * 80)
 
             return {
