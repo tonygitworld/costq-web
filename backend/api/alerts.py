@@ -45,6 +45,7 @@ async def check_alert_permission(
     current_user: dict,
     db: Session,  # ✅ 直接接收 db session 参数
     require_admin: bool = False,
+    allow_org_read: bool = False,
 ) -> dict:
     """检查用户是否有权限访问告警
 
@@ -53,6 +54,7 @@ async def check_alert_permission(
         current_user: 当前用户
         db: 数据库 Session（从 FastAPI 依赖注入传入）
         require_admin: 是否要求管理员权限
+        allow_org_read: 是否允许同组织用户只读访问
 
     Returns:
         dict: 告警对象的字典表示
@@ -90,7 +92,7 @@ async def check_alert_permission(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="需要管理员权限")
 
     # 普通用户只能访问自己的告警（UUID类型转换）
-    if not is_admin and str(alert.user_id) != str(current_user["id"]):
+    if not is_admin and not allow_org_read and str(alert.user_id) != str(current_user["id"]):
         logger.warning(
             "普通用户尝试访问其他用户的告警 - User: %s, Alert Owner: %s",
             current_user["id"],
@@ -262,12 +264,12 @@ async def get_alert_endpoint(
 
     **说明**:
     - 管理员：可以查看组织内任何告警
-    - 普通用户：只能查看自己的告警
+    - 普通用户：可查看同组织内任意告警
     """
     logger.info("获取告警详情 - User: %s, Alert ID: %s", current_user["username"], alert_id)
 
     # 权限检查（返回字典）
-    alert_dict = await check_alert_permission(alert_id, current_user, db)
+    alert_dict = await check_alert_permission(alert_id, current_user, db, allow_org_read=True)
 
     try:
         # 直接返回告警字典

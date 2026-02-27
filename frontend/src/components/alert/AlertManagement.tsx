@@ -209,7 +209,7 @@ export const AlertManagement: React.FC = () => {
           <div style={{ marginBottom: 4 }}>{text}</div>
           <Space size={4} style={{ fontSize: '12px' }}>
             <span style={{ color: '#999' }}>
-              👤 {record.created_by_username || t('table.unknown')} | 📅 {dayjs(record.created_at).fromNow()}
+              📅 {dayjs(record.created_at).fromNow()}
             </span>
             {record.account_id && (
               <>
@@ -222,6 +222,12 @@ export const AlertManagement: React.FC = () => {
       )
     },
     {
+      title: t('table.columnCreator'),
+      key: 'creator',
+      width: 120,
+      render: (_, record) => record.created_by_username || t('table.unknown')
+    },
+    {
       title: t('table.columnStatus'),
       key: 'status',
       width: 120,
@@ -232,35 +238,43 @@ export const AlertManagement: React.FC = () => {
       key: 'action',
       width: 200,
       fixed: 'right',
-      render: (_, record) => (
-        <Space size="small">
-          <Button
-            type="link"
-            size="small"
-            icon={<EyeOutlined />}
-            onClick={() => navigate(`/settings/alerts/${record.id}`)}
-          >
-            {t('detail')}
-          </Button>
-          <Button
-            type="link"
-            size="small"
-            icon={<EditOutlined />}
-            onClick={() => navigate(`/settings/alerts/edit/${record.id}`)}
-          >
-            {t('edit')}
-          </Button>
-          <Button
-            type="link"
-            size="small"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record)}
-          >
-            {t('delete')}
-          </Button>
-        </Space>
-      )
+      render: (_, record) => {
+        const isOwnerOrAdmin = record.user_id === currentUser?.id || isAdmin;
+
+        return (
+          <Space size="small">
+            <Button
+              type="link"
+              size="small"
+              icon={<EyeOutlined />}
+              onClick={() => navigate(`/settings/alerts/${record.id}`)}
+            >
+              {t('detail')}
+            </Button>
+            {isOwnerOrAdmin && (
+              <>
+                <Button
+                  type="link"
+                  size="small"
+                  icon={<EditOutlined />}
+                  onClick={() => navigate(`/settings/alerts/edit/${record.id}`)}
+                >
+                  {t('edit')}
+                </Button>
+                <Button
+                  type="link"
+                  size="small"
+                  danger
+                  icon={<DeleteOutlined />}
+                  onClick={() => handleDelete(record)}
+                >
+                  {t('delete')}
+                </Button>
+              </>
+            )}
+          </Space>
+        );
+      }
     }
   ];
 

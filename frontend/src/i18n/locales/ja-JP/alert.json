@@ -120,6 +120,7 @@
   "table": {
     "columnName": "名前",
     "columnDescription": "説明",
+    "columnCreator": "作成者",
     "columnStatus": "ステータス",
     "columnActions": "操作",
     "statusEnabled": "有効",

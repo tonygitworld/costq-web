@@ -224,8 +224,6 @@ class AlertService:
                     .filter(MonitoringConfig.org_id == params.org_id)
                 )
 
-                query = query.filter(MonitoringConfig.user_id == params.user_id)
-
                 if params.status_filter == "active":
                     query = query.filter(MonitoringConfig.is_active == True)
                 elif params.status_filter == "inactive":

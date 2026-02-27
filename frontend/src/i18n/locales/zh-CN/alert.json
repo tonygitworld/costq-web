@@ -120,6 +120,7 @@
   "table": {
     "columnName": "名称",
     "columnDescription": "描述",
+    "columnCreator": "创建者",
     "columnStatus": "状态",
     "columnActions": "操作",
     "statusEnabled": "启用",
