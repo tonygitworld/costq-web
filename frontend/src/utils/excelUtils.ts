@@ -13,7 +13,7 @@ export const EXCEL_CONSTRAINTS = {
 } as const;
 
 export const ATTACHMENT_CONSTRAINTS = {
-  MAX_TOTAL_COUNT: 8,  // 图片 + Excel + 文档 总数上限
+  MAX_TOTAL_COUNT: 3,  // 图片 + Excel + 文档 总数上限
 } as const;
 
 export interface ExcelValidationResult {
@@ -35,7 +35,7 @@ function getFileExtension(fileName: string): string {
  * 验证 Excel 文件的格式、大小、数量和附件总数
  *
  * 验证顺序：格式验证（MIME 类型 + 文件扩展名双重检查）→ 大小验证（≤20MB）
- *          → Excel 数量验证（≤3）→ 附件总数验证（图片+Excel ≤8）
+ *          → Excel 数量验证（≤3）→ 附件总数验证（图片+Excel+文档 ≤3）
  */
 export function validateExcelFile(
   file: File,
