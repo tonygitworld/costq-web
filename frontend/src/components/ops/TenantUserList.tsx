@@ -4,7 +4,7 @@
  * 展示指定租户下的用户列表
  */
 import React, { useState } from 'react';
-import { Table, Tag, Typography } from 'antd';
+import { Card, Table, Tag, Typography } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import {
@@ -84,14 +84,13 @@ export const TenantUserList: React.FC<TenantUserListProps> = ({ tenantId }) => {
   ];
 
   return (
-    <div>
-      <Title level={5}>{t('user.table.username')}</Title>
+    <Card>
+      <Title level={5}>{t('tenant.detail.userList', '用户列表')}</Title>
       <Table
         columns={columns}
         dataSource={data?.items}
         rowKey="id"
         loading={isLoading}
-        size="small"
         scroll={{
           x: 1000,
           y: 'calc(50vh - 150px)',
@@ -110,7 +109,7 @@ export const TenantUserList: React.FC<TenantUserListProps> = ({ tenantId }) => {
             setParams({ ...params, page, page_size: pageSize }),
         }}
       />
-    </div>
+    </Card>
   );
 };
 
