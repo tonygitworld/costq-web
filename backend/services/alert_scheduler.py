@@ -87,8 +87,8 @@ class AlertScheduler:
             self.tz = pytz_timezone("UTC")
             self.timezone_str = "UTC"
 
-        # 2. 执行时间：默认 07:00 (用户上班前)
-        self.execution_hour = int(os.getenv("ALERT_SCHEDULER_HOUR", 7))
+        # 2. 执行时间：默认 03:00 (凌晨低峰期)
+        self.execution_hour = int(os.getenv("ALERT_SCHEDULER_HOUR", 3))
         self.execution_minute = int(os.getenv("ALERT_SCHEDULER_MINUTE", 0))
 
         # 3. 并发控制：降低并发数，避免限流
