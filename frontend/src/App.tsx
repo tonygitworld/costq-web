@@ -215,7 +215,7 @@ const AppContent: FC = () => {
       >
         <Route path="dashboard" element={<ChatLayout><OpsDashboard /></ChatLayout>} />
         <Route path="tenants" element={<ChatLayout><TenantList /></ChatLayout>} />
-        <Route path="tenants/:id" element={<ChatLayout><TenantDetail /></ChatLayout>} />
+        <Route path="tenants/:tenantId" element={<ChatLayout><TenantDetail /></ChatLayout>} />
         <Route path="audit-logs" element={<ChatLayout><AuditLogs /></ChatLayout>} />
         <Route path="token-usage" element={<ChatLayout><OpsTokenUsage /></ChatLayout>} />
         {/* 默认跳转 */}
