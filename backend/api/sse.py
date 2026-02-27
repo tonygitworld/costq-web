@@ -27,9 +27,9 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 
 # 附件限制常量
-# 规范: 最多 3 个附件，总大小不超过 20MB
-_MAX_ATTACHMENTS = 3
-_MAX_TOTAL_SIZE_MB = 20
+# 规范: 附件数量无限制，总大小不超过 30MB
+_MAX_ATTACHMENTS = float('inf')  # 无限制
+_MAX_TOTAL_SIZE_MB = 30
 _ALLOWED_MIME_TYPES = {
     # 图片
     "image/jpeg",

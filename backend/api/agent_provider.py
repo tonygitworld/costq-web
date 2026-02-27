@@ -1,7 +1,10 @@
 """Agent Provider - Agent 抽象层，提供查询和取消接口"""
 
 import asyncio
+import base64
+import json
 import time
+import uuid
 from abc import ABC, abstractmethod
 from typing import AsyncIterator
 
@@ -409,6 +412,69 @@ class AWSBedrockAgentProvider(AgentProvider):
 
             logger.info("开始查询 - User: %s, Query: %s", user_id, query_id)
 
+            # 构建附件元数据（不含 base64 内容）
+            metadata = None
+            if images or files:
+                # 定义 MIME 类型分类
+                EXCEL_TYPES = {
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "application/vnd.ms-excel",
+                }
+                IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
+                # 文档类型包括标准 MIME 和可能的变体
+                DOCUMENT_TYPES = {
+                    "application/pdf",
+                    "application/msword",
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    "text/markdown",
+                    "text/plain",
+                    "text/x-markdown",
+                }
+
+                def is_document(f):
+                    """判断文件是否为文档类型（支持 MIME 类型或文件扩展名）"""
+                    if f.mime_type in DOCUMENT_TYPES:
+                        return True
+                    # 根据文件扩展名判断
+                    doc_extensions = {".pdf", ".doc", ".docx", ".md", ".markdown", ".txt"}
+                    return any(f.file_name.lower().endswith(ext) for ext in doc_extensions)
+
+                def get_base64_size(base64_data: str, file_name: str) -> int:
+                    """安全获取 base64 数据大小（字节），失败返回 0"""
+                    try:
+                        return len(base64.b64decode(base64_data))
+                    except Exception as e:
+                        logger.warning(
+                            "附件 base64 解码失败 - file_name: %s, error: %s",
+                            file_name,
+                            e,
+                        )
+                        return 0
+
+                attachments_metadata = {
+                    "images": [
+                        {"id": str(uuid.uuid4()), "fileName": img.file_name,
+                         "fileSize": get_base64_size(img.base64_data, img.file_name),
+                         "mimeType": img.mime_type}
+                        for img in (images or [])
+                    ],
+                    "excels": [
+                        {"id": str(uuid.uuid4()), "fileName": f.file_name,
+                         "fileSize": get_base64_size(f.base64_data, f.file_name),
+                         "mimeType": f.mime_type}
+                        for f in (files or [])
+                        if f.mime_type in EXCEL_TYPES or f.file_name.lower().endswith((".xlsx", ".xls"))
+                    ],
+                    "documents": [
+                        {"id": str(uuid.uuid4()), "fileName": f.file_name,
+                         "fileSize": get_base64_size(f.base64_data, f.file_name),
+                         "mimeType": f.mime_type}
+                        for f in (files or [])
+                        if is_document(f)
+                    ],
+                }
+                metadata = json.dumps({"attachments_metadata": attachments_metadata})
+
             # 保存用户消息（使用 run_in_executor 避免阻塞事件循环）
             if chat_storage and session_id:
                 try:
@@ -419,6 +485,7 @@ class AWSBedrockAgentProvider(AgentProvider):
                             user_id=user_id,
                             message_type="user",
                             content=query,
+                            metadata=metadata,
                         ),
                     )
                 except Exception as e:

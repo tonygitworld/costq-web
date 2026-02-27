@@ -113,7 +113,7 @@ export function useAttachments(): UseAttachmentsReturn {
         return {
           valid: false,
           error: t('attachment.totalSizeExceeded', {
-            max: '20MB',
+            max: '30MB',
           }),
           errorType: 'total_size',
         };
@@ -121,7 +121,7 @@ export function useAttachments(): UseAttachmentsReturn {
 
       // 3. 单个文件类型检查
       for (const file of files) {
-        if (!isAllowedFileType(file.type)) {
+        if (!isAllowedFileType(file.type, file.name)) {
           return {
             valid: false,
             error: t('attachment.typeNotAllowed', { fileName: file.name }),
@@ -136,11 +136,47 @@ export function useAttachments(): UseAttachmentsReturn {
   );
 
   /**
+   * 根据文件扩展名推断 MIME 类型
+   * 用于浏览器返回空 MIME 类型的情况（如 .md 文件）
+   */
+  function inferMimeType(fileName: string, browserMimeType: string): string {
+    // 如果浏览器返回了有效的 MIME 类型，直接使用
+    if (browserMimeType && browserMimeType !== '') {
+      return browserMimeType;
+    }
+
+    // 根据扩展名推断 MIME 类型
+    const ext = fileName.toLowerCase().split('.').pop();
+    const mimeTypeMap: Record<string, string> = {
+      // 图片
+      'jpg': 'image/jpeg',
+      'jpeg': 'image/jpeg',
+      'png': 'image/png',
+      'gif': 'image/gif',
+      'webp': 'image/webp',
+      // Excel
+      'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'xls': 'application/vnd.ms-excel',
+      // 文档
+      'pdf': 'application/pdf',
+      'doc': 'application/msword',
+      'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'md': 'text/markdown',
+      'markdown': 'text/markdown',
+      'txt': 'text/plain',
+    };
+
+    return mimeTypeMap[ext || ''] || browserMimeType || 'application/octet-stream';
+  }
+
+  /**
    * 处理单个文件
    */
   const processFile = useCallback(
     async (file: File): Promise<Attachment | null> => {
-      const category = getFileCategory(file.type);
+      // 推断正确的 MIME 类型（处理浏览器返回空 type 的情况）
+      const mimeType = inferMimeType(file.name, file.type);
+      const category = getFileCategory(mimeType, file.name);
 
       try {
         if (category === 'image') {
@@ -169,13 +205,13 @@ export function useAttachments(): UseAttachmentsReturn {
             type: category,
             fileName: file.name,
             fileSize: file.size,
-            mimeType: file.type,
+            mimeType: mimeType, // 使用推断的 MIME 类型
             base64Data,
           };
         }
 
         // 未知类型
-        logger.warn('[useAttachments] 未知文件类型:', file.type);
+        logger.warn('[useAttachments] 未知文件类型:', file.type, '推断为:', mimeType);
         return null;
       } catch (error) {
         logger.error('[useAttachments] 处理文件失败:', error);

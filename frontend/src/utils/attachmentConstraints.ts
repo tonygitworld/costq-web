@@ -21,10 +21,10 @@ export type Attachment =
  * 附件约束常量
  */
 export const ATTACHMENT_CONSTRAINTS = {
-  /** 最大附件数量 */
-  MAX_TOTAL_COUNT: 3,
+  /** 最大附件数量（无限制） */
+  MAX_TOTAL_COUNT: Infinity,
   /** 最大总大小（字节） */
-  MAX_TOTAL_SIZE: 20 * 1024 * 1024, // 20MB
+  MAX_TOTAL_SIZE: 30 * 1024 * 1024, // 30MB
 
   /** 允许的文件类型 */
   ALLOWED_TYPES: {
@@ -87,25 +87,37 @@ export function formatSize(bytes: number): string {
 }
 
 /**
- * 检查文件类型是否允许
+ * 检查文件类型是否允许（支持 MIME 类型或文件扩展名）
  * @param mimeType MIME 类型
+ * @param fileName 文件名（可选，用于扩展名判断）
  * @returns 是否允许
  */
-export function isAllowedFileType(mimeType: string): boolean {
+export function isAllowedFileType(mimeType: string, fileName?: string): boolean {
   const allAllowedTypes = [
     ...ATTACHMENT_CONSTRAINTS.ALLOWED_TYPES.IMAGE,
     ...ATTACHMENT_CONSTRAINTS.ALLOWED_TYPES.EXCEL,
     ...ATTACHMENT_CONSTRAINTS.ALLOWED_TYPES.DOCUMENT,
   ];
-  return allAllowedTypes.includes(mimeType as typeof allAllowedTypes[number]);
+  if (allAllowedTypes.includes(mimeType as typeof allAllowedTypes[number])) {
+    return true;
+  }
+  // 根据文件扩展名判断
+  if (fileName) {
+    const ext = fileName.toLowerCase().split('.').pop();
+    const allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'xlsx', 'xls', 'pdf', 'doc', 'docx', 'md', 'markdown', 'txt'];
+    return ext ? allowedExts.includes(ext) : false;
+  }
+  return false;
 }
 
 /**
- * 获取文件类型分类
+ * 获取文件类型分类（支持 MIME 类型或文件扩展名）
  * @param mimeType MIME 类型
+ * @param fileName 文件名（可选，用于扩展名判断）
  * @returns 类型分类
  */
-export function getFileCategory(mimeType: string): 'image' | 'excel' | 'document' | 'unknown' {
+export function getFileCategory(mimeType: string, fileName?: string): 'image' | 'excel' | 'document' | 'unknown' {
+  // 先检查 MIME 类型
   if (ATTACHMENT_CONSTRAINTS.ALLOWED_TYPES.IMAGE.includes(mimeType as typeof ATTACHMENT_CONSTRAINTS.ALLOWED_TYPES.IMAGE[number])) {
     return 'image';
   }
@@ -114,6 +126,13 @@ export function getFileCategory(mimeType: string): 'image' | 'excel' | 'document
   }
   if (ATTACHMENT_CONSTRAINTS.ALLOWED_TYPES.DOCUMENT.includes(mimeType as typeof ATTACHMENT_CONSTRAINTS.ALLOWED_TYPES.DOCUMENT[number])) {
     return 'document';
+  }
+  // 根据文件扩展名判断
+  if (fileName) {
+    const lowerName = fileName.toLowerCase();
+    if (lowerName.match(/\.(jpg|jpeg|png|gif|webp)$/)) return 'image';
+    if (lowerName.match(/\.(xlsx|xls)$/)) return 'excel';
+    if (lowerName.match(/\.(pdf|doc|docx|md|markdown|txt)$/)) return 'document';
   }
   return 'unknown';
 }

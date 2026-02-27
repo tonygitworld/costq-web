@@ -288,6 +288,7 @@ class AgentCoreClient:
 
                 # ✅ 记录 Runtime 调用开始（不区分环境）
                 runtime_session_id = invoke_params.get("runtimeSessionId")
+
                 logger.info(
                     "📤 [Agent Runtime调用] 发送请求到 Runtime",
                     extra={
