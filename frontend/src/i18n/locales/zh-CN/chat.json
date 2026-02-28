@@ -117,5 +117,13 @@
     "subtitle": "开始之前，请先配置您的云账号",
     "description": "配置云账号后，您可以使用 CostQ 进行成本分析、优化建议和账单管理",
     "configureButton": "配置云账号"
+  },
+  "attachment": {
+    "countExceeded": "无法添加：最多支持 {{max}} 个附件",
+    "totalSizeExceeded": "无法添加：附件总大小超过 {{max}} 限制",
+    "typeNotAllowed": "不支持的文件类型：{{fileName}}",
+    "limitReached": "已达到附件上限（最多 3 个）",
+    "addAttachment": "添加附件",
+    "status": "{{count}}/3 个文件，共 {{size}}/20MB"
   }
 }

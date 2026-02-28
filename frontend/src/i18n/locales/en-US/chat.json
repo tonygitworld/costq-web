@@ -116,5 +116,13 @@
     "subtitle": "Before starting, please configure your cloud accounts",
     "description": "After configuring cloud accounts, you can use CostQ for cost analysis, optimization recommendations, and billing management",
     "configureButton": "Configure Cloud Account"
+  },
+  "attachment": {
+    "countExceeded": "Cannot add: Maximum {{max}} attachments allowed",
+    "totalSizeExceeded": "Cannot add: Total attachment size exceeds {{max}} limit",
+    "typeNotAllowed": "Unsupported file type: {{fileName}}",
+    "limitReached": "Attachment limit reached (max 3)",
+    "addAttachment": "Add attachment",
+    "status": "{{count}}/3 files, {{size}}/20MB total"
   }
 }

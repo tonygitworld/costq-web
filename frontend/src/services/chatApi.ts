@@ -204,6 +204,33 @@ export function convertBackendMessage(backendMessage: ChatMessage, chatId: strin
     };
   }
 
+  // ✅ 解析附件元数据（如果存在）
+  let imageAttachments = undefined;
+  let excelAttachments = undefined;
+  let documentAttachments = undefined;
+
+  const attachmentsMetadata = backendMessage.metadata?.attachments_metadata;
+  if (attachmentsMetadata) {
+    imageAttachments = attachmentsMetadata.images?.map((img: any) => ({
+      id: img.id,
+      fileName: img.fileName,
+      fileSize: img.fileSize,
+      mimeType: img.mimeType,
+    }));
+    excelAttachments = attachmentsMetadata.excels?.map((excel: any) => ({
+      id: excel.id,
+      fileName: excel.fileName,
+      fileSize: excel.fileSize,
+      mimeType: excel.mimeType,
+    }));
+    documentAttachments = attachmentsMetadata.documents?.map((doc: any) => ({
+      id: doc.id,
+      fileName: doc.fileName,
+      fileSize: doc.fileSize,
+      mimeType: doc.mimeType,
+    }));
+  }
+
   return {
     id: backendMessage.id,
     chatId: chatId,
@@ -211,6 +238,9 @@ export function convertBackendMessage(backendMessage: ChatMessage, chatId: strin
     content: backendMessage.content,
     timestamp: new Date(backendMessage.timestamp).getTime(),
     tokenUsage,  // ✅ 添加 Token 统计
+    imageAttachments,  // ✅ 添加图片附件元数据
+    excelAttachments,  // ✅ 添加 Excel 附件元数据
+    documentAttachments,  // ✅ 添加文档附件元数据
     meta: {
       status: 'completed' as const,  // ✅ 使用 'completed' 而不是 'success'
       isStreaming: false,

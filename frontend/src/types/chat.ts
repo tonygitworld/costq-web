@@ -20,6 +20,34 @@ export interface TokenUsage {
   output_cache_hit_rate: number;  // 百分比（0-100）
 }
 
+// 图片附件类型
+export interface ImageAttachment {
+  id: string;              // crypto.randomUUID()
+  fileName: string;        // 原始文件名
+  fileSize: number;        // 文件大小（字节）
+  mimeType: string;        // MIME 类型：image/jpeg | image/png | image/gif | image/webp
+  previewUrl: string;      // URL.createObjectURL() 生成的本地预览 URL
+  base64Data: string;      // Base64 编码数据（含 data URI 前缀）
+}
+
+// Excel 附件类型
+export interface ExcelAttachment {
+  id: string;              // crypto.randomUUID()
+  fileName: string;        // 原始文件名
+  fileSize: number;        // 文件大小（字节）
+  mimeType: string;        // MIME 类型
+  base64Data: string;      // Base64 编码数据（含 data URI 前缀）
+}
+
+// 文档附件类型（Word / Markdown / Text 统一模型，通过 mimeType 区分子类型）
+export interface DocumentAttachment {
+  id: string;              // crypto.randomUUID()
+  fileName: string;        // 原始文件名
+  fileSize: number;        // 文件大小（字节）
+  mimeType: string;        // MIME 类型：application/msword | application/vnd.openxmlformats-officedocument.wordprocessingml.document | text/markdown | text/plain
+  base64Data: string;      // Base64 编码数据（含 data URI 前缀）
+}
+
 export interface Message {
   id: string;
   chatId: string;
@@ -44,6 +72,15 @@ export interface Message {
 
   // ✅ 新增：Token 使用统计（流结束后显示）
   tokenUsage?: TokenUsage;
+
+  // ✅ 新增：图片附件（可选，向后兼容）
+  imageAttachments?: ImageAttachment[];
+
+  // ✅ 新增：Excel 附件（可选，向后兼容）
+  excelAttachments?: ExcelAttachment[];
+
+  // ✅ 新增：文档附件（Word/Markdown/Text，可选，向后兼容）
+  documentAttachments?: DocumentAttachment[];
 }
 
 // ===== Agent 工作流程相关类型 =====

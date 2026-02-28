@@ -30,3 +30,4 @@ AVAILABLE_MODELS: list[ModelConfig] = [
         description="haiku45",
     ),
 ]
+

@@ -217,3 +217,16 @@
 .send-icon {
   font-size: 16px;
 }
+
+/* 拖拽上传视觉反馈 */
+.ai-chat-input-container.dragging {
+  box-shadow:
+    0 4px 20px rgba(218, 119, 86, 0.15),
+    0 0 0 2px rgba(218, 119, 86, 0.5);
+}
+
+:global(.dark) .ai-chat-input-container.dragging {
+  box-shadow:
+    0 4px 20px rgba(218, 119, 86, 0.2),
+    0 0 0 2px rgba(218, 119, 86, 0.6);
+}

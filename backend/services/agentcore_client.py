@@ -77,7 +77,8 @@ class AgentCoreClient:
                 qualifier=qualifier
             )
             logger.info(
-                f"✅ [Agent Runtime] Session 已停止 - SessionID: {runtime_session_id}",
+                "✅ [Agent Runtime] Session 已停止 - SessionID: %s",
+                runtime_session_id,
                 extra={
                     "runtime_arn": self.runtime_arn,
                     "runtime_session_id": runtime_session_id,
@@ -87,7 +88,8 @@ class AgentCoreClient:
             return True
         except self.client.exceptions.ResourceNotFoundException:
             logger.warning(
-                f"⚠️ [Agent Runtime] Session 不存在或已终止 - SessionID: {runtime_session_id}",
+                "⚠️ [Agent Runtime] Session 不存在或已终止 - SessionID: %s",
+                runtime_session_id,
                 extra={
                     "runtime_arn": self.runtime_arn,
                     "runtime_session_id": runtime_session_id,
@@ -96,7 +98,9 @@ class AgentCoreClient:
             return False
         except Exception as e:
             logger.error(
-                f"❌ [Agent Runtime] 停止 Session 失败 - SessionID: {runtime_session_id}, Error: {e}",
+                "❌ [Agent Runtime] 停止 Session 失败 - SessionID: %s, Error: %s",
+                runtime_session_id,
+                e,
                 exc_info=True,
                 extra={
                     "runtime_arn": self.runtime_arn,
@@ -115,6 +119,8 @@ class AgentCoreClient:
         prompt_type: str = "dialog",
         account_type: str = "aws",
         model_id: str | None = None,
+        images: list | None = None,
+        files: list | None = None,
     ) -> AsyncIterator[dict]:
         """
         异步流式调用 Runtime
@@ -188,6 +194,18 @@ class AgentCoreClient:
                     payload["org_id"] = org_id
                 if model_id:
                     payload["model_id"] = model_id
+                if images:
+                    # ✅ 传递图片数据到 Runtime（Pydantic 模型转为 dict）
+                    payload["images"] = [
+                        img.model_dump() if hasattr(img, 'model_dump') else img
+                        for img in images
+                    ]
+                if files:
+                    # ✅ 传递文件附件数据到 Runtime（Excel 等）
+                    payload["files"] = [
+                        f.model_dump() if hasattr(f, 'model_dump') else f
+                        for f in files
+                    ]
 
                 # ✅ 记录 Agent Runtime 调用参数（包含 model_id 追踪）
                 logger.info(
@@ -270,6 +288,7 @@ class AgentCoreClient:
 
                 # ✅ 记录 Runtime 调用开始（不区分环境）
                 runtime_session_id = invoke_params.get("runtimeSessionId")
+
                 logger.info(
                     "📤 [Agent Runtime调用] 发送请求到 Runtime",
                     extra={
@@ -414,7 +433,7 @@ class AgentCoreClient:
                     except Exception as iter_error:
                         iter_duration = time.time() - iter_start_time
                         logger.error(
-                            f"❌ [Agent Runtime调用] iter_chunks() 迭代失败",
+                            "❌ [Agent Runtime调用] iter_chunks() 迭代失败",
                             extra={
                                 "error": str(iter_error),
                                 "error_type": type(iter_error).__name__,
@@ -433,7 +452,7 @@ class AgentCoreClient:
 
                     iter_duration = time.time() - iter_start_time
                     logger.info(
-                        f"✅ [Agent Runtime调用] iter_chunks() 迭代完成",
+                        "✅ [Agent Runtime调用] iter_chunks() 迭代完成",
                         extra={
                             "iter_duration": f"{iter_duration:.2f}秒",
                             "event_count": event_count,
@@ -525,14 +544,14 @@ class AgentCoreClient:
             except IncompleteRead as e:
                 # ✅ 捕获 IncompleteRead，优雅降级
                 logger.warning(
-                    f"⚠️ SSE 流提前结束（IncompleteRead）！"
-                    f"已读取 {len(e.partial)} 字节（期望更多），"
-                    f"总共接收了 {event_count} 个事件，"
-                    f"{bytes_read} 总字节，{chunk_count} chunk"
+                    "⚠️ SSE 流提前结束（IncompleteRead）！已读取 %d 字节（期望更多），"
+                    "总共接收了 %d 个事件，%d 总字节，%d chunk",
+                    len(e.partial), event_count, bytes_read, chunk_count,
                 )
                 logger.warning(
-                    f"⚠️ 这可能不是错误，boto3 在某些情况下会误报 IncompleteRead。"
-                    f"已接收的 {event_count} 个事件将正常返回给前端。"
+                    "⚠️ 这可能不是错误，boto3 在某些情况下会误报 IncompleteRead。"
+                    "已接收的 %d 个事件将正常返回给前端。",
+                    event_count,
                 )
 
                 # 不抛出异常，发送结束标记（让前端收到已有的数据）
@@ -542,8 +561,8 @@ class AgentCoreClient:
 
             except Exception as e:
                 logger.error(
-                    f"❌ [线程] Runtime 调用失败: {e}（event_count={event_count}, "
-                    f"bytes_read={bytes_read}, chunk_count={chunk_count}）",
+                    "❌ [线程] Runtime 调用失败: %s（event_count=%d, bytes_read=%d, chunk_count=%d）",
+                    e, event_count, bytes_read, chunk_count,
                     exc_info=True,
                 )
                 # 发送异常
@@ -551,8 +570,8 @@ class AgentCoreClient:
             except BaseException as e:
                 # 捕获所有异常，包括 KeyboardInterrupt 和 SystemExit
                 logger.error(
-                    f"❌ [线程] 线程函数发生未捕获的异常: {e}（event_count={event_count}, "
-                    f"bytes_read={bytes_read}, chunk_count={chunk_count}）",
+                    "❌ [线程] 线程函数发生未捕获的异常: %s（event_count=%d, bytes_read=%d, chunk_count=%d）",
+                    e, event_count, bytes_read, chunk_count,
                     exc_info=True,
                 )
                 # 发送异常

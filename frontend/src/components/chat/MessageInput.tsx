@@ -10,6 +10,10 @@ import { useModelStore } from '../../stores/modelStore';
 import { MessageInputContainer } from './MessageInputContainer';
 import { PromptTemplatesPopoverContent } from './PromptTemplatesPopoverContent';
 import { useI18n } from '../../hooks/useI18n';
+import { useAttachments } from '../../hooks/useAttachments';
+import { FilePickerButton } from './FilePickerButton';
+import { AttachmentPreviewArea } from './AttachmentPreviewArea';
+import { getFileCategory } from '../../utils/attachmentConstraints';
 import { createChatSession, convertBackendSession } from '../../services/chatApi';
 import { logger } from '../../utils/logger';
 import '../styles/AIChatInput.css';
@@ -20,6 +24,7 @@ import CloudIcon from '../icons/CloudIcon';
 export const MessageInput: FC = () => {
   const [message, setMessage] = useState('');
   const [isFocused, setIsFocused] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [popoverOpen, setPopoverOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -31,6 +36,26 @@ export const MessageInput: FC = () => {
   const { t } = useI18n('chat');
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  const {
+    attachments,
+    totalSize,
+    remainingCount,
+    remainingSize,
+    canAddMore,
+    isProcessing,
+    addFiles,
+    removeAttachment,
+    clearAttachments,
+  } = useAttachments();
+
+  // 文件选择回调
+  const handleFilesSelected = useCallback((files: FileList) => {
+    if (!canAddMore) {
+      return;
+    }
+    addFiles(files);
+  }, [canAddMore, addFiles]);
 
   // 存储账号+服务组合
   const [accountServicePairs, setAccountServicePairs] = useState<Array<{
@@ -106,6 +131,53 @@ export const MessageInput: FC = () => {
   const handleBlurChange = useCallback(() => {
     setIsFocused(false);
   }, []);
+
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (loading) return;
+    setIsDragging(true);
+  }, [loading]);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (loading || !canAddMore) return;
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      addFiles(files);
+    }
+  }, [loading, canAddMore, addFiles]);
+
+  // ✅ 剪贴板粘贴图片处理
+  const handlePaste = useCallback((e: React.ClipboardEvent) => {
+    if (loading) return;
+
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    const imageFiles: File[] = [];
+    for (const item of Array.from(items)) {
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (file) imageFiles.push(file);
+      }
+    }
+
+    if (imageFiles.length > 0) {
+      e.preventDefault(); // 阻止默认粘贴行为（仅当有图片时）
+      addFiles(imageFiles);
+    }
+    // 如果没有图片，不阻止默认行为，让文本正常粘贴
+  }, [loading, addFiles]);
 
   const handleSelectionChange = useCallback((selectedAccountIds: string[]) => {
     // 从selectedAccountIds重建accountServicePairs
@@ -192,11 +264,19 @@ export const MessageInput: FC = () => {
         }, 0);
       }
 
+      // 分离不同类型的附件
+      const imageAttachments = attachments.filter((a) => a.type === 'image');
+      const excelAttachments = attachments.filter((a) => a.type === 'excel');
+      const documentAttachments = attachments.filter((a) => a.type === 'document');
+
       // 添加用户消息
       addMessage(chatId, {
         chatId,
         type: 'user',
         content: message.trim(),
+        imageAttachments: imageAttachments.length > 0 ? imageAttachments : undefined,
+        excelAttachments: excelAttachments.length > 0 ? excelAttachments : undefined,
+        documentAttachments: documentAttachments.length > 0 ? documentAttachments : undefined,
         meta: {
           status: 'completed',
           isStreaming: false,
@@ -234,8 +314,12 @@ export const MessageInput: FC = () => {
         });
       }, 0);
 
-      // 清空输入框
+      // 清空输入框（附件在 sendQuery 之后清空，确保失败时可重试）
       const currentMessage = message.trim();
+      const currentAttachments = [...attachments]; // 保存当前附件引用
+      const currentImageAttachments = currentAttachments.filter((a) => a.type === 'image');
+      const currentExcelAttachments = currentAttachments.filter((a) => a.type === 'excel');
+      const currentDocumentAttachments = currentAttachments.filter((a) => a.type === 'document');
       setMessage('');
       if (textAreaRef.current) {
         textAreaRef.current.style.height = 'auto';
@@ -265,9 +349,15 @@ export const MessageInput: FC = () => {
         awsAccountIds,
         gcpAccountIds,
         sessionIdToSend,
-        selectedModelId  // ✅ 传递选中的模型ID
+        selectedModelId,
+        currentImageAttachments.length > 0 ? currentImageAttachments : undefined,
+        currentExcelAttachments.length > 0 ? currentExcelAttachments : undefined,
+        currentDocumentAttachments.length > 0 ? currentDocumentAttachments : undefined
       );
       logger.debug('📤 [MessageInput] 已发送查询，Query ID:', queryId);
+
+      // ✅ sendQuery 已通过闭包捕获附件数据，此时清空附件状态安全
+      clearAttachments();
     } catch (error) {
       logger.error('❌ [MessageInput] 发送消息失败:', error);
     }
@@ -289,9 +379,18 @@ export const MessageInput: FC = () => {
 
     // 场景 3: 标准对话模式 - 显示底部固定输入框
     return (
-      <div className={`ai-chat-input-container ${isFocused ? 'focused' : ''}`}>
+      <div
+        className={`ai-chat-input-container ${isFocused ? 'focused' : ''} ${isDragging ? 'dragging' : ''}`}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
         {/* 1. 输入区域 */}
         <div className="ai-chat-input-area">
+          <AttachmentPreviewArea
+            attachments={attachments}
+            onRemove={removeAttachment}
+          />
           <textarea
             ref={textAreaRef}
             value={message}
@@ -299,10 +398,11 @@ export const MessageInput: FC = () => {
             onFocus={handleFocusChange}
             onBlur={handleBlurChange}
             onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
             placeholder={
               hasSelectedAccount
                 ? t('input.placeholder')
-                : "⚠️ 请先在右下角选择云账号以开始成本分析"
+                : t('input.placeholderNoAccount')
             }
             className={`ai-chat-textarea ${!hasSelectedAccount ? 'warning-placeholder' : ''}`}
             rows={1}
@@ -335,6 +435,10 @@ export const MessageInput: FC = () => {
                 <BulbOutlined style={{ fontSize: 18 }} />
               </button>
             </Popover>
+            <FilePickerButton
+              onFilesSelected={handleFilesSelected}
+              disabled={loading || !hasSelectedAccount || isProcessing || !canAddMore}
+            />
           </div>
 
           {/* 右侧：模型选择 + 云服务选择 + 发送按钮 */}

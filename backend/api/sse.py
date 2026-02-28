@@ -1,14 +1,15 @@
 """SSE API端点 - 网络 Handler 层，只负责 HTTP/SSE 处理"""
 
 import asyncio
+import base64
 import json
 import time
 import uuid
 from typing import Optional
 
-from fastapi import Depends, Request
+from fastapi import Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from ..api.agent_provider import get_agent_provider
 from ..utils.auth import get_current_user
@@ -25,15 +26,123 @@ logger = logging.getLogger(__name__)
 # SSE 查询接口 V2（新版本）
 # ============================================================================
 
+# 附件限制常量
+# 规范: 附件数量无限制，总大小不超过 30MB
+_MAX_ATTACHMENTS = float('inf')  # 无限制
+_MAX_TOTAL_SIZE_MB = 30
+_ALLOWED_MIME_TYPES = {
+    # 图片
+    "image/jpeg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    # Excel
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-excel",
+    # 文档
+    "application/pdf",
+    "text/csv",
+    "text/plain",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "text/markdown",
+}
+
+
+class ImageData(BaseModel):
+    """图片/文件附件数据"""
+    file_name: str = Field(..., description="文件名")
+    mime_type: str = Field(..., description="MIME 类型")
+    base64_data: str = Field(..., description="Base64 编码数据（不含 data URI 前缀）")
+
+
 class SSEQueryRequestV2(BaseModel):
     """SSE 查询请求 V2"""
 
-    query: str = Field(..., description="用户查询内容", min_length=1)
+    query: str = Field(..., description="用户查询内容", min_length=1, max_length=10000)
     query_id: Optional[str] = Field(None, description="查询ID（可选，如果不提供则自动生成）")
     session_id: Optional[str] = Field(None, description="会话ID（可选，如果不提供则创建新会话）")
     account_ids: Optional[list[str]] = Field(None, description="AWS 账号ID列表")
     gcp_account_ids: Optional[list[str]] = Field(None, description="GCP 账号ID列表")
     model_id: Optional[str] = Field(None, description="AI 模型 ID")
+    images: Optional[list[ImageData]] = Field(None, description="图片附件列表（可选）")
+    files: Optional[list[ImageData]] = Field(None, description="文件附件列表（Excel/文档，可选）")
+
+    @field_validator("images", "files")
+    @classmethod
+    def validate_attachments(cls, v):
+        """验证附件：数量和总大小限制"""
+        if not v:
+            return v
+        return v
+
+    @field_validator("images")
+    @classmethod
+    def validate_images_count(cls, images, info):
+        """验证图片数量"""
+        if not images:
+            return images
+
+        # 获取所有附件进行统一验证
+        files = info.data.get("files") or []
+        total_count = len(images) + len(files)
+
+        if total_count > _MAX_ATTACHMENTS:
+            raise ValueError(f"附件总数超过限制（最多 {_MAX_ATTACHMENTS} 个）")
+
+        # 验证 MIME 类型
+        for img in images:
+            if img.mime_type not in _ALLOWED_MIME_TYPES:
+                raise ValueError(f"不支持的图片类型: {img.mime_type}")
+
+        return images
+
+    @field_validator("files")
+    @classmethod
+    def validate_files_count(cls, files, info):
+        """验证文件数量"""
+        if not files:
+            return files
+
+        # 获取所有附件进行统一验证
+        images = info.data.get("images") or []
+        total_count = len(images) + len(files)
+
+        if total_count > _MAX_ATTACHMENTS:
+            raise ValueError(f"附件总数超过限制（最多 {_MAX_ATTACHMENTS} 个）")
+
+        # 验证 MIME 类型
+        for f in files:
+            if f.mime_type not in _ALLOWED_MIME_TYPES:
+                raise ValueError(f"不支持的文件类型: {f.mime_type}")
+
+        return files
+
+    @model_validator(mode="after")
+    def validate_total_size(self):
+        """验证附件总大小"""
+        images = self.images or []
+        files = self.files or []
+        all_attachments = images + files
+
+        if not all_attachments:
+            return self
+
+        # 计算总大小
+        total_size = 0
+        max_bytes = _MAX_TOTAL_SIZE_MB * 1024 * 1024
+
+        for att in all_attachments:
+            try:
+                size = len(base64.b64decode(att.base64_data))
+                total_size += size
+            except Exception:
+                raise ValueError(f"文件 {att.file_name} 的 base64 数据无效")
+
+        if total_size > max_bytes:
+            raise ValueError(f"附件总大小超过 {_MAX_TOTAL_SIZE_MB}MB 限制")
+
+        return self
 
     class Config:
         json_schema_extra = {
@@ -92,14 +201,15 @@ async def sse_query_endpoint_v2(
     gcp_account_ids_list = query_request.gcp_account_ids or []
 
     logger.info(
-        f"💬 [SSE查询V2] 用户 {username} 发送查询: {query_request.query[:100]}{'...' if len(query_request.query) > 100 else ''}",
+        "💬 [SSE查询V2] 用户 %s 发送查询（长度: %d）",
+        username,
+        len(query_request.query),
         extra={
             "user_id": user_id,
             "username": username,
             "org_id": org_id,
             "query_id": query_id,
             "session_id": query_request.session_id,
-            "query": query_request.query,
             "query_length": len(query_request.query),
             "account_ids": account_ids_list,
             "gcp_account_ids": gcp_account_ids_list,
@@ -228,6 +338,8 @@ async def sse_query_endpoint_v2(
                 session_id=query_request.session_id,
                 model_id=query_request.model_id,
                 cancel_event=cancel_event,
+                images=query_request.images,
+                files=query_request.files,
             ):
                 # ✅ 在每次 yield 前检查取消标志
                 if cancel_event.is_set():

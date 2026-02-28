@@ -116,5 +116,13 @@
     "subtitle": "開始する前に、クラウドアカウントを設定してください",
     "description": "クラウドアカウントを設定すると、CostQを使用してコスト分析、最適化の推奨事項、および請求管理を行うことができます",
     "configureButton": "クラウドアカウントを設定"
+  },
+  "attachment": {
+    "countExceeded": "追加できません：最大{{max}}個の添付ファイルまで",
+    "totalSizeExceeded": "追加できません：添付ファイルの合計サイズが{{max}}を超えています",
+    "typeNotAllowed": "サポートされていないファイル形式：{{fileName}}",
+    "limitReached": "添付ファイルの上限に達しました（最大3個）",
+    "addAttachment": "添付ファイルを追加",
+    "status": "{{count}}/3個のファイル、合計{{size}}/20MB"
   }
 }
