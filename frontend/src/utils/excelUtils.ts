@@ -2,6 +2,8 @@
  * Excel 处理工具模块 — 验证与常量定义
  */
 
+import { ATTACHMENT_CONSTRAINTS } from './attachmentConstraints';
+
 export const EXCEL_CONSTRAINTS = {
   ALLOWED_TYPES: [
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
@@ -12,9 +14,8 @@ export const EXCEL_CONSTRAINTS = {
   MAX_COUNT: 3,
 } as const;
 
-export const ATTACHMENT_CONSTRAINTS = {
-  MAX_TOTAL_COUNT: 3,  // 图片 + Excel + 文档 总数上限
-} as const;
+// 统一从 attachmentConstraints.ts 导入 ATTACHMENT_CONSTRAINTS
+export { ATTACHMENT_CONSTRAINTS };
 
 export interface ExcelValidationResult {
   valid: boolean;
@@ -45,6 +46,8 @@ export function validateExcelFile(
   maxExcelCount: number = EXCEL_CONSTRAINTS.MAX_COUNT,
   maxTotalCount: number = ATTACHMENT_CONSTRAINTS.MAX_TOTAL_COUNT,
 ): ExcelValidationResult {
+  // 使用统一的附件总数限制
+  const effectiveMaxTotalCount = ATTACHMENT_CONSTRAINTS.MAX_TOTAL_COUNT;
   // 1. 格式验证 — MIME 类型 + 文件扩展名双重检查
   const isValidType = EXCEL_CONSTRAINTS.ALLOWED_TYPES.includes(
     file.type as (typeof EXCEL_CONSTRAINTS.ALLOWED_TYPES)[number],
@@ -81,10 +84,10 @@ export function validateExcelFile(
   }
 
   // 4. 附件总数验证（图片 + Excel + 文档）
-  if (currentExcelCount + currentImageCount + currentDocumentCount + 1 > maxTotalCount) {
+  if (currentExcelCount + currentImageCount + currentDocumentCount + 1 > effectiveMaxTotalCount) {
     return {
       valid: false,
-      error: `每条消息最多附加 ${maxTotalCount} 个附件`,
+      error: `每条消息最多附加 ${effectiveMaxTotalCount} 个附件`,
       errorType: 'total_count',
     };
   }
