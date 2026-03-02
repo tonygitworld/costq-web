@@ -1,4 +1,12 @@
 {
+  "templateNames": {
+    "awsCostInsight": "AWS 成本洞察",
+    "riSpDataInsight": "RI/SP 数据洞察"
+  },
+  "noTemplates": "暂无模板",
+  "viewAll": "查看所有",
+  "customTemplates": "自定义模板",
+  "confirmUseTemplate": "确认使用此模板？",
   "manager": {
     "title": "自定义模板管理",
     "createTemplate": "创建模板",
@@ -40,6 +48,7 @@
     "title": "💰 全部成本模板",
     "systemTemplates": "系统模板",
     "userTemplates": "我的模板",
+    "myTemplates": "我的模板",
     "search": "搜索模板标题或描述...",
     "noResults": "暂无模板",
     "noResultsWithSearch": "未找到匹配 \"{{search}}\" 的模板",

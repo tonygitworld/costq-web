@@ -4,6 +4,8 @@
  * 提供统一的错误类型，用于API调用的错误处理
  */
 
+import i18n from '../i18n';
+
 /**
  * API客户端基础错误类
  */
@@ -27,8 +29,8 @@ export class ApiClientError extends Error {
  * 401 未授权错误
  */
 export class UnauthorizedError extends ApiClientError {
-  constructor(message: string = '未授权，请重新登录') {
-    super(message, 401, 'UNAUTHORIZED');
+  constructor(message?: string) {
+    super(message || i18n.t('error:serviceErrors.unauthorized'), 401, 'UNAUTHORIZED');
     this.name = 'UnauthorizedError';
   }
 }
@@ -37,8 +39,8 @@ export class UnauthorizedError extends ApiClientError {
  * 403 禁止访问错误
  */
 export class ForbiddenError extends ApiClientError {
-  constructor(message: string = '没有权限执行此操作') {
-    super(message, 403, 'FORBIDDEN');
+  constructor(message?: string) {
+    super(message || i18n.t('error:serviceErrors.forbidden'), 403, 'FORBIDDEN');
     this.name = 'ForbiddenError';
   }
 }
@@ -47,8 +49,8 @@ export class ForbiddenError extends ApiClientError {
  * 404 资源未找到错误
  */
 export class NotFoundError extends ApiClientError {
-  constructor(message: string = '请求的资源不存在') {
-    super(message, 404, 'NOT_FOUND');
+  constructor(message?: string) {
+    super(message || i18n.t('error:serviceErrors.notFound'), 404, 'NOT_FOUND');
     this.name = 'NotFoundError';
   }
 }
@@ -60,10 +62,10 @@ export class ValidationError extends ApiClientError {
   declare errors?: Record<string, string[]>;
 
   constructor(
-    message: string = '数据验证失败',
+    message?: string,
     errors?: Record<string, string[]>
   ) {
-    super(message, 422, 'VALIDATION_ERROR');
+    super(message || i18n.t('error:serviceErrors.validationFailed'), 422, 'VALIDATION_ERROR');
     this.name = 'ValidationError';
     this.errors = errors;
   }
@@ -73,8 +75,8 @@ export class ValidationError extends ApiClientError {
  * 500 服务器错误
  */
 export class ServerError extends ApiClientError {
-  constructor(message: string = '服务器错误，请稍后重试') {
-    super(message, 500, 'SERVER_ERROR');
+  constructor(message?: string) {
+    super(message || i18n.t('error:serviceErrors.serverError'), 500, 'SERVER_ERROR');
     this.name = 'ServerError';
   }
 }

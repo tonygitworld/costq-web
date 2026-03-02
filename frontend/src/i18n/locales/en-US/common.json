@@ -132,5 +132,10 @@
     "accountId": "Account ID",
     "region": "Region",
     "verified": "Verified"
+  },
+  "forbidden": {
+    "title": "403",
+    "subTitle": "Sorry, you don't have permission to access this page",
+    "backButton": "Go Back"
   }
 }

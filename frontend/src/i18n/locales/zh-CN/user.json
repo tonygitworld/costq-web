@@ -107,11 +107,14 @@
     "selectStatus": "请选择状态",
     "validation": {
       "usernameRequired": "请输入用户名",
+      "emailInvalid": "请输入有效的邮箱地址",
       "passwordRequired": "请输入密码",
       "passwordMin": "密码长度至少为 8 位",
       "passwordPattern": "必须包含大小写字母和数字",
       "roleRequired": "请选择角色"
-    }
+    },
+    "activationEmailHint": "用户将收到激活邮件，需通过邮件链接设置密码",
+    "emailPlaceholder": "请输入用户邮箱地址"
   },
   "actions": {
     "edit": "编辑",

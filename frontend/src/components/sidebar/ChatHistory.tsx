@@ -454,7 +454,7 @@ export const ChatHistory: FC = () => {
                       items: [
                         {
                           key: 'pin',
-                          label: chat.isPinned ? '取消固定' : '固定',
+                          label: chat.isPinned ? t('history.unpin') : t('history.pin'),
                           icon: <PushpinOutlined style={{ fontSize: '18px', transform: chat.isPinned ? 'rotate(-45deg)' : 'none' }} />,
                           className: 'gemini-menu-item',
                           onClick: (e) => {
@@ -464,7 +464,7 @@ export const ChatHistory: FC = () => {
                         },
                         {
                           key: 'rename',
-                          label: '重命名',
+                          label: t('history.rename'),
                           icon: <EditOutlined style={{ fontSize: '18px' }} />,
                           className: 'gemini-menu-item',
                           onClick: (e) => {

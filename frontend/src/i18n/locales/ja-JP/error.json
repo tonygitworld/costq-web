@@ -58,5 +58,21 @@
     "createFailed": "アラートの作成に失敗しました",
     "updateFailed": "アラートの更新に失敗しました",
     "deleteFailed": "アラートの削除に失敗しました"
+  },
+  "messageHandler": {
+    "processingError": "メッセージ処理エラー",
+    "processingErrorDesc": "サーバーメッセージの処理中にエラーが発生しました。もう一度お試しください。",
+    "requestFailed": "リクエスト処理に失敗しました。もう一度お試しいただくか、クエリを簡略化してください。",
+    "thinking": "思考中...",
+    "processingFailed": "処理に失敗しました",
+    "generationStopped": "生成を停止しました",
+    "sessionRenewed": "セッションが自動的に更新されました"
+  },
+  "serviceErrors": {
+    "unauthorized": "未認証です。再度ログインしてください",
+    "forbidden": "この操作を実行する権限がありません",
+    "notFound": "リクエストされたリソースは存在しません",
+    "validationFailed": "データ検証に失敗しました",
+    "serverError": "サーバーエラーが発生しました。後でもう一度お試しください"
   }
 }

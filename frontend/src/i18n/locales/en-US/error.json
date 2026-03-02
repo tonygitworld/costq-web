@@ -58,5 +58,21 @@
     "createFailed": "Failed to create alert",
     "updateFailed": "Failed to update alert",
     "deleteFailed": "Failed to delete alert"
+  },
+  "messageHandler": {
+    "processingError": "Message Processing Error",
+    "processingErrorDesc": "An error occurred while processing server message. Please try again.",
+    "requestFailed": "Request processing failed. Please try again or simplify your query.",
+    "thinking": "Thinking...",
+    "processingFailed": "Processing Failed",
+    "generationStopped": "Generation Stopped",
+    "sessionRenewed": "Session automatically renewed"
+  },
+  "serviceErrors": {
+    "unauthorized": "Unauthorized, please log in again",
+    "forbidden": "Insufficient permissions for this operation",
+    "notFound": "The requested resource does not exist",
+    "validationFailed": "Data validation failed",
+    "serverError": "Server error, please try again later"
   }
 }

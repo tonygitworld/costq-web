@@ -120,7 +120,6 @@
   "table": {
     "columnName": "Name",
     "columnDescription": "Description",
-    "columnCreator": "Creator",
     "columnStatus": "Status",
     "columnActions": "Actions",
     "statusEnabled": "Enabled",

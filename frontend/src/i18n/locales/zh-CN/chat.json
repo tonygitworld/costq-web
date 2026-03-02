@@ -38,6 +38,7 @@
     "copyContent": "复制内容",
     "downloadPDF": "下载为PDF",
     "analysisFailed": "❌ 分析失败",
+    "analysisFailedDesc": "请求处理失败，请重试或简化问题",
     "stopped": "🛑 已停止生成",
     "generationStopped": "生成已停止",
     "generationStoppedDesc": "您已停止此次生成，以上为部分生成的内容",
@@ -49,10 +50,9 @@
   "template": {
     "title": "💰 成本优化助手",
     "description": "选择模板快速分析 AWS/GCP 成本",
-    "viewAll": "查看所有",
-    "customTemplates": "自定义模板",
     "favoriteTemplates": "收藏的模板",
     "systemTemplates": "系统模板",
+    "myTemplate": "我的",
     "category": {
       "cost": "成本分析",
       "optimization": "优化建议",
@@ -94,6 +94,8 @@
     "confirmClearAllDesc": "确定要清空所有对话历史吗？此操作不可撤销",
     "deleteFailed": "删除失败，请重试",
     "analyzing": "正在分析",
+    "pin": "固定",
+    "unpin": "取消固定",
     "rename": "重命名",
     "renameSuccess": "重命名成功",
     "renameFailed": "重命名失败，请重试",
@@ -118,12 +120,22 @@
     "description": "配置云账号后，您可以使用 CostQ 进行成本分析、优化建议和账单管理",
     "configureButton": "配置云账号"
   },
-  "attachment": {
-    "countExceeded": "无法添加：最多支持 {{max}} 个附件",
-    "totalSizeExceeded": "无法添加：附件总大小超过 {{max}} 限制",
-    "typeNotAllowed": "不支持的文件类型：{{fileName}}",
-    "limitReached": "已达到附件上限（最多 3 个）",
-    "addAttachment": "添加附件",
-    "status": "{{count}}/3 个文件，共 {{size}}/20MB"
+  "cloudSelector": {
+    "selectService": "选择云服务",
+    "accountsCount": "{{count}} 个账号",
+    "remove": "移除",
+    "back": "返回",
+    "backToList": "返回云服务列表",
+    "searchPlaceholder": "搜索云账号",
+    "noAccounts": "暂无可用账号",
+    "noMatchingAccounts": "未找到匹配的账号"
+  },
+  "tokenUsage": {
+    "label": "📊 Token 使用",
+    "input": "输入",
+    "output": "输出",
+    "cacheRead": "缓存读取",
+    "cacheWrite": "缓存写入",
+    "cacheRate": "{{rate}}%"
   }
 }

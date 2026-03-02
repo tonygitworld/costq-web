@@ -327,12 +327,12 @@ export const UserManagement: React.FC = () => {
                 name="username"
                 rules={[
                   { required: true, message: t('form.validation.usernameRequired') },
-                  { type: 'email', message: '请输入有效的邮箱地址' },
+                  { type: 'email', message: t('form.validation.emailInvalid') },
                 ]}
-                extra="用户将收到激活邮件，需通过邮件链接设置密码"
+                extra={t('form.activationEmailHint')}
               >
                 <Input
-                  placeholder="请输入用户邮箱地址"
+                  placeholder={t('form.emailPlaceholder')}
                   autoComplete="off"
                   type="email"
                 />

@@ -107,11 +107,14 @@
     "selectStatus": "ステータスを選択",
     "validation": {
       "usernameRequired": "ユーザー名を入力してください",
+      "emailInvalid": "有効なメールアドレスを入力してください",
       "passwordRequired": "パスワードを入力してください",
       "passwordMin": "パスワードは8文字以上である必要があります",
       "passwordPattern": "大文字・小文字・数字を含む必要があります",
       "roleRequired": "役割を選択してください"
-    }
+    },
+    "activationEmailHint": "ユーザーにアクティベーションメールが送信され、リンクからパスワードを設定できます",
+    "emailPlaceholder": "ユーザーのメールアドレスを入力"
   },
   "actions": {
     "edit": "編集",

@@ -27,6 +27,7 @@ import {
   type OrgTokenUsageItem,
   type UserTokenUsageItem,
 } from '../../services/opsService';
+import { useI18n } from '../../hooks/useI18n';
 
 const { Title } = Typography;
 const { RangePicker } = DatePicker;
@@ -50,60 +51,61 @@ function getDateRange(
   };
 }
 
-/** Token 数值列（组织和用户表格共用） */
-const tokenValueColumns: ColumnsType<
-  OrgTokenUsageItem | UserTokenUsageItem
-> = [
-  {
-    title: '输入 Token',
-    dataIndex: 'input_tokens',
-    key: 'input_tokens',
-    render: (v: number) => v.toLocaleString(),
-  },
-  {
-    title: '输出 Token',
-    dataIndex: 'output_tokens',
-    key: 'output_tokens',
-    render: (v: number) => v.toLocaleString(),
-  },
-  {
-    title: '缓存读取',
-    dataIndex: 'cache_read_tokens',
-    key: 'cache_read_tokens',
-    render: (v: number) => v.toLocaleString(),
-  },
-  {
-    title: '缓存写入',
-    dataIndex: 'cache_write_tokens',
-    key: 'cache_write_tokens',
-    render: (v: number) => v.toLocaleString(),
-  },
-  {
-    title: '总计',
-    dataIndex: 'total_tokens',
-    key: 'total_tokens',
-    render: (v: number) => <strong>{v.toLocaleString()}</strong>,
-  },
-];
-
-const orgColumns: ColumnsType<OrgTokenUsageItem> = [
-  { title: '组织名称', dataIndex: 'org_name', key: 'org_name' },
-  ...(tokenValueColumns as ColumnsType<OrgTokenUsageItem>),
-];
-
-const userColumns: ColumnsType<UserTokenUsageItem> = [
-  { title: '用户名', dataIndex: 'username', key: 'username' },
-  { title: '所属组织', dataIndex: 'org_name', key: 'org_name' },
-  ...(tokenValueColumns as ColumnsType<UserTokenUsageItem>),
-];
-
 export const OpsTokenUsage: React.FC = () => {
+  const { t } = useI18n('ops');
   const [timeRange, setTimeRange] = useState<TimeRange>('30d');
   const [customDates, setCustomDates] = useState<[Dayjs, Dayjs] | null>(null);
   const [orgPage, setOrgPage] = useState(1);
   const [userPage, setUserPage] = useState(1);
   const [selectedOrgId, setSelectedOrgId] = useState<string | undefined>();
   const pageSize = 20;
+
+  /** Token 数值列（组织和用户表格共用） */
+  const tokenValueColumns: ColumnsType<
+    OrgTokenUsageItem | UserTokenUsageItem
+  > = [
+    {
+      title: t('tokenUsage.table.inputTokens'),
+      dataIndex: 'input_tokens',
+      key: 'input_tokens',
+      render: (v: number) => v.toLocaleString(),
+    },
+    {
+      title: t('tokenUsage.table.outputTokens'),
+      dataIndex: 'output_tokens',
+      key: 'output_tokens',
+      render: (v: number) => v.toLocaleString(),
+    },
+    {
+      title: t('tokenUsage.table.cacheRead'),
+      dataIndex: 'cache_read_tokens',
+      key: 'cache_read_tokens',
+      render: (v: number) => v.toLocaleString(),
+    },
+    {
+      title: t('tokenUsage.table.cacheWrite'),
+      dataIndex: 'cache_write_tokens',
+      key: 'cache_write_tokens',
+      render: (v: number) => v.toLocaleString(),
+    },
+    {
+      title: t('tokenUsage.table.total'),
+      dataIndex: 'total_tokens',
+      key: 'total_tokens',
+      render: (v: number) => <strong>{v.toLocaleString()}</strong>,
+    },
+  ];
+
+  const orgColumns: ColumnsType<OrgTokenUsageItem> = [
+    { title: t('tokenUsage.table.orgName'), dataIndex: 'org_name', key: 'org_name' },
+    ...(tokenValueColumns as ColumnsType<OrgTokenUsageItem>),
+  ];
+
+  const userColumns: ColumnsType<UserTokenUsageItem> = [
+    { title: t('tokenUsage.table.username'), dataIndex: 'username', key: 'username' },
+    { title: t('tokenUsage.table.orgName'), dataIndex: 'org_name', key: 'org_name' },
+    ...(tokenValueColumns as ColumnsType<UserTokenUsageItem>),
+  ];
 
   const { startDate, endDate } = useMemo(
     () => getDateRange(timeRange, customDates),
@@ -205,10 +207,10 @@ export const OpsTokenUsage: React.FC = () => {
         }}
       >
         <Title level={4} style={{ margin: 0 }}>
-          Token 用量统计
+          {t('tokenUsage.title')}
         </Title>
         <Button icon={<ReloadOutlined />} onClick={handleRefresh}>
-          刷新
+          {t('tokenUsage.refresh')}
         </Button>
       </div>
 
@@ -223,9 +225,9 @@ export const OpsTokenUsage: React.FC = () => {
       >
         <Segmented
           options={[
-            { label: '最近 7 天', value: '7d' },
-            { label: '最近 30 天', value: '30d' },
-            { label: '自定义', value: 'custom' },
+            { label: t('tokenUsage.timeRanges.7d'), value: '7d' },
+            { label: t('tokenUsage.timeRanges.30d'), value: '30d' },
+            { label: t('tokenUsage.timeRanges.custom'), value: 'custom' },
           ]}
           value={timeRange}
           onChange={handleTimeRangeChange}
@@ -244,7 +246,7 @@ export const OpsTokenUsage: React.FC = () => {
           <Col span={5}>
             <Card>
               <Statistic
-                title="输入 Token"
+                title={t('tokenUsage.summary.inputTokens')}
                 value={summary?.total_input_tokens ?? '-'}
                 formatter={(v) =>
                   typeof v === 'number' ? v.toLocaleString() : v
@@ -255,7 +257,7 @@ export const OpsTokenUsage: React.FC = () => {
           <Col span={5}>
             <Card>
               <Statistic
-                title="输出 Token"
+                title={t('tokenUsage.summary.outputTokens')}
                 value={summary?.total_output_tokens ?? '-'}
                 formatter={(v) =>
                   typeof v === 'number' ? v.toLocaleString() : v
@@ -266,7 +268,7 @@ export const OpsTokenUsage: React.FC = () => {
           <Col span={5}>
             <Card>
               <Statistic
-                title="缓存读取 Token"
+                title={t('tokenUsage.summary.cacheReadTokens')}
                 value={summary?.total_cache_read_tokens ?? '-'}
                 formatter={(v) =>
                   typeof v === 'number' ? v.toLocaleString() : v
@@ -277,7 +279,7 @@ export const OpsTokenUsage: React.FC = () => {
           <Col span={5}>
             <Card>
               <Statistic
-                title="缓存写入 Token"
+                title={t('tokenUsage.summary.cacheWriteTokens')}
                 value={summary?.total_cache_write_tokens ?? '-'}
                 formatter={(v) =>
                   typeof v === 'number' ? v.toLocaleString() : v
@@ -288,7 +290,7 @@ export const OpsTokenUsage: React.FC = () => {
           <Col span={4}>
             <Card>
               <Statistic
-                title="消息总数"
+                title={t('tokenUsage.summary.totalMessages')}
                 value={summary?.total_messages ?? '-'}
                 formatter={(v) =>
                   typeof v === 'number' ? v.toLocaleString() : v
@@ -306,7 +308,7 @@ export const OpsTokenUsage: React.FC = () => {
           items={[
             {
               key: 'org',
-              label: '按组织',
+              label: t('tokenUsage.table.byOrg'),
               children: (
                 <Spin spinning={orgLoading}>
                   <Table<OrgTokenUsageItem>
@@ -318,7 +320,7 @@ export const OpsTokenUsage: React.FC = () => {
                       pageSize,
                       total: orgData?.total ?? 0,
                       onChange: (p) => setOrgPage(p),
-                      showTotal: (total) => `共 ${total} 条`,
+                      showTotal: (total) => t('tokenUsage.table.totalRecords', { total }),
                     }}
                     size="middle"
                   />
@@ -327,13 +329,13 @@ export const OpsTokenUsage: React.FC = () => {
             },
             {
               key: 'user',
-              label: '按用户',
+              label: t('tokenUsage.table.byUser'),
               children: (
                 <Spin spinning={userLoading}>
                   <div style={{ marginBottom: 16 }}>
                     <Select
                       allowClear
-                      placeholder="按组织筛选"
+                      placeholder={t('tokenUsage.table.filterByOrg')}
                       style={{ width: 240 }}
                       value={selectedOrgId}
                       onChange={(v) => {
@@ -355,7 +357,7 @@ export const OpsTokenUsage: React.FC = () => {
                       pageSize,
                       total: userData?.total ?? 0,
                       onChange: (p) => setUserPage(p),
-                      showTotal: (total) => `共 ${total} 条`,
+                      showTotal: (total) => t('tokenUsage.table.totalRecords', { total }),
                     }}
                     size="middle"
                   />

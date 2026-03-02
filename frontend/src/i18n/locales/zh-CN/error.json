@@ -58,5 +58,21 @@
     "createFailed": "创建告警失败",
     "updateFailed": "更新告警失败",
     "deleteFailed": "删除告警失败"
+  },
+  "messageHandler": {
+    "processingError": "消息处理错误",
+    "processingErrorDesc": "处理服务器消息时出现错误，请重试。",
+    "requestFailed": "请求处理失败，请重试或简化问题",
+    "thinking": "正在思考...",
+    "processingFailed": "处理失败",
+    "generationStopped": "已停止生成",
+    "sessionRenewed": "会话已自动续期"
+  },
+  "serviceErrors": {
+    "unauthorized": "未授权，请重新登录",
+    "forbidden": "没有权限执行此操作",
+    "notFound": "请求的资源不存在",
+    "validationFailed": "数据验证失败",
+    "serverError": "服务器错误，请稍后重试"
   }
 }

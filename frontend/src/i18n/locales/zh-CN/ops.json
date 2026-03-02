@@ -104,6 +104,35 @@
     "activeUsers": "日活用户",
     "queries": "查询量"
   },
+  "tokenUsage": {
+    "title": "Token 用量统计",
+    "refresh": "刷新",
+    "timeRanges": {
+      "7d": "最近 7 天",
+      "30d": "最近 30 天",
+      "custom": "自定义"
+    },
+    "summary": {
+      "inputTokens": "输入 Token",
+      "outputTokens": "输出 Token",
+      "cacheReadTokens": "缓存读取 Token",
+      "cacheWriteTokens": "缓存写入 Token",
+      "totalMessages": "消息总数"
+    },
+    "table": {
+      "orgName": "组织名称",
+      "username": "用户名",
+      "inputTokens": "输入 Token",
+      "outputTokens": "输出 Token",
+      "cacheRead": "缓存读取",
+      "cacheWrite": "缓存写入",
+      "total": "总计",
+      "byOrg": "按组织",
+      "byUser": "按用户",
+      "filterByOrg": "按组织筛选",
+      "totalRecords": "共 {{total}} 条"
+    }
+  },
   "common": {
     "confirm": "确认",
     "cancel": "取消",
