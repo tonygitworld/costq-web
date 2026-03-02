@@ -38,23 +38,8 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
       </div>
 
       {showLanguageSwitcher && (
-        <div style={{
-          position: 'fixed',
-          top: '20px',
-          right: '20px',
-          zIndex: 1000,
-          whiteSpace: 'nowrap',
-        }}>
-          <div style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.25)',
-            backdropFilter: 'blur(10px)',
-            borderRadius: '20px',
-            padding: '6px 12px',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-            display: 'inline-flex',
-            alignItems: 'center',
-          }}>
+        <div className={styles.languageSwitcherWrapper}>
+          <div className={styles.languageSwitcherCard}>
             <LanguageSwitcher showIcon={false} showText={true} />
           </div>
         </div>

@@ -8,6 +8,7 @@ import { GlobalOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { Flag } from './FlagIcons';
+import { logger } from '../../utils/logger';
 
 // 语言配置
 const languages = [
@@ -70,7 +71,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
 
       // localStorage 会由 i18next-browser-languagedetector 自动保存
     } catch (error) {
-      console.error('[LanguageSwitcher] 语言切换失败:', error);
+      logger.error('[LanguageSwitcher] 语言切换失败:', error);
     }
   };
 
