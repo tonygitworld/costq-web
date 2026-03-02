@@ -101,7 +101,20 @@ const ForgotPasswordForm: React.FC = () => {
       setStep(4);
     } catch (error: any) {
       if (error?.errorFields) return;
-      message.error(getErrorMessage(error, t('forgotPassword.errors.resetFailed')));
+      // 验证码错误时跳回step2并在验证码输入框显示错误
+      const errMsg = getErrorMessage(error, t('forgotPassword.errors.resetFailed'));
+      const isCodeError = errMsg.includes('验证码') || errMsg.includes('code') || errMsg.includes('invalid') || errMsg.includes('expired');
+      if (isCodeError) {
+        setStep(2);
+        setTimeout(() => {
+          form.setFields([{
+            name: 'verification_code',
+            errors: [errMsg],
+          }]);
+        }, 100);
+      } else {
+        message.error(errMsg);
+      }
     } finally {
       setLoading(false);
     }
