@@ -13,6 +13,7 @@ import { AlertDetail } from './components/alert/AlertDetail';
 import { Login } from './components/auth/Login';
 import { Register } from './components/auth/Register';
 import { Activate } from './components/auth/Activate';
+import { ForgotPassword } from './components/auth/ForgotPassword';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { SuperAdminRoute } from './routes/SuperAdminRoute';
 import { OpsDashboard, TenantList, TenantDetail, AuditLogs, OpsTokenUsage } from './components/ops';
@@ -85,6 +86,14 @@ const AppContent: FC = () => {
         path="/activate/:token"
         element={
           isAuthenticated ? <Navigate to="/" replace /> : <Activate />
+        }
+      />
+
+      {/* 忘记密码页面 */}
+      <Route
+        path="/forgot-password"
+        element={
+          isAuthenticated ? <Navigate to="/" replace /> : <ForgotPassword />
         }
       />
 

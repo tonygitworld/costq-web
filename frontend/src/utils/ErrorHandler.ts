@@ -460,3 +460,28 @@ export function getErrorMessage(error: unknown, fallback = '操作失败'): stri
 
   return fallback;
 }
+
+export function getErrorCode(error: unknown): string | undefined {
+  if (typeof error === 'object' && error !== null) {
+    const err = error as Record<string, unknown>;
+
+    if (err.response && typeof err.response === 'object') {
+      const response = err.response as Record<string, unknown>;
+      if (response.data && typeof response.data === 'object') {
+        const data = response.data as Record<string, unknown>;
+        if (data.detail && typeof data.detail === 'object') {
+          const detail = data.detail as Record<string, unknown>;
+          if (typeof detail.error_code === 'string') {
+            return detail.error_code;
+          }
+        }
+      }
+    }
+
+    if (typeof err.code === 'string') {
+      return err.code;
+    }
+  }
+
+  return undefined;
+}

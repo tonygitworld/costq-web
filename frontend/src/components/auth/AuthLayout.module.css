@@ -1,0 +1,111 @@
+/* ========================================
+   AuthLayout — Full-screen centered auth container
+   Clean overlay, card-focused layout
+   ======================================== */
+
+.container {
+  position: fixed;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.overlay {
+  display: none;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  padding: 40px 24px;
+}
+
+.languageSwitcherWrapper {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  white-space: nowrap;
+}
+
+.languageSwitcherCard {
+  background-color: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: inline-flex;
+  align-items: center;
+}
+
+.backButton {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  z-index: 1000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #374151;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.backButton:hover {
+  background: #ffffff;
+  border-color: #d1d5db;
+}
+
+.backButton:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .content {
+    padding: 24px 16px;
+  }
+
+  .languageSwitcher {
+    top: 16px;
+    right: 16px;
+  }
+
+  .languageSwitcherWrapper {
+    top: 16px;
+    right: 16px;
+  }
+
+  .backButton {
+    top: 16px;
+    left: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding: 16px 12px;
+  }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .backButton {
+    transition: none;
+  }
+}
