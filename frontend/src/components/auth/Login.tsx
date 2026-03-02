@@ -226,20 +226,18 @@ export const Login: React.FC = () => {
             />
           </Form.Item>
 
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+            <span style={{ fontSize: '14px', color: '#262626' }}>{t('login.password')}</span>
+            <Link to="/forgot-password" style={{ color: '#667eea', fontSize: '13px' }}>
+              {t('login.forgotPassword')}
+            </Link>
+          </div>
           <Form.Item
             name="password"
             rules={[
               { required: true, message: t('login.validation.passwordRequired') },
             ]}
             style={{ marginBottom: '24px' }}
-            label={
-              <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                <span>{t('login.password')}</span>
-                <Link to="/forgot-password" style={{ color: '#667eea', fontSize: '13px', fontWeight: 400 }}>
-                  {t('login.forgotPassword')}
-                </Link>
-              </div>
-            }
           >
             <Input.Password
               prefix={<LockOutlined style={{ color: '#8c8c8c' }} />}
