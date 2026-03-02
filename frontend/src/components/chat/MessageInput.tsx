@@ -30,8 +30,8 @@ export const MessageInput: FC = () => {
   const navigate = useNavigate();
   const { currentChatId, addMessage, createNewChat, messages } = useChatStore();
   const { sendQuery, currentQueryId, cancelGeneration, isCancelling } = useSSEContext();
-  const { accounts: rawAwsAccounts, loading: awsLoading } = useAccountStore(); // AWS 账号列表
-  const { accounts: rawGcpAccounts, loading: gcpLoading } = useGCPAccountStore(); // GCP 账号列表
+  const { accounts: rawAwsAccounts, loading: awsLoading, setSelectedAccounts } = useAccountStore(); // AWS 账号列表
+  const { accounts: rawGcpAccounts, loading: gcpLoading, setSelectedAccounts: setSelectedGCPAccounts } = useGCPAccountStore(); // GCP 账号列表
   const { selectedModelId } = useModelStore(); // 获取选中的模型ID
   const { t } = useI18n('chat');
 
@@ -216,7 +216,13 @@ export const MessageInput: FC = () => {
     });
 
     setAccountServicePairs(newPairs);
-  }, [rawAwsAccounts, rawGcpAccounts]);
+
+    // 同步到全局 store，确保 useTemplateExecution 等使用 store 的地方读到最新选中的账号
+    const awsIds = newPairs.filter(p => p.type === 'aws').map(p => p.accountId);
+    const gcpIds = newPairs.filter(p => p.type === 'gcp').map(p => p.accountId);
+    setSelectedAccounts(awsIds);
+    setSelectedGCPAccounts(gcpIds);
+  }, [rawAwsAccounts, rawGcpAccounts, setSelectedAccounts, setSelectedGCPAccounts]);
 
   const handleSend = async () => {
     if (!message.trim() || loading) return;
