@@ -289,7 +289,7 @@ export const AlertManagement: React.FC = () => {
         <Space style={{ width: '100%' }}>
         <Button
           icon={<ArrowLeftOutlined />}
-          onClick={() => navigate('/chat')}
+          onClick={() => navigate('/')}
           type="text"
         >
           {t('common:button.back')}

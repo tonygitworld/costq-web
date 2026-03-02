@@ -198,7 +198,7 @@ export const CloudAccountManagement: React.FC = () => {
         <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
           <Button
             icon={<ArrowLeftOutlined />}
-            onClick={() => navigate('/chat')}
+            onClick={() => navigate('/')}
             type="text"
           >
             {t('common:button.back')}

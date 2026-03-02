@@ -244,7 +244,13 @@ export const UserManagement: React.FC = () => {
         {/* 返回按钮 */}
         <Button
           icon={<ArrowLeftOutlined />}
-          onClick={() => navigate('/chat')}
+          onClick={() => {
+            if (window.history.length > 1) {
+              navigate(-1);
+            } else {
+              navigate('/');
+            }
+          }}
           type="text"
         >
           {t('common:button.back')}
