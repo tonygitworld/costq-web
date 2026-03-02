@@ -45,10 +45,12 @@ class UserStoragePostgreSQL:
         """
         db = self._get_db()
         try:
+            org_id = str(uuid.uuid4())
             org = Organization(
-                id=str(uuid.uuid4()),
+                id=org_id,
                 name=name,
-                is_active=is_active,  # ✅ 直接在创建时设置状态
+                external_id=f"org-{org_id}",
+                is_active=is_active,
                 created_at=_utc_now(),
                 updated_at=_utc_now(),
             )
