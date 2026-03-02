@@ -33,6 +33,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
           top: '20px',
           right: '20px',
           zIndex: 1000,
+          whiteSpace: 'nowrap',
         }}>
           <div style={{
             backgroundColor: 'rgba(255, 255, 255, 0.25)',
@@ -41,6 +42,8 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
             padding: '6px 12px',
             border: '1px solid rgba(255, 255, 255, 0.3)',
             boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+            display: 'inline-flex',
+            alignItems: 'center',
           }}>
             <LanguageSwitcher showIcon={false} showText={true} />
           </div>

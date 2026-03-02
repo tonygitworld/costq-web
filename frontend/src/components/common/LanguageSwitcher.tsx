@@ -100,7 +100,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
         menu={{ items: menuItems, onClick: handleMenuClick }}
         trigger={['click']}
         placement="bottomRight"
-        getPopupContainer={(triggerNode) => triggerNode.parentNode as HTMLElement}
+        getPopupContainer={() => document.body}
       >
         <Button
           type="text"
