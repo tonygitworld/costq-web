@@ -98,7 +98,11 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
 
     return (
       <Dropdown
-        menu={{ items: menuItems, onClick: handleMenuClick }}
+        menu={{
+          items: menuItems,
+          onClick: handleMenuClick,
+          onMouseDown: (e) => e.stopPropagation(),
+        }}
         trigger={['click']}
         placement="bottomRight"
         getPopupContainer={() => document.body}

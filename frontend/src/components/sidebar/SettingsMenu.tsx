@@ -99,14 +99,14 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
       const timer = setTimeout(() => {
         window.addEventListener('scroll', updatePosition, true);
         window.addEventListener('resize', updatePosition);
-        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('click', handleClickOutside);
       }, 0);
 
       return () => {
         clearTimeout(timer);
         window.removeEventListener('scroll', updatePosition, true);
         window.removeEventListener('resize', updatePosition);
-        document.removeEventListener('mousedown', handleClickOutside);
+        document.removeEventListener('click', handleClickOutside);
       };
     }
   }, [isOpen]);
