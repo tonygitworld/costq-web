@@ -8,26 +8,11 @@
   inset: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-.waveBackground {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
-
-/* Lighter overlay — let the wave show through more */
 .overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: radial-gradient(
-    ellipse 70% 65% at 50% 45%,
-    rgba(255, 255, 255, 0.55) 0%,
-    rgba(255, 255, 255, 0.2) 50%,
-    transparent 80%
-  );
+  display: none;
 }
 
 .content {
