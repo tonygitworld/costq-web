@@ -84,9 +84,18 @@ const ForgotPasswordForm: React.FC = () => {
   const handleVerifyCode = async () => {
     try {
       await form.validateFields(['verification_code']);
+      const code = form.getFieldValue('verification_code');
+      setLoading(true);
+      await authApi.verifyResetCode(email, code);
       setStep(3);
-    } catch {
-      // form validation error
+    } catch (error: any) {
+      if (error?.errorFields) return;
+      form.setFields([{
+        name: 'verification_code',
+        errors: [getErrorMessage(error, t('forgotPassword.errors.invalidCode'))],
+      }]);
+    } finally {
+      setLoading(false);
     }
   };
 

@@ -201,6 +201,50 @@ class EmailVerificationService:
 
         return {"success": True, "message": "验证码验证成功"}
 
+    def check_code(
+        self, email: str, code: str, purpose: str = VerificationPurpose.REGISTER
+    ) -> dict[str, Any]:
+        """
+        仅校验验证码是否正确，不消耗（不标记 verified_at，不增加 attempts）
+
+        用于前端在进入下一步前的预校验
+        """
+        verification = (
+            self.db.query(EmailVerificationCode)
+            .filter(
+                and_(
+                    EmailVerificationCode.email == email,
+                    EmailVerificationCode.purpose == purpose,
+                    EmailVerificationCode.verified_at.is_(None),
+                )
+            )
+            .order_by(EmailVerificationCode.created_at.desc())
+            .first()
+        )
+
+        if not verification:
+            return {"success": False, "message": "验证码不存在或已过期", "error_code": "CODE_NOT_FOUND"}
+
+        if verification.is_expired():
+            return {"success": False, "message": "验证码已过期，请重新获取", "error_code": "CODE_EXPIRED"}
+
+        if verification.is_verified():
+            return {"success": False, "message": "验证码已使用", "error_code": "CODE_USED"}
+
+        if verification.attempts >= 5:
+            return {"success": False, "message": "验证码尝试次数过多，请重新获取", "error_code": "MAX_ATTEMPTS_EXCEEDED"}
+
+        if verification.code != code:
+            remaining = 5 - verification.attempts
+            return {
+                "success": False,
+                "message": f"验证码错误，还剩 {remaining} 次尝试机会",
+                "error_code": "CODE_MISMATCH",
+                "remaining_attempts": remaining,
+            }
+
+        return {"success": True, "message": "验证码正确"}
+
     # ========== 激活Token相关 ==========
 
     @staticmethod

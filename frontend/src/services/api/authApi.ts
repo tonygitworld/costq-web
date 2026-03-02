@@ -152,6 +152,18 @@ export const authApi = {
   },
 
   /**
+   * 验证重置验证码（不消耗，仅校验）
+   */
+  async verifyResetCode(email: string, verification_code: string): Promise<{
+    valid: boolean;
+    message: string;
+  }> {
+    return apiClient.post('/auth/verify-reset-code', { email, verification_code }, {
+      skipAuth: true,
+    });
+  },
+
+  /**
    * 重置密码 - 验证验证码并设置新密码
    */
   async resetPassword(email: string, verification_code: string, new_password: string): Promise<{

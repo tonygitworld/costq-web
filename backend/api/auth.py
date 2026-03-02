@@ -831,6 +831,59 @@ async def forgot_password(request_body: ForgotPasswordRequest, request: Request)
         db.close()
 
 
+class VerifyResetCodeRequest(BaseModel):
+    """验证重置验证码请求（不消耗验证码）"""
+
+    email: str = Field(..., description="邮箱地址")
+    verification_code: str = Field(..., min_length=6, max_length=6, description="验证码")
+
+    @field_validator("email")
+    @classmethod
+    def email_valid(cls, v):
+        if not re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", v):
+            raise ValueError("邮箱格式不正确")
+        return v.lower()
+
+
+@router.post("/verify-reset-code")
+@limiter.limit("10/minute")
+async def verify_reset_code(request_body: VerifyResetCodeRequest, request: Request):
+    """
+    验证重置验证码是否正确（不消耗验证码，仅校验）
+    """
+    from backend.database import get_db
+    from backend.services.email_verification_service import get_email_verification_service
+
+    db = next(get_db())
+    verification_service = get_email_verification_service(db)
+
+    try:
+        code_result = verification_service.check_code(
+            email=request_body.email,
+            code=request_body.verification_code,
+            purpose="reset_password",
+        )
+
+        if not code_result["success"]:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=code_result["message"],
+            )
+
+        return {"valid": True, "message": "验证码正确"}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ 验证码校验失败: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="服务暂时不可用，请稍后重试",
+        )
+    finally:
+        db.close()
+
+
 @router.post("/reset-password")
 @limiter.limit("5/minute")
 async def reset_password(request_body: ResetPasswordRequest, request: Request):
