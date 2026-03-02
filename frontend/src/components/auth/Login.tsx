@@ -265,6 +265,12 @@ export const Login: React.FC = () => {
             </Button>
           </Form.Item>
 
+          <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+            <Link to="/forgot-password" style={{ color: '#667eea', fontSize: '14px' }}>
+              {t('login.forgotPassword')}
+            </Link>
+          </div>
+
           <div style={{
             textAlign: 'center',
             paddingTop: '16px',
