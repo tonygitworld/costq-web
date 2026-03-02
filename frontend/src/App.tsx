@@ -11,6 +11,7 @@ import { AlertManagement } from './components/alert/AlertManagement';
 import { AlertForm } from './components/alert/AlertForm';
 import { AlertDetail } from './components/alert/AlertDetail';
 import { Login } from './components/auth/Login';
+import { EnterpriseLogin } from './components/auth/EnterpriseLogin';
 import { Register } from './components/auth/Register';
 import { Activate } from './components/auth/Activate';
 import { ForgotPassword } from './components/auth/ForgotPassword';
@@ -69,7 +70,7 @@ const AppContent: FC = () => {
       <Route
         path="/login"
         element={
-          isAuthenticated ? <Navigate to="/" replace /> : <Login />
+          isAuthenticated ? <Navigate to="/" replace /> : <EnterpriseLogin />
         }
       />
 
