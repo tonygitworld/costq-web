@@ -9,6 +9,7 @@ interface AuthLayoutProps {
   showLanguageSwitcher?: boolean;
   showBackButton?: boolean;
   backTo?: string;
+  onBack?: () => void;
 }
 
 export const AuthLayout: React.FC<AuthLayoutProps> = ({
@@ -16,8 +17,17 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
   showLanguageSwitcher = true,
   showBackButton = true,
   backTo = '/',
+  onBack,
 }) => {
   const navigate = useNavigate();
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+    } else {
+      navigate(backTo);
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -53,7 +63,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
       {showBackButton && (
         <button
           className={styles.backButton}
-          onClick={() => navigate(backTo)}
+          onClick={handleBack}
           aria-label="Back"
           type="button"
         >

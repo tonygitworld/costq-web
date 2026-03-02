@@ -279,8 +279,18 @@ const ForgotPasswordForm: React.FC = () => {
     </>
   );
 
+  const handleBack = () => {
+    if (step === 1) {
+      navigate('/login');
+    } else if (step === 2) {
+      setStep(1);
+    } else if (step === 3) {
+      setStep(2);
+    }
+  };
+
   return (
-    <AuthLayout showBackButton={true} backTo="/login">
+    <AuthLayout showBackButton={step !== 4} onBack={handleBack}>
       <FormCard>
         {step === 1 && renderEmailStep()}
         {step === 2 && renderCodeStep()}
