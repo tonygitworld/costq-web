@@ -26,13 +26,6 @@
   padding: 40px 24px;
 }
 
-.languageSwitcher {
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  z-index: 1000;
-}
-
 .backButton {
   position: fixed;
   top: 24px;
