@@ -86,7 +86,7 @@ class UserStoragePostgreSQL:
         """获取或创建组织的 External ID（用于 IAM Role AssumeRole）
 
         External ID 用于防止混淆代理人攻击，是 AWS IAM Role 信任策略的安全机制。
-        每个组织有唯一的 External ID。
+        每个组织有唯一的 External ID。若数据库中尚未写入，则生成并持久化。
 
         Args:
             org_id: 组织ID
@@ -104,12 +104,20 @@ class UserStoragePostgreSQL:
             if not org:
                 raise ValueError(f"组织不存在: {org_id}")
 
-            # ⚠️ 临时方案：数据库模型中 external_id 字段被注释，使用组织 ID 生成固定的 External ID
-            # 这样可以保证同一个组织的 External ID 始终一致
+            # 已有值直接返回
+            if org.external_id:
+                return org.external_id
+
+            # 首次生成并持久化
             external_id = f"org-{org_id}"
-            logger.debug("External ID: %s for org: %s", external_id, org_id)
+            org.external_id = external_id
+            db.commit()
+            logger.info("External ID 已生成并写入数据库: org_id=%s", org_id)
 
             return external_id
+        except Exception:
+            db.rollback()
+            raise
         finally:
             db.close()
 
