@@ -104,6 +104,35 @@
     "activeUsers": "Active Users",
     "queries": "Queries"
   },
+  "tokenUsage": {
+    "title": "Token Usage Statistics",
+    "refresh": "Refresh",
+    "timeRanges": {
+      "7d": "Last 7 Days",
+      "30d": "Last 30 Days",
+      "custom": "Custom"
+    },
+    "summary": {
+      "inputTokens": "Input Tokens",
+      "outputTokens": "Output Tokens",
+      "cacheReadTokens": "Cache Read Tokens",
+      "cacheWriteTokens": "Cache Write Tokens",
+      "totalMessages": "Total Messages"
+    },
+    "table": {
+      "orgName": "Organization",
+      "username": "Username",
+      "inputTokens": "Input Tokens",
+      "outputTokens": "Output Tokens",
+      "cacheRead": "Cache Read",
+      "cacheWrite": "Cache Write",
+      "total": "Total",
+      "byOrg": "By Organization",
+      "byUser": "By User",
+      "filterByOrg": "Filter by Organization",
+      "totalRecords": "Total {{total}} records"
+    }
+  },
   "common": {
     "confirm": "Confirm",
     "cancel": "Cancel",

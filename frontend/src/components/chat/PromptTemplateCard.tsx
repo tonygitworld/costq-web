@@ -16,7 +16,7 @@ interface Props {
 }
 
 export const PromptTemplateCard: React.FC<Props> = ({ template, onClick }) => {
-  const { language } = useI18n('common'); // 订阅语言变化以触发重新渲染
+  const { language, t } = useI18n('chat'); // 订阅语言变化以触发重新渲染
 
   // 判断是否为用户模板
   const isUserTemplate = 'user_id' in template;
@@ -88,7 +88,7 @@ export const PromptTemplateCard: React.FC<Props> = ({ template, onClick }) => {
                 color="#722ed1"
                 style={{ fontSize: 10, padding: '1px 6px', margin: 0, fontWeight: 400 }}
               >
-                我的
+                {t('template.myTemplate')}
               </Tag>
             ) : (
               template.cloud_provider && (

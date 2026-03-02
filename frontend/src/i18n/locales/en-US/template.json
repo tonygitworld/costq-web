@@ -1,4 +1,12 @@
 {
+  "templateNames": {
+    "awsCostInsight": "AWS Cost Insight",
+    "riSpDataInsight": "RI/SP Data Insight"
+  },
+  "noTemplates": "No templates available",
+  "viewAll": "View All",
+  "customTemplates": "Custom Templates",
+  "confirmUseTemplate": "Confirm to use this template?",
   "manager": {
     "title": "Custom Template Management",
     "createTemplate": "Create Template",
@@ -40,6 +48,7 @@
     "title": "💰 All Cost Templates",
     "systemTemplates": "System Templates",
     "userTemplates": "My Templates",
+    "myTemplates": "My Templates",
     "search": "Search by title or description...",
     "noResults": "No templates available",
     "noResultsWithSearch": "No templates matching \"{{search}}\"",
@@ -61,7 +70,7 @@
     "descriptionPlaceholder": "Brief description of the template purpose",
     "templateContent": "Template Content",
     "contentPlaceholder": "e.g., Check AWS costs for the last {{days}} days, focusing on {{service}} service",
-    "contentHint": "Tip: Use {{variableName}} to create dynamic templates",
+    "contentHint": "Tip: Use double curly braces {{...}} to create dynamic template variables",
     "createButton2": "Create",
     "updateButton": "Update",
     "validation": {

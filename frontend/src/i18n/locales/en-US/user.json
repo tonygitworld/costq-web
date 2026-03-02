@@ -107,11 +107,14 @@
     "selectStatus": "Select status",
     "validation": {
       "usernameRequired": "Please enter username",
+      "emailInvalid": "Please enter a valid email address",
       "passwordRequired": "Please enter password",
       "passwordMin": "Password must be at least 8 characters",
       "passwordPattern": "Must contain uppercase, lowercase, and numbers",
       "roleRequired": "Please select role"
-    }
+    },
+    "activationEmailHint": "User will receive an activation email to set password via link",
+    "emailPlaceholder": "Enter user email address"
   },
   "actions": {
     "edit": "Edit",

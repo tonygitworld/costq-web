@@ -13,9 +13,6 @@ import dayjs from 'dayjs';
 import { ThinkingSummary } from './ThinkingSummary';
 import { ToolCallWithDetails } from './ToolCallWithDetails';
 import StatusCard from './StatusCard';
-import { MessageImageGrid } from './MessageImageGrid';
-import { MessageExcelList } from './MessageExcelList';
-import { MessageDocumentList } from './MessageDocumentList';
 
 // ✨ 新增：导入样式
 import './MessageItem.css';
@@ -61,18 +58,6 @@ const MessageItemComponent: FC<MessageItemProps> = ({ message }) => {
               <div className="user-message-text">
                 {message.content}
               </div>
-              {/* ✅ 用户消息中的图片附件展示 */}
-              {message.imageAttachments && message.imageAttachments.length > 0 && (
-                <MessageImageGrid attachments={message.imageAttachments} />
-              )}
-              {/* ✅ 用户消息中的 Excel 附件展示 */}
-              {message.excelAttachments && message.excelAttachments.length > 0 && (
-                <MessageExcelList attachments={message.excelAttachments} />
-              )}
-              {/* ✅ 用户消息中的文档附件展示 */}
-              {message.documentAttachments && message.documentAttachments.length > 0 && (
-                <MessageDocumentList attachments={message.documentAttachments} />
-              )}
             </HoverStableCard>
 
             {/* 用户消息的操作区域 - 时间戳和复制按钮横向排列 */}
@@ -221,38 +206,26 @@ const MessageItemComponent: FC<MessageItemProps> = ({ message }) => {
               )}
 
               {/* ✅ Token 使用统计 - 集成到消息卡片内部底部 */}
-              {/* ✅ AI 消息中的图片附件展示 */}
-              {message.imageAttachments && message.imageAttachments.length > 0 && (
-                <MessageImageGrid attachments={message.imageAttachments} />
-              )}
-              {/* ✅ AI 消息中的 Excel 附件展示 */}
-              {message.excelAttachments && message.excelAttachments.length > 0 && (
-                <MessageExcelList attachments={message.excelAttachments} />
-              )}
-              {/* ✅ AI 消息中的文档附件展示 */}
-              {message.documentAttachments && message.documentAttachments.length > 0 && (
-                <MessageDocumentList attachments={message.documentAttachments} />
-              )}
               {message.meta.status === 'completed' && message.tokenUsage && (
                 <div className="token-usage-inline">
                   <div className="token-usage-divider"></div>
                   <div className="token-usage-compact">
-                    <span className="token-usage-label">📊 Token 使用</span>
+                    <span className="token-usage-label">{t('tokenUsage.label')}</span>
                     <span className="token-stat-inline">
-                      输入: <strong>{message.tokenUsage.input_tokens.toLocaleString()}</strong>
+                      {t('tokenUsage.input')}: <strong>{message.tokenUsage.input_tokens.toLocaleString()}</strong>
                     </span>
                     <span className="token-stat-inline">
-                      输出: <strong>{message.tokenUsage.output_tokens.toLocaleString()}</strong>
+                      {t('tokenUsage.output')}: <strong>{message.tokenUsage.output_tokens.toLocaleString()}</strong>
                     </span>
                     {message.tokenUsage.cache_read_tokens > 0 && (
                       <span className="token-stat-inline token-cache-read">
-                        缓存读取: <strong>{message.tokenUsage.cache_read_tokens.toLocaleString()}</strong>
-                        <span className="token-cache-rate"> ({message.tokenUsage.input_cache_hit_rate}%)</span>
+                        {t('tokenUsage.cacheRead')}: <strong>{message.tokenUsage.cache_read_tokens.toLocaleString()}</strong>
+                        <span className="token-cache-rate"> ({t('tokenUsage.cacheRate', { rate: message.tokenUsage.input_cache_hit_rate })})</span>
                       </span>
                     )}
                     {message.tokenUsage.cache_write_tokens > 0 && (
                       <span className="token-stat-inline token-cache-write">
-                        缓存写入: <strong>{message.tokenUsage.cache_write_tokens.toLocaleString()}</strong>
+                        {t('tokenUsage.cacheWrite')}: <strong>{message.tokenUsage.cache_write_tokens.toLocaleString()}</strong>
                       </span>
                     )}
                   </div>
@@ -296,7 +269,7 @@ const MessageItemComponent: FC<MessageItemProps> = ({ message }) => {
           {message.meta.status === 'failed' && message.meta.error && (
             <Alert
               message={t('message.analysisFailed')}
-              description={message.meta.error.message || '请求处理失败，请重试或简化问题'}
+              description={message.meta.error.message || t('message.analysisFailedDesc')}
               type="error"
               showIcon
               icon={<ExclamationCircleOutlined />}
@@ -376,9 +349,6 @@ export const MessageItem = memo(MessageItemComponent, (prevProps, nextProps) => 
     prevMsg.thinking === nextMsg.thinking &&
     prevMsg.toolCalls?.length === nextMsg.toolCalls?.length &&
     prevMsg.contentBlocks?.length === nextMsg.contentBlocks?.length &&
-    prevMsg.showStatus === nextMsg.showStatus &&
-    prevMsg.imageAttachments?.length === nextMsg.imageAttachments?.length &&
-    prevMsg.excelAttachments?.length === nextMsg.excelAttachments?.length &&
-    prevMsg.documentAttachments?.length === nextMsg.documentAttachments?.length
+    prevMsg.showStatus === nextMsg.showStatus
   );
 });

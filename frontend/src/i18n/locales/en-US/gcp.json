@@ -74,6 +74,9 @@
     },
     "selector": {
       "placeholder": "Select GCP account to query"
+    },
+    "validation": {
+      "invalidJson": "Invalid JSON format"
     }
   }
 }

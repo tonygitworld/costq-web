@@ -1,4 +1,12 @@
 {
+  "templateNames": {
+    "awsCostInsight": "AWS コスト洞察",
+    "riSpDataInsight": "RI/SP データ洞察"
+  },
+  "noTemplates": "テンプレートがありません",
+  "viewAll": "すべて表示",
+  "customTemplates": "カスタムテンプレート",
+  "confirmUseTemplate": "このテンプレートを使用しますか？",
   "manager": {
     "title": "カスタムテンプレート管理",
     "createTemplate": "テンプレートを作成",
@@ -40,6 +48,7 @@
     "title": "💰 すべてのコストテンプレート",
     "systemTemplates": "システムテンプレート",
     "userTemplates": "マイテンプレート",
+    "myTemplates": "マイテンプレート",
     "search": "タイトルまたは説明で検索...",
     "noResults": "テンプレートがありません",
     "noResultsWithSearch": "「{{search}}」に一致するテンプレートが見つかりません",

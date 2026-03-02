@@ -117,7 +117,7 @@ export const IAMRoleTab: FC<IAMRoleTabProps> = ({ onSuccess, onCancel }) => {
               </div>
 
               {loadingExtId ? (
-                <Spin tip="加载中..." />
+                <Spin tip={t('common:status.loading')} />
               ) : externalIdInfo ? (
                 <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                   {/* External ID */}

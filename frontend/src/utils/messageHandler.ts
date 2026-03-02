@@ -4,6 +4,7 @@ import { type ThinkingData, type ToolCallData, type ContentBlock, type Message, 
 import { useChatStore } from '../stores/chatStore';
 import { notification } from 'antd';
 import { logger } from './logger';
+import i18n from '../i18n';
 
 // 消息构建器状态类型
 interface MessageBuilderState {
@@ -228,8 +229,8 @@ export class MessageHandler {
     } catch (error) {
       logger.error('处理消息时出错:', error);
       notification.error({
-        message: '消息处理错误',
-        description: '处理服务器消息时出现错误，请重试。'
+        message: i18n.t('error:messageHandler.processingError'),
+        description: i18n.t('error:messageHandler.processingErrorDesc')
       });
     }
   };
@@ -396,10 +397,10 @@ export class MessageHandler {
 
     // ✅ 处理错误情况：无论是否有 error 字段，只要 success 为 false 就显示错误
     if (!success) {
-      const errorMessage = error || '请求处理失败，请重试或简化问题';
+      const errorMessage = error || i18n.t('error:messageHandler.requestFailed');
       logger.error('❌ [messageHandler.handleCompletion] 查询失败:', errorMessage);
       notification.error({
-        message: '处理失败',
+        message: i18n.t('error:messageHandler.processingFailed'),
         description: errorMessage,
         duration: 5
       });
@@ -436,7 +437,7 @@ export class MessageHandler {
     }
 
     //作为思考步骤处理
-    this.handleThinkingStep({ content: message.content || '正在思考...' });
+    this.handleThinkingStep({ content: message.content || i18n.t('error:messageHandler.thinking') });
   };
 
   private handleMessageStart = (message: WebSocketMessage & { session_id?: string }) => {
@@ -833,7 +834,7 @@ export class MessageHandler {
     });
 
     notification.error({
-      message: '处理失败',
+      message: i18n.t('error:messageHandler.processingFailed'),
       description: errorMessage,
       duration: 5
     });
@@ -925,7 +926,7 @@ export class MessageHandler {
     // ⚠️ 注意：使用静态 notification API 会有警告，但在工具类中这是可接受的
     // 如需消除警告，需要重构为通过 Context 注入 notification 实例
     notification.info({
-      message: '已停止生成',
+      message: i18n.t('error:messageHandler.generationStopped'),
       description: reason,
       duration: 3
     });
@@ -1213,8 +1214,8 @@ export class MessageHandler {
 
     // 4. 显示通知（可选）
     notification.info({
-      message: '会话已自动续期',
-      description: msg || '会话已过期，已自动创建新会话',
+      message: i18n.t('error:messageHandler.sessionRenewed'),
+      description: msg || i18n.t('error:messageHandler.sessionRenewed'),
       duration: 3,
       placement: 'topRight'
     });
