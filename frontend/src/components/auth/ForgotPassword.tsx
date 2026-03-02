@@ -6,7 +6,7 @@ import { useI18n } from '../../hooks/useI18n';
 import { AuthLayout } from './AuthLayout';
 import { FormCard } from './FormCard';
 import { authApi } from '../../services/api/authApi';
-import { getErrorMessage } from '../../utils/ErrorHandler';
+import { getErrorCode, getErrorMessage } from '../../utils/ErrorHandler';
 import styles from './ForgotPassword.module.css';
 
 const ForgotPasswordForm: React.FC = () => {
@@ -112,7 +112,12 @@ const ForgotPasswordForm: React.FC = () => {
       if (error?.errorFields) return;
       // 验证码错误时跳回step2并在验证码输入框显示错误
       const errMsg = getErrorMessage(error, t('forgotPassword.errors.resetFailed'));
-      const isCodeError = errMsg.includes('验证码') || errMsg.includes('code') || errMsg.includes('invalid') || errMsg.includes('expired');
+      const errorCode = getErrorCode(error);
+      const isCodeError = errorCode === 'CODE_MISMATCH'
+        || errorCode === 'CODE_EXPIRED'
+        || errorCode === 'CODE_NOT_FOUND'
+        || errorCode === 'CODE_USED'
+        || errorCode === 'MAX_ATTEMPTS_EXCEEDED';
       if (isCodeError) {
         setStep(2);
         setTimeout(() => {
