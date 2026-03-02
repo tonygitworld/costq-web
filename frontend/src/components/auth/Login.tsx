@@ -232,6 +232,14 @@ export const Login: React.FC = () => {
               { required: true, message: t('login.validation.passwordRequired') },
             ]}
             style={{ marginBottom: '24px' }}
+            label={
+              <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                <span>{t('login.password')}</span>
+                <Link to="/forgot-password" style={{ color: '#667eea', fontSize: '13px', fontWeight: 400 }}>
+                  {t('login.forgotPassword')}
+                </Link>
+              </div>
+            }
           >
             <Input.Password
               prefix={<LockOutlined style={{ color: '#8c8c8c' }} />}
@@ -264,12 +272,6 @@ export const Login: React.FC = () => {
               {t('login.submitButton')}
             </Button>
           </Form.Item>
-
-          <div style={{ textAlign: 'center', marginBottom: '12px' }}>
-            <Link to="/forgot-password" style={{ color: '#667eea', fontSize: '14px' }}>
-              {t('login.forgotPassword')}
-            </Link>
-          </div>
 
           <div style={{
             textAlign: 'center',
