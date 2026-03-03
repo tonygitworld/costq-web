@@ -28,6 +28,12 @@ import boto3
 from loguru import logger
 from sqlalchemy.orm import Session
 
+# Support running as standalone script (like other migrations/tools)
+import sys
+import pathlib
+project_root = pathlib.Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(project_root))
+
 from backend.database import get_session_local
 from backend.models.user import Organization
 from backend.services.marketplace_storage_postgresql import MarketplaceStoragePostgreSQL
