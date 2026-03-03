@@ -286,6 +286,9 @@ export const opsService = {
   deactivateTenant: (tenantId: string): Promise<TenantActionResponse> =>
     apiClient.put<TenantActionResponse>(`/ops/tenants/${tenantId}/deactivate`),
 
+  refreshTenantMarketplaceSubscription: (tenantId: string): Promise<any> =>
+    apiClient.post(`/ops/marketplace/tenants/refresh`, { tenant_id: tenantId }),
+
   /**
    * 获取删除租户的影响预览
    */

@@ -59,6 +59,30 @@ export const TenantDetail: React.FC = () => {
     onError: () => message.error(t('tenant.message.operationFailed')),
   });
 
+  // Marketplace 刷新订阅状态
+  const refreshMarketplaceMutation = useMutation({
+    mutationFn: () => opsService.refreshTenantMarketplaceSubscription(tenantId!),
+    onSuccess: (data) => {
+      // data contains should_disable/organization_is_active/plan
+      const active = data?.organization_is_active;
+      const plan = data?.plan;
+      message.success(`Marketplace刷新完成：${active ? '已启用' : '已禁用'}${plan ? `（plan=${plan}）` : ''}`);
+      queryClient.invalidateQueries({ queryKey: ['ops-tenant', tenantId] });
+    },
+    onError: () => message.error('Marketplace刷新失败'),
+  });
+
+  const handleRefreshMarketplace = () => {
+    if (!tenantId) return;
+    modal.confirm({
+      title: '刷新 Marketplace 订阅状态',
+      content: '将调用 AWS Marketplace entitlement 校验，并自动启用/禁用该租户。确认继续？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => refreshMarketplaceMutation.mutateAsync(),
+    });
+  };
+
   // 切换状态
   const handleToggleStatus = () => {
     if (!tenant) return;
@@ -113,6 +137,14 @@ export const TenantDetail: React.FC = () => {
             <Tag color={tenant.is_active ? 'green' : 'orange'}>
               {tenant.is_active ? t('tenant.status.activated') : t('tenant.status.pending')}
             </Tag>
+            <Button
+              size="small"
+              onClick={handleRefreshMarketplace}
+              loading={refreshMarketplaceMutation.isPending}
+              style={{ marginLeft: 8 }}
+            >
+              刷新订阅（Marketplace）
+            </Button>
             <Button
               size="small"
               danger={tenant.is_active}

@@ -25,11 +25,28 @@ class OpsRefreshRequest(BaseModel):
     tenant_id: str
 
 
-@router.post("/tenants/refresh", response_model=RefreshResponse)
+class OpsRefreshResponse(BaseModel):
+    should_disable: bool
+    reason: str | None = None
+    aws_customer_identifier: str | None = None
+    plan: str | None = None
+    organization_is_active: bool
+
+
+@router.post("/tenants/refresh", response_model=OpsRefreshResponse)
 def ops_refresh_tenant_subscription(
     req: OpsRefreshRequest,
     current_user: dict = Depends(get_current_super_admin),
     db: Session = Depends(get_db),
 ):
     # Reuse marketplace refresh logic
-    return refresh_entitlement(RefreshRequest(org_id=req.tenant_id), db=db)
+    r: RefreshResponse = refresh_entitlement(RefreshRequest(org_id=req.tenant_id), db=db)
+
+    # Manual decision helper: should_disable == not active
+    return OpsRefreshResponse(
+        should_disable=not r.organization_is_active,
+        reason=None,
+        aws_customer_identifier=r.aws_customer_identifier,
+        plan=r.plan,
+        organization_is_active=r.organization_is_active,
+    )
