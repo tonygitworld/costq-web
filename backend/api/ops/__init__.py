@@ -11,6 +11,7 @@ from backend.api.ops.audit_logs import router as audit_logs_router
 from backend.api.ops.dashboard import router as dashboard_router
 from backend.api.ops.tenants import router as tenants_router
 from backend.api.ops.token_usage import router as token_usage_router
+from backend.api.ops.marketplace import router as marketplace_ops_router
 
 # 创建运营后台主路由
 ops_router = APIRouter(
@@ -23,5 +24,6 @@ ops_router.include_router(dashboard_router)
 ops_router.include_router(tenants_router)
 ops_router.include_router(audit_logs_router)
 ops_router.include_router(token_usage_router)
+ops_router.include_router(marketplace_ops_router)
 
 __all__ = ["ops_router"]
