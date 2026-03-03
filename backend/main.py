@@ -28,6 +28,7 @@ from .api.models import router as models_router
 # P2-3: 禁用监控 API（安全考虑）
 from .api.monitoring import router as monitoring_router  # Phase 4: 监控路由（简化版）
 from .api.ops import ops_router  # 运营后台路由
+from .api.marketplace import router as marketplace_router  # AWS Marketplace
 from .api.profile import router as profile_router
 from .api.prompt_templates import router as prompt_templates_router
 from .api.users import router as users_router
@@ -292,6 +293,7 @@ app.include_router(alerts_router)  # 告警管理路由 (Alert MCP Server)
 # P2-3: 禁用监控 API（安全考虑）
 app.include_router(monitoring_router)  # Phase 4: 监控路由（简化版）
 app.include_router(ops_router)  # 运营后台路由
+app.include_router(marketplace_router)  # AWS Marketplace 路由
 
 # 挂载静态文件（开发环境禁用缓存）
 class NoCacheStaticFiles(StaticFiles):
