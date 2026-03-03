@@ -159,12 +159,13 @@ if __name__ == "__main__":
     project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     sys.path.insert(0, project_root)
 
-    from backend.database import SessionLocal
+    from backend.database import get_session_local
 
     logger.info("=" * 60)
     logger.info("🚀 开始执行数据库迁移: Marketplace 基础表")
     logger.info("=" * 60)
 
+    SessionLocal = get_session_local()
     db = SessionLocal()
     try:
         upgrade(db)
