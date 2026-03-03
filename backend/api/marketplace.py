@@ -99,10 +99,10 @@ def refresh_entitlement(req: RefreshRequest, db=Depends(get_db)):
         raise HTTPException(status_code=404, detail="Organization not found")
 
     storage = MarketplaceStoragePostgreSQL(db)
-    customer_identifier = storage.get_customer_identifier_by_org(org_id=req.org_id)
+    mapping = storage.get_customer_mapping_by_org(org_id=req.org_id)
 
-    # MVP: if no mapping, disable org
-    if not customer_identifier:
+    # If no mapping, disable org
+    if not mapping or not mapping.get("aws_customer_identifier"):
         org.is_active = False
         db.commit()
         return RefreshResponse(
@@ -112,11 +112,59 @@ def refresh_entitlement(req: RefreshRequest, db=Depends(get_db)):
             organization_is_active=org.is_active,
         )
 
-    # Without product_code we can't query entitlement. For MVP, keep org active.
-    # TODO: persist product_code and query GetEntitlement, then disable/enable accordingly.
+    customer_identifier = mapping["aws_customer_identifier"]
+    product_code = mapping.get("aws_product_code")
+
+    if not product_code:
+        # Can't verify entitlement without product code: conservative choice is disable.
+        org.is_active = False
+        db.commit()
+        return RefreshResponse(
+            org_id=req.org_id,
+            aws_customer_identifier=customer_identifier,
+            plan=None,
+            organization_is_active=org.is_active,
+        )
+
+    svc = MarketplaceService()
+    entitlements = svc.get_entitlements(product_code=product_code, customer_identifier=customer_identifier)
+
+    # If no entitlements returned -> disable
+    if not entitlements:
+        org.is_active = False
+        db.commit()
+        return RefreshResponse(
+            org_id=req.org_id,
+            aws_customer_identifier=customer_identifier,
+            plan=None,
+            organization_is_active=org.is_active,
+        )
+
+    # MVP: determine plan from first entitlement Dimension
+    plan = (entitlements[0].get("Dimension") or "").lower() or None
+
+    # Cache entitlement for audit/diagnostics
+    try:
+        storage.upsert_entitlement_cache(
+            org_id=req.org_id,
+            aws_customer_identifier=customer_identifier,
+            dimension="plan",
+            value=plan or "unknown",
+            expires_at=_utc_now() + timedelta(hours=6),
+            raw_entitlement={"entitlements": entitlements},
+            last_refresh_error=None,
+        )
+    except Exception:
+        # Cache failure shouldn't block entitlement decision
+        pass
+
+    # Enable org if entitlement exists
+    org.is_active = True
+    db.commit()
+
     return RefreshResponse(
         org_id=req.org_id,
         aws_customer_identifier=customer_identifier,
-        plan=None,
+        plan=plan,
         organization_is_active=org.is_active,
     )

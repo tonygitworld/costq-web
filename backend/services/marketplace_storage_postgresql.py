@@ -59,18 +59,20 @@ class MarketplaceStoragePostgreSQL:
         )
         self.db.commit()
 
-    def get_customer_identifier_by_org(self, *, org_id: str) -> str | None:
+    def get_customer_mapping_by_org(self, *, org_id: str) -> dict[str, str] | None:
         row = self.db.execute(
             text(
                 """
-                SELECT aws_customer_identifier
+                SELECT aws_customer_identifier, aws_product_code
                 FROM marketplace_customers
                 WHERE org_id = :org_id
                 """
             ),
             {"org_id": org_id},
         ).fetchone()
-        return row[0] if row else None
+        if not row:
+            return None
+        return {"aws_customer_identifier": row[0], "aws_product_code": row[1]}
 
     def upsert_entitlement_cache(
         self,
