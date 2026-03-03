@@ -132,7 +132,7 @@ class MarketplaceStoragePostgreSQL:
                 INSERT INTO marketplace_event_log
                     (aws_customer_identifier, sns_message_id, event_type, payload, status, received_at)
                 VALUES
-                    (:aws_customer_identifier, :sns_message_id, :event_type, :payload::jsonb, :status, now())
+                    (:aws_customer_identifier, :sns_message_id, :event_type, CAST(:payload AS jsonb), :status, now())
                 ON CONFLICT (sns_message_id) DO NOTHING;
                 """
             ),
