@@ -1,95 +1,178 @@
-"""create marketplace tables (postgresql)
+#!/usr/bin/env python3
+"""数据库迁移: 创建 AWS Marketplace 相关基础表 (PostgreSQL)
 
-Revision ID: 016_create_marketplace_tables_postgresql
-Revises: 015_upgrade_all_remaining_tables_to_uuid
-Create Date: 2026-03-03
+创建表:
+- marketplace_customers: Marketplace customerIdentifier 与组织(org) 映射（1:1）
+- marketplace_entitlement_cache: entitlement 缓存（plan 等维度）
+- marketplace_event_log: 事件日志（用于幂等/审计/重放）
 
-Note:
-- This migration targets the dev PostgreSQL RDS.
-- Uses organizations(id) as the tenant/org foreign key.
+运行方式:
+    RDS_SECRET_NAME=costq/rds/postgresql-dev python backend/migrations/016_create_marketplace_tables_postgresql.py
+
+说明:
+- 该仓库 migrations 采用“脚本直跑”的风格（参考 010_create_execution_log.py）。
+- 本脚本使用 backend.database.SessionLocal 建立连接；因此需通过 RDS_SECRET_NAME 指向 dev RDS。
 """
 
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
+from loguru import logger
+from sqlalchemy import text
 
 
-# revision identifiers, used by Alembic.
-revision = "016_create_marketplace_tables_postgresql"
-down_revision = "015_upgrade_all_remaining_tables_to_uuid"
-branch_labels = None
-depends_on = None
+def upgrade(db):
+    logger.info("⬆️  开始迁移: 创建 Marketplace 基础表")
+
+    try:
+        logger.info("📋 创建 marketplace_customers 表...")
+        db.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS marketplace_customers (
+                    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                    org_id UUID NOT NULL,
+                    aws_customer_identifier TEXT NOT NULL,
+                    aws_product_code TEXT,
+                    status TEXT NOT NULL DEFAULT 'active',
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+
+                    CONSTRAINT fk_marketplace_customers_org
+                        FOREIGN KEY (org_id)
+                        REFERENCES organizations(id)
+                        ON DELETE CASCADE,
+
+                    CONSTRAINT uq_marketplace_customers_org_id
+                        UNIQUE (org_id),
+
+                    CONSTRAINT uq_marketplace_customers_aws_customer_identifier
+                        UNIQUE (aws_customer_identifier)
+                )
+                """
+            )
+        )
+        db.execute(text("CREATE INDEX IF NOT EXISTS ix_marketplace_customers_org_id ON marketplace_customers(org_id)"))
+        db.commit()
+        logger.info("✅ marketplace_customers 表创建成功")
+
+        logger.info("📋 创建 marketplace_entitlement_cache 表...")
+        db.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS marketplace_entitlement_cache (
+                    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                    org_id UUID NOT NULL,
+                    aws_customer_identifier TEXT NOT NULL,
+                    dimension TEXT NOT NULL,
+                    value TEXT NOT NULL,
+                    expiration_date TIMESTAMPTZ,
+                    raw_entitlement JSONB,
+                    cached_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                    expires_at TIMESTAMPTZ NOT NULL,
+                    last_refresh_error TEXT,
+
+                    CONSTRAINT fk_marketplace_entitlement_cache_org
+                        FOREIGN KEY (org_id)
+                        REFERENCES organizations(id)
+                        ON DELETE CASCADE,
+
+                    CONSTRAINT uq_marketplace_entitlement_cache_org_dimension
+                        UNIQUE (org_id, dimension)
+                )
+                """
+            )
+        )
+        db.execute(text("CREATE INDEX IF NOT EXISTS ix_marketplace_entitlement_cache_org_id ON marketplace_entitlement_cache(org_id)"))
+        db.execute(text("CREATE INDEX IF NOT EXISTS ix_marketplace_entitlement_cache_aws_customer_identifier ON marketplace_entitlement_cache(aws_customer_identifier)"))
+        db.execute(text("CREATE INDEX IF NOT EXISTS ix_marketplace_entitlement_cache_expires_at ON marketplace_entitlement_cache(expires_at)"))
+        db.commit()
+        logger.info("✅ marketplace_entitlement_cache 表创建成功")
+
+        logger.info("📋 创建 marketplace_event_log 表...")
+        db.execute(
+            text(
+                """
+                CREATE TABLE IF NOT EXISTS marketplace_event_log (
+                    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                    aws_customer_identifier TEXT,
+                    sns_message_id TEXT,
+                    event_type TEXT NOT NULL,
+                    payload JSONB NOT NULL,
+                    status TEXT NOT NULL DEFAULT 'pending',
+                    error_message TEXT,
+                    received_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                    processed_at TIMESTAMPTZ,
+
+                    CONSTRAINT uq_marketplace_event_log_sns_message_id
+                        UNIQUE (sns_message_id)
+                )
+                """
+            )
+        )
+        db.execute(text("CREATE INDEX IF NOT EXISTS ix_marketplace_event_log_status ON marketplace_event_log(status)"))
+        db.execute(text("CREATE INDEX IF NOT EXISTS ix_marketplace_event_log_received_at ON marketplace_event_log(received_at)"))
+        db.commit()
+        logger.info("✅ marketplace_event_log 表创建成功")
+
+        logger.info("🔍 验证迁移结果...")
+        result = db.execute(
+            text(
+                """
+                SELECT table_name
+                FROM information_schema.tables
+                WHERE table_schema='public'
+                  AND table_name IN (
+                    'marketplace_customers',
+                    'marketplace_entitlement_cache',
+                    'marketplace_event_log'
+                  )
+                ORDER BY table_name
+                """
+            )
+        )
+        tables = [row[0] for row in result.fetchall()]
+        logger.info(f"📊 已创建的表: {tables}")
+        logger.info("✅ 迁移完成！")
+
+    except Exception as e:
+        logger.error(f"❌ 迁移失败: {e}")
+        db.rollback()
+        raise
 
 
-def upgrade():
-    # 1) marketplace_customers (1:1 org_id)
-    op.create_table(
-        "marketplace_customers",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
-        sa.Column("org_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False),
-        sa.Column("aws_customer_identifier", sa.Text(), nullable=False),
-        sa.Column("aws_product_code", sa.Text(), nullable=True),
-        sa.Column("status", sa.Text(), nullable=False, server_default=sa.text("'active'")),
-        sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
-        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
-        sa.UniqueConstraint("org_id", name="uq_marketplace_customers_org_id"),
-        sa.UniqueConstraint("aws_customer_identifier", name="uq_marketplace_customers_aws_customer_identifier"),
-    )
-    op.create_index("ix_marketplace_customers_org_id", "marketplace_customers", ["org_id"])
-
-    # 2) marketplace_entitlement_cache
-    op.create_table(
-        "marketplace_entitlement_cache",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
-        sa.Column("org_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False),
-        sa.Column("aws_customer_identifier", sa.Text(), nullable=False),
-        sa.Column("dimension", sa.Text(), nullable=False),
-        sa.Column("value", sa.Text(), nullable=False),
-        sa.Column("expiration_date", sa.DateTime(timezone=True), nullable=True),
-        sa.Column("raw_entitlement", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-        sa.Column("cached_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
-        sa.Column("expires_at", sa.DateTime(timezone=True), nullable=False),
-        sa.Column("last_refresh_error", sa.Text(), nullable=True),
-        sa.UniqueConstraint("org_id", "dimension", name="uq_marketplace_entitlement_cache_org_dimension"),
-    )
-    op.create_index("ix_marketplace_entitlement_cache_org_id", "marketplace_entitlement_cache", ["org_id"])
-    op.create_index(
-        "ix_marketplace_entitlement_cache_aws_customer_identifier",
-        "marketplace_entitlement_cache",
-        ["aws_customer_identifier"],
-    )
-    op.create_index("ix_marketplace_entitlement_cache_expires_at", "marketplace_entitlement_cache", ["expires_at"])
-
-    # 3) marketplace_event_log
-    op.create_table(
-        "marketplace_event_log",
-        sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
-        sa.Column("aws_customer_identifier", sa.Text(), nullable=True),
-        sa.Column("sns_message_id", sa.Text(), nullable=True),
-        sa.Column("event_type", sa.Text(), nullable=False),
-        sa.Column("payload", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-        sa.Column("status", sa.Text(), nullable=False, server_default=sa.text("'pending'")),
-        sa.Column("error_message", sa.Text(), nullable=True),
-        sa.Column("received_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("now()")),
-        sa.Column("processed_at", sa.DateTime(timezone=True), nullable=True),
-        sa.UniqueConstraint("sns_message_id", name="uq_marketplace_event_log_sns_message_id"),
-    )
-    op.create_index("ix_marketplace_event_log_status", "marketplace_event_log", ["status"])
-    op.create_index("ix_marketplace_event_log_received_at", "marketplace_event_log", ["received_at"])
+def downgrade(db):
+    logger.info("⬇️  开始回滚: 删除 Marketplace 基础表")
+    try:
+        db.execute(text("DROP TABLE IF EXISTS marketplace_event_log CASCADE"))
+        db.execute(text("DROP TABLE IF EXISTS marketplace_entitlement_cache CASCADE"))
+        db.execute(text("DROP TABLE IF EXISTS marketplace_customers CASCADE"))
+        db.commit()
+        logger.info("✅ 回滚完成")
+    except Exception as e:
+        logger.error(f"❌ 回滚失败: {e}")
+        db.rollback()
+        raise
 
 
-def downgrade():
-    op.drop_index("ix_marketplace_event_log_received_at", table_name="marketplace_event_log")
-    op.drop_index("ix_marketplace_event_log_status", table_name="marketplace_event_log")
-    op.drop_table("marketplace_event_log")
+if __name__ == "__main__":
+    import sys
+    import os
 
-    op.drop_index("ix_marketplace_entitlement_cache_expires_at", table_name="marketplace_entitlement_cache")
-    op.drop_index(
-        "ix_marketplace_entitlement_cache_aws_customer_identifier",
-        table_name="marketplace_entitlement_cache",
-    )
-    op.drop_index("ix_marketplace_entitlement_cache_org_id", table_name="marketplace_entitlement_cache")
-    op.drop_table("marketplace_entitlement_cache")
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    sys.path.insert(0, project_root)
 
-    op.drop_index("ix_marketplace_customers_org_id", table_name="marketplace_customers")
-    op.drop_table("marketplace_customers")
+    from backend.database import SessionLocal
+
+    logger.info("=" * 60)
+    logger.info("🚀 开始执行数据库迁移: Marketplace 基础表")
+    logger.info("=" * 60)
+
+    db = SessionLocal()
+    try:
+        upgrade(db)
+        logger.info("=" * 60)
+        logger.info("✅ 迁移执行成功！")
+        logger.info("=" * 60)
+    except Exception:
+        db.rollback()
+        raise
+    finally:
+        db.close()
