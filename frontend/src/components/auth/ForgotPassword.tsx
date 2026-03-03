@@ -178,7 +178,7 @@ const ForgotPasswordForm: React.FC = () => {
         >
           <Input
             prefix={<Mail size={18} className={styles.inputIcon} />}
-            placeholder={t('login.emailPlaceholder')}
+            placeholder={t('forgotPassword.emailPlaceholder')}
             size="large"
             className={styles.formInput}
             autoComplete="email"
