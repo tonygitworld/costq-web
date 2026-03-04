@@ -4,7 +4,7 @@ import type { TableProps } from 'antd';
 import {
   DndContext,
   closestCenter,
-  PointerSensor,
+  MouseSensor,
   KeyboardSensor,
   useSensor,
   useSensors,
@@ -17,6 +17,7 @@ import { restrictToHorizontalAxis } from '@dnd-kit/modifiers';
 import { useColumnResize } from '../../../hooks/useColumnResize';
 import { useColumnDragOrder } from '../../../hooks/useColumnDragOrder';
 import { DraggableHeaderCell } from './DraggableHeaderCell';
+import { SortIcon } from './SortIcon';
 import './AWSStyleTable.css';
 
 export interface AWSStyleTableProps<T = any> extends TableProps<T> {
@@ -59,21 +60,33 @@ export function AWSStyleTable<T extends Record<string, any>>({
 
   // 3. 传感器配置 — 始终调用，保证 hooks 顺序一致
   const sensors = useSensors(
-    useSensor(PointerSensor, {
+    useSensor(MouseSensor, {
       activationConstraint: { distance: 8 },
     }),
     useSensor(KeyboardSensor)
   );
 
-  // 4. 自定义 header cell — 把 columnKey 和 resize 信息注入
+  // 4. 自定义 header cell — 把 columnKey 和 resize 信息注入，同时给有 sorter 的列注入 sortIcon
   const finalColumns = useMemo(() => {
     return resizedColumns.map(col => {
       const key = (col as any).key || (col as any).dataIndex;
       const isFixed = !!(col as any).fixed;
       const originalOnHeaderCell = (col as any).onHeaderCell;
+      const hasSorter = !!(col as any).sorter;
 
       return {
         ...col,
+        // 有 sorter 的列注入 AWS 风格排序图标 + 两态排序（ascend ↔ descend）
+        ...(hasSorter ? {
+          ...(!((col as any).sortIcon) ? {
+            sortIcon: ({ sortOrder }: { sortOrder: 'ascend' | 'descend' | null }) => (
+              <SortIcon sortOrder={sortOrder} />
+            ),
+          } : {}),
+          ...(!((col as any).sortDirections) ? {
+            sortDirections: ['ascend', 'descend', 'ascend'] as const,
+          } : {}),
+        } : {}),
         onHeaderCell: (column: any) => {
           const resizeProps = originalOnHeaderCell ? originalOnHeaderCell(column) : {};
           return {

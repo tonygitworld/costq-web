@@ -22,6 +22,7 @@ export const DraggableHeaderCell: FC<DraggableHeaderCellProps> = ({
   ...restProps
 }) => {
   const resizeRef = useRef<{ startX: number; startWidth: number } | null>(null);
+  const isResizingRef = useRef(false);
 
   const {
     attributes,
@@ -40,8 +41,8 @@ export const DraggableHeaderCell: FC<DraggableHeaderCellProps> = ({
       if (!onResize || !width) return;
       e.preventDefault();
       e.stopPropagation();
-
       resizeRef.current = { startX: e.clientX, startWidth: width };
+      isResizingRef.current = true;
 
       const onMouseMove = (moveEvent: MouseEvent) => {
         if (!resizeRef.current) return;
@@ -56,6 +57,10 @@ export const DraggableHeaderCell: FC<DraggableHeaderCellProps> = ({
         document.removeEventListener('mouseup', onMouseUp);
         document.body.style.cursor = '';
         document.body.style.userSelect = '';
+        // 延迟清除标记，确保 mouseup 后的 click 事件被拦截
+        requestAnimationFrame(() => {
+          isResizingRef.current = false;
+        });
       };
 
       document.addEventListener('mousemove', onMouseMove);
@@ -66,30 +71,38 @@ export const DraggableHeaderCell: FC<DraggableHeaderCellProps> = ({
     [onResize, width, minWidth]
   );
 
-  const stopPointerPropagation = useCallback((e: React.PointerEvent) => {
-    e.stopPropagation();
-  }, []);
+  // 拦截 resize 后的 click，防止触发排序
+  const handleThClick = useCallback((e: React.MouseEvent<HTMLTableCellElement>) => {
+    if (isResizingRef.current) {
+      e.stopPropagation();
+      e.preventDefault();
+      return;
+    }
+    // 调用 Ant Design 的原始 onClick（排序）
+    const antdOnClick = (restProps as any).onClick;
+    antdOnClick?.(e);
+  }, [restProps]);
 
   const resizeHandle = onResize && width ? (
     <span
       className="aws-table-resize-handle"
-      onMouseDown={handleResizeMouseDown}
-      onPointerDown={stopPointerPropagation}
+      onMouseDown={e => { e.stopPropagation(); handleResizeMouseDown(e); }}
+      onPointerDown={e => e.stopPropagation()}
       onClick={e => e.stopPropagation()}
     />
   ) : null;
 
-  // 不启用拖拽时（包括 fixed 列），保留 Ant Design 原始 style 不覆盖
+  // 不启用拖拽时（包括 fixed 列）
   if (!dragEnabled || !columnKey) {
+    const { onClick: _antdClick, ...nonClickProps } = restProps as any;
     return (
-      <th style={styleProp} className={className} {...restProps}>
+      <th style={styleProp} className={className} onClick={handleThClick} {...nonClickProps}>
         {children}
         {resizeHandle}
       </th>
     );
   }
 
-  // 拖拽启用的列：合并 transform/transition，但不覆盖 Ant Design 的 position
   const style: React.CSSProperties = {
     ...styleProp,
     transform: CSS.Translate.toString(transform),
@@ -98,21 +111,20 @@ export const DraggableHeaderCell: FC<DraggableHeaderCellProps> = ({
     whiteSpace: 'nowrap',
   };
 
+  // 从 restProps 中提取 onClick，用 handleThClick 替代
+  const { onClick: _antdClick, ...nonClickRestProps } = restProps as any;
+
   return (
     <th
       ref={setNodeRef}
       style={style}
       className={`${className || ''} ${isDragging ? 'aws-table-dragging' : ''}`}
       {...attributes}
-      {...restProps}
+      {...listeners}
+      {...nonClickRestProps}
+      onClick={handleThClick}
     >
-      <div
-        className="aws-table-header-drag-zone"
-        {...listeners}
-        style={{ display: 'flex', alignItems: 'center', cursor: 'grab' }}
-      >
-        {children}
-      </div>
+      {children}
       {resizeHandle}
     </th>
   );

@@ -83,7 +83,9 @@ export const AccountManagement: FC = () => {
       dataIndex: 'alias',
       key: 'alias',
       width: 200,
-      minWidth: 120,
+      minWidth: 140,
+      sorter: (a, b) => (a.alias || '').localeCompare(b.alias || ''),
+      showSorterTooltip: false,
       render: (alias: string, record: AWSAccount) => (
         <Space>
           <CloudOutlined style={{ color: '#1890ff', fontSize: '16px' }} />
@@ -100,8 +102,10 @@ export const AccountManagement: FC = () => {
       title: t('aws.accountId'),
       dataIndex: 'account_id',
       key: 'account_id',
-      width: 150,
-      minWidth: 130,
+      width: 180,
+      minWidth: 150,
+      sorter: (a, b) => (a.account_id || '').localeCompare(b.account_id || ''),
+      showSorterTooltip: false,
       render: (accountId: string) => (
         <Text code>{accountId || 'N/A'}</Text>
       ),
@@ -110,8 +114,10 @@ export const AccountManagement: FC = () => {
       title: t('table.authType'),
       dataIndex: 'auth_type',
       key: 'auth_type',
-      width: 120,
-      minWidth: 90,
+      width: 130,
+      minWidth: 100,
+      sorter: (a, b) => (a.auth_type || '').localeCompare(b.auth_type || ''),
+      showSorterTooltip: false,
       render: (authType: AuthType) => (
         authType === 'iam_role' ? (
           <Tag color="green">{t('aws.authTypes.iam_role')}</Tag>
@@ -124,7 +130,13 @@ export const AccountManagement: FC = () => {
       title: t('table.credential'),
       key: 'credential',
       width: 200,
-      minWidth: 120,
+      minWidth: 140,
+      sorter: (a, b) => {
+        const aVal = a.auth_type === 'iam_role' ? (a.role_arn || '') : (a.access_key_id_masked || '');
+        const bVal = b.auth_type === 'iam_role' ? (b.role_arn || '') : (b.access_key_id_masked || '');
+        return aVal.localeCompare(bVal);
+      },
+      showSorterTooltip: false,
       render: (_, record: AWSAccount) => (
         record.auth_type === 'iam_role' ? (
           <Tooltip title={record.role_arn}>
@@ -141,8 +153,10 @@ export const AccountManagement: FC = () => {
       title: t('table.region'),
       dataIndex: 'region',
       key: 'region',
-      width: 120,
-      minWidth: 100,
+      width: 150,
+      minWidth: 130,
+      sorter: (a, b) => (a.region || '').localeCompare(b.region || ''),
+      showSorterTooltip: false,
       render: (region: string) => (
         <Tag color="blue">{region}</Tag>
       ),
@@ -153,6 +167,8 @@ export const AccountManagement: FC = () => {
       key: 'description',
       ellipsis: true,
       minWidth: 80,
+      sorter: (a, b) => (a.description || '').localeCompare(b.description || ''),
+      showSorterTooltip: false,
       render: (description?: string) => (
         <Text type="secondary">{description || '-'}</Text>
       ),
@@ -160,9 +176,11 @@ export const AccountManagement: FC = () => {
     {
       title: t('table.status'),
       key: 'status',
-      width: 100,
-      minWidth: 80,
+      width: 110,
+      minWidth: 90,
       align: 'center',
+      sorter: (a, b) => Number(a.is_verified) - Number(b.is_verified),
+      showSorterTooltip: false,
       render: (_, record: AWSAccount) => (
         record.is_verified ? (
           <Tag icon={<CheckCircleOutlined />} color="success">
@@ -180,7 +198,9 @@ export const AccountManagement: FC = () => {
       dataIndex: 'created_at',
       key: 'created_at',
       width: 180,
-      minWidth: 130,
+      minWidth: 150,
+      sorter: (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+      showSorterTooltip: false,
       render: (createdAt: string) => (
         <Text type="secondary">
           {dayjs(createdAt).format('YYYY-MM-DD HH:mm')}
@@ -190,8 +210,8 @@ export const AccountManagement: FC = () => {
     {
       title: t('table.actions'),
       key: 'actions',
-      width: 150,
-      minWidth: 130,
+      width: 160,
+      minWidth: 140,
       fixed: 'right',
       render: (_, record: AWSAccount) => (
         <Space size="small">
@@ -284,7 +304,7 @@ export const AccountManagement: FC = () => {
               showTotal: (total) => `共 ${total} 个账号`,
             }}
             scroll={{
-              x: 1200,
+              x: 1400,
               y: 'calc(100vh - 450px)'
             }}
             sticky={{

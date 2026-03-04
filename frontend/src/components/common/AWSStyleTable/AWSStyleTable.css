@@ -1,41 +1,146 @@
-/* 列宽拖拽手柄 */
+/* ===== 列宽拖拽手柄（AWS 风格） ===== */
 .aws-table-resize-handle {
   position: absolute;
-  right: 0;
+  right: -5px;
   top: 0;
   bottom: 0;
-  width: 6px;
+  width: 12px;
   cursor: col-resize;
-  z-index: 1;
+  z-index: 2;
 }
 
-.aws-table-resize-handle:hover {
-  background-color: rgba(0, 0, 0, 0.06);
+/* 中间的竖线指示器 — 默认显示灰色分隔线 */
+.aws-table-resize-handle::after {
+  content: '';
+  position: absolute;
+  top: 25%;
+  bottom: 25%;
+  left: 50%;
+  width: 1px;
+  background-color: #d5dbdb;
+  transition: background-color 0.15s, width 0.15s;
 }
 
-.aws-table-resize-handle:active {
-  background-color: #1677ff;
+/* hover 时显示深灰竖线 */
+.aws-table-resize-handle:hover::after {
+  background-color: #879596;
+  width: 2px;
+  margin-left: -1px;
 }
 
-/* 拖拽中的列头 */
+/* 拖拽中竖线颜色加深 */
+.aws-table-resize-handle:active::after {
+  background-color: #545b64;
+  width: 2px;
+  margin-left: -1px;
+}
+
+/* ===== 拖拽中的列头 ===== */
 .aws-table-dragging {
   opacity: 0.5;
   background: #e6f4ff !important;
 }
 
-/* 确保 th 有 position relative 给 resize handle 定位 */
+/* ===== 可拖拽列头 cursor ===== */
 .aws-style-table .ant-table-thead > tr > th {
   position: relative;
-}
-
-/* 列头拖拽区域 — 占满 th 内容区，但不覆盖 resize handle */
-.aws-table-header-drag-zone {
-  flex: 1;
-  overflow: hidden;
+  user-select: none;
+  transition: background-color 0.15s;
   cursor: grab;
-  padding-right: 6px; /* 给 resize handle 留空间 */
 }
 
-.aws-table-header-drag-zone:active {
+.aws-style-table .ant-table-thead > tr > th:active {
   cursor: grabbing;
+}
+
+/* 列头 hover 高亮 */
+.aws-style-table .ant-table-thead > tr > th:hover {
+  background-color: #fafafa;
+}
+
+/* ===== AWS 风格排序图标 ===== */
+.aws-style-table .ant-table-column-sorters {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* 未排序：空心灰色三角 */
+.aws-sort-path-inactive {
+  fill: none;
+  stroke: #687078;
+  stroke-width: 1.8;
+  transition: stroke 0.15s ease;
+}
+
+/* 已排序：实心黑色三角 */
+.aws-sort-path-active {
+  fill: #16191f;
+  stroke: none;
+  transition: fill 0.15s ease;
+}
+
+/* hover 未排序图标：stroke 变深 */
+.aws-style-table .ant-table-thead > tr > th:hover .aws-sort-path-inactive {
+  stroke: #545b64;
+}
+
+/* hover 已排序图标：fill 变深灰 */
+.aws-style-table .ant-table-thead > tr > th:hover .aws-sort-path-active {
+  fill: #545b64;
+}
+
+/* 覆盖 Ant Design 排序列头背景 — 保持和未排序列头一致（不变色） */
+.aws-style-table .ant-table-thead > tr > th.ant-table-column-sort,
+.aws-style-table .ant-table-thead > tr > td.ant-table-column-sort {
+  background: #fafafa !important;
+}
+
+/* 覆盖 Ant Design 可排序列 hover 背景 */
+.aws-style-table .ant-table-thead > tr > th.ant-table-column-has-sorters:hover,
+.aws-style-table .ant-table-thead > tr > td.ant-table-column-has-sorters:hover {
+  background: #fafafa !important;
+}
+
+/* 覆盖 Ant Design 排序后 body 数据列的背景色（AWS 不高亮数据列） */
+.aws-style-table .ant-table-tbody > tr > td.ant-table-column-sort {
+  background: transparent !important;
+}
+
+/* 可排序列 hover 时显示 pointer */
+.aws-style-table .ant-table-column-has-sorters {
+  cursor: pointer;
+}
+
+/* ===== 表格行 hover ===== */
+.aws-style-table .ant-table-tbody > tr:hover > td {
+  transition: background-color 0.15s;
+}
+
+/* ===== 滚动优化 ===== */
+.aws-style-table .ant-table-body,
+.aws-style-table .ant-table-content {
+  overscroll-behavior-x: contain;
+}
+
+.aws-style-table .ant-table-body::-webkit-scrollbar,
+.aws-style-table .ant-table-content::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.aws-style-table .ant-table-body::-webkit-scrollbar-thumb,
+.aws-style-table .ant-table-content::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.aws-style-table .ant-table-body::-webkit-scrollbar-thumb:hover,
+.aws-style-table .ant-table-content::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.aws-style-table .ant-table-body::-webkit-scrollbar-track,
+.aws-style-table .ant-table-content::-webkit-scrollbar-track {
+  background: transparent;
 }
