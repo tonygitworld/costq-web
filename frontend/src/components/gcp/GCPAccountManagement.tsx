@@ -3,7 +3,6 @@ import { type FC, useState, useEffect } from 'react';
 import {
   Card,
   Button,
-  Table,
   Space,
   Tag,
   Popconfirm,
@@ -28,6 +27,7 @@ import { AddGCPAccountModal } from './AddGCPAccountModal';
 import { EditGCPAccountModal } from './EditGCPAccountModal';
 import { usePagination } from '../../hooks/usePagination';
 import { useI18n } from '../../hooks/useI18n';
+import { AWSStyleTable } from '../common/AWSStyleTable';
 import dayjs from 'dayjs';
 
 const { Text } = Typography;
@@ -93,6 +93,7 @@ export const GCPAccountManagement: FC = () => {
       dataIndex: 'account_name',
       key: 'account_name',
       width: 200,
+      minWidth: 120,
       render: (name: string, record: GCPAccount) => (
         <Space>
           <GoogleOutlined style={{ color: '#4285F4', fontSize: '16px' }} />
@@ -110,6 +111,7 @@ export const GCPAccountManagement: FC = () => {
       dataIndex: 'project_id',
       key: 'project_id',
       width: 180,
+      minWidth: 120,
       render: (projectId: string) => (
         <Text code>{projectId}</Text>
       ),
@@ -119,6 +121,7 @@ export const GCPAccountManagement: FC = () => {
       dataIndex: 'service_account_email_masked',
       key: 'service_account_email_masked',
       width: 220,
+      minWidth: 130,
       render: (email: string) => (
         <Tooltip title="Service Account Email">
           <Text type="secondary" code style={{ fontSize: '12px' }}>{email}</Text>
@@ -129,6 +132,7 @@ export const GCPAccountManagement: FC = () => {
       title: t('gcp:account.table.organization'),
       key: 'org_billing',
       width: 180,
+      minWidth: 100,
       render: (_, record: GCPAccount) => (
         <Space direction="vertical" size={0}>
           {record.organization_id && (
@@ -151,6 +155,7 @@ export const GCPAccountManagement: FC = () => {
       title: 'BigQuery Export',
       key: 'bigquery_export',
       width: 200,
+      minWidth: 100,
       render: (_, record: GCPAccount) => {
         const hasConfig = record.billing_export_project_id ||
                          record.billing_export_dataset ||
@@ -178,6 +183,7 @@ export const GCPAccountManagement: FC = () => {
       dataIndex: 'description',
       key: 'description',
       ellipsis: true,
+      minWidth: 80,
       render: (description?: string) => (
         <Text type="secondary">{description || '-'}</Text>
       ),
@@ -186,6 +192,7 @@ export const GCPAccountManagement: FC = () => {
       title: t('gcp:account.table.status'),
       key: 'status',
       width: 100,
+      minWidth: 80,
       align: 'center',
       render: (_, record: GCPAccount) => (
         record.is_verified ? (
@@ -204,6 +211,7 @@ export const GCPAccountManagement: FC = () => {
       dataIndex: 'created_at',
       key: 'created_at',
       width: 180,
+      minWidth: 130,
       render: (createdAt: string) => (
         <Text type="secondary">
           {dayjs(createdAt).format('YYYY-MM-DD HH:mm')}
@@ -214,6 +222,7 @@ export const GCPAccountManagement: FC = () => {
       title: t('gcp:account.table.actions'),
       key: 'actions',
       width: 200,
+      minWidth: 180,
       fixed: 'right',
       render: (_, record: GCPAccount) => (
         <Space size="small">
@@ -304,7 +313,8 @@ export const GCPAccountManagement: FC = () => {
             </Button>
           </Empty>
         ) : (
-          <Table
+          <AWSStyleTable
+            tableId="gcp-account-management"
             columns={columns}
             dataSource={accounts}
             rowKey="id"

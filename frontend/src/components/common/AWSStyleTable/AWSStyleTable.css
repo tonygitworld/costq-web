@@ -1,0 +1,41 @@
+/* 列宽拖拽手柄 */
+.aws-table-resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  cursor: col-resize;
+  z-index: 1;
+}
+
+.aws-table-resize-handle:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.aws-table-resize-handle:active {
+  background-color: #1677ff;
+}
+
+/* 拖拽中的列头 */
+.aws-table-dragging {
+  opacity: 0.5;
+  background: #e6f4ff !important;
+}
+
+/* 确保 th 有 position relative 给 resize handle 定位 */
+.aws-style-table .ant-table-thead > tr > th {
+  position: relative;
+}
+
+/* 列头拖拽区域 — 占满 th 内容区，但不覆盖 resize handle */
+.aws-table-header-drag-zone {
+  flex: 1;
+  overflow: hidden;
+  cursor: grab;
+  padding-right: 6px; /* 给 resize handle 留空间 */
+}
+
+.aws-table-header-drag-zone:active {
+  cursor: grabbing;
+}

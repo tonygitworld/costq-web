@@ -3,7 +3,6 @@ import { type FC, useState, useEffect } from 'react';
 import {
   Card,
   Button,
-  Table,
   Space,
   Tag,
   Popconfirm,
@@ -26,6 +25,7 @@ import { AuthType } from '../../types/awsAccount';
 import { AddAccountModal } from './AddAccountModal';
 import { useI18n } from '../../hooks/useI18n';
 import { usePagination } from '../../hooks/usePagination';
+import { AWSStyleTable } from './AWSStyleTable';
 import dayjs from 'dayjs';
 
 const { Text } = Typography;
@@ -83,6 +83,7 @@ export const AccountManagement: FC = () => {
       dataIndex: 'alias',
       key: 'alias',
       width: 200,
+      minWidth: 120,
       render: (alias: string, record: AWSAccount) => (
         <Space>
           <CloudOutlined style={{ color: '#1890ff', fontSize: '16px' }} />
@@ -100,6 +101,7 @@ export const AccountManagement: FC = () => {
       dataIndex: 'account_id',
       key: 'account_id',
       width: 150,
+      minWidth: 130,
       render: (accountId: string) => (
         <Text code>{accountId || 'N/A'}</Text>
       ),
@@ -109,6 +111,7 @@ export const AccountManagement: FC = () => {
       dataIndex: 'auth_type',
       key: 'auth_type',
       width: 120,
+      minWidth: 90,
       render: (authType: AuthType) => (
         authType === 'iam_role' ? (
           <Tag color="green">{t('aws.authTypes.iam_role')}</Tag>
@@ -121,6 +124,7 @@ export const AccountManagement: FC = () => {
       title: t('table.credential'),
       key: 'credential',
       width: 200,
+      minWidth: 120,
       render: (_, record: AWSAccount) => (
         record.auth_type === 'iam_role' ? (
           <Tooltip title={record.role_arn}>
@@ -138,6 +142,7 @@ export const AccountManagement: FC = () => {
       dataIndex: 'region',
       key: 'region',
       width: 120,
+      minWidth: 100,
       render: (region: string) => (
         <Tag color="blue">{region}</Tag>
       ),
@@ -147,6 +152,7 @@ export const AccountManagement: FC = () => {
       dataIndex: 'description',
       key: 'description',
       ellipsis: true,
+      minWidth: 80,
       render: (description?: string) => (
         <Text type="secondary">{description || '-'}</Text>
       ),
@@ -155,6 +161,7 @@ export const AccountManagement: FC = () => {
       title: t('table.status'),
       key: 'status',
       width: 100,
+      minWidth: 80,
       align: 'center',
       render: (_, record: AWSAccount) => (
         record.is_verified ? (
@@ -173,6 +180,7 @@ export const AccountManagement: FC = () => {
       dataIndex: 'created_at',
       key: 'created_at',
       width: 180,
+      minWidth: 130,
       render: (createdAt: string) => (
         <Text type="secondary">
           {dayjs(createdAt).format('YYYY-MM-DD HH:mm')}
@@ -183,6 +191,7 @@ export const AccountManagement: FC = () => {
       title: t('table.actions'),
       key: 'actions',
       width: 150,
+      minWidth: 130,
       fixed: 'right',
       render: (_, record: AWSAccount) => (
         <Space size="small">
@@ -263,7 +272,8 @@ export const AccountManagement: FC = () => {
             </Button>
           </Empty>
         ) : (
-          <Table
+          <AWSStyleTable
+            tableId="aws-account-management"
             columns={columns}
             dataSource={accounts}
             rowKey="id"
