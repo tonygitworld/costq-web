@@ -147,7 +147,7 @@ class UserStoragePostgreSQL:
                 username=username,
                 email=email,
                 hashed_password=password_hash,
-                # full_name 字段在数据库中不存在，已移除
+                full_name=full_name,
                 role=role,
                 is_active=True,
                 created_at=_utc_now(),

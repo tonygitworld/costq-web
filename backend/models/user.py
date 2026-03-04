@@ -58,6 +58,7 @@ class User(Base):
     username = Column(String(50), unique=True, nullable=False, index=True)
     email = Column(String(255), unique=True, nullable=False, index=True)
     hashed_password = Column(String(255), nullable=False)
+    full_name = Column(String(100), nullable=True)
     role = Column(String(20), nullable=False, default="user")  # 'admin' or 'user'
     is_active = Column(Boolean, default=True, nullable=False)
     created_at = Column(DateTime(timezone=True), default=_utc_now, nullable=False)
@@ -94,6 +95,7 @@ class User(Base):
             "username": self.username,
             "email": self.email,
             "password_hash": self.hashed_password,  # API 兼容性：数据库字段是 hashed_password
+            "full_name": self.full_name,
             "role": self.role,
             "is_active": self.is_active,
             "created_at": self.created_at.isoformat() if self.created_at else None,
