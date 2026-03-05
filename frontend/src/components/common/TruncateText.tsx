@@ -10,14 +10,16 @@ interface TruncateTextProps {
   tooltipMaxWidth?: number;
   /** 是否启用点击弹出 Modal 查看完整内容，默认 false（仅 hover Tooltip） */
   expandable?: boolean;
-  /** Modal 标题，默认 "详细内容" */
+  /** Modal 标题 */
   modalTitle?: string;
+  /** 展开链接文字（支持 i18n），默认 "展开查看" */
+  expandLabel?: string;
 }
 
 /**
  * 多行文本截断组件。
  * - 默认：超出 maxLines 行时 hover 弹出 Tooltip
- * - expandable 模式：截断时显示"展开"链接，点击弹出 Modal 查看完整内容（支持 Markdown 渲染）
+ * - expandable 模式：截断时显示展开链接，点击弹出 Modal 查看完整内容（支持 Markdown 渲染）
  * - 文本未截断时不弹 Tooltip，也不显示展开链接
  */
 export const TruncateText: FC<TruncateTextProps> = ({
@@ -25,7 +27,8 @@ export const TruncateText: FC<TruncateTextProps> = ({
   maxLines = 2,
   tooltipMaxWidth = 400,
   expandable = false,
-  modalTitle = '详细内容',
+  modalTitle,
+  expandLabel = '展开查看',
 }) => {
   const textRef = useRef<HTMLDivElement>(null);
   const [isTruncated, setIsTruncated] = useState(false);
@@ -53,10 +56,8 @@ export const TruncateText: FC<TruncateTextProps> = ({
     </div>
   );
 
-  // 未截断 → 直接返回
   if (!isTruncated) return clampedContent;
 
-  // expandable 模式：点击展开 Modal，Markdown 渲染
   if (expandable) {
     return (
       <>
@@ -66,7 +67,7 @@ export const TruncateText: FC<TruncateTextProps> = ({
             onClick={(e) => { e.stopPropagation(); setModalOpen(true); }}
             style={{ fontSize: 12, color: '#0972d3', cursor: 'pointer', marginTop: 2, display: 'inline-block' }}
           >
-            展开查看
+            {expandLabel}
           </a>
         </div>
         <Modal
@@ -84,7 +85,6 @@ export const TruncateText: FC<TruncateTextProps> = ({
     );
   }
 
-  // 默认模式：hover Tooltip
   return (
     <Tooltip
       title={<div style={{ maxWidth: tooltipMaxWidth, whiteSpace: 'pre-wrap' }}>{text}</div>}
