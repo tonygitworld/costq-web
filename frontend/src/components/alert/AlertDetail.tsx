@@ -244,7 +244,7 @@ export const AlertDetail: React.FC = () => {
       minWidth: 120,
       sorter: (a, b) => (a.result_summary || '').localeCompare(b.result_summary || ''),
       showSorterTooltip: false,
-      render: (text) => <TruncateText text={text || ''} maxLines={2} expandable modalTitle={t('history.columnResult')} />
+      render: (text) => <TruncateText text={text || ''} maxLines={1} expandable modalTitle={t('history.columnResult')} />
     }
   ];
 

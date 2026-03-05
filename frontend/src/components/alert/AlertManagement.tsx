@@ -214,7 +214,7 @@ export const AlertManagement: React.FC = () => {
       showSorterTooltip: false,
       render: (text, record) => (
         <div>
-          <TruncateText text={text} maxLines={2} />
+          <TruncateText text={text} maxLines={1} expandable modalTitle={t('table.columnDescription')} />
           <Space size={4} style={{ fontSize: '12px', marginTop: 4 }}>
             <span style={{ color: '#999' }}>
               📅 {dayjs(record.created_at).fromNow()}
