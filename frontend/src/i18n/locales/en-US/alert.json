@@ -128,7 +128,8 @@
     "executedAgo": "{{time}}",
     "total": "{{count}} alerts",
     "unknown": "Unknown",
-    "notSet": "Not Set"
+    "notSet": "Not Set",
+    "columnCreator": "Creator"
   },
 
   "filter": {

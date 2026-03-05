@@ -3,6 +3,7 @@
 记录每次告警检查的详细执行过程，用于调试、审计和性能监控
 """
 
+import json
 import uuid
 from datetime import UTC, datetime
 
@@ -133,15 +134,13 @@ class AlertExecutionLog(Base):
 
         包含前端期望的字段映射
         """
-        # 构造结果摘要
+        # 构造结果摘要（返回完整内容，前端负责截断展示）
         if self.agent_response:
             try:
-                import json
-
                 response_data = json.loads(self.agent_response)
-                result_summary = response_data.get("message", "")
-            except:
-                result_summary = self.agent_response[:200] if self.agent_response else ""
+                result_summary = response_data.get("message", "") or self.agent_response
+            except (json.JSONDecodeError, TypeError, ValueError):
+                result_summary = self.agent_response or ""
         else:
             result_summary = ""
 
