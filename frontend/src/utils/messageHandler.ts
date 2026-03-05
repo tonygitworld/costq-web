@@ -35,6 +35,9 @@ export class MessageHandler {
   // ✅ 新增：已取消标志（丢弃 abort 后到达的残留消息）
   private isCancelled = false;
 
+  // ✅ 新增：当前查询 ID（用于过滤非当前查询的事件）
+  private currentQueryId: string | null = null;
+
   // ✨ 新增：当前消息的构建状态
   private currentMessageBuilder: MessageBuilderState = {
     thinking: undefined,
@@ -62,9 +65,14 @@ export class MessageHandler {
     this.resetCurrentQuery = callback;
   }
 
+  // ✅ 新增：设置当前查询 ID
+  setCurrentQueryId(queryId: string | null) {
+    this.currentQueryId = queryId;
+  }
+
   // ✅ 新增：重置消息构建器（在发送新查询时调用）
   resetMessageBuilder() {
-    logger.debug('🔄 [messageHandler] 重置消息构建器，准备新查询');
+    logger.debug(`🔄 [messageHandler] 重置消息构建器，准备新查询 - 旧 messageId: ${this.currentMessageBuilder.messageId}, 旧 chatId: ${this.currentMessageBuilder.chatId}, isCancelled was: ${this.isCancelled}`);
     this.currentMessageBuilder = {
       thinking: undefined,
       toolCalls: new Map(),
@@ -149,7 +157,7 @@ export class MessageHandler {
     try {
       // ✅ 丢弃已取消查询的残留消息（abort 后后端可能还会发送一些消息）
       if (this.isCancelled) {
-        logger.debug(`🗑️ [handleMessage] 丢弃已取消查询的残留消息 - type: ${message.type}`);
+        logger.debug(`🗑️ [handleMessage] 丢弃已取消查询的残留消息 - type: ${message.type}, isCancelled: true, messageId: ${this.currentMessageBuilder.messageId}`);
         return;
       }
 
@@ -888,6 +896,15 @@ export class MessageHandler {
     // ✅ 后端发送的是 message 字段而非 reason 字段，需要兼容两者
     const cancelReason = message.reason || message.message || 'generation_cancelled';
 
+    logger.debug(`🔍 [handleGenerationCancelled] 收到事件 - query_id: ${query_id}, reason: ${cancelReason}, isCancelled: ${this.isCancelled}, messageId: ${this.currentMessageBuilder.messageId}, chatId: ${this.currentMessageBuilder.chatId}, currentQueryId: ${this.currentQueryId}`);
+
+    // ✅ 关键修复：如果事件的 query_id 与当前查询不匹配，忽略
+    // 场景：第一次查询被取消后，后端的 generation_cancelled 事件在第二次查询的 SSE 流中到达
+    if (query_id && this.currentQueryId && query_id !== this.currentQueryId) {
+      logger.debug(`⏭️ [handleGenerationCancelled] query_id 不匹配，忽略 - 事件: ${query_id}, 当前: ${this.currentQueryId}`);
+      return;
+    }
+
     const sessionId = message?.session_id;
     const currentChatId = sessionId || this.currentMessageBuilder.chatId || this.chatStore.currentChatId;
 
@@ -987,6 +1004,8 @@ export class MessageHandler {
     // 查找最后一个助手消息，如果是待处理状态，则复用它
     const messages = this.chatStore.messages[currentChatId] || [];
     const lastMessage = messages[messages.length - 1];
+
+    logger.debug(`🔍 [ensureCurrentMessage] 查找占位消息 - lastMessage: type=${lastMessage?.type}, status=${lastMessage?.meta?.status}, content="${lastMessage?.content?.substring(0, 20)}", id=${lastMessage?.id}`);
 
     if (lastMessage &&
         lastMessage.type === 'assistant' &&
@@ -1234,6 +1253,8 @@ export class MessageHandler {
 
     const currentChatId = this.currentMessageBuilder.chatId || this.chatStore.currentChatId;
     let messageId = this.currentMessageBuilder.messageId;
+
+    logger.debug(`🔍 [handleLocalCancel] 开始 - reason: ${reason}, chatId: ${currentChatId}, messageId: ${messageId}, isCancelled: ${this.isCancelled}`);
 
     // ✅ 如果 messageHandler 还没有 messageId（后端还没发消息），
     // 直接查找占位消息（MessageInput 创建的 pending/streaming 状态的空 assistant 消息）

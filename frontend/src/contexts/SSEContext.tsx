@@ -92,6 +92,7 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
     logger.debug(`🟢 [SSEContext.sendQuery] 设置 currentQueryId = ${queryId}, sessionId = ${sessionId}, modelId = ${modelId}`);
     setCurrentQueryId(queryId);
     currentQueryIdRef.current = queryId;
+    messageHandler.setCurrentQueryId(queryId);  // ✅ 同步到 messageHandler
 
     // ✅ V2: 创建 AbortController 用于取消请求
     const abortController = new AbortController();
@@ -267,6 +268,7 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
     setCurrentQueryId(null);
     currentQueryIdRef.current = null;
     setIsCancelling(false);
+    messageHandler.setCurrentQueryId(null);  // ✅ 同步到 messageHandler
   }, []);
 
   const cancellingRef = useRef<Set<string>>(new Set());
