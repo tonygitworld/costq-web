@@ -287,6 +287,10 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
     setCurrentQueryId(null);
     currentQueryIdRef.current = null;
 
+    // ✅ 1.5 立即清理消息状态（isStreaming、showStatus 等）
+    // abort 后后端的 generation_cancelled 消息无法到达前端，必须在前端本地处理
+    messageHandler.handleLocalCancel('user_cancelled');
+
     // ✅ 2. 立即 abort 连接（同步操作，无延迟）
     const abortController = queryAbortControllers.current.get(queryId);
     if (abortController) {

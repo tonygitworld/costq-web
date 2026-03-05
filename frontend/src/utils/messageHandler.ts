@@ -1220,6 +1220,52 @@ export class MessageHandler {
       placement: 'topRight'
     });
   };
+
+  // ✅ 前端本地取消：abort 连接后后端的 generation_cancelled 消息无法到达，
+  // 需要在前端直接清理消息状态（isStreaming、showStatus 等）
+  handleLocalCancel = (reason?: string) => {
+    const currentChatId = this.currentMessageBuilder.chatId || this.chatStore.currentChatId;
+    const messageId = this.currentMessageBuilder.messageId;
+
+    if (!currentChatId || !messageId) {
+      logger.warn('⚠️ [handleLocalCancel] 无当前聊天或消息，跳过');
+      return;
+    }
+
+    logger.debug(`🛑 [handleLocalCancel] 前端本地取消 - ChatId: ${currentChatId}, MessageId: ${messageId}`);
+
+    const messages = this.chatStore.messages[currentChatId] || [];
+    const currentMessage = messages.find(m => m.id === messageId);
+
+    this.chatStore.updateMessage(currentChatId, messageId, {
+      meta: {
+        ...currentMessage?.meta,
+        status: 'cancelled' as const,
+        isStreaming: false,
+        streamingProgress: 100,
+        endTime: Date.now(),
+        cancelReason: reason || 'user_cancelled',
+        retryCount: currentMessage?.meta.retryCount || 0,
+        maxRetries: currentMessage?.meta.maxRetries || 3,
+        canRetry: true,
+        canEdit: false,
+        canDelete: true
+      },
+      showStatus: false,
+      statusType: undefined,
+      statusMessage: undefined
+    });
+
+    // 重置构建器
+    this.currentMessageBuilder = {
+      thinking: undefined,
+      toolCalls: new Map(),
+      content: '',
+      contentBlocks: [],
+      messageId: undefined,
+      chatId: undefined
+    };
+  };
 }
 
 // 创建全局实例
