@@ -19,15 +19,20 @@ class ModelConfig(BaseModel):
 # 可用模型列表（集中配置）
 AVAILABLE_MODELS: list[ModelConfig] = [
     ModelConfig(
-        model_id="global.anthropic.claude-sonnet-4-5-20250929-v1:0",
-        name="sonnet45",
-        description="sonnet45",
-        is_default=True,
+        model_id="jp.anthropic.claude-sonnet-4-6",
+        name="sonnet46",
+        description="sonnet46",
     ),
     ModelConfig(
-        model_id="global.anthropic.claude-haiku-4-5-20251001-v1:0",
+        model_id="jp.anthropic.claude-sonnet-4-5-20250929-v1:0",
+        name="sonnet45",
+        description="sonnet45",
+    ),
+    ModelConfig(
+        model_id="jp.anthropic.claude-haiku-4-5-20251001-v1:0",
         name="haiku45",
         description="haiku45",
+        is_default=True,
     ),
 ]
 

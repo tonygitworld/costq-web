@@ -1,8 +1,12 @@
 {
   "selectModel": "选择模型",
+  "sonnet46": {
+    "name": "Claude Sonnet 4.6",
+    "description": "最新旗舰模型，推理能力最强"
+  },
   "sonnet45": {
     "name": "Claude Sonnet 4.5",
-    "description": "最新旗舰模型，推理能力最强"
+    "description": "高性能旗舰模型，推理能力强"
   },
   "haiku45": {
     "name": "Claude Haiku 4.5",
