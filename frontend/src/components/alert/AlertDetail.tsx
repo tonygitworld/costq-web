@@ -30,6 +30,7 @@ import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import { usePagination } from '../../hooks/usePagination';
 import { useI18n } from '../../hooks/useI18n';
 import { AWSStyleTable } from '../common/AWSStyleTable';
+import { TruncateText } from '../common/TruncateText';
 import type { AlertHistory } from '../../types/alert';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -239,11 +240,11 @@ export const AlertDetail: React.FC = () => {
       title: t('history.columnResult'),
       dataIndex: 'result_summary',
       key: 'result_summary',
-      ellipsis: true,
       width: 300,
       minWidth: 120,
       sorter: (a, b) => (a.result_summary || '').localeCompare(b.result_summary || ''),
       showSorterTooltip: false,
+      render: (text) => <TruncateText text={text || ''} maxLines={2} expandable modalTitle={t('history.columnResult')} />
     }
   ];
 

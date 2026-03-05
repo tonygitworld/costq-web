@@ -34,6 +34,7 @@ import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import { usePagination } from '../../hooks/usePagination';
 import { useI18n } from '../../hooks/useI18n';
 import { AWSStyleTable } from '../common/AWSStyleTable';
+import { TruncateText } from '../common/TruncateText';
 import type { Alert } from '../../types/alert';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -207,15 +208,14 @@ export const AlertManagement: React.FC = () => {
       title: t('table.columnDescription'),
       dataIndex: 'description',
       key: 'description',
-      ellipsis: true,
       width: 280,
       minWidth: 110,
       sorter: (a, b) => a.description.localeCompare(b.description),
       showSorterTooltip: false,
       render: (text, record) => (
         <div>
-          <div style={{ marginBottom: 4 }}>{text}</div>
-          <Space size={4} style={{ fontSize: '12px' }}>
+          <TruncateText text={text} maxLines={2} />
+          <Space size={4} style={{ fontSize: '12px', marginTop: 4 }}>
             <span style={{ color: '#999' }}>
               📅 {dayjs(record.created_at).fromNow()}
             </span>
