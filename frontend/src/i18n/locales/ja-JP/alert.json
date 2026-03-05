@@ -128,7 +128,8 @@
     "executedAgo": "{{time}}",
     "total": "{{count}} 件のアラート",
     "unknown": "不明",
-    "notSet": "未設定"
+    "notSet": "未設定",
+    "columnCreator": "作成者"
   },
 
   "filter": {
