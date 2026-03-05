@@ -238,7 +238,7 @@ const MessageItemComponent: FC<MessageItemProps> = ({ message }) => {
           {message.meta.status === 'cancelled' && (
             <Alert
               message={t('message.generationStopped')}
-              description={message.meta.cancelReason || t('message.generationStoppedDesc')}
+              description={t('message.generationStoppedDesc')}
               type="warning"
               showIcon
               icon={<StopOutlined />}

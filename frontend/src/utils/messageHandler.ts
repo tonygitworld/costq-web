@@ -32,6 +32,12 @@ export class MessageHandler {
   // ✅ 新增：缓存待处理的 Token 统计（解决竞态条件）
   private pendingTokenUsage: Map<string, TokenUsage> = new Map();
 
+  // ✅ 新增：已取消标志（丢弃 abort 后到达的残留消息）
+  private isCancelled = false;
+
+  // ✅ 新增：当前查询 ID（用于过滤非当前查询的事件）
+  private currentQueryId: string | null = null;
+
   // ✨ 新增：当前消息的构建状态
   private currentMessageBuilder: MessageBuilderState = {
     thinking: undefined,
@@ -59,18 +65,36 @@ export class MessageHandler {
     this.resetCurrentQuery = callback;
   }
 
+  // ✅ 新增：设置当前查询 ID
+  setCurrentQueryId(queryId: string | null) {
+    this.currentQueryId = queryId;
+  }
+
   // ✅ 新增：重置消息构建器（在发送新查询时调用）
   resetMessageBuilder() {
-    logger.debug('🔄 [messageHandler] 重置消息构建器，准备新查询');
+    logger.debug(`🔄 [messageHandler] 重置消息构建器，准备新查询 - 旧 messageId: ${this.currentMessageBuilder.messageId}, 旧 chatId: ${this.currentMessageBuilder.chatId}, isCancelled was: ${this.isCancelled}`);
     this.currentMessageBuilder = {
       thinking: undefined,
       toolCalls: new Map(),
       content: '',
       contentBlocks: [],
-      messageId: undefined,  // ✅ 重置 messageId，确保创建新消息
+      messageId: undefined,
       chatId: this.currentMessageBuilder.chatId  // ✅ 保留 chatId，因为可能在同一会话中
     };
-    this.processedEventIds.clear();  // ✅ 清理事件去重集合
+    this.processedEventIds.clear();
+    this.isCancelled = false;
+  }
+
+  // ✅ 内部重置构建器（完成/失败/取消后调用，清除 chatId）
+  private clearMessageBuilder() {
+    this.currentMessageBuilder = {
+      thinking: undefined,
+      toolCalls: new Map(),
+      content: '',
+      contentBlocks: [],
+      messageId: undefined,
+      chatId: undefined
+    };
   }
 
   // ✅ 公共方法：更新工具调用状态（减少重复代码）
@@ -131,6 +155,12 @@ export class MessageHandler {
 
   handleMessage = (message: WebSocketMessage) => {
     try {
+      // ✅ 丢弃已取消查询的残留消息（abort 后后端可能还会发送一些消息）
+      if (this.isCancelled) {
+        logger.debug(`🗑️ [handleMessage] 丢弃已取消查询的残留消息 - type: ${message.type}, isCancelled: true, messageId: ${this.currentMessageBuilder.messageId}`);
+        return;
+      }
+
       switch (message.type) {
         // ========== 旧格式（向后兼容）==========
         case 'stream_start':
@@ -418,10 +448,9 @@ export class MessageHandler {
     this.processedEventIds.clear();
     logger.debug('🧹 [前端] 已清理事件去重集合');
 
-    // ✅ 修复：标记消息已完成，但不重置 messageId
-    // messageId 应该在下一次用户发送新查询时才重置
-    // 这样可以确保一个完整的对话（工具调用 + 最终回复）在同一个消息中
-    logger.debug('✅ [前端] 消息完成，保留 messageId 直到下次查询');
+    // ✅ 重置构建器，防止后续残留事件修改已完成的消息
+    this.clearMessageBuilder();
+    logger.debug('✅ [前端] 消息完成，已重置构建器');
   };
 
   private handleThinking = (message: WebSocketMessage) => {
@@ -809,18 +838,11 @@ export class MessageHandler {
       logger.error('❌ [messageHandler.handleMessageComplete] resetCurrentQuery 未设置！');
     }
 
-    // ✅ 重置构建器（包含 messageId）
-    this.currentMessageBuilder = {
-      thinking: undefined,
-      toolCalls: new Map(),
-      content: '',
-      contentBlocks: [],
-      messageId: undefined,  // ✅ 重置 messageId，确保下次查询创建新消息
-      chatId: undefined
-    };
+    // ✅ 重置构建器
+    this.clearMessageBuilder();
   };
 
-  private handleError = (message: { error?: string; session_id?: string }) => {
+  private handleError = (message: WebSocketMessage & { error?: string; session_id?: string }) => {
     const { error } = message;
     // ✅ 已移除 flushUpdates 调用，不再需要批处理机制
 
@@ -863,12 +885,25 @@ export class MessageHandler {
         }
       });
     }
+
+    // ✅ 重置构建器，防止后续残留事件修改已失败的消息
+    this.clearMessageBuilder();
   };
 
   // ✅ 新增: 处理生成取消事件
-  private handleGenerationCancelled = (message: { reason?: string; query_id?: string; session_id?: string }) => {
-    const { reason, query_id } = message;
-    // ✅ 已移除 flushUpdates 调用，不再需要批处理机制
+  private handleGenerationCancelled = (message: { reason?: string; message?: string; query_id?: string; session_id?: string }) => {
+    const { query_id } = message;
+    // ✅ 后端发送的是 message 字段而非 reason 字段，需要兼容两者
+    const cancelReason = message.reason || message.message || 'generation_cancelled';
+
+    logger.debug(`🔍 [handleGenerationCancelled] 收到事件 - query_id: ${query_id}, reason: ${cancelReason}, isCancelled: ${this.isCancelled}, messageId: ${this.currentMessageBuilder.messageId}, chatId: ${this.currentMessageBuilder.chatId}, currentQueryId: ${this.currentQueryId}`);
+
+    // ✅ 关键修复：如果事件的 query_id 与当前查询不匹配，忽略
+    // 场景：第一次查询被取消后，后端的 generation_cancelled 事件在第二次查询的 SSE 流中到达
+    if (query_id && this.currentQueryId && query_id !== this.currentQueryId) {
+      logger.debug(`⏭️ [handleGenerationCancelled] query_id 不匹配，忽略 - 事件: ${query_id}, 当前: ${this.currentQueryId}`);
+      return;
+    }
 
     const sessionId = message?.session_id;
     const currentChatId = sessionId || this.currentMessageBuilder.chatId || this.chatStore.currentChatId;
@@ -878,10 +913,19 @@ export class MessageHandler {
       return;
     }
 
-    logger.debug(`🛑 生成已取消 - Query: ${query_id}, ChatId: ${currentChatId}, Reason: ${reason}`);
-
     const messages = this.chatStore.messages[currentChatId] || [];
     const currentMessage = messages.find(m => m.id === this.currentMessageBuilder.messageId);
+
+    // ✅ 关键修复：如果消息已经处于终态（completed/failed/cancelled），不再覆盖
+    // 场景：查询正常完成后，watch_disconnect 检测到连接断开，后端发送 generation_cancelled
+    // 此时消息已经是 completed 状态，不应被覆盖为 cancelled
+    const terminalStatuses = ['completed', 'failed', 'cancelled'];
+    if (currentMessage && terminalStatuses.includes(currentMessage.meta?.status)) {
+      logger.debug(`⏭️ [handleGenerationCancelled] 消息已处于终态 (${currentMessage.meta.status})，忽略 generation_cancelled - Query: ${query_id}`);
+      return;
+    }
+
+    logger.debug(`🛑 生成已取消 - Query: ${query_id}, ChatId: ${currentChatId}, Reason: ${cancelReason}`);
 
     // 更新消息状态为"已取消"
     this.chatStore.updateMessage(
@@ -894,7 +938,7 @@ export class MessageHandler {
           isStreaming: false,
           streamingProgress: 100,
           endTime: Date.now(),
-          cancelReason: reason,
+          cancelReason: cancelReason,
           retryCount: currentMessage?.meta.retryCount || 0,
           maxRetries: currentMessage?.meta.maxRetries || 3,
           canRetry: true,
@@ -913,23 +957,8 @@ export class MessageHandler {
       this.resetCurrentQuery();
     }
 
-    // ✅ 重置构建器（包含 messageId）
-    this.currentMessageBuilder = {
-      thinking: undefined,
-      toolCalls: new Map(),
-      content: '',
-      contentBlocks: [],
-      messageId: undefined,  // ✅ 重置 messageId，确保下次查询创建新消息
-      chatId: undefined
-    };
-
-    // ⚠️ 注意：使用静态 notification API 会有警告，但在工具类中这是可接受的
-    // 如需消除警告，需要重构为通过 Context 注入 notification 实例
-    notification.info({
-      message: i18n.t('error:messageHandler.generationStopped'),
-      description: reason,
-      duration: 3
-    });
+    // ✅ 重置构建器
+    this.clearMessageBuilder();
   };
 
   // ✅ 新增: 处理取消确认事件
@@ -961,14 +990,7 @@ export class MessageHandler {
       if (existingChatId !== currentChatId) {
         // 不同的会话，重置构建器（可能是新查询）
         logger.warn(`⚠️ 检测到会话切换: ${existingChatId} → ${currentChatId}，重置消息构建器`);
-        this.currentMessageBuilder = {
-          thinking: undefined,
-          toolCalls: new Map(),
-          content: '',
-          contentBlocks: [],
-          messageId: undefined,
-          chatId: undefined
-        };
+        this.clearMessageBuilder();
       } else {
         // ✅ 同一个会话，但需要检查是否是新查询
         // 如果消息已经标记为完成（通过 message_complete 事件），则应该创建新消息
@@ -982,6 +1004,8 @@ export class MessageHandler {
     // 查找最后一个助手消息，如果是待处理状态，则复用它
     const messages = this.chatStore.messages[currentChatId] || [];
     const lastMessage = messages[messages.length - 1];
+
+    logger.debug(`🔍 [ensureCurrentMessage] 查找占位消息 - lastMessage: type=${lastMessage?.type}, status=${lastMessage?.meta?.status}, content="${lastMessage?.content?.substring(0, 20)}", id=${lastMessage?.id}`);
 
     if (lastMessage &&
         lastMessage.type === 'assistant' &&
@@ -1219,6 +1243,63 @@ export class MessageHandler {
       duration: 3,
       placement: 'topRight'
     });
+  };
+
+  // ✅ 前端本地取消：abort 连接后后端的 generation_cancelled 消息无法到达，
+  // 需要在前端直接清理消息状态（isStreaming、showStatus 等）
+  handleLocalCancel = (reason?: string) => {
+    // ✅ 设置取消标志，丢弃 abort 后到达的残留消息
+    this.isCancelled = true;
+
+    const currentChatId = this.currentMessageBuilder.chatId || this.chatStore.currentChatId;
+    let messageId = this.currentMessageBuilder.messageId;
+
+    logger.debug(`🔍 [handleLocalCancel] 开始 - reason: ${reason}, chatId: ${currentChatId}, messageId: ${messageId}, isCancelled: ${this.isCancelled}`);
+
+    // ✅ 如果 messageHandler 还没有 messageId（后端还没发消息），
+    // 直接查找占位消息（MessageInput 创建的 pending/streaming 状态的空 assistant 消息）
+    if (!messageId && currentChatId) {
+      const messages = this.chatStore.messages[currentChatId] || [];
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage &&
+          lastMessage.type === 'assistant' &&
+          (lastMessage.meta?.status === 'pending' || lastMessage.meta?.status === 'streaming')) {
+        messageId = lastMessage.id;
+        logger.debug(`🔍 [handleLocalCancel] 找到占位消息 - MessageId: ${messageId}`);
+      }
+    }
+
+    if (!currentChatId || !messageId) {
+      logger.warn('⚠️ [handleLocalCancel] 无当前聊天或消息，跳过');
+      return;
+    }
+
+    logger.debug(`🛑 [handleLocalCancel] 前端本地取消 - ChatId: ${currentChatId}, MessageId: ${messageId}`);
+
+    const messages = this.chatStore.messages[currentChatId] || [];
+    const currentMessage = messages.find(m => m.id === messageId);
+
+    this.chatStore.updateMessage(currentChatId, messageId, {
+      meta: {
+        ...currentMessage?.meta,
+        status: 'cancelled' as const,
+        isStreaming: false,
+        streamingProgress: 100,
+        endTime: Date.now(),
+        cancelReason: reason || 'user_cancelled',
+        retryCount: currentMessage?.meta.retryCount || 0,
+        maxRetries: currentMessage?.meta.maxRetries || 3,
+        canRetry: true,
+        canEdit: false,
+        canDelete: true
+      },
+      showStatus: false,
+      statusType: undefined,
+      statusMessage: undefined
+    });
+
+    // 重置构建器
+    this.clearMessageBuilder();
   };
 }
 

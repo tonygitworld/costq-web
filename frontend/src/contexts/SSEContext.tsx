@@ -1,5 +1,5 @@
 // SSE Context - 全局SSE连接管理
-import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import {
   type WebSocketMessage,
   type BatchMessage,
@@ -57,6 +57,9 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
   const [currentQueryId, setCurrentQueryId] = useState<string | null>(null);
   const [isCancelling, setIsCancelling] = useState<boolean>(false);
 
+  // ✅ 用 ref 同步追踪 currentQueryId，解决 async 闭包中的陈旧闭包问题
+  const currentQueryIdRef = useRef<string | null>(null);
+
   // ✅ V2 架构：存储每个查询的 AbortController，用于取消查询
   const queryAbortControllers = useRef<Map<string, AbortController>>(new Map());
 
@@ -88,6 +91,8 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
 
     logger.debug(`🟢 [SSEContext.sendQuery] 设置 currentQueryId = ${queryId}, sessionId = ${sessionId}, modelId = ${modelId}`);
     setCurrentQueryId(queryId);
+    currentQueryIdRef.current = queryId;
+    messageHandler.setCurrentQueryId(queryId);  // ✅ 同步到 messageHandler
 
     // ✅ V2: 创建 AbortController 用于取消请求
     const abortController = new AbortController();
@@ -219,9 +224,10 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
         // ✅ AbortController 已经在 done 检查中清理了
         // ✅ currentQueryId 的清理由 messageHandler.handleCompletion 统一处理
         // ✅ 如果流正常结束但没有 complete 消息，需要手动清理 currentQueryId
-        if (currentQueryId === queryId) {
+        if (currentQueryIdRef.current === queryId) {
           logger.debug(`🧹 [SSEContext.sendQuery] 流正常结束但没有 complete 消息，清理 currentQueryId - QueryID: ${queryId}`);
           setCurrentQueryId(null);
+          currentQueryIdRef.current = null;
         }
 
       } catch (error: any) {
@@ -229,9 +235,10 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
         // ✅ 错误时也不立即清理 currentQueryId，让 messageHandler 统一处理
         // ✅ 如果 error 消息已经通过 handleMessage 处理，会调用 resetCurrentQuery
         // ✅ 但如果错误发生在消息处理之前（如网络错误），需要手动清理
-        if (error.name !== 'AbortError' && currentQueryId === queryId) {
+        if (error.name !== 'AbortError' && currentQueryIdRef.current === queryId) {
           logger.debug(`🧹 [SSEContext.sendQuery] 发生错误，清理 currentQueryId - QueryID: ${queryId}`);
           setCurrentQueryId(null);
+          currentQueryIdRef.current = null;
         }
 
         if (error.name === 'AbortError') {
@@ -259,13 +266,15 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
   const resetCurrentQuery = useCallback(() => {
     logger.debug('🔴 [SSEContext] 重置 currentQueryId 和 isCancelling');
     setCurrentQueryId(null);
+    currentQueryIdRef.current = null;
     setIsCancelling(false);
+    messageHandler.setCurrentQueryId(null);  // ✅ 同步到 messageHandler
   }, []);
 
   const cancellingRef = useRef<Set<string>>(new Set());
 
   // ✅ V2 架构：取消查询通过 AbortController + 显式调用取消接口实现
-  const cancelGeneration = async (queryId: string) => {
+  const cancelGeneration = useCallback(async (queryId: string) => {
     logger.debug('🟡 [SSEContext.cancelGeneration] 开始取消查询:', queryId);
 
     if (cancellingRef.current.has(queryId)) {
@@ -275,40 +284,36 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
 
     cancellingRef.current.add(queryId);
     setIsCancelling(true);
-    logger.debug('🟡 [SSEContext.cancelGeneration] 设置 isCancelling = true');
 
-    try {
-      // ✅ 1. 显式调用取消接口（优雅的 API 设计）
-      try {
-        const { apiClient } = await import('../services/apiClient');
-        await apiClient.post(`/sse/cancel/v2/${queryId}`, { reason: 'user_cancelled' });
-        logger.debug('✅ [SSEContext.cancelGeneration] 取消接口调用成功 - QueryID:', queryId);
-      } catch (error) {
-        logger.warn('⚠️ [SSEContext.cancelGeneration] 取消接口调用失败（继续关闭连接）:', error);
-        // 即使接口调用失败，也继续关闭连接
-      }
+    // ✅ 1. 立即清理 UI 状态（用户体验优先，不等 API 返回）
+    setCurrentQueryId(null);
+    currentQueryIdRef.current = null;
 
-      // ✅ 2. 使用 AbortController 关闭连接（双重保障）
-      const abortController = queryAbortControllers.current.get(queryId);
-      if (abortController) {
-        logger.debug('🛑 [SSEContext.cancelGeneration] 关闭连接 - QueryID:', queryId);
-        abortController.abort();  // ✅ 这会触发 AbortError，后端会检测到连接断开
-        queryAbortControllers.current.delete(queryId);
-      } else {
-        logger.warn('⚠️ [SSEContext.cancelGeneration] 未找到查询的 AbortController:', queryId);
-      }
+    // ✅ 1.5 立即清理消息状态（isStreaming、showStatus 等）
+    // abort 后后端的 generation_cancelled 消息无法到达前端，必须在前端本地处理
+    messageHandler.handleLocalCancel('user_cancelled');
 
-      // ✅ 3. 清理状态
-      setCurrentQueryId(null);
-    } catch (error) {
-      logger.error('❌ [SSEContext.cancelGeneration] 取消查询失败:', error);
-    } finally {
-      setTimeout(() => {
-        cancellingRef.current.delete(queryId);
-        setIsCancelling(false);
-      }, 3000);
+    // ✅ 2. 立即 abort 连接（同步操作，无延迟）
+    const abortController = queryAbortControllers.current.get(queryId);
+    if (abortController) {
+      logger.debug('🛑 [SSEContext.cancelGeneration] 关闭连接 - QueryID:', queryId);
+      abortController.abort();
+      queryAbortControllers.current.delete(queryId);
+    } else {
+      logger.warn('⚠️ [SSEContext.cancelGeneration] 未找到查询的 AbortController:', queryId);
     }
-  };
+
+    // ✅ 3. 立即重置 isCancelling，不等取消 API 返回
+    // 修复：上一次取消的异步 API 还在 await 时，用户发送新查询，
+    // 新查询的停止按钮因 isCancelling=true 被禁用
+    cancellingRef.current.delete(queryId);
+    setIsCancelling(false);
+
+    // ✅ 4. 异步调用取消 API（fire-and-forget，不阻塞 UI）
+    apiClient.post(`/sse/cancel/v2/${queryId}`, { reason: 'user_cancelled' })
+      .then(() => logger.debug('✅ [SSEContext.cancelGeneration] 取消接口调用成功 - QueryID:', queryId))
+      .catch((error: unknown) => logger.warn('⚠️ [SSEContext.cancelGeneration] 取消接口调用失败:', error));
+  }, []);
 
 
   const handleApprove = (confirmationId: string) => {
@@ -336,13 +341,13 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
     messageHandler.setResetCurrentQuery(resetCurrentQuery);
   }, [resetCurrentQuery]);
 
-  const contextValue: SSEContextType = {
+  const contextValue: SSEContextType = useMemo(() => ({
     sendMessage,
     sendQuery,
     cancelGeneration,
     currentQueryId,
     isCancelling
-  };
+  }), [currentQueryId, isCancelling, cancelGeneration]);
 
   return (
     <SSEContext.Provider value={contextValue}>

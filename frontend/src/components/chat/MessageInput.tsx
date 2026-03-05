@@ -295,30 +295,26 @@ export const MessageInput: FC = () => {
         }
       });
 
-      // 🔧 修复：延迟添加 AI 占位消息，确保 useLayoutEffect 先检测到用户消息并滚动
-      // 使用 setTimeout(0) 将 AI 消息添加推迟到下一个事件循环
-      setTimeout(() => {
-        // ✅ 立即添加 AI 占位消息，确保 UI 显示 Loading 状态
-        addMessage(chatId, {
-          chatId,
-          type: 'assistant',
-          content: '', // 初始内容为空
-          showStatus: true, // ✅ 启用状态卡片显示
-          statusType: 'initializing', // ✅ 状态类型：初始化中
-          statusMessage: '正在初始化账号连接...', // ✅ 状态消息
-          statusEstimatedSeconds: 5, // 初始预估时间
-          meta: {
-            status: 'pending', // 标记为等待中
-            isStreaming: true, // 标记为流式传输
-            streamingProgress: 0,
-            retryCount: 0,
-            maxRetries: 0,
-            canRetry: false,
-            canEdit: false,
-            canDelete: false
-          }
-        });
-      }, 0);
+      // ✅ 立即添加 AI 占位消息（同步），确保取消时能找到该消息
+      addMessage(chatId, {
+        chatId,
+        type: 'assistant',
+        content: '',
+        showStatus: true,
+        statusType: 'initializing',
+        statusMessage: '正在初始化账号连接...',
+        statusEstimatedSeconds: 5,
+        meta: {
+          status: 'pending',
+          isStreaming: true,
+          streamingProgress: 0,
+          retryCount: 0,
+          maxRetries: 0,
+          canRetry: false,
+          canEdit: false,
+          canDelete: false
+        }
+      });
 
       // 清空输入框（附件在 sendQuery 之后清空，确保失败时可重试）
       const currentMessage = message.trim();
