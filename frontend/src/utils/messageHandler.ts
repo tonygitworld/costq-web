@@ -32,6 +32,9 @@ export class MessageHandler {
   // ✅ 新增：缓存待处理的 Token 统计（解决竞态条件）
   private pendingTokenUsage: Map<string, TokenUsage> = new Map();
 
+  // ✅ 新增：已取消标志（丢弃 abort 后到达的残留消息）
+  private isCancelled = false;
+
   // ✨ 新增：当前消息的构建状态
   private currentMessageBuilder: MessageBuilderState = {
     thinking: undefined,
@@ -71,6 +74,7 @@ export class MessageHandler {
       chatId: this.currentMessageBuilder.chatId  // ✅ 保留 chatId，因为可能在同一会话中
     };
     this.processedEventIds.clear();  // ✅ 清理事件去重集合
+    this.isCancelled = false;  // ✅ 清除取消标志，准备接收新查询的消息
   }
 
   // ✅ 公共方法：更新工具调用状态（减少重复代码）
@@ -131,6 +135,12 @@ export class MessageHandler {
 
   handleMessage = (message: WebSocketMessage) => {
     try {
+      // ✅ 丢弃已取消查询的残留消息（abort 后后端可能还会发送一些消息）
+      if (this.isCancelled) {
+        logger.debug(`🗑️ [handleMessage] 丢弃已取消查询的残留消息 - type: ${message.type}`);
+        return;
+      }
+
       switch (message.type) {
         // ========== 旧格式（向后兼容）==========
         case 'stream_start':
@@ -1224,6 +1234,9 @@ export class MessageHandler {
   // ✅ 前端本地取消：abort 连接后后端的 generation_cancelled 消息无法到达，
   // 需要在前端直接清理消息状态（isStreaming、showStatus 等）
   handleLocalCancel = (reason?: string) => {
+    // ✅ 设置取消标志，丢弃 abort 后到达的残留消息
+    this.isCancelled = true;
+
     const currentChatId = this.currentMessageBuilder.chatId || this.chatStore.currentChatId;
     const messageId = this.currentMessageBuilder.messageId;
 
