@@ -301,16 +301,16 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
       logger.warn('⚠️ [SSEContext.cancelGeneration] 未找到查询的 AbortController:', queryId);
     }
 
-    // ✅ 3. 异步调用取消 API（不阻塞 UI）
-    try {
-      await apiClient.post(`/sse/cancel/v2/${queryId}`, { reason: 'user_cancelled' });
-      logger.debug('✅ [SSEContext.cancelGeneration] 取消接口调用成功 - QueryID:', queryId);
-    } catch (error) {
-      logger.warn('⚠️ [SSEContext.cancelGeneration] 取消接口调用失败:', error);
-    } finally {
-      cancellingRef.current.delete(queryId);
-      setIsCancelling(false);
-    }
+    // ✅ 3. 立即重置 isCancelling，不等取消 API 返回
+    // 修复：上一次取消的异步 API 还在 await 时，用户发送新查询，
+    // 新查询的停止按钮因 isCancelling=true 被禁用
+    cancellingRef.current.delete(queryId);
+    setIsCancelling(false);
+
+    // ✅ 4. 异步调用取消 API（fire-and-forget，不阻塞 UI）
+    apiClient.post(`/sse/cancel/v2/${queryId}`, { reason: 'user_cancelled' })
+      .then(() => logger.debug('✅ [SSEContext.cancelGeneration] 取消接口调用成功 - QueryID:', queryId))
+      .catch((error: unknown) => logger.warn('⚠️ [SSEContext.cancelGeneration] 取消接口调用失败:', error));
   }, []);
 
 
