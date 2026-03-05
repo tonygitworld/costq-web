@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Table, Button, Space, Tag, Typography, Input, Modal, Form, message, Select, App } from 'antd';
+import { Card, Button, Space, Tag, Typography, Input, Modal, Form, message, Select, App } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, ArrowLeftOutlined, KeyOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import type { ColumnsType } from 'antd/es/table';
@@ -8,6 +8,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { AccountPermissionModal } from './AccountPermissionModal';
 import { useI18n } from '../../hooks/useI18n';
 import { usePagination } from '../../hooks/usePagination';
+import { AWSStyleTable } from '../common/AWSStyleTable';
 import { apiClient } from '../../services/apiClient';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -72,12 +73,18 @@ export const UserManagement: React.FC = () => {
       dataIndex: 'username',
       key: 'username',
       width: 150,
+      minWidth: 120,
+      sorter: (a, b) => a.username.localeCompare(b.username),
+      showSorterTooltip: false,
     },
     {
       title: t('table.fullName'),
       dataIndex: 'full_name',
       key: 'full_name',
       width: 120,
+      minWidth: 100,
+      sorter: (a, b) => (a.full_name || '').localeCompare(b.full_name || ''),
+      showSorterTooltip: false,
       render: (name) => name || t('profile.noValue'),
     },
     {
@@ -85,6 +92,9 @@ export const UserManagement: React.FC = () => {
       dataIndex: 'role',
       key: 'role',
       width: 100,
+      minWidth: 90,
+      sorter: (a, b) => a.role.localeCompare(b.role),
+      showSorterTooltip: false,
       render: (role: string) => (
         <Tag color={role === 'admin' ? 'red' : 'blue'}>
           {role === 'admin' ? t('common:role.admin') : t('common:role.user')}
@@ -96,6 +106,9 @@ export const UserManagement: React.FC = () => {
       dataIndex: 'is_active',
       key: 'is_active',
       width: 100,
+      minWidth: 90,
+      sorter: (a, b) => Number(a.is_active) - Number(b.is_active),
+      showSorterTooltip: false,
       render: (is_active: boolean) => (
         <Tag color={is_active ? 'green' : 'default'}>
           {is_active ? t('common:status.active') : t('common:status.inactive')}
@@ -107,26 +120,40 @@ export const UserManagement: React.FC = () => {
       dataIndex: 'created_at',
       key: 'created_at',
       width: 180,
-      render: (time: string) => new Date(time).toLocaleString(),
+      minWidth: 150,
+      sorter: (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+      showSorterTooltip: false,
+      render: (time: string) => (
+        <Typography.Text type="secondary">
+          {dayjs(time).format('YYYY-MM-DD HH:mm')}
+        </Typography.Text>
+      ),
     },
     {
       title: t('table.lastLogin'),
       dataIndex: 'last_login_at',
       key: 'last_login_at',
       width: 220,
+      minWidth: 170,
+      sorter: (a, b) => {
+        const aTime = a.last_login_at ? new Date(a.last_login_at).getTime() : 0;
+        const bTime = b.last_login_at ? new Date(b.last_login_at).getTime() : 0;
+        return aTime - bTime;
+      },
+      showSorterTooltip: false,
       render: (time: string) => {
-        if (!time) return t('profile.neverLogin');
-        // UTC时间转换为浏览器本地时区
+        if (!time) return <Typography.Text type="secondary">{t('profile.neverLogin')}</Typography.Text>;
         const localTime = dayjs.utc(time).local();
         const timeStr = localTime.format('YYYY/MM/DD HH:mm:ss');
-        const timezone = localTime.format('Z'); // 时区偏移，如 +08:00
-        return `${timeStr} (UTC${timezone})`;
+        const tz = localTime.format('Z');
+        return <Typography.Text type="secondary">{`${timeStr} (UTC${tz})`}</Typography.Text>;
       },
     },
     {
       title: t('table.actions'),
       key: 'action',
       width: 240,
+      minWidth: 200,
       fixed: 'right',
       render: (_, record) => (
         <Space size="small">
@@ -280,7 +307,8 @@ export const UserManagement: React.FC = () => {
           </Space>
 
           {/* 用户列表 */}
-          <Table
+          <AWSStyleTable
+            tableId="user-management"
             columns={columns}
             dataSource={filteredUsers}
             rowKey="id"
@@ -291,7 +319,7 @@ export const UserManagement: React.FC = () => {
               showTotal: (total) => `共 ${total} 条`,
             }}
             scroll={{
-              x: 1200,
+              x: 1300,
               y: 'calc(100vh - 400px)'
             }}
             sticky={{
