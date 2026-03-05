@@ -70,11 +70,23 @@ export class MessageHandler {
       toolCalls: new Map(),
       content: '',
       contentBlocks: [],
-      messageId: undefined,  // ✅ 重置 messageId，确保创建新消息
+      messageId: undefined,
       chatId: this.currentMessageBuilder.chatId  // ✅ 保留 chatId，因为可能在同一会话中
     };
-    this.processedEventIds.clear();  // ✅ 清理事件去重集合
-    this.isCancelled = false;  // ✅ 清除取消标志，准备接收新查询的消息
+    this.processedEventIds.clear();
+    this.isCancelled = false;
+  }
+
+  // ✅ 内部重置构建器（完成/失败/取消后调用，清除 chatId）
+  private clearMessageBuilder() {
+    this.currentMessageBuilder = {
+      thinking: undefined,
+      toolCalls: new Map(),
+      content: '',
+      contentBlocks: [],
+      messageId: undefined,
+      chatId: undefined
+    };
   }
 
   // ✅ 公共方法：更新工具调用状态（减少重复代码）
@@ -428,15 +440,8 @@ export class MessageHandler {
     this.processedEventIds.clear();
     logger.debug('🧹 [前端] 已清理事件去重集合');
 
-    // ✅ 重置构建器（包含 messageId），防止后续残留事件修改已完成的消息
-    this.currentMessageBuilder = {
-      thinking: undefined,
-      toolCalls: new Map(),
-      content: '',
-      contentBlocks: [],
-      messageId: undefined,
-      chatId: undefined
-    };
+    // ✅ 重置构建器，防止后续残留事件修改已完成的消息
+    this.clearMessageBuilder();
     logger.debug('✅ [前端] 消息完成，已重置构建器');
   };
 
@@ -825,18 +830,11 @@ export class MessageHandler {
       logger.error('❌ [messageHandler.handleMessageComplete] resetCurrentQuery 未设置！');
     }
 
-    // ✅ 重置构建器（包含 messageId）
-    this.currentMessageBuilder = {
-      thinking: undefined,
-      toolCalls: new Map(),
-      content: '',
-      contentBlocks: [],
-      messageId: undefined,  // ✅ 重置 messageId，确保下次查询创建新消息
-      chatId: undefined
-    };
+    // ✅ 重置构建器
+    this.clearMessageBuilder();
   };
 
-  private handleError = (message: { error?: string; session_id?: string }) => {
+  private handleError = (message: WebSocketMessage & { error?: string; session_id?: string }) => {
     const { error } = message;
     // ✅ 已移除 flushUpdates 调用，不再需要批处理机制
 
@@ -881,14 +879,7 @@ export class MessageHandler {
     }
 
     // ✅ 重置构建器，防止后续残留事件修改已失败的消息
-    this.currentMessageBuilder = {
-      thinking: undefined,
-      toolCalls: new Map(),
-      content: '',
-      contentBlocks: [],
-      messageId: undefined,
-      chatId: undefined
-    };
+    this.clearMessageBuilder();
   };
 
   // ✅ 新增: 处理生成取消事件
@@ -949,15 +940,8 @@ export class MessageHandler {
       this.resetCurrentQuery();
     }
 
-    // ✅ 重置构建器（包含 messageId）
-    this.currentMessageBuilder = {
-      thinking: undefined,
-      toolCalls: new Map(),
-      content: '',
-      contentBlocks: [],
-      messageId: undefined,  // ✅ 重置 messageId，确保下次查询创建新消息
-      chatId: undefined
-    };
+    // ✅ 重置构建器
+    this.clearMessageBuilder();
   };
 
   // ✅ 新增: 处理取消确认事件
@@ -989,14 +973,7 @@ export class MessageHandler {
       if (existingChatId !== currentChatId) {
         // 不同的会话，重置构建器（可能是新查询）
         logger.warn(`⚠️ 检测到会话切换: ${existingChatId} → ${currentChatId}，重置消息构建器`);
-        this.currentMessageBuilder = {
-          thinking: undefined,
-          toolCalls: new Map(),
-          content: '',
-          contentBlocks: [],
-          messageId: undefined,
-          chatId: undefined
-        };
+        this.clearMessageBuilder();
       } else {
         // ✅ 同一个会话，但需要检查是否是新查询
         // 如果消息已经标记为完成（通过 message_complete 事件），则应该创建新消息
@@ -1301,14 +1278,7 @@ export class MessageHandler {
     });
 
     // 重置构建器
-    this.currentMessageBuilder = {
-      thinking: undefined,
-      toolCalls: new Map(),
-      content: '',
-      contentBlocks: [],
-      messageId: undefined,
-      chatId: undefined
-    };
+    this.clearMessageBuilder();
   };
 }
 
