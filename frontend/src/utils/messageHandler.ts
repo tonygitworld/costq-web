@@ -1238,7 +1238,20 @@ export class MessageHandler {
     this.isCancelled = true;
 
     const currentChatId = this.currentMessageBuilder.chatId || this.chatStore.currentChatId;
-    const messageId = this.currentMessageBuilder.messageId;
+    let messageId = this.currentMessageBuilder.messageId;
+
+    // ✅ 如果 messageHandler 还没有 messageId（后端还没发消息），
+    // 直接查找占位消息（MessageInput 创建的 pending/streaming 状态的空 assistant 消息）
+    if (!messageId && currentChatId) {
+      const messages = this.chatStore.messages[currentChatId] || [];
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage &&
+          lastMessage.type === 'assistant' &&
+          (lastMessage.meta?.status === 'pending' || lastMessage.meta?.status === 'streaming')) {
+        messageId = lastMessage.id;
+        logger.debug(`🔍 [handleLocalCancel] 找到占位消息 - MessageId: ${messageId}`);
+      }
+    }
 
     if (!currentChatId || !messageId) {
       logger.warn('⚠️ [handleLocalCancel] 无当前聊天或消息，跳过');
