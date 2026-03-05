@@ -6,7 +6,6 @@ import React, { useState, useEffect } from 'react';
 import {
   Card,
   Button,
-  Table,
   Space,
   Input,
   Select,
@@ -34,6 +33,7 @@ import { useAccountStore } from '../../stores/accountStore';
 import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import { usePagination } from '../../hooks/usePagination';
 import { useI18n } from '../../hooks/useI18n';
+import { AWSStyleTable } from '../common/AWSStyleTable';
 import type { Alert } from '../../types/alert';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -185,7 +185,8 @@ export const AlertManagement: React.FC = () => {
     {
       title: '●',
       key: 'indicator',
-      width: 40,
+      width: 50,
+      minWidth: 50,
       render: (_, record) => (
         <span style={{ fontSize: '20px' }}>
           {record.is_active ? '🟢' : '🔴'}
@@ -196,7 +197,10 @@ export const AlertManagement: React.FC = () => {
       title: t('table.columnName'),
       dataIndex: 'display_name',
       key: 'display_name',
-      width: 150,
+      width: 160,
+      minWidth: 100,
+      sorter: (a, b) => a.display_name.localeCompare(b.display_name),
+      showSorterTooltip: false,
       render: (text) => <strong>{text}</strong>
     },
     {
@@ -204,6 +208,9 @@ export const AlertManagement: React.FC = () => {
       dataIndex: 'description',
       key: 'description',
       ellipsis: true,
+      minWidth: 120,
+      sorter: (a, b) => a.description.localeCompare(b.description),
+      showSorterTooltip: false,
       render: (text, record) => (
         <div>
           <div style={{ marginBottom: 4 }}>{text}</div>
@@ -225,18 +232,25 @@ export const AlertManagement: React.FC = () => {
       title: t('table.columnCreator'),
       key: 'creator',
       width: 120,
+      minWidth: 100,
+      sorter: (a, b) => (a.created_by_username || '').localeCompare(b.created_by_username || ''),
+      showSorterTooltip: false,
       render: (_, record) => record.created_by_username || t('table.unknown')
     },
     {
       title: t('table.columnStatus'),
       key: 'status',
-      width: 120,
+      width: 130,
+      minWidth: 110,
+      sorter: (a, b) => Number(a.is_active) - Number(b.is_active),
+      showSorterTooltip: false,
       render: (_, record) => getStatusDisplay(record)
     },
     {
       title: t('table.columnActions'),
       key: 'action',
       width: 200,
+      minWidth: 160,
       fixed: 'right',
       render: (_, record) => {
         const isOwnerOrAdmin = record.user_id === currentUser?.id || isAdmin;
@@ -359,7 +373,8 @@ export const AlertManagement: React.FC = () => {
           </Space>
         </Space>
 
-        <Table
+        <AWSStyleTable
+          tableId="alert-management"
           columns={columns}
           dataSource={filteredAlerts}
           rowKey="id"
@@ -370,7 +385,7 @@ export const AlertManagement: React.FC = () => {
             showTotal: (total) => t('table.total', { count: total }),
           }}
           scroll={{
-            x: 1000,
+            x: 1100,
             y: 'calc(100vh - 400px)'
           }}
           sticky={{

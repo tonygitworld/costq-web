@@ -11,7 +11,6 @@ import {
   Statistic,
   Row,
   Col,
-  Table,
   Tag,
   message,
   App
@@ -30,6 +29,7 @@ import { useAccountStore } from '../../stores/accountStore';
 import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import { usePagination } from '../../hooks/usePagination';
 import { useI18n } from '../../hooks/useI18n';
+import { AWSStyleTable } from '../common/AWSStyleTable';
 import type { AlertHistory } from '../../types/alert';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -191,7 +191,8 @@ export const AlertDetail: React.FC = () => {
     {
       title: '●',
       key: 'indicator',
-      width: 40,
+      width: 50,
+      minWidth: 50,
       render: (_, record) => (
         <span style={{ fontSize: '16px' }}>
           {record.status === 'success' ? '✅' : '❌'}
@@ -203,13 +204,19 @@ export const AlertDetail: React.FC = () => {
       dataIndex: 'executed_at',
       key: 'executed_at',
       width: 180,
+      minWidth: 160,
+      sorter: (a, b) => new Date(a.executed_at).getTime() - new Date(b.executed_at).getTime(),
+      showSorterTooltip: false,
       render: (text) => dayjs(text).format('YYYY-MM-DD HH:mm')
     },
     {
       title: t('history.columnStatus'),
       dataIndex: 'status',
       key: 'status',
-      width: 80,
+      width: 100,
+      minWidth: 90,
+      sorter: (a, b) => a.status.localeCompare(b.status),
+      showSorterTooltip: false,
       render: (status) => (
         <Tag color={status === 'success' ? 'success' : 'error'}>
           {status === 'success' ? t('history.statusSuccess') : t('history.statusFailed')}
@@ -220,7 +227,10 @@ export const AlertDetail: React.FC = () => {
       title: t('history.columnTriggered'),
       dataIndex: 'triggered',
       key: 'triggered',
-      width: 80,
+      width: 100,
+      minWidth: 90,
+      sorter: (a, b) => Number(a.triggered) - Number(b.triggered),
+      showSorterTooltip: false,
       render: (triggered) => (
         triggered ? <Tag color="warning">{t('history.triggered')}</Tag> : <Tag>{t('history.notTriggered')}</Tag>
       )
@@ -229,7 +239,10 @@ export const AlertDetail: React.FC = () => {
       title: t('history.columnResult'),
       dataIndex: 'result_summary',
       key: 'result_summary',
-      ellipsis: true
+      ellipsis: true,
+      minWidth: 120,
+      sorter: (a, b) => (a.result_summary || '').localeCompare(b.result_summary || ''),
+      showSorterTooltip: false,
     }
   ];
 
@@ -361,7 +374,8 @@ export const AlertDetail: React.FC = () => {
           </Button>
         }
       >
-        <Table
+        <AWSStyleTable
+          tableId="alert-history"
           columns={historyColumns}
           dataSource={alertHistory}
           rowKey="id"
@@ -370,6 +384,10 @@ export const AlertDetail: React.FC = () => {
             ...paginationProps,
             total: alertHistory.length,
             showTotal: (total) => t('history.pagination', { total }),
+          }}
+          scroll={{
+            x: 800,
+            y: 'calc(100vh - 500px)'
           }}
         />
       </Card>
