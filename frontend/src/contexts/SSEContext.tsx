@@ -1,5 +1,5 @@
 // SSE Context - 全局SSE连接管理
-import React, { createContext, useContext, useEffect, useRef, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import {
   type WebSocketMessage,
   type BatchMessage,
@@ -299,7 +299,6 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
 
     // ✅ 3. 异步调用取消 API（不阻塞 UI）
     try {
-      const { apiClient } = await import('../services/apiClient');
       await apiClient.post(`/sse/cancel/v2/${queryId}`, { reason: 'user_cancelled' });
       logger.debug('✅ [SSEContext.cancelGeneration] 取消接口调用成功 - QueryID:', queryId);
     } catch (error) {
@@ -336,13 +335,13 @@ export const SSEProvider: React.FC<SSEProviderProps> = ({ children }) => {
     messageHandler.setResetCurrentQuery(resetCurrentQuery);
   }, [resetCurrentQuery]);
 
-  const contextValue: SSEContextType = {
+  const contextValue: SSEContextType = useMemo(() => ({
     sendMessage,
     sendQuery,
     cancelGeneration,
     currentQueryId,
     isCancelling
-  };
+  }), [currentQueryId, isCancelling, cancelGeneration]);
 
   return (
     <SSEContext.Provider value={contextValue}>
