@@ -185,8 +185,8 @@ export const AlertManagement: React.FC = () => {
     {
       title: '●',
       key: 'indicator',
-      width: 50,
-      minWidth: 50,
+      width: 40,
+      minWidth: 32,
       render: (_, record) => (
         <span style={{ fontSize: '20px' }}>
           {record.is_active ? '🟢' : '🔴'}
@@ -197,8 +197,8 @@ export const AlertManagement: React.FC = () => {
       title: t('table.columnName'),
       dataIndex: 'display_name',
       key: 'display_name',
-      width: 160,
-      minWidth: 100,
+      width: 150,
+      minWidth: 75,
       sorter: (a, b) => a.display_name.localeCompare(b.display_name),
       showSorterTooltip: false,
       render: (text) => <strong>{text}</strong>
@@ -208,7 +208,8 @@ export const AlertManagement: React.FC = () => {
       dataIndex: 'description',
       key: 'description',
       ellipsis: true,
-      minWidth: 120,
+      width: 280,
+      minWidth: 110,
       sorter: (a, b) => a.description.localeCompare(b.description),
       showSorterTooltip: false,
       render: (text, record) => (
@@ -231,8 +232,8 @@ export const AlertManagement: React.FC = () => {
     {
       title: t('table.columnCreator'),
       key: 'creator',
-      width: 120,
-      minWidth: 100,
+      width: 180,
+      minWidth: 80,
       sorter: (a, b) => (a.created_by_username || '').localeCompare(b.created_by_username || ''),
       showSorterTooltip: false,
       render: (_, record) => record.created_by_username || t('table.unknown')
@@ -240,8 +241,8 @@ export const AlertManagement: React.FC = () => {
     {
       title: t('table.columnStatus'),
       key: 'status',
-      width: 130,
-      minWidth: 110,
+      width: 150,
+      minWidth: 95,
       sorter: (a, b) => Number(a.is_active) - Number(b.is_active),
       showSorterTooltip: false,
       render: (_, record) => getStatusDisplay(record)
@@ -249,8 +250,8 @@ export const AlertManagement: React.FC = () => {
     {
       title: t('table.columnActions'),
       key: 'action',
-      width: 200,
-      minWidth: 160,
+      width: 250,
+      minWidth: 55,
       fixed: 'right',
       render: (_, record) => {
         const isOwnerOrAdmin = record.user_id === currentUser?.id || isAdmin;
@@ -385,7 +386,7 @@ export const AlertManagement: React.FC = () => {
             showTotal: (total) => t('table.total', { count: total }),
           }}
           scroll={{
-            x: 1100,
+            x: 1400,
             y: 'calc(100vh - 400px)'
           }}
           sticky={{

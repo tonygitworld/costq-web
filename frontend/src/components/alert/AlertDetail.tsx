@@ -191,8 +191,8 @@ export const AlertDetail: React.FC = () => {
     {
       title: '●',
       key: 'indicator',
-      width: 16,
-      minWidth: 16,
+      width: 36,
+      minWidth: 28,
       render: (_, record) => (
         <span style={{ fontSize: '16px' }}>
           {record.status === 'success' ? '✅' : '❌'}
@@ -203,8 +203,8 @@ export const AlertDetail: React.FC = () => {
       title: t('history.columnTime'),
       dataIndex: 'executed_at',
       key: 'executed_at',
-      width: 40,
-      minWidth: 30,
+      width: 170,
+      minWidth: 110,
       sorter: (a, b) => new Date(a.executed_at).getTime() - new Date(b.executed_at).getTime(),
       showSorterTooltip: false,
       render: (text) => dayjs(text).format('YYYY-MM-DD HH:mm')
@@ -213,8 +213,8 @@ export const AlertDetail: React.FC = () => {
       title: t('history.columnStatus'),
       dataIndex: 'status',
       key: 'status',
-      width: 20,
-      minWidth: 16,
+      width: 100,
+      minWidth: 70,
       sorter: (a, b) => a.status.localeCompare(b.status),
       showSorterTooltip: false,
       render: (status) => (
@@ -227,8 +227,8 @@ export const AlertDetail: React.FC = () => {
       title: t('history.columnTriggered'),
       dataIndex: 'triggered',
       key: 'triggered',
-      width: 20,
-      minWidth: 16,
+      width: 100,
+      minWidth: 70,
       sorter: (a, b) => Number(a.triggered) - Number(b.triggered),
       showSorterTooltip: false,
       render: (triggered) => (
@@ -240,7 +240,8 @@ export const AlertDetail: React.FC = () => {
       dataIndex: 'result_summary',
       key: 'result_summary',
       ellipsis: true,
-      minWidth: 40,
+      width: 300,
+      minWidth: 120,
       sorter: (a, b) => (a.result_summary || '').localeCompare(b.result_summary || ''),
       showSorterTooltip: false,
     }

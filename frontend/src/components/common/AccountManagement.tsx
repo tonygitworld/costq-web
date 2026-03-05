@@ -166,6 +166,7 @@ export const AccountManagement: FC = () => {
       dataIndex: 'description',
       key: 'description',
       ellipsis: true,
+      width: 200,
       minWidth: 80,
       sorter: (a, b) => (a.description || '').localeCompare(b.description || ''),
       showSorterTooltip: false,

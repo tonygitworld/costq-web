@@ -73,7 +73,7 @@ export const UserManagement: React.FC = () => {
       dataIndex: 'username',
       key: 'username',
       width: 150,
-      minWidth: 120,
+      minWidth: 105,
       sorter: (a, b) => a.username.localeCompare(b.username),
       showSorterTooltip: false,
     },
@@ -82,7 +82,7 @@ export const UserManagement: React.FC = () => {
       dataIndex: 'full_name',
       key: 'full_name',
       width: 120,
-      minWidth: 100,
+      minWidth: 95,
       sorter: (a, b) => (a.full_name || '').localeCompare(b.full_name || ''),
       showSorterTooltip: false,
       render: (name) => name || t('profile.noValue'),
@@ -92,7 +92,7 @@ export const UserManagement: React.FC = () => {
       dataIndex: 'role',
       key: 'role',
       width: 100,
-      minWidth: 90,
+      minWidth: 55,
       sorter: (a, b) => a.role.localeCompare(b.role),
       showSorterTooltip: false,
       render: (role: string) => (
@@ -105,8 +105,8 @@ export const UserManagement: React.FC = () => {
       title: t('table.status'),
       dataIndex: 'is_active',
       key: 'is_active',
-      width: 100,
-      minWidth: 90,
+      width: 120,
+      minWidth: 95,
       sorter: (a, b) => Number(a.is_active) - Number(b.is_active),
       showSorterTooltip: false,
       render: (is_active: boolean) => (
@@ -120,7 +120,7 @@ export const UserManagement: React.FC = () => {
       dataIndex: 'created_at',
       key: 'created_at',
       width: 180,
-      minWidth: 150,
+      minWidth: 100,
       sorter: (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
       showSorterTooltip: false,
       render: (time: string) => (
@@ -134,7 +134,7 @@ export const UserManagement: React.FC = () => {
       dataIndex: 'last_login_at',
       key: 'last_login_at',
       width: 220,
-      minWidth: 170,
+      minWidth: 115,
       sorter: (a, b) => {
         const aTime = a.last_login_at ? new Date(a.last_login_at).getTime() : 0;
         const bTime = b.last_login_at ? new Date(b.last_login_at).getTime() : 0;
@@ -153,7 +153,7 @@ export const UserManagement: React.FC = () => {
       title: t('table.actions'),
       key: 'action',
       width: 240,
-      minWidth: 200,
+      minWidth: 55,
       fixed: 'right',
       render: (_, record) => (
         <Space size="small">

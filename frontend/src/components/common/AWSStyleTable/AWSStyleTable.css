@@ -1,3 +1,17 @@
+/* ===== 表格布局 ===== */
+/* rc-table 在有 scroll/sticky 时自动设置 table-layout:fixed，并给所有 <table> 加 minWidth:100%。
+   当 scroll.x < 容器宽度时，minWidth:100% 会让 table 实际宽度 > scroll.x，
+   导致 table-layout:fixed 按比例重分配列宽（拖拽一列影响其他列）。
+   覆盖为 0，确保 table 宽度完全由 width(=scroll.x) 控制。 */
+.aws-style-table table {
+  min-width: 0 !important;
+}
+
+/* 容器仅用于测量宽度 */
+.aws-style-table-container {
+  width: 100%;
+}
+
 /* ===== 列宽拖拽手柄（AWS 风格） ===== */
 .aws-table-resize-handle {
   position: absolute;
