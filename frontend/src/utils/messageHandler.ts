@@ -428,10 +428,16 @@ export class MessageHandler {
     this.processedEventIds.clear();
     logger.debug('🧹 [前端] 已清理事件去重集合');
 
-    // ✅ 修复：标记消息已完成，但不重置 messageId
-    // messageId 应该在下一次用户发送新查询时才重置
-    // 这样可以确保一个完整的对话（工具调用 + 最终回复）在同一个消息中
-    logger.debug('✅ [前端] 消息完成，保留 messageId 直到下次查询');
+    // ✅ 重置构建器（包含 messageId），防止后续残留事件修改已完成的消息
+    this.currentMessageBuilder = {
+      thinking: undefined,
+      toolCalls: new Map(),
+      content: '',
+      contentBlocks: [],
+      messageId: undefined,
+      chatId: undefined
+    };
+    logger.debug('✅ [前端] 消息完成，已重置构建器');
   };
 
   private handleThinking = (message: WebSocketMessage) => {
@@ -873,12 +879,23 @@ export class MessageHandler {
         }
       });
     }
+
+    // ✅ 重置构建器，防止后续残留事件修改已失败的消息
+    this.currentMessageBuilder = {
+      thinking: undefined,
+      toolCalls: new Map(),
+      content: '',
+      contentBlocks: [],
+      messageId: undefined,
+      chatId: undefined
+    };
   };
 
   // ✅ 新增: 处理生成取消事件
-  private handleGenerationCancelled = (message: { reason?: string; query_id?: string; session_id?: string }) => {
-    const { reason, query_id } = message;
-    // ✅ 已移除 flushUpdates 调用，不再需要批处理机制
+  private handleGenerationCancelled = (message: { reason?: string; message?: string; query_id?: string; session_id?: string }) => {
+    const { query_id } = message;
+    // ✅ 后端发送的是 message 字段而非 reason 字段，需要兼容两者
+    const cancelReason = message.reason || message.message || 'generation_cancelled';
 
     const sessionId = message?.session_id;
     const currentChatId = sessionId || this.currentMessageBuilder.chatId || this.chatStore.currentChatId;
@@ -888,10 +905,19 @@ export class MessageHandler {
       return;
     }
 
-    logger.debug(`🛑 生成已取消 - Query: ${query_id}, ChatId: ${currentChatId}, Reason: ${reason}`);
-
     const messages = this.chatStore.messages[currentChatId] || [];
     const currentMessage = messages.find(m => m.id === this.currentMessageBuilder.messageId);
+
+    // ✅ 关键修复：如果消息已经处于终态（completed/failed/cancelled），不再覆盖
+    // 场景：查询正常完成后，watch_disconnect 检测到连接断开，后端发送 generation_cancelled
+    // 此时消息已经是 completed 状态，不应被覆盖为 cancelled
+    const terminalStatuses = ['completed', 'failed', 'cancelled'];
+    if (currentMessage && terminalStatuses.includes(currentMessage.meta?.status)) {
+      logger.debug(`⏭️ [handleGenerationCancelled] 消息已处于终态 (${currentMessage.meta.status})，忽略 generation_cancelled - Query: ${query_id}`);
+      return;
+    }
+
+    logger.debug(`🛑 生成已取消 - Query: ${query_id}, ChatId: ${currentChatId}, Reason: ${cancelReason}`);
 
     // 更新消息状态为"已取消"
     this.chatStore.updateMessage(
@@ -904,7 +930,7 @@ export class MessageHandler {
           isStreaming: false,
           streamingProgress: 100,
           endTime: Date.now(),
-          cancelReason: reason,
+          cancelReason: cancelReason,
           retryCount: currentMessage?.meta.retryCount || 0,
           maxRetries: currentMessage?.meta.maxRetries || 3,
           canRetry: true,
@@ -932,14 +958,6 @@ export class MessageHandler {
       messageId: undefined,  // ✅ 重置 messageId，确保下次查询创建新消息
       chatId: undefined
     };
-
-    // ⚠️ 注意：使用静态 notification API 会有警告，但在工具类中这是可接受的
-    // 如需消除警告，需要重构为通过 Context 注入 notification 实例
-    notification.info({
-      message: i18n.t('error:messageHandler.generationStopped'),
-      description: reason,
-      duration: 3
-    });
   };
 
   // ✅ 新增: 处理取消确认事件
