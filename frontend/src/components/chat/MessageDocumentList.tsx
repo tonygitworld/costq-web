@@ -1,5 +1,5 @@
 import { type FC } from 'react';
-import { FileWordOutlined, FileMarkdownOutlined, FileTextOutlined } from '@ant-design/icons';
+import { FileWordOutlined, FileMarkdownOutlined, FileTextOutlined, FilePdfOutlined } from '@ant-design/icons';
 import type { DocumentAttachment } from '../../types/chat';
 import { getDocumentType } from '../../utils/documentUtils';
 import styles from './MessageDocumentList.module.css';
@@ -14,8 +14,10 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function getIcon(docType: 'word' | 'markdown' | 'text') {
+function getIcon(docType: 'pdf' | 'word' | 'markdown' | 'text') {
   switch (docType) {
+    case 'pdf':
+      return <FilePdfOutlined className={styles.documentIcon} style={{ color: '#ff4d4f' }} />;
     case 'word':
       return <FileWordOutlined className={styles.documentIcon} style={{ color: '#2b579a' }} />;
     case 'markdown':
@@ -24,6 +26,7 @@ function getIcon(docType: 'word' | 'markdown' | 'text') {
       return <FileTextOutlined className={styles.documentIcon} style={{ color: '#666666' }} />;
   }
 }
+
 
 export const MessageDocumentList: FC<MessageDocumentListProps> = ({ attachments }) => {
   if (!attachments || attachments.length === 0) return null;

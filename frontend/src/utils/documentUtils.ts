@@ -119,14 +119,16 @@ export function validateDocumentFile(
  * 根据 MIME 类型和文件扩展名判断文档子类型
  * 用于 UI 展示时区分图标和颜色
  */
-export function getDocumentType(mimeType: string, fileName: string): 'word' | 'markdown' | 'text' {
+export function getDocumentType(mimeType: string, fileName: string): 'pdf' | 'word' | 'markdown' | 'text' {
   const extension = getFileExtension(fileName);
 
+  if (extension === '.pdf') return 'pdf';
   if (extension === '.doc' || extension === '.docx') return 'word';
   if (extension === '.md') return 'markdown';
   if (extension === '.txt') return 'text';
 
   // fallback: 根据 MIME 类型判断
+  if (mimeType === 'application/pdf') return 'pdf';
   if (mimeType === 'application/msword' ||
       mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
     return 'word';
