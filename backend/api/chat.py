@@ -47,6 +47,12 @@ class ChatSessionUpdate(BaseModel):
     title: str = Field(..., min_length=1, max_length=200, description="会话标题")
 
 
+class ChatSessionPinUpdate(BaseModel):
+    """更新聊天会话置顶状态请求"""
+
+    is_pinned: bool = Field(..., description="是否置顶")
+
+
 class ChatMessageCreate(BaseModel):
     """创建聊天消息请求"""
 
@@ -64,8 +70,9 @@ class ChatSessionResponse(BaseModel):
     title: str
     created_at: str
     updated_at: str
-    message_count: int = 0  # ✅ 新增：消息数量
-    total_tokens: int = 0  # ✅ 新增：总Token数
+    message_count: int = 0
+    total_tokens: int = 0
+    is_pinned: bool = False  # ✅ 新增：置顶状态
 
     @field_serializer("created_at", "updated_at")
     def add_utc_suffix(self, value: str) -> str:
@@ -243,6 +250,42 @@ async def delete_chat_session(
         logger.error("- Session: %s, Error: %s", session_id, e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"删除会话失败: {str(e)}"
+        )
+
+
+@router.patch("/sessions/{session_id}/pin", response_model=ChatSessionResponse)
+async def update_chat_session_pin(
+    session_id: str,
+    pin_update: ChatSessionPinUpdate,
+    current_user: dict = Depends(get_current_user),
+    chat_storage=Depends(get_storage_service),
+):
+    """更新会话置顶状态
+
+    权限检查：会话必须属于当前用户
+    """
+    user_id = current_user["id"]
+
+    session = chat_storage.get_session(session_id)
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"会话不存在: {session_id}"
+        )
+
+    if session["user_id"] != user_id:
+        logger.warning("无权修改置顶 - User: %s Session: %s", user_id, session_id)
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="无权修改该会话")
+
+    try:
+        chat_storage.update_session_pin(session_id, pin_update.is_pinned)
+        updated_session = chat_storage.get_session(session_id)
+        return ChatSessionResponse(**updated_session)
+
+    except Exception as e:
+        logger.error("更新置顶失败 - Session: %s, Error: %s", session_id, e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"更新置顶状态失败: {str(e)}"
         )
 
 

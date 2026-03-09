@@ -4,7 +4,7 @@
 1. ✅ 使用PostgreSQL数据库（通过SQLAlchemy ORM）
 2. ✅ 支持多租户用户隔离
 3. ✅ 完整的CRUD操作
-4. ✅ 自动统计信息更新（通过数据库触发器）
+4. ✅ 统计信息在 save_message 中原子性更新
 5. ✅ 兼容现有的chat_storage API接口
 6. ✅ 每个操作使用独立的数据库会话，避免事务失败污染
 
@@ -154,7 +154,7 @@ class ChatStoragePostgreSQL:
 
     def get_user_sessions(self, user_id: str, limit: int = 50) -> list[dict]:
         """
-        获取用户的所有会话（按更新时间倒序）
+        获取用户的所有会话（置顶会话始终包含，不受 limit 截断）
 
         Args:
             user_id: 用户ID
@@ -165,22 +165,38 @@ class ChatStoragePostgreSQL:
         """
         db = self._get_db()
         try:
-            sessions = (
+            # ✅ 两步查询：确保置顶会话不被截断
+            # Step 1: 查询所有置顶会话（不限数量）
+            pinned_sessions = (
                 db.query(ChatSession)
-                .filter(ChatSession.user_id == user_id)
+                .filter(ChatSession.user_id == user_id, ChatSession.is_pinned == True)
                 .order_by(
                     desc(ChatSession.last_message_at).nulls_last(), desc(ChatSession.updated_at)
                 )
-                .limit(limit)
                 .all()
             )
 
-            logger.info("PG- User: %s, Count: {len(sessions)}", user_id)
+            # Step 2: 查询非置顶会话（limit 减去置顶数量）
+            remaining_limit = max(0, limit - len(pinned_sessions))
+            unpinned_sessions = (
+                db.query(ChatSession)
+                .filter(ChatSession.user_id == user_id, ChatSession.is_pinned == False)
+                .order_by(
+                    desc(ChatSession.last_message_at).nulls_last(), desc(ChatSession.updated_at)
+                )
+                .limit(remaining_limit)
+                .all()
+            ) if remaining_limit > 0 else []
+
+            # 合并：置顶在前，非置顶在后
+            sessions = pinned_sessions + unpinned_sessions
+
+            logger.info("PG- User: %s, Pinned: %d, Unpinned: %d", user_id, len(pinned_sessions), len(unpinned_sessions))
 
             return [session.to_dict() for session in sessions]
 
         except Exception as e:
-            db.rollback()  # ✅ 添加 rollback
+            db.rollback()
             logger.error("PG: %s", e)
             return []
         finally:
@@ -236,6 +252,32 @@ class ChatStoragePostgreSQL:
         except Exception as e:
             db.rollback()
             logger.error("PG: %s", e)
+            raise
+        finally:
+            db.close()
+
+    def update_session_pin(self, session_id: str, is_pinned: bool):
+        """
+        更新会话置顶状态
+
+        Args:
+            session_id: 会话ID
+            is_pinned: 是否置顶
+        """
+        db = self._get_db()
+        try:
+            session = db.query(ChatSession).filter(ChatSession.id == session_id).first()
+
+            if session:
+                session.is_pinned = is_pinned
+                db.commit()
+                logger.info("📌 更新置顶状态 - Session: %s, is_pinned: %s", session_id, is_pinned)
+            else:
+                logger.warning("会话不存在 - Session: %s", session_id)
+
+        except Exception as e:
+            db.rollback()
+            logger.error("更新置顶状态失败: %s", e)
             raise
         finally:
             db.close()
@@ -302,8 +344,17 @@ class ChatStoragePostgreSQL:
 
             db.add(new_message)
 
-            # 注意：会话统计信息由数据库触发器自动更新
-            # 不需要手动更新 message_count 和 last_message_at
+            # ✅ 原子性更新会话统计信息（使用 SQL 表达式避免并发竞态）
+            from sqlalchemy import text
+            db.execute(
+                text("""
+                    UPDATE chat_sessions
+                    SET message_count = message_count + 1,
+                        last_message_at = :ts
+                    WHERE id = :sid
+                """),
+                {"ts": timestamp, "sid": session_id}
+            )
 
             db.commit()
             db.refresh(new_message)

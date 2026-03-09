@@ -25,6 +25,7 @@ export interface ChatSession {
   last_message_at?: string;
   message_count: number;
   total_tokens: number;
+  is_pinned?: boolean;  // ✅ 新增：置顶状态
   model_config?: Record<string, unknown>;
 }
 
@@ -134,6 +135,16 @@ export async function deleteChatSession(sessionId: string): Promise<void> {
 }
 
 /**
+ * 更新会话置顶状态
+ */
+export async function updateChatPin(sessionId: string, isPinned: boolean): Promise<ChatSession> {
+  const response = await apiClient.patch<ChatSession>(`/chat/sessions/${sessionId}/pin`, {
+    is_pinned: isPinned
+  });
+  return response;
+}
+
+/**
  * 获取会话的所有消息
  */
 export async function getChatMessages(sessionId: string, limit: number = 100): Promise<ChatMessage[]> {
@@ -179,7 +190,8 @@ export function convertBackendSession(backendSession: ChatSession) {
     updatedAt: new Date(backendSession.updated_at).getTime(),
     preview: `${backendSession.message_count} 条消息`,
     messageCount: backendSession.message_count,
-    totalTokens: backendSession.total_tokens
+    totalTokens: backendSession.total_tokens,
+    isPinned: backendSession.is_pinned ?? false,  // ✅ 映射置顶状态
   };
 }
 
