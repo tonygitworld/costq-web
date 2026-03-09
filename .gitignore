@@ -67,3 +67,5 @@ temp/
 
 # Deployment
 deployment/
+
+.deepvcode/
