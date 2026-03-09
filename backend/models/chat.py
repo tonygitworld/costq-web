@@ -2,7 +2,7 @@
 
 from datetime import datetime, timezone
 
-from sqlalchemy import JSON, Column, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, Boolean, Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 from backend.models.base import Base
@@ -32,6 +32,9 @@ class ChatSession(Base):
     updated_at = Column(DateTime(timezone=True), default=_utc_now, onupdate=_utc_now, nullable=False)
     last_message_at = Column(DateTime(timezone=True), nullable=True, index=True)
 
+    # 置顶状态
+    is_pinned = Column(Boolean, default=False, nullable=False)
+
     # 统计信息
     message_count = Column(Integer, default=0, nullable=False)
     total_tokens = Column(Integer, default=0, nullable=False)
@@ -59,6 +62,7 @@ class ChatSession(Base):
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
             "last_message_at": self.last_message_at.isoformat() if self.last_message_at else None,
+            "is_pinned": self.is_pinned,
             "message_count": self.message_count,
             "total_tokens": self.total_tokens,
             "model_config": self.model_config,
