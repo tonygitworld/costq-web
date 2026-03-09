@@ -283,9 +283,9 @@ async def update_chat_session_pin(
         return ChatSessionResponse(**updated_session)
 
     except Exception as e:
-        logger.error("更新置顶失败 - Session: %s, Error: %s", session_id, e)
+        logger.error("更新置顶失败 - Session: %s", session_id, exc_info=True)
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"更新置顶状态失败: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="更新置顶状态失败"
         )
 
 

@@ -271,13 +271,13 @@ class ChatStoragePostgreSQL:
             if session:
                 session.is_pinned = is_pinned
                 db.commit()
-                logger.info("📌 更新置顶状态 - Session: %s, is_pinned: %s", session_id, is_pinned)
+                logger.info("更新置顶状态 - Session: %s, is_pinned: %s", session_id, is_pinned)
             else:
                 logger.warning("会话不存在 - Session: %s", session_id)
 
         except Exception as e:
             db.rollback()
-            logger.error("更新置顶状态失败: %s", e)
+            logger.error("更新置顶状态失败 - Session: %s", session_id, exc_info=True)
             raise
         finally:
             db.close()
