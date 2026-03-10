@@ -232,7 +232,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
             <ConnectionStatus />
           </div> */}
 
-          {process.env.NODE_ENV === 'development' && <ScrollIssueReporter />}
+          {process.env.NODE_ENV === 'development' && !isMobile && <ScrollIssueReporter />}
         </Layout.Content>
       </Layout>
 

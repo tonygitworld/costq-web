@@ -10,6 +10,7 @@ import { useModelStore } from '../../stores/modelStore';
 import { MessageInputContainer } from './MessageInputContainer';
 import { PromptTemplatesPopoverContent } from './PromptTemplatesPopoverContent';
 import { useI18n } from '../../hooks/useI18n';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import { useAttachments } from '../../hooks/useAttachments';
 import { FilePickerButton } from './FilePickerButton';
 import { AttachmentPreviewArea } from './AttachmentPreviewArea';
@@ -36,6 +37,7 @@ export const MessageInput: FC = () => {
   const { t } = useI18n('chat');
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const isMobile = useIsMobile();
 
   const {
     attachments,
@@ -94,11 +96,10 @@ export const MessageInput: FC = () => {
   // 云服务账号加载状态
   const cloudServicesLoading = awsLoading || gcpLoading;
 
-  // 自适应高度处理
+  // 自适应高度处理（仅桌面端，移动端由 CSS 控制）
   useEffect(() => {
-    if (textAreaRef.current) {
-      textAreaRef.current.style.height = 'auto';
-      // 计算内容高度，最大 384px (max-h-96)
+    if (textAreaRef.current && !isMobile) {
+      textAreaRef.current.style.height = '24px';
       const scrollHeight = textAreaRef.current.scrollHeight;
       const maxHeight = 384;
 
@@ -110,7 +111,12 @@ export const MessageInput: FC = () => {
         textAreaRef.current.style.overflowY = 'hidden';
       }
     }
-  }, [message]);
+    // 移动端：清除 JS 设置的内联高度，让 CSS 接管
+    if (textAreaRef.current && isMobile) {
+      textAreaRef.current.style.height = '';
+      textAreaRef.current.style.overflowY = '';
+    }
+  }, [message, isMobile]);
 
   // ✅ 停止生成处理
   const handleStop = useCallback(() => {
@@ -379,7 +385,107 @@ export const MessageInput: FC = () => {
   // ✅ 渲染标准聊天输入框
   const renderContent = () => {
 
-    // 场景 3: 标准对话模式 - 显示底部固定输入框
+    // 移动端：豆包风格布局
+    if (isMobile) {
+      return (
+        <div className="mobile-chat-input-wrapper">
+          {/* 1. 横向滚动胶囊标签栏 */}
+          <div className="mobile-capsule-bar">
+            <ModelSelector />
+            <CloudServiceSelector
+              awsAccounts={awsAccounts}
+              gcpAccounts={gcpAccounts}
+              onSelectionChange={handleSelectionChange}
+              initialSelectedAccountIds={accountServicePairs.map(p => p.accountId)}
+              loading={cloudServicesLoading}
+            />
+            <Popover
+              content={<PromptTemplatesPopoverContent onClose={() => setPopoverOpen(false)} />}
+              title={
+                <span>
+                  成本优化助手
+                  <span style={{ marginLeft: 8, fontSize: 12, fontWeight: 'normal', color: '#999' }}>
+                    选择模板快速分析
+                  </span>
+                </span>
+              }
+              trigger="click"
+              open={popoverOpen}
+              onOpenChange={setPopoverOpen}
+              placement="topLeft"
+              overlayStyle={{ width: 320 }}
+            >
+              <button className="mobile-capsule-btn">
+                <BulbOutlined style={{ fontSize: 14 }} />
+                <span>模板</span>
+              </button>
+            </Popover>
+          </div>
+
+          {/* 2. 胶囊输入框 */}
+          <div
+            className={`mobile-capsule-input ${isFocused ? 'focused' : ''}`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <AttachmentPreviewArea
+              attachments={attachments}
+              onRemove={removeAttachment}
+            />
+            <div className="mobile-capsule-input-row">
+              <FilePickerButton
+                onFilesSelected={handleFilesSelected}
+                disabled={loading || !hasSelectedAccount || isProcessing || !canAddMore}
+              />
+              <textarea
+                ref={textAreaRef}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onFocus={handleFocusChange}
+                onBlur={handleBlurChange}
+                onKeyDown={handleKeyDown}
+                onPaste={handlePaste}
+                placeholder={
+                  hasSelectedAccount
+                    ? '输入问题...'
+                    : '请先选择云账号'
+                }
+                className="mobile-capsule-textarea"
+                rows={1}
+                disabled={(loading && !isCancelling) || !hasSelectedAccount}
+              />
+              {loading ? (
+                <button
+                  className="mobile-send-btn active"
+                  onClick={handleStop}
+                  disabled={isCancelling}
+                  aria-label="Stop generation"
+                >
+                  <StopOutlined style={{ fontSize: 16, color: '#fff' }} />
+                </button>
+              ) : (
+                <button
+                  className={`mobile-send-btn ${message.trim() && hasSelectedAccount ? 'active' : ''}`}
+                  onClick={handleSend}
+                  disabled={!message.trim() || !hasSelectedAccount}
+                  aria-label="Send message"
+                >
+                  <SendOutlined style={{ fontSize: 14, color: message.trim() && hasSelectedAccount ? '#fff' : '#bbb' }} />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* 3. AI 免责声明 */}
+          <div className="mobile-ai-disclaimer">
+            AI 生成内容仅供参考
+          </div>
+        </div>
+      );
+    }
+
+    // 桌面端：保持原有布局
     return (
       <div
         className={`ai-chat-input-container ${isFocused ? 'focused' : ''} ${isDragging ? 'dragging' : ''}`}
@@ -408,13 +514,12 @@ export const MessageInput: FC = () => {
             }
             className={`ai-chat-textarea ${!hasSelectedAccount ? 'warning-placeholder' : ''}`}
             rows={1}
-            disabled={(loading && !isCancelling) || !hasSelectedAccount} // 加载中或未选择账号时禁用输入
+            disabled={(loading && !isCancelling) || !hasSelectedAccount}
           />
         </div>
 
         {/* 2. 工具栏区域 */}
         <div className="ai-chat-input-toolbar">
-          {/* 左侧：成本优化助手 */}
           <div className="toolbar-left">
             <Popover
               content={<PromptTemplatesPopoverContent onClose={() => setPopoverOpen(false)} />}
@@ -443,16 +548,12 @@ export const MessageInput: FC = () => {
             />
           </div>
 
-          {/* 右侧：模型选择 + 云服务选择 + 发送按钮 */}
           <div className="toolbar-right" style={{
             display: 'flex',
             alignItems: 'center',
             gap: '8px'
           }}>
-            {/* 模型选择器 - 放置在云服务选择器左侧 */}
             <ModelSelector />
-
-            {/* 云服务选择器 - 新的Drawer组件 */}
             <CloudServiceSelector
               awsAccounts={awsAccounts}
               gcpAccounts={gcpAccounts}
@@ -461,7 +562,6 @@ export const MessageInput: FC = () => {
               loading={cloudServicesLoading}
             />
 
-            {/* 发送/停止按钮 */}
             {loading ? (
               <button
                 className="send-btn active"
@@ -492,6 +592,12 @@ export const MessageInput: FC = () => {
     );
   };
 
+  // 移动端：直接渲染，不需要 MessageInputContainer 包裹
+  if (isMobile) {
+    return renderContent();
+  }
+
+  // 桌面端：保持原有包裹结构
   return (
     <>
       <MessageInputContainer

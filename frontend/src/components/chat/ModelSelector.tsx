@@ -215,6 +215,72 @@ export const ModelSelector: React.FC = () => {
     );
   };
 
+  // 移动端：紧凑图标按钮 (Sparkles ✨ - AI 行业标准图标)
+  const mobiletrigger = (
+    <button
+      className="icon-btn model-selector-mobile-btn"
+      title={selectedModel ? t(`${selectedModel.name}.name`) : t('selectModel')}
+      style={{ position: 'relative' }}
+    >
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+        <path d="M20 3v4"/>
+        <path d="M22 5h-4"/>
+      </svg>
+    </button>
+  );
+
+  // 桌面端：完整下拉框
+  const desktopTrigger = (
+    <div
+      style={{
+        position: 'relative',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '180px',
+        height: '32px',
+        backgroundColor: loading ? '#f5f5f5' : '#ffffff',
+        border: `1px solid ${loading ? '#e0e0e0' : '#d9d9d9'}`,
+        borderRadius: '6px',
+        padding: '0 8px',
+        cursor: loading ? 'not-allowed' : 'pointer',
+        transition: 'all 0.2s',
+        boxShadow: '0 2px 0 rgba(0, 0, 0, 0.02)',
+        flexShrink: 0,
+        opacity: loading ? 0.7 : 1,
+      }}
+      onMouseEnter={(e) => {
+        if (!loading) {
+          e.currentTarget.style.borderColor = '#4096ff';
+          e.currentTarget.style.boxShadow = '0 0 0 2px rgba(5, 145, 255, 0.06)';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!loading) {
+          e.currentTarget.style.borderColor = '#d9d9d9';
+          e.currentTarget.style.boxShadow = '0 2px 0 rgba(0, 0, 0, 0.02)';
+        }
+      }}
+      title={loading ? "加载中..." : t('selectModel')}
+    >
+      {renderTriggerContent()}
+      <span style={{
+        marginLeft: '4px',
+        color: 'rgba(0, 0, 0, 0.25)',
+        fontSize: '12px',
+        transition: 'transform 0.3s',
+        transform: isPopoverOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+        display: 'inline-flex',
+        alignItems: 'center',
+      }}>
+        <svg viewBox="64 64 896 896" width="1em" height="1em" fill="currentColor" aria-hidden="true">
+          <path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path>
+        </svg>
+      </span>
+    </div>
+  );
+
   return (
     <Popover
       content={renderContent()}
@@ -236,56 +302,7 @@ export const ModelSelector: React.FC = () => {
         }
       }}
     >
-      {/* 触发按钮 */}
-      <div
-        style={{
-          position: 'relative',
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: '180px',
-          height: '32px',
-          backgroundColor: loading ? '#f5f5f5' : '#ffffff',
-          border: `1px solid ${loading ? '#e0e0e0' : '#d9d9d9'}`,
-          borderRadius: '6px',
-          padding: '0 8px',
-          cursor: loading ? 'not-allowed' : 'pointer',
-          transition: 'all 0.2s',
-          boxShadow: '0 2px 0 rgba(0, 0, 0, 0.02)',
-          flexShrink: 0,
-          opacity: loading ? 0.7 : 1,
-        }}
-        onMouseEnter={(e) => {
-          if (!loading) {
-            e.currentTarget.style.borderColor = '#4096ff';
-            e.currentTarget.style.boxShadow = '0 0 0 2px rgba(5, 145, 255, 0.06)';
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!loading) {
-            e.currentTarget.style.borderColor = '#d9d9d9';
-            e.currentTarget.style.boxShadow = '0 2px 0 rgba(0, 0, 0, 0.02)';
-          }
-        }}
-        title={loading ? "加载中..." : t('selectModel')}
-      >
-        {renderTriggerContent()}
-
-        {/* 下拉箭头 */}
-        <span style={{
-          marginLeft: '4px',
-          color: 'rgba(0, 0, 0, 0.25)',
-          fontSize: '12px',
-          transition: 'transform 0.3s',
-          transform: isPopoverOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-          display: 'inline-flex',
-          alignItems: 'center',
-        }}>
-          <svg viewBox="64 64 896 896" width="1em" height="1em" fill="currentColor" aria-hidden="true">
-            <path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path>
-          </svg>
-        </span>
-      </div>
+      {isMobile ? mobiletrigger : desktopTrigger}
     </Popover>
   );
 };

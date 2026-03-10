@@ -128,8 +128,8 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background-color: white;
-  /* 顶部留出汉堡菜单按钮的空间 */
+  height: 100dvh;
+  background-color: #ffffff;
   padding-top: 56px;
 }
 
@@ -140,16 +140,28 @@
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.1) transparent;
 }
 
-/* 输入框区域：固定在底部，不随内容滚动 */
+.mobile-message-area::-webkit-scrollbar {
+  width: 3px;
+}
+
+.mobile-message-area::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.1);
+  border-radius: 3px;
+}
+
+/* 输入框区域：固定在底部 */
 .mobile-input-area {
   flex-shrink: 0;
-  padding: 8px 12px 12px;
-  background-color: white;
+  padding: 8px 12px;
+  background-color: #ffffff;
   border-top: 1px solid rgba(0, 0, 0, 0.06);
-  /* 适配 iOS 底部安全区域 */
-  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
 }
 
 /* 移动端输入框内部样式覆盖 */
@@ -158,8 +170,12 @@
 }
 
 .mobile-input-area .ai-chat-input-container {
+  background-color: #ffffff !important;
   border-radius: 16px !important;
   padding: 10px 12px !important;
+  box-shadow:
+    0 1px 8px rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(0, 0, 0, 0.06) !important;
 }
 
 .mobile-input-area .ai-disclaimer {

@@ -73,7 +73,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onQuickQuestion })
 
   if (isMobile) {
     return (
-      <div className="welcome-mobile-content">
+      <div className="welcome-mobile-content" style={{ flex: 1 }}>
         {/* 问候语区域 */}
         <div className="welcome-mobile-greeting">
           <h1 className="welcome-mobile-title">{greeting}</h1>

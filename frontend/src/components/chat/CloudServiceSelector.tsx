@@ -85,11 +85,18 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
     return initialSelectedAccountIds;
   };
 
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 600);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>(loadSelectedAccounts());
   const [currentView, setCurrentView] = useState<ViewType>('providers');
   const [selectedProviderId, setSelectedProviderId] = useState<string | null>(null);
   const [searchKeyword, setSearchKeyword] = useState<string>('');
+
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth <= 600);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
 
   // 保存到localStorage
   useEffect(() => {
@@ -583,19 +590,103 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
     }
   };
 
+  // 移动端：紧凑图标按钮（云图标 + 选中数量徽章）
+  const mobileTrigger = (
+    <button
+      className="icon-btn cloud-selector-mobile-btn"
+      title={selectedAccountsCount > 0 ? `已选 ${selectedAccountsCount} 个账号` : '选择云服务'}
+      style={{ position: 'relative' }}
+    >
+      <svg viewBox="64 64 896 896" focusable="false" width="18" height="18" fill="currentColor" aria-hidden="true">
+        <path d="M811.4 418.7C765.6 297.9 648.9 212 512.2 212S258.8 297.8 213 418.6C127.3 441.1 64 519.1 64 612c0 110.5 89.5 200 199.9 200h496.2C870.5 812 960 722.5 960 612c0-92.7-63.1-170.7-148.6-193.3z"/>
+      </svg>
+      {selectedAccountsCount > 0 && (
+        <span style={{
+          position: 'absolute',
+          top: '-4px',
+          right: '-4px',
+          minWidth: '16px',
+          height: '16px',
+          padding: '0 4px',
+          backgroundColor: '#da7756',
+          color: '#fff',
+          fontSize: '10px',
+          fontWeight: 600,
+          borderRadius: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          lineHeight: 1,
+        }}>
+          {selectedAccountsCount}
+        </span>
+      )}
+    </button>
+  );
+
+  // 桌面端：完整下拉框
+  const desktopTrigger = (
+    <div
+      style={{
+        position: 'relative',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '180px',
+        height: '32px',
+        backgroundColor: loading ? '#f5f5f5' : '#ffffff',
+        border: `1px solid ${loading ? '#e0e0e0' : '#d9d9d9'}`,
+        borderRadius: '6px',
+        padding: '0 8px',
+        cursor: loading ? 'not-allowed' : 'pointer',
+        transition: 'all 0.2s',
+        boxShadow: '0 2px 0 rgba(0, 0, 0, 0.02)',
+        flexShrink: 0,
+        opacity: loading ? 0.7 : 1,
+      }}
+      onMouseEnter={(e) => {
+        if (!loading) {
+          e.currentTarget.style.borderColor = '#4096ff';
+          e.currentTarget.style.boxShadow = '0 0 0 2px rgba(5, 145, 255, 0.06)';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!loading) {
+          e.currentTarget.style.borderColor = '#d9d9d9';
+          e.currentTarget.style.boxShadow = '0 2px 0 rgba(0, 0, 0, 0.02)';
+        }
+      }}
+      title={loading ? "正在加载云账号..." : "选择云服务"}
+    >
+      {renderTriggerContent()}
+      <span style={{
+        marginLeft: '4px',
+        color: 'rgba(0, 0, 0, 0.25)',
+        fontSize: '12px',
+        transition: 'transform 0.3s',
+        transform: isPopoverOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+        display: 'inline-flex',
+        alignItems: 'center',
+      }}>
+        <svg viewBox="64 64 896 896" width="1em" height="1em" fill="currentColor" aria-hidden="true">
+          <path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path>
+        </svg>
+      </span>
+    </div>
+  );
+
   return (
     <Popover
       content={renderContent()}
       trigger="click"
       open={isPopoverOpen && !loading}
       onOpenChange={(visible) => {
-        if (loading) return; // 加载时不允许操作
+        if (loading) return;
         setIsPopoverOpen(visible);
         if (!visible) {
-          // 关闭时重置视图
           setCurrentView('providers');
           setSelectedProviderId(null);
-          setSearchKeyword(''); // 清空搜索关键词
+          setSearchKeyword('');
         }
       }}
       placement="top"
@@ -610,56 +701,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
         }
       }}
     >
-      {/* 触发按钮 */}
-      <div
-        style={{
-          position: 'relative',
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: '180px',              // 固定宽度
-          height: '32px',
-          backgroundColor: loading ? '#f5f5f5' : '#ffffff',
-          border: `1px solid ${loading ? '#e0e0e0' : '#d9d9d9'}`,
-          borderRadius: '6px',
-          padding: '0 8px',
-          cursor: loading ? 'not-allowed' : 'pointer',
-          transition: 'all 0.2s',
-          boxShadow: '0 2px 0 rgba(0, 0, 0, 0.02)',
-          flexShrink: 0,             // 防止被压缩
-          opacity: loading ? 0.7 : 1,
-        }}
-        onMouseEnter={(e) => {
-          if (!loading) {
-            e.currentTarget.style.borderColor = '#4096ff';
-            e.currentTarget.style.boxShadow = '0 0 0 2px rgba(5, 145, 255, 0.06)';
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!loading) {
-            e.currentTarget.style.borderColor = '#d9d9d9';
-            e.currentTarget.style.boxShadow = '0 2px 0 rgba(0, 0, 0, 0.02)';
-          }
-        }}
-        title={loading ? "正在加载云账号..." : "选择云服务"}
-      >
-        {renderTriggerContent()}
-
-        {/* 下拉箭头 - 使用 Ant Design 样式 */}
-        <span style={{
-          marginLeft: '4px',
-          color: 'rgba(0, 0, 0, 0.25)',
-          fontSize: '12px',
-          transition: 'transform 0.3s',
-          transform: isPopoverOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-          display: 'inline-flex',
-          alignItems: 'center',
-        }}>
-          <svg viewBox="64 64 896 896" width="1em" height="1em" fill="currentColor" aria-hidden="true">
-            <path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path>
-          </svg>
-        </span>
-      </div>
+      {isMobile ? mobileTrigger : desktopTrigger}
     </Popover>
   );
 };
