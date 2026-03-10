@@ -230,3 +230,53 @@
     0 4px 20px rgba(218, 119, 86, 0.2),
     0 0 0 2px rgba(218, 119, 86, 0.6);
 }
+
+/* ===== 移动端响应式优化 ===== */
+@media (max-width: 600px) {
+  .ai-chat-input-container {
+    padding: 10px 12px;
+    border-radius: 16px;
+  }
+
+  .ai-chat-textarea {
+    font-size: 16px; /* 防止 iOS 自动缩放 */
+  }
+
+  /* 工具栏改为两行：第一行左侧工具，第二行右侧操作 */
+  .ai-chat-input-toolbar {
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: auto;
+  }
+
+  .toolbar-left {
+    order: 2;
+    flex: 0 0 auto;
+  }
+
+  .toolbar-right {
+    order: 1;
+    flex: 1;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+}
+
+/* 移动端：ModelSelector 宽度自适应 */
+@media (max-width: 600px) {
+  /* 覆盖 ModelSelector 内联样式的固定宽度 */
+  .toolbar-right > div[style*="width: 180px"],
+  .toolbar-right > div[style*="width:180px"] {
+    width: auto !important;
+    min-width: 100px !important;
+    max-width: 130px !important;
+  }
+
+  /* 模型名称文字截断 */
+  .toolbar-right span[style*="font-size: 13px"] {
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

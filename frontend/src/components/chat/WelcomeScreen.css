@@ -42,9 +42,20 @@
   margin: 0;
   line-height: 1.2;
   letter-spacing: -0.01em;
+  text-align: center;
+  padding: 0 16px;
+  word-break: break-word;
 
   /* 动画：右 -> 左 */
   animation: slideInFromRight 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* 移动端标题缩小 */
+@media (max-width: 600px) {
+  .welcome-title-serif {
+    font-size: 1.6rem;
+    padding: 0 8px;
+  }
 }
 
 /* 动画定义 */
@@ -97,4 +108,61 @@
   border-color: #ccc;
   color: #333;
   transform: translateY(-1px);
+}
+
+/* ===== 移动端欢迎页布局 ===== */
+.welcome-mobile-content {
+  display: flex;
+  flex-direction: column;
+  padding: 32px 20px 24px;
+  width: 100%;
+  animation: fadeInUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.welcome-mobile-greeting {
+  margin-bottom: 32px;
+}
+
+.welcome-mobile-title {
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: #1f1f1f;
+  margin: 0 0 8px 0;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.welcome-mobile-subtitle {
+  font-size: 0.9rem;
+  color: rgba(0, 0, 0, 0.45);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* 快捷问题卡片列表 */
+.welcome-mobile-questions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.welcome-quick-question {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: #f7f8fa;
+  border: 1px solid #ebebeb;
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  font-family: inherit;
+  line-height: 1.4;
+}
+
+.welcome-quick-question:active {
+  background: #eff0f2;
+  border-color: #d0d0d0;
 }

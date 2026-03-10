@@ -43,6 +43,18 @@
   .main-content-container { padding: 0; }
 }
 
+/* 移动端：减少左右 padding */
+@media (max-width: 600px) {
+  .main-content-input-area {
+    padding: 0 8px 8px 8px;
+  }
+
+  /* 给汉堡菜单按钮留出空间 */
+  .main-content-container {
+    padding-top: 56px;
+  }
+}
+
 /* =========================================
    欢迎模式 (居中显示 - 同步位移版)
    ========================================= */
@@ -80,6 +92,20 @@
   background-color: transparent;
 }
 
+/* 移动端：减少位移，避免内容被推出屏幕 */
+@media (max-width: 600px) {
+  .welcome-mode .welcome-screen-container {
+    transform: translateY(-28vh);
+    margin-bottom: 16px;
+  }
+
+  .welcome-mode .main-content-input-area {
+    transform: translateY(-28vh);
+    max-width: 100%;
+    padding: 0 8px;
+  }
+}
+
 /* 4. 增强内部输入框样式 (悬浮卡片感) */
 .welcome-mode .ai-chat-input-container {
   box-shadow:
@@ -95,4 +121,47 @@
   opacity: 0;
   pointer-events: none;
   position: absolute;
+}
+
+/* ===== 移动端专属布局 ===== */
+.main-content-mobile {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: white;
+  /* 顶部留出汉堡菜单按钮的空间 */
+  padding-top: 56px;
+}
+
+/* 消息区域：占满剩余空间，可滚动 */
+.mobile-message-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+
+/* 输入框区域：固定在底部，不随内容滚动 */
+.mobile-input-area {
+  flex-shrink: 0;
+  padding: 8px 12px 12px;
+  background-color: white;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  /* 适配 iOS 底部安全区域 */
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+/* 移动端输入框内部样式覆盖 */
+.mobile-input-area .message-input-container {
+  padding: 0 !important;
+}
+
+.mobile-input-area .ai-chat-input-container {
+  border-radius: 16px !important;
+  padding: 10px 12px !important;
+}
+
+.mobile-input-area .ai-disclaimer {
+  display: none;
 }

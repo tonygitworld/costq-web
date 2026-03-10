@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Popover } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useModelStore } from '../../stores/modelStore';
@@ -43,6 +43,13 @@ export const ModelSelector: React.FC = () => {
   } = useModelStore();
 
   const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
+
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth <= 600);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
 
   // 组件挂载时获取模型列表
   useEffect(() => {

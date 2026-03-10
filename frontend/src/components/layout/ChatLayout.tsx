@@ -2,13 +2,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Layout, Button, Drawer } from 'antd';
-import { MenuOutlined } from '@ant-design/icons';
+import { MenuOutlined, EditOutlined } from '@ant-design/icons';
 import { Sidebar } from './Sidebar';
 import { MainContent } from './MainContent';
 import { ScrollIssueReporter } from '../common/ScrollIssueReporter';
 import { useChatStore } from '../../stores/chatStore';
 import { useAccountStore } from '../../stores/accountStore';
 import { useGCPAccountStore } from '../../stores/gcpAccountStore';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import './ChatLayout.css';
 
 import { logger } from '../../utils/logger';
@@ -20,12 +21,12 @@ interface ChatLayoutProps {
 
 export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) => {
   const [sidebarVisible, setSidebarVisible] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);  // 移动端响应式标志
+  const [collapsed, setCollapsed] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-    // 从 localStorage 读取初始状态
     const stored = localStorage.getItem('sidebar-collapsed');
     return stored ? JSON.parse(stored) : false;
   });
+  const isMobile = useIsMobile();
 
 
   // ✅ URL 路由支持：读取 sessionId 参数
@@ -177,8 +178,29 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
       </Layout.Sider>
 
       <Layout className="chat-layout-main" style={{ marginLeft: collapsed ? 0 : contentMarginLeft, transition: 'margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1)' }}>
-        {/* 移动端菜单按钮 - 浮动显示 */}
-        {collapsed && (
+        {/* 移动端：固定顶部导航栏 */}
+        {isMobile && collapsed && (
+          <div className="mobile-top-nav">
+            <Button
+              type="text"
+              icon={<MenuOutlined />}
+              onClick={() => setSidebarVisible(true)}
+              className="mobile-nav-btn"
+            />
+            <span className="mobile-nav-title">CostQ</span>
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              onClick={() => {
+                useChatStore.getState().createNewChat();
+              }}
+              className="mobile-nav-btn"
+            />
+          </div>
+        )}
+
+        {/* 桌面端：浮动汉堡按钮（保持原有） */}
+        {!isMobile && collapsed && (
           <div style={{ position: 'absolute', top: 16, left: 16, zIndex: 1000 }}>
             <Button
               type="text"

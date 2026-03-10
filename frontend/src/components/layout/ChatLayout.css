@@ -125,3 +125,43 @@
     margin-left: 0;
   }
 }
+
+/* ===== 移动端顶部导航栏 ===== */
+.mobile-top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  background-color: white;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  z-index: 1000;
+  /* iOS 顶部安全区域 */
+  padding-top: env(safe-area-inset-top);
+}
+
+.mobile-nav-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  letter-spacing: -0.01em;
+}
+
+.mobile-nav-btn {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 10px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333 !important;
+  font-size: 18px !important;
+}
+
+.mobile-nav-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
