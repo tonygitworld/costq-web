@@ -50,6 +50,11 @@
       "validateSuccess": "認証情報の検証に成功しました",
       "validateFailed": "認証情報の検証に失敗しました。アクセスキーが有効かご確認ください。",
       "deleteFailed": "アカウントの削除に失敗しました"
+    },
+    "empty": {
+      "noAccounts": "AWS アカウントがありません",
+      "hint": "「アカウントを追加」ボタンをクリックして追加してください",
+      "addFirst": "最初のアカウントを追加"
     }
   },
   "gcp": {
@@ -98,7 +103,28 @@
     "step3Desc": "デプロイ完了後、Role ARNを入力",
     "externalId": "External ID",
     "externalIdTip": "このIDをCloudFormationパラメータにコピーしてください",
+    "externalIdDesc": "これはお客様の組織の固有識別子であり、セキュリティ検証に使用されます",
+    "platformAccountIdLabel": "CostQ プラットフォームアカウント ID:",
+    "cfnTemplateUrlLabel": "CloudFormation テンプレート URL:",
+    "autoFillTitle": "自動入力",
+    "autoFillDesc": "External ID とプラットフォームアカウント ID は CloudFormation パラメータに自動入力されました。下のボタンをクリックするだけでデプロイできます",
+    "deployNote": "クリック後、新しいタブで AWS コンソールが開きます。パラメータは自動入力済みです",
     "deployButton": "CloudFormation Stackをデプロイ",
+    "step2Instruction": "開いた AWS CloudFormation コンソールでデプロイを完了してください",
+    "reviewParams": "パラメータを確認",
+    "reviewParamsDesc": "External ID とプラットフォームアカウント ID が自動入力されていることを確認",
+    "checkPermission": "許可の確認にチェック",
+    "checkPermissionDesc": "\"AWS CloudFormation が IAM リソースを作成する場合があることを確認します\" チェックボックスにチェック",
+    "createStack": "Stack を作成",
+    "createStackDesc": "Create Stack ボタンをクリックして完了を待ってください（1～2 分程度）",
+    "copyRoleArn": "Role ARN をコピー",
+    "copyRoleArnDesc": "Outputs タブで RoleArn の値を見つけてコピーしてください",
+    "tipTitle": "ヒント",
+    "tipDesc": "CloudFormation Stack の作成完了後、Outputs タブで RoleArn をコピーしてください",
+    "deployDoneButton": "デプロイ完了。次のステップへ",
+    "step3Instruction": "Role ARN とアカウント情報を入力",
+    "roleArnInvalid": "有効な IAM Role ARN 形式で入力してください",
+    "descPlaceholder": "アカウントの説明（任意）",
     "copyExternalId": "External IDをコピー",
     "loadingError": "External ID情報を読み込めません",
     "stepTitle1": "デプロイ情報の取得",
@@ -154,6 +180,7 @@
     "validate": "検証",
     "edit": "編集",
     "delete": "削除",
-    "noData": "アカウントデータがありません"
+    "noData": "アカウントデータがありません",
+    "description": "説明"
   }
 }

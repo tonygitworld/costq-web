@@ -162,7 +162,7 @@ export const AccountManagement: FC = () => {
       ),
     },
     {
-      title: '描述',
+      title: t('table.description'),
       dataIndex: 'description',
       key: 'description',
       ellipsis: true,
@@ -275,9 +275,9 @@ export const AccountManagement: FC = () => {
           <Empty
             description={
               <Space direction="vertical" size={4}>
-                <Text type="secondary">暂无 AWS 账号</Text>
+                <Text type="secondary">{t('aws.empty.noAccounts')}</Text>
                 <Text type="secondary" style={{ fontSize: '12px' }}>
-                  点击"添加账号"按钮开始添加
+                  {t('aws.empty.hint')}
                 </Text>
               </Space>
             }
@@ -289,7 +289,7 @@ export const AccountManagement: FC = () => {
               icon={<PlusOutlined />}
               onClick={() => setAddModalVisible(true)}
             >
-              添加第一个账号
+              {t('aws.empty.addFirst')}
             </Button>
           </Empty>
         ) : (
@@ -302,7 +302,7 @@ export const AccountManagement: FC = () => {
             pagination={{
               ...paginationProps,
               total: accounts.length,
-              showTotal: (total) => `共 ${total} 个账号`,
+              showTotal: (total) => t('management.accountCount', { count: total }),
             }}
             scroll={{
               x: 1400,

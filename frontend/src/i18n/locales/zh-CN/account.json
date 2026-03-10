@@ -50,6 +50,11 @@
       "validateSuccess": "凭证验证成功",
       "validateFailed": "凭证验证失败，请检查 Access Key 是否有效",
       "deleteFailed": "删除账号失败"
+    },
+    "empty": {
+      "noAccounts": "暂无 AWS 账号",
+      "hint": "点击\"添加账号\"按钮开始添加",
+      "addFirst": "添加第一个账号"
     }
   },
   "gcp": {
@@ -98,7 +103,28 @@
     "step3Desc": "部署完成后，填写 Role ARN",
     "externalId": "External ID",
     "externalIdTip": "将此 ID 复制到 CloudFormation 参数中",
+    "externalIdDesc": "这是您组织的唯一标识符，用于安全验证",
+    "platformAccountIdLabel": "CostQ 平台账号 ID:",
+    "cfnTemplateUrlLabel": "CloudFormation 模板 URL:",
+    "autoFillTitle": "自动填充",
+    "autoFillDesc": "External ID 和平台账号 ID 已自动填充到 CloudFormation 参数中，您只需点击下方按钮即可部署",
+    "deployNote": "点击后将在新标签页打开 AWS 控制台，参数已自动填充",
     "deployButton": "一键部署 CloudFormation Stack",
+    "step2Instruction": "在打开的 AWS CloudFormation 控制台中完成部署",
+    "reviewParams": "审查参数",
+    "reviewParamsDesc": "确认 External ID 和平台账号 ID 已自动填充",
+    "checkPermission": "勾选权限确认",
+    "checkPermissionDesc": "勾选 \"我确认 AWS CloudFormation 可能创建 IAM 资源\" 复选框",
+    "createStack": "创建 Stack",
+    "createStackDesc": "点击 Create Stack 按钮并等待完成（约 1-2 分钟）",
+    "copyRoleArn": "复制 Role ARN",
+    "copyRoleArnDesc": "在 Outputs 标签页中找到并复制 RoleArn 的值",
+    "tipTitle": "提示",
+    "tipDesc": "CloudFormation Stack 创建完成后，请前往 Outputs 标签页复制 RoleArn",
+    "deployDoneButton": "我已完成部署，继续下一步",
+    "step3Instruction": "填写 Role ARN 和账号信息",
+    "roleArnInvalid": "请输入有效的 IAM Role ARN 格式",
+    "descPlaceholder": "账号描述（可选）",
     "copyExternalId": "复制 External ID",
     "loadingError": "无法加载 External ID 信息",
     "stepTitle1": "获取部署信息",
@@ -154,6 +180,7 @@
     "validate": "验证",
     "edit": "编辑",
     "delete": "删除",
-    "noData": "暂无账号数据"
+    "noData": "暂无账号数据",
+    "description": "描述"
   }
 }

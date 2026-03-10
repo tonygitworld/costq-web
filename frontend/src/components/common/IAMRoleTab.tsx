@@ -134,20 +134,20 @@ export const IAMRoleTab: FC<IAMRoleTabProps> = ({ onSuccess, onCancel }) => {
                       }
                     />
                     <Text type="secondary" style={{ fontSize: '12px' }}>
-                      这是您组织的唯一标识符，用于安全验证
+                      {t('iamRole.externalIdDesc')}
                     </Text>
                   </div>
 
                   {/* Platform Account ID */}
                   <div>
-                    <Text strong>CostQ 平台账号 ID:</Text>
+                    <Text strong>{t('iamRole.platformAccountIdLabel')}</Text>
                     <Input
                       value={externalIdInfo.platform_account_id}
                       readOnly
                       addonAfter={
                         <CopyOutlined
                           style={{ cursor: 'pointer' }}
-                          onClick={() => copyToClipboard(externalIdInfo.platform_account_id, '平台账号 ID')}
+                          onClick={() => copyToClipboard(externalIdInfo.platform_account_id, t('iamRole.platformAccountIdLabel'))}
                         />
                       }
                     />
@@ -155,22 +155,22 @@ export const IAMRoleTab: FC<IAMRoleTabProps> = ({ onSuccess, onCancel }) => {
 
                   {/* CloudFormation Template URL */}
                   <div>
-                    <Text strong>CloudFormation 模板 URL:</Text>
+                    <Text strong>{t('iamRole.cfnTemplateUrlLabel')}</Text>
                     <Input
                       value={externalIdInfo.cloudformation_template_url}
                       readOnly
                       addonAfter={
                         <CopyOutlined
                           style={{ cursor: 'pointer' }}
-                          onClick={() => copyToClipboard(externalIdInfo.cloudformation_template_url, '模板 URL')}
+                          onClick={() => copyToClipboard(externalIdInfo.cloudformation_template_url, 'CloudFormation URL')}
                         />
                       }
                     />
                   </div>
 
                   <Alert
-                    message="自动填充"
-                    description="External ID 和平台账号 ID 已自动填充到 CloudFormation 参数中，您只需点击下方按钮即可部署"
+                    message={t('iamRole.autoFillTitle')}
+                    description={t('iamRole.autoFillDesc')}
                     type="info"
                     showIcon
                   />
@@ -190,7 +190,7 @@ export const IAMRoleTab: FC<IAMRoleTabProps> = ({ onSuccess, onCancel }) => {
                   </Button>
 
                   <Text type="secondary" style={{ fontSize: '12px' }}>
-                    点击后将在新标签页打开 AWS 控制台，参数已自动填充
+                    {t('iamRole.deployNote')}
                   </Text>
                 </Space>
               ) : (
@@ -209,36 +209,36 @@ export const IAMRoleTab: FC<IAMRoleTabProps> = ({ onSuccess, onCancel }) => {
                   <LinkOutlined /> {t('iamRole.step2Title')}
                 </Title>
                 <Paragraph type="secondary">
-                  在打开的 AWS CloudFormation 控制台中完成部署
+                  {t('iamRole.step2Instruction')}
                 </Paragraph>
               </div>
 
               <Steps direction="vertical" size="small" current={-1}>
                 <Step
-                  title="审查参数"
-                  description="确认 External ID 和平台账号 ID 已自动填充"
+                  title={t('iamRole.reviewParams')}
+                  description={t('iamRole.reviewParamsDesc')}
                   icon={<CheckCircleOutlined />}
                 />
                 <Step
-                  title="勾选权限确认"
-                  description='勾选 "我确认 AWS CloudFormation 可能创建 IAM 资源" 复选框'
+                  title={t('iamRole.checkPermission')}
+                  description={t('iamRole.checkPermissionDesc')}
                   icon={<CheckCircleOutlined />}
                 />
                 <Step
-                  title="创建 Stack"
-                  description="点击 Create Stack 按钮并等待完成（约 1-2 分钟）"
+                  title={t('iamRole.createStack')}
+                  description={t('iamRole.createStackDesc')}
                   icon={<CheckCircleOutlined />}
                 />
                 <Step
-                  title="复制 Role ARN"
-                  description="在 Outputs 标签页中找到并复制 RoleArn 的值"
+                  title={t('iamRole.copyRoleArn')}
+                  description={t('iamRole.copyRoleArnDesc')}
                   icon={<CheckCircleOutlined />}
                 />
               </Steps>
 
               <Alert
-                message="提示"
-                description="CloudFormation Stack 创建完成后，请前往 Outputs 标签页复制 RoleArn"
+                message={t('iamRole.tipTitle')}
+                description={t('iamRole.tipDesc')}
                 type="warning"
                 showIcon
               />
@@ -248,7 +248,7 @@ export const IAMRoleTab: FC<IAMRoleTabProps> = ({ onSuccess, onCancel }) => {
                 block
                 onClick={() => setCurrentStep(2)}
               >
-                我已完成部署，继续下一步
+                {t('iamRole.deployDoneButton')}
               </Button>
             </Space>
           </Card>
@@ -263,7 +263,7 @@ export const IAMRoleTab: FC<IAMRoleTabProps> = ({ onSuccess, onCancel }) => {
                   <CloudServerOutlined /> {t('iamRole.step3Title')}
                 </Title>
                 <Paragraph type="secondary">
-                  填写 Role ARN 和账号信息
+                  {t('iamRole.step3Instruction')}
                 </Paragraph>
               </div>
 
@@ -277,28 +277,28 @@ export const IAMRoleTab: FC<IAMRoleTabProps> = ({ onSuccess, onCancel }) => {
                 }}
               >
                 <Form.Item
-                  label="账号别名"
+                  label={t('form.accountAlias')}
                   name="alias"
-                  rules={[{ required: true, message: '请输入账号别名' }]}
+                  rules={[{ required: true, message: t('form.accountAliasRequired') }]}
                 >
-                  <Input placeholder="例如: Production Account" />
+                  <Input placeholder={t('form.accountAliasPlaceholder')} />
                 </Form.Item>
 
                 <Form.Item
                   label={
                     <span>
                       IAM Role ARN
-                      <Tooltip title="从 CloudFormation Outputs 中复制的 RoleArn 值">
-                        <Tag color="blue" style={{ marginLeft: 8 }}>必填</Tag>
+                      <Tooltip title={t('iamRole.copyRoleArnDesc')}>
+                        <Tag color="blue" style={{ marginLeft: 8 }}>{t('common:common.required')}</Tag>
                       </Tooltip>
                     </span>
                   }
                   name="role_arn"
                   rules={[
-                    { required: true, message: '请输入 IAM Role ARN' },
+                    { required: true, message: t('aws.validation.roleArnRequired') },
                     {
                       pattern: /^arn:aws:iam::\d{12}:role\/.+/,
-                      message: '请输入有效的 IAM Role ARN 格式'
+                      message: t('iamRole.roleArnInvalid')
                     }
                   ]}
                 >
@@ -306,9 +306,9 @@ export const IAMRoleTab: FC<IAMRoleTabProps> = ({ onSuccess, onCancel }) => {
                 </Form.Item>
 
                 <Form.Item
-                  label="默认区域"
+                  label={t('form.defaultRegion')}
                   name="region"
-                  rules={[{ required: true, message: '请选择默认区域' }]}
+                  rules={[{ required: true, message: t('form.regionRequired') }]}
                 >
                   <Select>
                     <Select.Option value="us-east-1">US East (N. Virginia)</Select.Option>
@@ -328,12 +328,12 @@ export const IAMRoleTab: FC<IAMRoleTabProps> = ({ onSuccess, onCancel }) => {
                 </Form.Item>
 
                 <Form.Item
-                  label="描述"
+                  label={t('form.description')}
                   name="description"
                 >
                   <Input.TextArea
                     rows={3}
-                    placeholder="账号描述（可选）"
+                    placeholder={t('iamRole.descPlaceholder')}
                   />
                 </Form.Item>
 
@@ -345,10 +345,10 @@ export const IAMRoleTab: FC<IAMRoleTabProps> = ({ onSuccess, onCancel }) => {
                       loading={submitting}
                       icon={<CheckCircleOutlined />}
                     >
-                      添加账号
+                      {t('management.addAccount')}
                     </Button>
                     <Button onClick={onCancel}>
-                      取消
+                      {t('common:button.cancel')}
                     </Button>
                   </Space>
                 </Form.Item>

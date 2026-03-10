@@ -50,6 +50,11 @@
       "validateSuccess": "Credentials validated successfully",
       "validateFailed": "Credential validation failed. Please check if your Access Key is valid.",
       "deleteFailed": "Failed to delete account"
+    },
+    "empty": {
+      "noAccounts": "No AWS accounts yet",
+      "hint": "Click the \"Add Account\" button to get started",
+      "addFirst": "Add your first account"
     }
   },
   "gcp": {
@@ -98,7 +103,28 @@
     "step3Desc": "After deployment, fill in Role ARN",
     "externalId": "External ID",
     "externalIdTip": "Copy this ID to CloudFormation parameters",
+    "externalIdDesc": "This is your organization's unique identifier used for security verification",
+    "platformAccountIdLabel": "CostQ Platform Account ID:",
+    "cfnTemplateUrlLabel": "CloudFormation Template URL:",
+    "autoFillTitle": "Auto-filled",
+    "autoFillDesc": "External ID and Platform Account ID have been auto-filled into CloudFormation parameters. Just click the button below to deploy.",
+    "deployNote": "Clicking will open the AWS Console in a new tab with parameters pre-filled",
     "deployButton": "Deploy CloudFormation Stack",
+    "step2Instruction": "Complete the deployment in the opened AWS CloudFormation console",
+    "reviewParams": "Review Parameters",
+    "reviewParamsDesc": "Confirm External ID and Platform Account ID are auto-filled",
+    "checkPermission": "Check Permission Acknowledgment",
+    "checkPermissionDesc": "Check the \"I acknowledge that AWS CloudFormation might create IAM resources\" checkbox",
+    "createStack": "Create Stack",
+    "createStackDesc": "Click the Create Stack button and wait for completion (approx. 1-2 minutes)",
+    "copyRoleArn": "Copy Role ARN",
+    "copyRoleArnDesc": "Find and copy the RoleArn value in the Outputs tab",
+    "tipTitle": "Tip",
+    "tipDesc": "After CloudFormation Stack creation is complete, go to the Outputs tab to copy the RoleArn",
+    "deployDoneButton": "Deployment complete, proceed to next step",
+    "step3Instruction": "Enter Role ARN and account information",
+    "roleArnInvalid": "Please enter a valid IAM Role ARN format",
+    "descPlaceholder": "Account description (optional)",
     "copyExternalId": "Copy External ID",
     "loadingError": "Unable to load External ID information",
     "stepTitle1": "Get Deployment Info",
@@ -154,6 +180,7 @@
     "validate": "Validate",
     "edit": "Edit",
     "delete": "Delete",
-    "noData": "No account data"
+    "noData": "No account data",
+    "description": "Description"
   }
 }
