@@ -63,7 +63,7 @@ export const MobileSettingsPage: FC<MobileSettingsPageProps> = ({ visible, onClo
         <button
           className="mobile-settings-back-btn"
           onClick={onClose}
-          aria-label="返回"
+          aria-label={t('chat:accessibility.back')}
         >
           <ArrowLeftOutlined style={{ fontSize: '18px' }} />
         </button>

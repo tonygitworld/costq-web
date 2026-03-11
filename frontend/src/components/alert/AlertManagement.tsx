@@ -205,7 +205,7 @@ export const AlertManagement: React.FC = () => {
       render: (_: any, record: Alert) => getAccountName(record.account_id, record.account_type),
     },
     {
-      label: '创建时间',
+      label: t('table.columnCreatedAt'),
       key: 'created_at',
       render: (v: string) => <span style={{ color: '#667085', fontSize: 12 }}>{dayjs(v).format('YYYY-MM-DD HH:mm')}</span>,
     },

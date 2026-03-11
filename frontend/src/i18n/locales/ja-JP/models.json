@@ -1,5 +1,9 @@
 {
   "selectModel": "モデルを選択",
+  "loading": "読み込み中...",
+  "loadFailed": "読み込み失敗",
+  "noModels": "利用可能なモデルがありません",
+  "mobileLabel": "モデル",
   "sonnet46": {
     "name": "Claude Sonnet 4.6",
     "description": "最新のフラッグシップモデル、最強の推論能力"

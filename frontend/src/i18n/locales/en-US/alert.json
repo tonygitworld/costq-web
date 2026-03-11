@@ -130,7 +130,8 @@
     "unknown": "Unknown",
     "notSet": "Not Set",
     "columnCreator": "Creator",
-    "columnAccount": "Account"
+    "columnAccount": "Account",
+    "columnCreatedAt": "Created At"
   },
 
   "filter": {

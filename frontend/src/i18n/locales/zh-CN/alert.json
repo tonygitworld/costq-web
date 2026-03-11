@@ -130,7 +130,8 @@
     "unknown": "未知",
     "notSet": "未设置",
     "columnCreator": "创建者",
-    "columnAccount": "关联账号"
+    "columnAccount": "关联账号",
+    "columnCreatedAt": "创建时间"
   },
 
   "filter": {

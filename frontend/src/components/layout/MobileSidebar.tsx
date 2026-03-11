@@ -56,7 +56,7 @@ export const MobileSidebar: FC<MobileSidebarProps> = ({ visible, onClose, onOpen
           <button
             className="mobile-sidebar-close-btn"
             onClick={onClose}
-            aria-label="关闭侧边栏"
+            aria-label={t('chat:accessibility.closeSidebar')}
           >
             <CloseOutlined style={{ fontSize: '18px' }} />
           </button>

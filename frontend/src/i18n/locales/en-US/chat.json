@@ -26,6 +26,8 @@
   "input": {
     "placeholder": "Type your question... (Enter to send, Shift+Enter for new line)",
     "placeholderNoAccount": "💡 Please select a cloud account to start asking questions...",
+    "mobilePlaceholder": "Ask a question...",
+    "mobilePlaceholderNoAccount": "Please select a cloud account first",
     "sendButton": "Send",
     "stopButton": "Stop",
     "stopping": "Stopping...",
@@ -33,6 +35,8 @@
     "connected": "Connected",
     "disconnected": "Disconnected"
   },
+  "aiDisclaimer": "AI-generated content is for reference only",
+  "aiDisclaimerDesktop": "AI-generated content is for reference only. Please verify key cost information.",
   "message": {
     "assistant": "Assistant",
     "copyContent": "Copy content",
@@ -49,6 +53,8 @@
   },
   "template": {
     "title": "💰 Cost Optimization Assistant",
+    "mobileTitle": "Cost Optimization Assistant",
+    "mobileDescription": "Choose a template for quick analysis",
     "description": "Choose a template for quick AWS/GCP cost analysis",
     "favoriteTemplates": "Favorite Templates",
     "systemTemplates": "System Templates",
@@ -75,14 +81,26 @@
   },
   "toolCall": {
     "calling": "Calling",
+    "callingTool": "Calling tool: {{name}}",
+    "callingStatus": "Running",
+    "successStatus": "Done",
+    "errorStatus": "Failed",
     "success": "Success",
     "error": "Failed",
+    "executing": "(Executing...)",
+    "arguments": "📊 Arguments",
+    "resultLabel": "📊 Result",
+    "errorLabel": "❌ Error",
+    "details": "Details",
     "duration": "Took {{seconds}}s",
     "viewDetails": "View Details",
     "hideDetails": "Hide Details",
-    "arguments": "Arguments",
     "result": "Result",
     "errorInfo": "Error Info"
+  },
+  "accessibility": {
+    "back": "Back",
+    "closeSidebar": "Close sidebar"
   },
   "history": {
     "newChat": "New Chat",
@@ -123,6 +141,9 @@
   },
   "cloudSelector": {
     "selectService": "Select Cloud Service",
+    "mobileLabel": "Cloud",
+    "loading": "Loading cloud accounts...",
+    "selectedCount": "{{count}} selected",
     "accountsCount": "{{count}} accounts",
     "remove": "Remove",
     "back": "Back",
@@ -138,5 +159,8 @@
     "cacheRead": "Cache Read",
     "cacheWrite": "Cache Write",
     "cacheRate": "{{rate}}%"
+  },
+  "pagination": {
+    "total": "{{total}} total"
   }
 }

@@ -130,7 +130,8 @@
     "unknown": "不明",
     "notSet": "未設定",
     "columnCreator": "作成者",
-    "columnAccount": "関連アカウント"
+    "columnAccount": "関連アカウント",
+    "columnCreatedAt": "作成日時"
   },
 
   "filter": {

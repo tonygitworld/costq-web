@@ -3,6 +3,7 @@ import { type FC, type ReactNode } from 'react';
 import { Tag } from 'antd';
 import { type ToolCallData } from '../../types/chat';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { useI18n } from '../../hooks/useI18n';
 
 interface ToolCallSummaryProps {
   toolCall: ToolCallData;
@@ -12,24 +13,25 @@ interface ToolCallSummaryProps {
 
 export const ToolCallSummary: FC<ToolCallSummaryProps> = ({ toolCall, detailsButton, expanded }) => {
   const isMobile = useIsMobile();
+  const { t } = useI18n('chat');
 
   const getStatusConfig = (status: string) => {
     const configs = {
       calling: {
         icon: '⏳',
-        text: '执行中',
+        text: t('toolCall.callingStatus'),
         color: 'processing' as const,
         dot: '#1890ff',
       },
       success: {
         icon: '✅',
-        text: '完成',
+        text: t('toolCall.successStatus'),
         color: 'success' as const,
         dot: '#52c41a',
       },
       error: {
         icon: '❌',
-        text: '失败',
+        text: t('toolCall.errorStatus'),
         color: 'error' as const,
         dot: '#ff4d4f',
       },
@@ -53,7 +55,7 @@ export const ToolCallSummary: FC<ToolCallSummaryProps> = ({ toolCall, detailsBut
             className="tool-call-label"
             style={expanded ? { wordBreak: 'break-all', whiteSpace: 'normal', overflow: 'visible' } : undefined}
           >
-            调用工具: {toolCall.name}
+            {t('toolCall.callingTool', { name: toolCall.name })}
           </span>
           <span className="tool-call-meta">
             {isCalling ? (

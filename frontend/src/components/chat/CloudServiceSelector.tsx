@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useI18n } from '../../hooks/useI18n';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 // 添加旋转动画样式
 const spinKeyframes = `
@@ -85,18 +86,12 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
     return initialSelectedAccountIds;
   };
 
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 600);
+  const isMobile = useIsMobile();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>(loadSelectedAccounts());
   const [currentView, setCurrentView] = useState<ViewType>('providers');
   const [selectedProviderId, setSelectedProviderId] = useState<string | null>(null);
   const [searchKeyword, setSearchKeyword] = useState<string>('');
-
-  useEffect(() => {
-    const handler = () => setIsMobile(window.innerWidth <= 600);
-    window.addEventListener('resize', handler);
-    return () => window.removeEventListener('resize', handler);
-  }, []);
 
   // 保存到localStorage
   useEffect(() => {
@@ -180,7 +175,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
             borderRadius: '50%',
             animation: 'spin 1s linear infinite'
           }} />
-          <span>正在加载云账号...</span>
+          <span>{t('cloudSelector.loading')}</span>
         </div>
       );
     }
@@ -593,10 +588,10 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
   // 移动端：紧凑图标按钮（云图标 + 选中数量徽章）
   // 获取移动端显示文本
   const getMobileLabel = () => {
-    if (selectedAccountsCount === 0) return '云账号';
+    if (selectedAccountsCount === 0) return t('cloudSelector.mobileLabel');
     const allAccounts = [...(awsAccounts || []), ...(gcpAccounts || [])];
     const firstSelected = allAccounts.find(acc => selectedAccountIds.includes(acc.id));
-    const name = firstSelected?.name || '账号';
+    const name = firstSelected?.name || t('cloudSelector.mobileLabel');
     const shortName = name.length > 6 ? name.slice(0, 6) + '…' : name;
     if (selectedAccountsCount === 1) return shortName;
     return `${shortName} +${selectedAccountsCount - 1}`;
@@ -605,7 +600,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
   const mobileTrigger = (
     <button
       className="mobile-capsule-btn"
-      title={selectedAccountsCount > 0 ? `已选 ${selectedAccountsCount} 个账号` : '选择云服务'}
+      title={selectedAccountsCount > 0 ? t('cloudSelector.selectedCount', { count: selectedAccountsCount }) : t('cloudSelector.selectService')}
     >
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
@@ -646,7 +641,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
           e.currentTarget.style.boxShadow = '0 2px 0 rgba(0, 0, 0, 0.02)';
         }
       }}
-      title={loading ? "正在加载云账号..." : "选择云服务"}
+      title={loading ? t('cloudSelector.loading') : t('cloudSelector.selectService')}
     >
       {renderTriggerContent()}
       <span style={{

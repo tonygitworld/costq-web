@@ -6,6 +6,7 @@ import { type ToolCallData } from '../../types/chat';
 import { ToolCallSummary } from './ToolCallSummary';
 import { JsonDisplay } from './JsonDisplay';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { useI18n } from '../../hooks/useI18n';
 
 interface ToolCallWithDetailsProps {
   toolCall: ToolCallData;
@@ -16,6 +17,7 @@ export const ToolCallWithDetails: FC<ToolCallWithDetailsProps> = ({ toolCall }) 
   const [showDetails, setShowDetails] = useState(false);
   const isCalling = toolCall.status === 'calling';
   const isMobile = useIsMobile();
+  const { t } = useI18n('chat');
 
   // ✅ 修复：检查是否真的有内容（空对象不算有内容）
   const hasArgs = toolCall.args && Object.keys(toolCall.args).length > 0;
@@ -38,7 +40,7 @@ export const ToolCallWithDetails: FC<ToolCallWithDetailsProps> = ({ toolCall }) 
         padding: isMobile ? '0 4px' : '0 8px',
       }}
     >
-      {isMobile ? '' : '详情'}
+      {isMobile ? '' : t('toolCall.details')}
     </Button>
   ) : null;
 
@@ -100,10 +102,10 @@ export const ToolCallWithDetails: FC<ToolCallWithDetailsProps> = ({ toolCall }) 
           {toolCall.args && Object.keys(toolCall.args).length > 0 && (
             <div style={{ marginBottom: toolCall.result || toolCall.error ? (isMobile ? '10px' : '16px') : '0' }}>
               <div style={labelStyle}>
-                📊 调用参数
+                {t('toolCall.arguments')}
                 {isCalling && (
                   <span style={{ fontSize: '12px', color: '#1890ff', fontWeight: 'normal' }}>
-                    (正在执行...)
+                    {t('toolCall.executing')}
                   </span>
                 )}
               </div>
@@ -115,7 +117,7 @@ export const ToolCallWithDetails: FC<ToolCallWithDetailsProps> = ({ toolCall }) 
           {toolCall.result && !isCalling && (
             <div>
               <div style={labelStyle}>
-                📊 返回结果
+                {t('toolCall.resultLabel')}
               </div>
               <JsonDisplay data={toolCall.result} />
             </div>
@@ -125,7 +127,7 @@ export const ToolCallWithDetails: FC<ToolCallWithDetailsProps> = ({ toolCall }) 
           {toolCall.error && (
             <div>
               <div style={{ ...labelStyle, color: '#ff4d4f' }}>
-                ❌ 错误信息
+                {t('toolCall.errorLabel')}
               </div>
               <div style={{
                 padding: isMobile ? '6px 8px' : '8px 12px',

@@ -308,7 +308,7 @@ export const MessageInput: FC = () => {
         content: '',
         showStatus: true,
         statusType: 'initializing',
-        statusMessage: '正在初始化账号连接...',
+        statusMessage: t('status.initializing'),
         statusEstimatedSeconds: 5,
         meta: {
           status: 'pending',
@@ -403,9 +403,9 @@ export const MessageInput: FC = () => {
               content={<PromptTemplatesPopoverContent onClose={() => setPopoverOpen(false)} />}
               title={
                 <span>
-                  成本优化助手
+                  {t('template.mobileTitle')}
                   <span style={{ marginLeft: 8, fontSize: 12, fontWeight: 'normal', color: '#999' }}>
-                    选择模板快速分析
+                    {t('template.mobileDescription')}
                   </span>
                 </span>
               }
@@ -450,8 +450,8 @@ export const MessageInput: FC = () => {
                 onPaste={handlePaste}
                 placeholder={
                   hasSelectedAccount
-                    ? '输入问题...'
-                    : '请先选择云账号'
+                    ? t('input.mobilePlaceholder')
+                    : t('input.mobilePlaceholderNoAccount')
                 }
                 className="mobile-capsule-textarea"
                 rows={1}
@@ -481,7 +481,7 @@ export const MessageInput: FC = () => {
 
           {/* 3. AI 免责声明 */}
           <div className="mobile-ai-disclaimer">
-            AI 生成内容仅供参考
+            {t('aiDisclaimer')}
           </div>
         </div>
       );
@@ -527,9 +527,9 @@ export const MessageInput: FC = () => {
               content={<PromptTemplatesPopoverContent onClose={() => setPopoverOpen(false)} />}
               title={
                 <span>
-                  成本优化助手
+                  {t('template.mobileTitle')}
                   <span style={{ marginLeft: 8, fontSize: 12, fontWeight: 'normal', color: '#999' }}>
-                    选择模板快速分析 AWS/GCP 成本
+                    {t('template.description')}
                   </span>
                 </span>
               }
@@ -540,7 +540,7 @@ export const MessageInput: FC = () => {
               overlayStyle={{ width: 350 }}
               align={{ offset: [-14, 0] }}
             >
-              <button className="icon-btn" title="成本优化助手">
+              <button className="icon-btn" title={t('template.mobileTitle')}>
                 <BulbOutlined style={{ fontSize: 18 }} />
               </button>
             </Popover>
@@ -627,7 +627,7 @@ export const MessageInput: FC = () => {
         color: 'rgba(0, 0, 0, 0.45)',
         padding: '0 16px'
       }}>
-        AI 生成内容仅供参考，请核实关键成本信息。
+        {t('aiDisclaimerDesktop')}
       </div>
     </>
   );

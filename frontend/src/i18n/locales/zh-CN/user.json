@@ -123,5 +123,8 @@
     "managePermissions": "管理权限",
     "confirmDeleteUser": "确认删除",
     "confirmDeleteDesc": "确定要删除用户\"{{username}}\"吗？删除后无法恢复。"
+  },
+  "pagination": {
+    "total": "共 {{total}} 条"
   }
 }

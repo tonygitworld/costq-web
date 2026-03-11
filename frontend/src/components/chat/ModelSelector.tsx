@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Popover } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useModelStore } from '../../stores/modelStore';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import CheckmarkIcon from '../icons/CheckmarkIcon';
 
 // 添加旋转动画样式
@@ -43,13 +44,7 @@ export const ModelSelector: React.FC = () => {
   } = useModelStore();
 
   const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
-
-  useEffect(() => {
-    const handler = () => setIsMobile(window.innerWidth <= 600);
-    window.addEventListener('resize', handler);
-    return () => window.removeEventListener('resize', handler);
-  }, []);
+  const isMobile = useIsMobile();
 
   // 组件挂载时获取模型列表
   useEffect(() => {
@@ -78,7 +73,7 @@ export const ModelSelector: React.FC = () => {
             borderRadius: '50%',
             animation: 'spin 1s linear infinite'
           }} />
-          <span>加载中...</span>
+          <span>{t('loading')}</span>
         </div>
       );
     }
@@ -93,7 +88,7 @@ export const ModelSelector: React.FC = () => {
           color: 'rgba(0, 0, 0, 0.45)',
           fontSize: '13px'
         }}>
-          <span>加载失败</span>
+          <span>{t('loadFailed')}</span>
         </div>
       );
     }
@@ -141,7 +136,7 @@ export const ModelSelector: React.FC = () => {
     if (loading) {
       return (
         <div style={{ padding: '24px 16px', textAlign: 'center', color: '#999', fontSize: '13px' }}>
-          加载中...
+          {t('loading')}
         </div>
       );
     }
@@ -157,7 +152,7 @@ export const ModelSelector: React.FC = () => {
     if (models.length === 0) {
       return (
         <div style={{ padding: '24px 16px', textAlign: 'center', color: '#999', fontSize: '13px' }}>
-          暂无可用模型
+          {t('noModels')}
         </div>
       );
     }
@@ -216,7 +211,7 @@ export const ModelSelector: React.FC = () => {
   };
 
   // 移动端：胶囊标签按钮 (Sparkles ✨ + 模型名)
-  const mobiletrigger = (
+  const mobileTrigger = (
     <button
       className="mobile-capsule-btn"
       title={selectedModel ? t(`${selectedModel.name}.name`) : t('selectModel')}
@@ -224,7 +219,7 @@ export const ModelSelector: React.FC = () => {
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
       </svg>
-      <span>{selectedModel ? t(`${selectedModel.name}.name`) : '模型'}</span>
+      <span>{selectedModel ? t(`${selectedModel.name}.name`) : t('mobileLabel')}</span>
     </button>
   );
 
@@ -260,7 +255,7 @@ export const ModelSelector: React.FC = () => {
           e.currentTarget.style.boxShadow = '0 2px 0 rgba(0, 0, 0, 0.02)';
         }
       }}
-      title={loading ? "加载中..." : t('selectModel')}
+      title={loading ? t('loading') : t('selectModel')}
     >
       {renderTriggerContent()}
       <span style={{
@@ -300,7 +295,7 @@ export const ModelSelector: React.FC = () => {
         }
       }}
     >
-      {isMobile ? mobiletrigger : desktopTrigger}
+      {isMobile ? mobileTrigger : desktopTrigger}
     </Popover>
   );
 };

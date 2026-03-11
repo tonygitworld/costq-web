@@ -26,6 +26,8 @@
   "input": {
     "placeholder": "ご質問を入力してください... (Enterで送信、Shift+Enterで改行)",
     "placeholderNoAccount": "💡 まずクラウドアカウントを選択してから、質問を始めてください...",
+    "mobilePlaceholder": "質問を入力...",
+    "mobilePlaceholderNoAccount": "まずクラウドアカウントを選択してください",
     "sendButton": "送信",
     "stopButton": "停止",
     "stopping": "停止中...",
@@ -33,6 +35,8 @@
     "connected": "接続済み",
     "disconnected": "未接続"
   },
+  "aiDisclaimer": "AI生成コンテンツは参考用です",
+  "aiDisclaimerDesktop": "AI生成コンテンツは参考用です。重要なコスト情報をご確認ください。",
   "message": {
     "assistant": "アシスタント",
     "copyContent": "内容をコピー",
@@ -49,6 +53,8 @@
   },
   "template": {
     "title": "💰 コスト最適化アシスタント",
+    "mobileTitle": "コスト最適化アシスタント",
+    "mobileDescription": "テンプレートで素早く分析",
     "description": "テンプレートを選択してAWS/GCPコストを素早く分析",
     "favoriteTemplates": "お気に入りテンプレート",
     "systemTemplates": "システムテンプレート",
@@ -75,14 +81,26 @@
   },
   "toolCall": {
     "calling": "呼び出し中",
+    "callingTool": "ツール呼び出し: {{name}}",
+    "callingStatus": "実行中",
+    "successStatus": "完了",
+    "errorStatus": "失敗",
     "success": "成功",
     "error": "失敗",
+    "executing": "(実行中...)",
+    "arguments": "📊 引数",
+    "resultLabel": "📊 結果",
+    "errorLabel": "❌ エラー",
+    "details": "詳細",
     "duration": "所要時間 {{seconds}}秒",
     "viewDetails": "詳細を表示",
     "hideDetails": "詳細を非表示",
-    "arguments": "引数",
     "result": "結果",
     "errorInfo": "エラー情報"
+  },
+  "accessibility": {
+    "back": "戻る",
+    "closeSidebar": "サイドバーを閉じる"
   },
   "history": {
     "newChat": "新しい会話",
@@ -123,6 +141,9 @@
   },
   "cloudSelector": {
     "selectService": "クラウドサービスを選択",
+    "mobileLabel": "クラウド",
+    "loading": "クラウドアカウントを読み込み中...",
+    "selectedCount": "{{count}}件選択中",
     "accountsCount": "{{count}} アカウント",
     "remove": "削除",
     "back": "戻る",
@@ -138,5 +159,8 @@
     "cacheRead": "キャッシュ読み取り",
     "cacheWrite": "キャッシュ書き込み",
     "cacheRate": "{{rate}}%"
+  },
+  "pagination": {
+    "total": "全{{total}}件"
   }
 }

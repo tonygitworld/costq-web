@@ -406,7 +406,7 @@ export const UserManagement: React.FC = () => {
               pagination={{
                 ...paginationProps,
                 total: filteredUsers.length,
-                showTotal: (total) => `共 ${total} 条`,
+                showTotal: (total) => t('user:pagination.total', { total }),
               }}
             />
           </div>
@@ -460,7 +460,7 @@ export const UserManagement: React.FC = () => {
               pagination={{
                 ...paginationProps,
                 total: filteredUsers.length,
-                showTotal: (total) => `共 ${total} 条`,
+                showTotal: (total) => t('user:pagination.total', { total }),
               }}
               scroll={{
                 x: 1300,
