@@ -419,7 +419,7 @@ export const MessageInput: FC = () => {
             >
               <button className="mobile-capsule-btn">
                 <BulbOutlined style={{ fontSize: 14 }} />
-                <span>模板</span>
+                <span>{t('template.mobileLabel')}</span>
               </button>
             </Popover>
           </div>

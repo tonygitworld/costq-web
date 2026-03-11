@@ -53,6 +53,7 @@
     "favoriteTemplates": "Favorite Templates",
     "systemTemplates": "System Templates",
     "myTemplate": "Mine",
+    "mobileLabel": "Templates",
     "category": {
       "cost": "Cost Analysis",
       "optimization": "Optimization",

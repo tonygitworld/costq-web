@@ -53,6 +53,7 @@
     "favoriteTemplates": "お気に入りテンプレート",
     "systemTemplates": "システムテンプレート",
     "myTemplate": "マイ",
+    "mobileLabel": "テンプレート",
     "category": {
       "cost": "コスト分析",
       "optimization": "最適化",

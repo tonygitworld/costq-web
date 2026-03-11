@@ -53,6 +53,7 @@
     "favoriteTemplates": "收藏的模板",
     "systemTemplates": "系统模板",
     "myTemplate": "我的",
+    "mobileLabel": "模板",
     "category": {
       "cost": "成本分析",
       "optimization": "优化建议",

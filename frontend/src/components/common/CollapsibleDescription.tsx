@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useI18n } from '../../hooks/useI18n';
 
 /** markdown 组件映射 - 卡片内紧凑样式 */
 const mdComponents = {
@@ -33,7 +34,7 @@ const extractPlainPreview = (text: string, maxLen = 50): string => {
   return plain.length > maxLen ? plain.slice(0, maxLen) + '…' : plain;
 };
 
-const ToggleLink: React.FC<{ expanded: boolean; onClick: () => void }> = ({ expanded, onClick }) => (
+const ToggleLink: React.FC<{ expanded: boolean; onClick: () => void; collapseLabel: string; expandLabel: string }> = ({ expanded, onClick, collapseLabel, expandLabel }) => (
   <button
     onClick={onClick}
     type="button"
@@ -52,13 +53,14 @@ const ToggleLink: React.FC<{ expanded: boolean; onClick: () => void }> = ({ expa
       WebkitTapHighlightColor: 'transparent',
     }}
   >
-    {expanded ? (<>收起 <UpOutlined style={{ fontSize: 9 }} /></>) : (<>展开 <DownOutlined style={{ fontSize: 9 }} /></>)}
+    {expanded ? (<>{collapseLabel} <UpOutlined style={{ fontSize: 9 }} /></>) : (<>{expandLabel} <DownOutlined style={{ fontSize: 9 }} /></>)}
   </button>
 );
 
 
 export const CollapsibleDescription: React.FC<{ text: string }> = ({ text }) => {
   const [expanded, setExpanded] = useState(false);
+  const { t } = useI18n('common');
 
   if (!text) return <span style={{ color: '#667085', fontSize: 12 }}>-</span>;
 
@@ -84,7 +86,7 @@ export const CollapsibleDescription: React.FC<{ text: string }> = ({ text }) => 
           }}>
             {extractPlainPreview(text)}
           </span>
-          <ToggleLink expanded={false} onClick={() => setExpanded(true)} />
+          <ToggleLink expanded={false} onClick={() => setExpanded(true)} collapseLabel={t('button.collapse')} expandLabel={t('button.expand')} />
         </div>
       ) : (
         <div>
@@ -103,7 +105,7 @@ export const CollapsibleDescription: React.FC<{ text: string }> = ({ text }) => 
             )}
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
-            <ToggleLink expanded={true} onClick={() => setExpanded(false)} />
+            <ToggleLink expanded={true} onClick={() => setExpanded(false)} collapseLabel={t('button.collapse')} expandLabel={t('button.expand')} />
           </div>
         </div>
       )}
