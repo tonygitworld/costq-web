@@ -18,19 +18,22 @@ import { useAuthStore } from '../../stores/authStore';
 import { useAccountStore } from '../../stores/accountStore';
 import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import { useI18n } from '../../hooks/useI18n';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import '../styles/SettingsMenu.css';
 
 interface SettingsMenuProps {
   isCollapsed?: boolean;
+  onOpenSettings?: () => void;
 }
 
-export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => {
+export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false, onOpenSettings }) => {
   const navigate = useNavigate();
   const isAdmin = useAuthStore(state => state.isAdmin);
   const isSuperAdmin = useAuthStore(state => state.isSuperAdmin);
   const logout = useAuthStore(state => state.logout);
   const { t } = useI18n(['chat', 'common']);
+  const isMobile = useIsMobile();
 
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -75,6 +78,11 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false }) => 
   };
 
   const toggleMenu = () => {
+    // 移动端：调用 onOpenSettings 回调，不打开 portal 浮层
+    if (isMobile && onOpenSettings) {
+      onOpenSettings();
+      return;
+    }
     if (!isOpen) {
       updatePosition();
     }

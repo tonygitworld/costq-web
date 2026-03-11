@@ -25,6 +25,7 @@ import { setAuthMessageListener, setAuthRedirectListener } from './utils/authNot
 import './i18n';
 import 'antd/dist/reset.css';
 import './styles/account-selection.css';
+import './styles/mobile-settings.css';
 
 // 创建 QueryClient 实例
 const queryClient = new QueryClient({

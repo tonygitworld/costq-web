@@ -2,8 +2,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Layout, Button, Drawer } from 'antd';
-import { MenuOutlined, EditOutlined } from '@ant-design/icons';
+import { MenuOutlined } from '@ant-design/icons';
 import { Sidebar } from './Sidebar';
+import { MobileSidebar } from './MobileSidebar';
+import { MobileSettingsPage } from './MobileSettingsPage';
 import { MainContent } from './MainContent';
 import { ScrollIssueReporter } from '../common/ScrollIssueReporter';
 import { useChatStore } from '../../stores/chatStore';
@@ -21,12 +23,21 @@ interface ChatLayoutProps {
 
 export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) => {
   const [sidebarVisible, setSidebarVisible] = useState(false);
+  const [settingsVisible, setSettingsVisible] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     const stored = localStorage.getItem('sidebar-collapsed');
     return stored ? JSON.parse(stored) : false;
   });
   const isMobile = useIsMobile();
+
+  // 切换到桌面端时重置移动端状态
+  useEffect(() => {
+    if (!isMobile) {
+      setSettingsVisible(false);
+      setSidebarVisible(false);
+    }
+  }, [isMobile]);
 
 
   // ✅ URL 路由支持：读取 sessionId 参数
@@ -243,19 +254,37 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
         </Layout.Content>
       </Layout>
 
-      {/* 移动端：抽屉式侧边栏 */}
-      <Drawer
-        placement="left"
-        open={sidebarVisible}
-        onClose={() => setSidebarVisible(false)}
-        className="chat-layout-drawer"
-        styles={{
-          body: { padding: 0, backgroundColor: '#f7f8fa' }, // 适配现代极简风
-          header: { backgroundColor: '#f7f8fa', borderBottom: 'none' } // 无边框
-        }}
-      >
-        <Sidebar isCollapsed={false} />
-      </Drawer>
+      {/* 移动端：MobileSidebar + MobileSettingsPage */}
+      {isMobile ? (
+        <>
+          <MobileSidebar
+            visible={sidebarVisible}
+            onClose={() => setSidebarVisible(false)}
+            onOpenSettings={() => {
+              setSidebarVisible(false);
+              setSettingsVisible(true);
+            }}
+          />
+          <MobileSettingsPage
+            visible={settingsVisible}
+            onClose={() => setSettingsVisible(false)}
+          />
+        </>
+      ) : (
+        /* 桌面端：保持原有 Drawer + Sidebar 逻辑 */
+        <Drawer
+          placement="left"
+          open={sidebarVisible}
+          onClose={() => setSidebarVisible(false)}
+          className="chat-layout-drawer"
+          styles={{
+            body: { padding: 0, backgroundColor: '#f7f8fa' },
+            header: { backgroundColor: '#f7f8fa', borderBottom: 'none' }
+          }}
+        >
+          <Sidebar isCollapsed={false} />
+        </Drawer>
+      )}
     </Layout>
   );
 };

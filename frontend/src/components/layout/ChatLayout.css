@@ -195,3 +195,18 @@
     color: #1a1a1a;
   }
 }
+
+/* ===== 移动端侧边栏覆盖层适配 ===== */
+@media (max-width: 600px) {
+  /* 确保主内容区域在侧边栏打开时不受影响 */
+  .chat-layout-main {
+    margin-left: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* 移动端 Drawer 隐藏（已被 MobileSidebar 替代） */
+  .chat-layout-drawer {
+    display: none;
+  }
+}
