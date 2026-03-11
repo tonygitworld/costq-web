@@ -6,6 +6,7 @@ import {
   Space,
   Tag,
   Popconfirm,
+  Modal,
   message,
   Typography,
   Empty,
@@ -26,6 +27,8 @@ import { AddAccountModal } from './AddAccountModal';
 import { useI18n } from '../../hooks/useI18n';
 import { usePagination } from '../../hooks/usePagination';
 import { AWSStyleTable } from './AWSStyleTable';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import { CardListView, type CardField, type CardAction } from './CardListView';
 import dayjs from 'dayjs';
 
 const { Text } = Typography;
@@ -43,6 +46,8 @@ export const AccountManagement: FC = () => {
 
   const [addModalVisible, setAddModalVisible] = useState(false);
   const [validating, setValidating] = useState<string | null>(null);
+
+  const isMobile = useIsMobile();
 
   // 加载账号列表
   useEffect(() => {
@@ -75,6 +80,58 @@ export const AccountManagement: FC = () => {
       setValidating(null);
     }
   };
+
+  // 移动端卡片字段配置
+  const cardFields: CardField<AWSAccount>[] = [
+    { label: t('table.alias'), key: 'alias' },
+    { label: t('aws.accountId'), key: 'account_id', render: (v) => <Text code>{v || 'N/A'}</Text> },
+    {
+      label: t('table.authType'),
+      key: 'auth_type',
+      render: (v: AuthType) =>
+        v === 'iam_role' ? (
+          <Tag color="green">{t('aws.authTypes.iam_role')}</Tag>
+        ) : (
+          <Tag color="blue">{t('aws.authTypes.access_key')}</Tag>
+        ),
+    },
+    { label: t('table.region'), key: 'region', render: (v) => <Tag color="blue">{v}</Tag> },
+    {
+      label: t('table.status'),
+      key: 'is_verified',
+      render: (_, record: AWSAccount) =>
+        record.is_verified ? (
+          <Tag icon={<CheckCircleOutlined />} color="success">{t('aws.status.valid')}</Tag>
+        ) : (
+          <Tag icon={<CloseCircleOutlined />} color="warning">{t('aws.status.unknown')}</Tag>
+        ),
+    },
+  ];
+
+  // 移动端卡片操作配置
+  const cardActions: CardAction<AWSAccount>[] = [
+    {
+      label: t('table.validate'),
+      icon: <ReloadOutlined />,
+      onClick: (record) => handleValidate(record.id),
+      loading: (record) => validating === record.id,
+    },
+    {
+      label: t('table.delete'),
+      icon: <DeleteOutlined />,
+      danger: true,
+      onClick: (record) => {
+        Modal.confirm({
+          title: t('common:message.confirmDelete'),
+          content: `${t('management.deleteAccount')} "${record.alias}"?`,
+          okText: t('common:button.delete'),
+          cancelText: t('common:button.cancel'),
+          okButtonProps: { danger: true },
+          onOk: () => handleDelete(record.id),
+        });
+      },
+    },
+  ];
 
   // 表格列定义
   const columns: ColumnsType<AWSAccount> = [
@@ -292,6 +349,19 @@ export const AccountManagement: FC = () => {
               {t('aws.empty.addFirst')}
             </Button>
           </Empty>
+        ) : isMobile ? (
+          <CardListView<AWSAccount>
+            dataSource={accounts}
+            rowKey="id"
+            fields={cardFields}
+            actions={cardActions}
+            loading={loading}
+            pagination={{
+              ...paginationProps,
+              total: accounts.length,
+              showTotal: (total) => t('management.accountCount', { count: total }),
+            }}
+          />
         ) : (
           <AWSStyleTable
             tableId="aws-account-management"
