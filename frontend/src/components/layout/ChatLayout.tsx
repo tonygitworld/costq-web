@@ -181,21 +181,28 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
         {/* 移动端：固定顶部导航栏 */}
         {isMobile && collapsed && (
           <div className="mobile-top-nav">
-            <Button
-              type="text"
-              icon={<MenuOutlined />}
+            <button
+              className="mobile-icon-btn"
               onClick={() => setSidebarVisible(true)}
-              className="mobile-nav-btn"
-            />
+              aria-label="打开侧边栏"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                <line x1="3" y1="8" x2="15" y2="8"/>
+                <line x1="3" y1="16" x2="21" y2="16"/>
+              </svg>
+            </button>
             <span className="mobile-nav-title">CostQ</span>
-            <Button
-              type="text"
-              icon={<EditOutlined />}
+            <button
+              className="mobile-icon-btn"
               onClick={() => {
                 useChatStore.getState().createNewChat();
               }}
-              className="mobile-nav-btn"
-            />
+              aria-label="新建聊天"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+              </svg>
+            </button>
           </div>
         )}
 

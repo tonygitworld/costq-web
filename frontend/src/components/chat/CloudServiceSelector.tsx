@@ -591,36 +591,26 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
   };
 
   // 移动端：紧凑图标按钮（云图标 + 选中数量徽章）
+  // 获取移动端显示文本
+  const getMobileLabel = () => {
+    if (selectedAccountsCount === 0) return '云账号';
+    const allAccounts = [...(awsAccounts || []), ...(gcpAccounts || [])];
+    const firstSelected = allAccounts.find(acc => selectedAccountIds.includes(acc.id));
+    const name = firstSelected?.name || '账号';
+    const shortName = name.length > 6 ? name.slice(0, 6) + '…' : name;
+    if (selectedAccountsCount === 1) return shortName;
+    return `${shortName} +${selectedAccountsCount - 1}`;
+  };
+
   const mobileTrigger = (
     <button
-      className="icon-btn cloud-selector-mobile-btn"
+      className="mobile-capsule-btn"
       title={selectedAccountsCount > 0 ? `已选 ${selectedAccountsCount} 个账号` : '选择云服务'}
-      style={{ position: 'relative' }}
     >
-      <svg viewBox="64 64 896 896" focusable="false" width="18" height="18" fill="currentColor" aria-hidden="true">
-        <path d="M811.4 418.7C765.6 297.9 648.9 212 512.2 212S258.8 297.8 213 418.6C127.3 441.1 64 519.1 64 612c0 110.5 89.5 200 199.9 200h496.2C870.5 812 960 722.5 960 612c0-92.7-63.1-170.7-148.6-193.3z"/>
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
       </svg>
-      {selectedAccountsCount > 0 && (
-        <span style={{
-          position: 'absolute',
-          top: '-4px',
-          right: '-4px',
-          minWidth: '16px',
-          height: '16px',
-          padding: '0 4px',
-          backgroundColor: '#da7756',
-          color: '#fff',
-          fontSize: '10px',
-          fontWeight: 600,
-          borderRadius: '8px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          lineHeight: 1,
-        }}>
-          {selectedAccountsCount}
-        </span>
-      )}
+      <span>{getMobileLabel()}</span>
     </button>
   );
 

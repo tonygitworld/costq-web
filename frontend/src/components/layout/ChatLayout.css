@@ -165,3 +165,33 @@
 .mobile-nav-btn:hover {
   background-color: rgba(0, 0, 0, 0.05) !important;
 }
+
+/* DeepSeek 风格图标按钮 */
+.mobile-icon-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #555;
+  transition: color 0.15s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-icon-btn:active {
+  background: rgba(0, 0, 0, 0.08);
+  color: #1a1a1a;
+}
+
+@media (hover: hover) {
+  .mobile-icon-btn:hover {
+    background: rgba(0, 0, 0, 0.06);
+    color: #1a1a1a;
+  }
+}

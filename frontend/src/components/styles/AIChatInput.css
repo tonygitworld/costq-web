@@ -347,36 +347,6 @@
 }
 
 /* ModelSelector / CloudServiceSelector 在胶囊栏里的样式 */
-.mobile-capsule-bar .model-selector-mobile-btn,
-.mobile-capsule-bar .cloud-selector-mobile-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 14px;
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 20px;
-  font-size: 13px;
-  color: #444;
-  width: auto;
-  height: auto;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-}
-
-.mobile-capsule-bar .cloud-selector-mobile-btn span[style] {
-  position: static !important;
-  top: auto !important;
-  right: auto !important;
-  min-width: auto !important;
-  height: auto !important;
-  padding: 0 !important;
-  background-color: transparent !important;
-  color: #da7756 !important;
-  font-size: 12px !important;
-  font-weight: 600 !important;
-  border-radius: 0 !important;
-}
-
 /* 2. 胶囊输入框 */
 .mobile-capsule-input {
   display: flex;
