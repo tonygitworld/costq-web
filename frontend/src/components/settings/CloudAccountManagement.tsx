@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Badge, Typography, Space, Button } from 'antd';
+import { Card, Row, Col, Badge, Typography, Space, Button, Segmented } from 'antd';
 import { CloudOutlined, GoogleOutlined, LockOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAccountStore } from '../../stores/accountStore';
@@ -7,6 +7,7 @@ import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import { AccountManagement } from '../common/AccountManagement';
 import { GCPAccountManagement } from '../gcp/GCPAccountManagement';
 import { useI18n } from '../../hooks/useI18n';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 import { logger } from '../../utils/logger';
 
@@ -29,6 +30,7 @@ export const CloudAccountManagement: React.FC = () => {
   const awsAccounts = useAccountStore(state => state.accounts);
   const gcpAccounts = useGCPAccountStore(state => state.accounts);
   const { t } = useI18n(['account', 'common']);
+  const isMobile = useIsMobile();
 
   const [selectedProvider, setSelectedProvider] = useState<CloudProvider>('aws');
 
@@ -206,33 +208,57 @@ export const CloudAccountManagement: React.FC = () => {
         </div>
 
         {/* 标题 */}
-        <Title level={3}>{t('management.title')}</Title>
+        <Title level={3} style={{ marginBottom: -8 }}>{t('management.title')}</Title>
 
         {/* 主内容区域 */}
-        <Row gutter={24}>
-          {/* 左侧：云厂商选择 */}
-          <Col xs={24} sm={24} md={8} lg={6} xl={6}>
-            <div style={{
-              position: 'sticky',
-              top: 24,
-              maxHeight: 'calc(100vh - 200px)',
-              overflow: 'auto'
-            }}>
-              <Title level={5} style={{ marginBottom: 16 }}>{t('management.selectProvider')}</Title>
-              {providers.map(provider => renderProviderCard(provider))}
-            </div>
-          </Col>
+        {isMobile ? (
+          <div>
+            <Segmented
+              options={providers.filter(p => !p.disabled).map(p => ({
+                label: (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '2px 0' }}>
+                    {React.cloneElement(p.icon as React.ReactElement, {
+                      style: { fontSize: '15px', color: (p.icon as React.ReactElement).props.style?.color }
+                    })}
+                    <span style={{ fontWeight: 500 }}>{p.name}</span>
+                    <span style={{ fontSize: '12px', color: 'rgba(0,0,0,0.35)', fontWeight: 400 }}>{p.count}</span>
+                  </div>
+                ),
+                value: p.key,
+              }))}
+              value={selectedProvider}
+              onChange={(v) => setSelectedProvider(v as CloudProvider)}
+              block
+              style={{ marginBottom: 4 }}
+            />
+            <div style={{ marginTop: 16 }}>{renderContent()}</div>
+          </div>
+        ) : (
+          <Row gutter={24}>
+            {/* 左侧：云厂商选择 */}
+            <Col xs={24} sm={24} md={8} lg={6} xl={6}>
+              <div style={{
+                position: 'sticky',
+                top: 24,
+                maxHeight: 'calc(100vh - 200px)',
+                overflow: 'auto'
+              }}>
+                <Title level={5} style={{ marginBottom: 16 }}>{t('management.selectProvider')}</Title>
+                {providers.map(provider => renderProviderCard(provider))}
+              </div>
+            </Col>
 
-          {/* 右侧：账号列表 */}
-          <Col xs={24} sm={24} md={16} lg={18} xl={18}>
-            <div style={{
-              maxHeight: 'calc(100vh - 200px)',
-              overflow: 'auto'
-            }}>
-              {renderContent()}
-            </div>
-          </Col>
-        </Row>
+            {/* 右侧：账号列表 */}
+            <Col xs={24} sm={24} md={16} lg={18} xl={18}>
+              <div style={{
+                maxHeight: 'calc(100vh - 200px)',
+                overflow: 'auto'
+              }}>
+                {renderContent()}
+              </div>
+            </Col>
+          </Row>
+        )}
       </div>
     </div>
   );

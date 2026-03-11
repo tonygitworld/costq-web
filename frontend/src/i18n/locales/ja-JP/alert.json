@@ -129,7 +129,8 @@
     "total": "{{count}} 件のアラート",
     "unknown": "不明",
     "notSet": "未設定",
-    "columnCreator": "作成者"
+    "columnCreator": "作成者",
+    "columnAccount": "関連アカウント"
   },
 
   "filter": {

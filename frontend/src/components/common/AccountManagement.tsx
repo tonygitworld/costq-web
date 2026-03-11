@@ -95,7 +95,29 @@ export const AccountManagement: FC = () => {
           <Tag color="blue">{t('aws.authTypes.access_key')}</Tag>
         ),
     },
+    {
+      label: t('table.credential'),
+      key: 'credential',
+      render: (_, record: AWSAccount) =>
+        record.auth_type === 'iam_role' ? (
+          <Text type="secondary" code style={{ fontSize: '12px' }}>
+            {record.role_arn ? record.role_arn.split('/').pop() : 'N/A'}
+          </Text>
+        ) : (
+          <Text type="secondary" code style={{ fontSize: '12px' }}>{record.access_key_id_masked || 'N/A'}</Text>
+        ),
+    },
     { label: t('table.region'), key: 'region', render: (v) => <Tag color="blue">{v}</Tag> },
+    {
+      label: t('table.description'),
+      key: 'description',
+      render: (v) => <Text type="secondary">{v || '-'}</Text>,
+    },
+    {
+      label: t('table.createdAt'),
+      key: 'created_at',
+      render: (v) => <Text type="secondary">{dayjs(v).format('YYYY-MM-DD HH:mm')}</Text>,
+    },
     {
       label: t('table.status'),
       key: 'is_verified',

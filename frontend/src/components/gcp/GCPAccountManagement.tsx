@@ -6,6 +6,7 @@ import {
   Space,
   Tag,
   Popconfirm,
+  Modal,
   message,
   Typography,
   Empty,
@@ -28,6 +29,8 @@ import { EditGCPAccountModal } from './EditGCPAccountModal';
 import { usePagination } from '../../hooks/usePagination';
 import { useI18n } from '../../hooks/useI18n';
 import { AWSStyleTable } from '../common/AWSStyleTable';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import { CardListView, type CardField, type CardAction } from '../common/CardListView';
 import dayjs from 'dayjs';
 
 const { Text } = Typography;
@@ -47,6 +50,8 @@ export const GCPAccountManagement: FC = () => {
   const [validating, setValidating] = useState<string | null>(null);
   const { paginationProps } = usePagination(10);
   const { t } = useI18n(['gcp', 'common']);
+
+  const isMobile = useIsMobile();
 
   // 加载账号列表
   useEffect(() => {
@@ -85,6 +90,91 @@ export const GCPAccountManagement: FC = () => {
       setValidating(null);
     }
   };
+
+  // 移动端卡片字段配置
+  const cardFields: CardField<GCPAccount>[] = [
+    { label: t('gcp:account.table.name'), key: 'account_name' },
+    { label: t('gcp:account.form.projectId'), key: 'project_id', render: (v) => <Text code>{v}</Text> },
+    {
+      label: 'Service Account',
+      key: 'service_account_email_masked',
+      render: (v) => <Text type="secondary" code style={{ fontSize: '12px' }}>{v}</Text>,
+    },
+    {
+      label: t('gcp:account.table.organization'),
+      key: 'org_billing',
+      render: (_, record: GCPAccount) => {
+        const parts: string[] = [];
+        if (record.organization_id) parts.push(`Org: ${record.organization_id}`);
+        if (record.billing_account_id) parts.push(`Billing: ${record.billing_account_id}`);
+        return parts.length > 0
+          ? <Text type="secondary" style={{ fontSize: '12px' }}>{parts.join(' / ')}</Text>
+          : <Text type="secondary">-</Text>;
+      },
+    },
+    {
+      label: 'BigQuery Export',
+      key: 'bigquery_export',
+      render: (_, record: GCPAccount) => {
+        const hasConfig = record.billing_export_project_id ||
+                         record.billing_export_dataset ||
+                         record.billing_export_table;
+        return hasConfig
+          ? <Tag color="success" icon={<CheckCircleOutlined />}>{t('common:status.configured')}</Tag>
+          : <Tag color="default">{t('common:status.notConfigured')}</Tag>;
+      },
+    },
+    {
+      label: t('gcp:account.table.description'),
+      key: 'description',
+      render: (v) => <Text type="secondary">{v || '-'}</Text>,
+    },
+    {
+      label: t('gcp:account.table.createdAt'),
+      key: 'created_at',
+      render: (v) => <Text type="secondary">{dayjs(v).format('YYYY-MM-DD HH:mm')}</Text>,
+    },
+    {
+      label: t('gcp:account.table.status'),
+      key: 'is_verified',
+      render: (_, record: GCPAccount) =>
+        record.is_verified ? (
+          <Tag icon={<CheckCircleOutlined />} color="success">{t('gcp:account.status.verified')}</Tag>
+        ) : (
+          <Tag icon={<CloseCircleOutlined />} color="warning">{t('gcp:account.status.unverified')}</Tag>
+        ),
+    },
+  ];
+
+  // 移动端卡片操作配置
+  const cardActions: CardAction<GCPAccount>[] = [
+    {
+      label: t('common:button.edit'),
+      icon: <EditOutlined />,
+      onClick: (record) => handleEdit(record),
+    },
+    {
+      label: t('gcp:account.action.verify'),
+      icon: <ReloadOutlined />,
+      onClick: (record) => handleValidate(record.id),
+      loading: (record) => validating === record.id,
+    },
+    {
+      label: t('common:button.delete'),
+      icon: <DeleteOutlined />,
+      danger: true,
+      onClick: (record) => {
+        Modal.confirm({
+          title: t('gcp:account.action.confirmDelete'),
+          content: t('gcp:account.action.confirmDeleteContent'),
+          okText: t('common:button.delete'),
+          cancelText: t('common:button.cancel'),
+          okButtonProps: { danger: true },
+          onOk: () => handleDelete(record.id),
+        });
+      },
+    },
+  ];
 
   // 表格列定义
   const columns: ColumnsType<GCPAccount> = [
@@ -325,6 +415,19 @@ export const GCPAccountManagement: FC = () => {
               {t('gcp:account.addButton')}
             </Button>
           </Empty>
+        ) : isMobile ? (
+          <CardListView<GCPAccount>
+            dataSource={accounts}
+            rowKey="id"
+            fields={cardFields}
+            actions={cardActions}
+            loading={loading}
+            pagination={{
+              ...paginationProps,
+              total: accounts.length,
+              showTotal: (total) => t('common:pagination.total', { total }),
+            }}
+          />
         ) : (
           <AWSStyleTable
             tableId="gcp-account-management"

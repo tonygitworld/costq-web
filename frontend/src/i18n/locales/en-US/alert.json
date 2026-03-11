@@ -129,7 +129,8 @@
     "total": "{{count}} alerts",
     "unknown": "Unknown",
     "notSet": "Not Set",
-    "columnCreator": "Creator"
+    "columnCreator": "Creator",
+    "columnAccount": "Account"
   },
 
   "filter": {

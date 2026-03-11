@@ -1,55 +1,146 @@
+/* ============================================
+   CardListView - Mobile Card List Component
+   Design: Stripe Dashboard + Material Design 3
+   ============================================ */
+
 .card-list-view {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
+/* --- Card Container --- */
 .card-list-view-card {
   background: #fff;
-  border: 1px solid #f0f0f0;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  border: 1px solid #eaecf0;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.03);
+  overflow: hidden;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.card-list-view-card:active {
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  transform: scale(0.99);
+}
+
+/* --- Card Header --- */
+.card-list-view-card-header {
+  padding: 12px 16px;
+  background: #fafbfc;
+  border-bottom: 1px solid #eaecf0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.card-list-view-card-header-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #101828;
+  line-height: 1.4;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-list-view-card-header-badge {
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
+/* --- Card Body Fields --- */
+.card-list-view-fields {
+  padding: 2px 16px 6px;
 }
 
 .card-list-view-field {
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
+  padding: 9px 0;
+  border-bottom: 1px solid #f2f4f7;
+  gap: 12px;
+}
+
+.card-list-view-field:last-child {
+  border-bottom: none;
+}
+
+/* 全宽字段：label 在上，value 在下 */
+.card-list-view-field-full {
+  flex-direction: column;
   align-items: flex-start;
-  padding: 6px 0;
+  gap: 4px;
 }
 
 .card-list-view-field-label {
-  color: rgba(0, 0, 0, 0.45);
+  color: #667085;
   font-size: 13px;
   flex-shrink: 0;
-  margin-right: 12px;
+  line-height: 1.4;
+}
+
+.card-list-view-field-full .card-list-view-field-label {
+  margin-bottom: 0;
 }
 
 .card-list-view-field-value {
-  color: rgba(0, 0, 0, 0.88);
+  color: #344054;
   font-size: 13px;
   text-align: right;
-  word-break: break-all;
+  word-break: break-word;
+  line-height: 1.4;
+  min-width: 0;
 }
 
+.card-list-view-field-value-full {
+  color: #344054;
+  font-size: 13px;
+  text-align: left;
+  word-break: break-word;
+  width: 100%;
+  line-height: 1.5;
+}
+
+/* --- Card Actions Footer --- */
 .card-list-view-actions {
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
+  padding: 10px 16px;
+  background: #f9fafb;
+  border-top: 1px solid #eaecf0;
+}
+
+.card-list-view-actions .ant-btn {
+  flex: 1;
+  min-width: 0;
+  border-radius: 6px;
+  font-size: 13px;
+  height: 32px;
 }
 
 .card-list-view-actions .ant-btn-dangerous {
-  color: #ff4d4f;
-  border-color: #ff4d4f;
+  color: #f04438;
+  border-color: #fda29b;
+  background: #fff;
 }
 
+.card-list-view-actions .ant-btn-dangerous:active {
+  background: #fef3f2;
+}
+
+/* --- Pagination --- */
 .card-list-view-pagination {
   display: flex;
   justify-content: center;
   margin-top: 16px;
 }
 
+/* --- Empty State --- */
 .card-list-view-empty {
-  padding: 32px 0;
+  padding: 40px 0;
 }

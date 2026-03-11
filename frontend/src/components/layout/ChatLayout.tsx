@@ -189,8 +189,8 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
       </Layout.Sider>
 
       <Layout className="chat-layout-main" style={{ marginLeft: collapsed ? 0 : contentMarginLeft, transition: 'margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1)' }}>
-        {/* 移动端：固定顶部导航栏 */}
-        {isMobile && collapsed && (
+        {/* 移动端：固定顶部导航栏（设置子页面有自己的导航，不显示） */}
+        {isMobile && collapsed && !location.pathname.startsWith('/settings') && (
           <div className="mobile-top-nav">
             <button
               className="mobile-icon-btn"
