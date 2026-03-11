@@ -21,6 +21,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { useAccountStore } from '../../stores/accountStore';
 import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import { useI18n } from '../../hooks/useI18n';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import type { CreateAlertRequest, UpdateAlertRequest } from '../../types/alert';
 
 
@@ -34,6 +35,7 @@ export const AlertForm: React.FC = () => {
   const [form] = Form.useForm();
   const currentUser = useAuthStore(state => state.user);
   const { t } = useI18n('alert');
+  const isMobile = useIsMobile();
 
   const {
     currentAlert,
@@ -175,30 +177,54 @@ export const AlertForm: React.FC = () => {
       background: '#f0f2f5',
       position: 'relative'
     }}>
-      <Space direction="vertical" size="large" style={{
+      <Space direction="vertical" size={isMobile ? 12 : 'large'} style={{
         width: '100%',
-        padding: '24px',
-        paddingBottom: '100px'  // ✅ 为底部按钮留出空间
+        padding: isMobile ? '0' : '24px',
+        paddingBottom: '100px'
       }}>
         {/* 标题 */}
-        <Space>
-          <Button
-            icon={<ArrowLeftOutlined />}
-            onClick={() => navigate('/settings/alerts')}
-          >
-            {t('back')}
-          </Button>
-          <Title level={3}>
-            📝 {isEdit ? t('edit') : t('create')}
-          </Title>
-        </Space>
+        {isMobile ? (
+          <div style={{
+            flexShrink: 0,
+            background: 'linear-gradient(to bottom, #ffffff, #fafbfc)',
+            boxShadow: '0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.04)',
+            zIndex: 10,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px 12px' }}>
+              <Button
+                icon={<ArrowLeftOutlined />}
+                onClick={() => navigate('/settings/alerts')}
+                type="text"
+                size="small"
+                style={{ color: '#344054', width: 32, height: 32, borderRadius: 8 }}
+              />
+              <span style={{ fontSize: 17, fontWeight: 700, color: '#101828', letterSpacing: '-0.01em' }}>
+                📝 {isEdit ? t('edit') : t('create')}
+              </span>
+            </div>
+          </div>
+        ) : (
+          <Space>
+            <Button
+              icon={<ArrowLeftOutlined />}
+              onClick={() => navigate('/settings/alerts')}
+            >
+              {t('back')}
+            </Button>
+            <Title level={3}>
+              📝 {isEdit ? t('edit') : t('create')}
+            </Title>
+          </Space>
+        )}
 
       {/* 表单 */}
-      <Card title={t('card.basicInfo')}>
+      <div style={isMobile ? { padding: '0 12px' } : undefined}>
+      <Card title={t('card.basicInfo')} size={isMobile ? 'small' : 'default'}>
         <Form
           form={form}
           layout="vertical"
           autoComplete="off"
+          size={isMobile ? 'small' : 'middle'}
         >
           <Form.Item
             label={t('form.name')}
@@ -207,6 +233,7 @@ export const AlertForm: React.FC = () => {
               { required: true, message: t('form.nameRequired') },
               { max: 50, message: t('form.nameMaxLength', { max: 50 }) }
             ]}
+            style={isMobile ? { marginBottom: 12 } : undefined}
           >
             <Input
               placeholder={t('form.namePlaceholder')}
@@ -218,7 +245,7 @@ export const AlertForm: React.FC = () => {
             message={t('tips.nameHint')}
             type="info"
             showIcon
-            style={{ marginBottom: 16 }}
+            style={{ marginBottom: isMobile ? 12 : 16, fontSize: isMobile ? 12 : undefined }}
           />
 
           {/* ✅ 新增：账号选择 */}
@@ -228,6 +255,7 @@ export const AlertForm: React.FC = () => {
             rules={[
               { required: true, message: t('form.accountRequired') }
             ]}
+            style={isMobile ? { marginBottom: 12 } : undefined}
           >
             <Select
               placeholder={t('form.accountPlaceholder')}
@@ -257,7 +285,7 @@ export const AlertForm: React.FC = () => {
             message={t('tips.accountHint')}
             type="info"
             showIcon
-            style={{ marginBottom: 16 }}
+            style={{ marginBottom: isMobile ? 12 : 16, fontSize: isMobile ? 12 : undefined }}
           />
 
           <Form.Item
@@ -267,10 +295,11 @@ export const AlertForm: React.FC = () => {
               { required: true, message: t('form.descriptionRequired') },
               { min: 10, message: t('form.descriptionMinLength', { min: 10 }) }
             ]}
+            style={isMobile ? { marginBottom: 12 } : undefined}
           >
             <TextArea
               placeholder={t('form.descriptionPlaceholder')}
-              rows={6}
+              rows={isMobile ? 4 : 6}
               maxLength={500}
               showCount
             />
@@ -280,40 +309,40 @@ export const AlertForm: React.FC = () => {
             message={t('tips.descriptionHint')}
             type="info"
             showIcon
-            style={{ marginBottom: 16 }}
+            style={{ marginBottom: isMobile ? 8 : 16, fontSize: isMobile ? 12 : undefined }}
           />
         </Form>
       </Card>
 
       {/* 示例卡片 */}
-      <Card title={t('card.examples')}>
-        <Space direction="vertical" style={{ width: '100%' }}>
-          <Paragraph>
+      <Card title={t('card.examples')} size={isMobile ? 'small' : 'default'}>
+        <div style={isMobile ? { fontSize: 13 } : undefined}>
+          <Paragraph style={isMobile ? { marginBottom: 8 } : undefined}>
             <Text type="secondary">{t('examples.title')}</Text>
           </Paragraph>
-          <ul style={{ paddingLeft: 20 }}>
-            <li>
-              <Text code>{t('examples.ec2Cost')}</Text>
+          <ul style={{ paddingLeft: isMobile ? 16 : 20, margin: 0 }}>
+            <li style={isMobile ? { marginBottom: 4 } : undefined}>
+              <Text code style={isMobile ? { fontSize: 12 } : undefined}>{t('examples.ec2Cost')}</Text>
+            </li>
+            <li style={isMobile ? { marginBottom: 4 } : undefined}>
+              <Text code style={isMobile ? { fontSize: 12 } : undefined}>{t('examples.riCoverage')}</Text>
+            </li>
+            <li style={isMobile ? { marginBottom: 4 } : undefined}>
+              <Text code style={isMobile ? { fontSize: 12 } : undefined}>{t('examples.unusedEbs')}</Text>
             </li>
             <li>
-              <Text code>{t('examples.riCoverage')}</Text>
-            </li>
-            <li>
-              <Text code>{t('examples.unusedEbs')}</Text>
-            </li>
-            <li>
-              <Text code>{t('examples.s3Growth')}</Text>
+              <Text code style={isMobile ? { fontSize: 12 } : undefined}>{t('examples.s3Growth')}</Text>
             </li>
           </ul>
-        </Space>
+        </div>
       </Card>
 
       {/* 系统说明 */}
-      <Card>
+      <Card size={isMobile ? 'small' : 'default'}>
         <Alert
           message={t('card.systemInfo')}
           description={
-            <ul style={{ paddingLeft: 20, marginBottom: 0 }}>
+            <ul style={{ paddingLeft: isMobile ? 16 : 20, marginBottom: 0, fontSize: isMobile ? 12 : undefined }}>
               <li>{t('systemInfo.checkFrequency')}</li>
               <li>{t('systemInfo.executionTime')}</li>
               <li>{t('systemInfo.notificationMethod')}</li>
@@ -324,6 +353,7 @@ export const AlertForm: React.FC = () => {
           showIcon
         />
       </Card>
+      </div>
 
       {/* 操作按钮 - 固定在底部 */}
       <div style={{
@@ -332,32 +362,38 @@ export const AlertForm: React.FC = () => {
         left: 0,
         right: 0,
         background: '#fff',
-        padding: '16px 24px',
+        padding: isMobile ? '8px 12px' : '16px 24px',
         borderTop: '1px solid #f0f0f0',
         boxShadow: '0 -2px 8px rgba(0,0,0,0.08)',
         zIndex: 100,
-        marginLeft: '-24px',
-        marginRight: '-24px',
-        marginBottom: '-24px'
+        marginLeft: isMobile ? 0 : '-24px',
+        marginRight: isMobile ? 0 : '-24px',
+        marginBottom: isMobile ? 0 : '-24px'
       }}>
         <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-          <Button onClick={() => navigate('/settings/alerts')}>
+          <Button size={isMobile ? 'small' : 'middle'} onClick={() => navigate('/settings/alerts')}
+            style={isMobile ? { fontSize: 12, padding: '0 8px' } : undefined}
+          >
             {t('cancel')}
           </Button>
-          <Space>
+          <Space size={isMobile ? 6 : 8}>
             <Button
               type="default"
+              size={isMobile ? 'small' : 'middle'}
               icon={<SendOutlined />}
               onClick={() => handleSave(true)}
               loading={savingAlert}
+              style={isMobile ? { fontSize: 12, padding: '0 8px' } : undefined}
             >
-              {t('button.saveAndTest')}
+              {isMobile ? '测试' : t('button.saveAndTest')}
             </Button>
             <Button
               type="primary"
+              size={isMobile ? 'small' : 'middle'}
               icon={<SaveOutlined />}
               onClick={() => handleSave(false)}
               loading={savingAlert}
+              style={isMobile ? { fontSize: 12, padding: '0 8px' } : undefined}
             >
               {t('save')}
             </Button>

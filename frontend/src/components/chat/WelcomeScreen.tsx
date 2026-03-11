@@ -79,19 +79,6 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onQuickQuestion })
           <h1 className="welcome-mobile-title">{greeting}</h1>
           <p className="welcome-mobile-subtitle">{subtitle}</p>
         </div>
-
-        {/* 快捷问题卡片 */}
-        <div className="welcome-mobile-questions">
-          {quickQuestions.map((q, i) => (
-            <button
-              key={i}
-              className="welcome-quick-question"
-              onClick={() => onQuickQuestion?.(q)}
-            >
-              {q}
-            </button>
-          ))}
-        </div>
       </div>
     );
   }

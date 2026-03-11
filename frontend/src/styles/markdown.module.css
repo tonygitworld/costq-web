@@ -102,12 +102,12 @@
 
 .markdownContent table {
   border-collapse: collapse;
-  width: 100%;
+  min-width: 100%;
+  width: auto;
   margin: 1.5em 0;
   border: 1px solid #e2e8f0;
   border-radius: var(--border-radius-md);
   overflow: hidden;
-  /* 移除max-width限制，让表格自然填充 */
 }
 
 .markdownContent th,
@@ -180,8 +180,8 @@
 
   .markdownContent th,
   .markdownContent td {
-    padding: 0.5em 0.75em;
-    font-size: 0.9em;
+    padding: 0.4em 0.6em;
+    font-size: 0.85em;
   }
 
   .markdownContent blockquote {
