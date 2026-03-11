@@ -412,8 +412,10 @@ export const MessageInput: FC = () => {
               trigger="click"
               open={popoverOpen}
               onOpenChange={setPopoverOpen}
-              placement="topLeft"
-              overlayStyle={{ width: 320 }}
+              placement="top"
+              arrow={false}
+              overlayClassName="mobile-template-popover"
+              getPopupContainer={() => document.body}
             >
               <button className="mobile-capsule-btn">
                 <BulbOutlined style={{ fontSize: 14 }} />

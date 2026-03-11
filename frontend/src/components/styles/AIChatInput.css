@@ -304,6 +304,7 @@
   flex-direction: column;
   gap: 10px;
   width: 100%;
+  position: relative;
 }
 
 /* 1. 横向滚动胶囊标签栏 */
@@ -463,4 +464,23 @@
   color: rgba(0, 0, 0, 0.3);
   padding: 0 16px;
   user-select: none;
+}
+
+/* 移动端模板 Popover 宽度自适应 */
+@media (max-width: 600px) {
+  .mobile-template-popover.ant-popover {
+    position: fixed !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    transform: none !important;
+  }
+
+  .mobile-template-popover .ant-popover-inner {
+    width: 100%;
+  }
+
+  .mobile-template-popover .ant-popover-inner > div {
+    width: 100% !important;
+  }
 }
