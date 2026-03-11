@@ -23,7 +23,7 @@ import {
   DeleteOutlined,
   EyeOutlined,
   PlayCircleOutlined,
-  ArrowLeftOutlined
+  ArrowLeftOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
@@ -37,6 +37,7 @@ import { AWSStyleTable } from '../common/AWSStyleTable';
 import { CardListView, type CardField, type CardAction } from '../common/CardListView';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { TruncateText } from '../common/TruncateText';
+import { CollapsibleDescription } from '../common/CollapsibleDescription';
 import type { Alert } from '../../types/alert';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -194,11 +195,7 @@ export const AlertManagement: React.FC = () => {
     {
       label: t('table.columnDescription'),
       key: 'description',
-      render: (text: string) => (
-        <span style={{ color: '#667085', fontSize: 12, lineHeight: 1.5 }}>
-          {text && text.length > 80 ? `${text.slice(0, 80)}...` : (text || '-')}
-        </span>
-      ),
+      render: (text: string) => <CollapsibleDescription text={text} />,
       fullWidth: true,
     },
     { label: t('table.columnCreator'), key: 'created_by_username', render: (v) => v || t('table.unknown') },
@@ -363,155 +360,110 @@ export const AlertManagement: React.FC = () => {
         backgroundColor: '#f5f5f5',
         overflow: 'hidden',
       }}>
-        {/* 顶部工具栏 - 不用 sticky，用 flex 布局固定 */}
+        {/* 顶部工具栏 */}
         <div style={{
-          padding: '10px 16px 0',
-          backgroundColor: '#fff',
-          borderBottom: '1px solid #eaecf0',
           flexShrink: 0,
+          background: 'linear-gradient(to bottom, #ffffff, #fafbfc)',
+          boxShadow: '0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.04)',
+          zIndex: 10,
         }}>
-          {/* 第一行：返回 + 标题 + 操作按钮 */}
+          {/* 第一行：返回 + 标题 */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: 10,
+            padding: '12px 16px 8px',
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Button
-                icon={<ArrowLeftOutlined />}
-                onClick={() => navigate('/')}
-                type="text"
-                size="small"
-                style={{ color: '#344054' }}
-              />
-              <span style={{ fontSize: 17, fontWeight: 600, color: '#101828' }}>
-                {t('title')}
-              </span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={loadAlerts}
-                loading={loading}
-                type="text"
-                size="small"
-                style={{ color: '#667085' }}
-              />
-              {isAdmin && (
-                <Button
-                  icon={<PlayCircleOutlined />}
-                  onClick={handleManualTrigger}
-                  loading={triggering}
-                  type="text"
-                  size="small"
-                  style={{ color: '#667085' }}
-                />
-              )}
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={() => navigate('/settings/alerts/new')}
-                size="small"
-                style={{ borderRadius: 6, marginLeft: 4 }}
-              >
-                新建
-              </Button>
-            </div>
+            <Button
+              icon={<ArrowLeftOutlined />}
+              onClick={() => navigate('/')}
+              type="text"
+              size="small"
+              style={{ color: '#344054', width: 32, height: 32, borderRadius: 8 }}
+            />
+            <span style={{ fontSize: 17, fontWeight: 700, color: '#101828', letterSpacing: '-0.01em' }}>
+              {t('title')}
+            </span>
           </div>
 
-          {/* 第二行：搜索框 */}
-          <div style={{ marginBottom: 8 }}>
+          {/* 搜索 + 筛选区域 */}
+          <div style={{ padding: '0 16px 12px' }}>
             <Input
               placeholder={t('filter.searchPlaceholder')}
               prefix={<SearchOutlined style={{ color: '#98a2b3' }} />}
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
               allowClear
-              size="small"
+              size="middle"
               style={{
-                borderRadius: 8,
-                backgroundColor: '#f9fafb',
-                border: '1px solid #eaecf0',
+                borderRadius: 10,
+                backgroundColor: '#f2f4f7',
+                border: '1px solid transparent',
+                marginBottom: 8,
+                height: 36,
               }}
             />
-          </div>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+              <Select
+                value={statusFilter}
+                onChange={setStatusFilter}
+                size="middle"
+                variant="filled"
+                style={{ flex: 1 }}
+              >
+                <Select.Option value="all">{t('filter.allStatus')}</Select.Option>
+                <Select.Option value="active">{t('filter.enabled')}</Select.Option>
+                <Select.Option value="inactive">{t('filter.disabled')}</Select.Option>
+              </Select>
+              <Select
+                value={creatorFilter}
+                onChange={setCreatorFilter}
+                size="middle"
+                variant="filled"
+                style={{ flex: 1 }}
+              >
+                <Select.Option value="all">{t('filter.allCreators')}</Select.Option>
+                <Select.Option value="me">{t('filter.createdByMe')}</Select.Option>
+              </Select>
+            </div>
 
-          {/* 第三行：筛选 chips - 水平滚动 */}
-          <div style={{
-            display: 'flex',
-            gap: 6,
-            overflowX: 'auto',
-            paddingBottom: 10,
-            WebkitOverflowScrolling: 'touch',
-            msOverflowStyle: 'none',
-            scrollbarWidth: 'none',
-          }}>
-            {([
-              { value: 'all' as const, label: t('filter.allStatus'), group: 'status' },
-              { value: 'active' as const, label: t('filter.enabled'), group: 'status' },
-              { value: 'inactive' as const, label: t('filter.disabled'), group: 'status' },
-            ] as const).map(item => {
-              const selected = statusFilter === item.value;
-              return (
-                <div
-                  key={item.value}
-                  onClick={() => setStatusFilter(item.value)}
-                  style={{
-                    padding: '4px 12px',
-                    borderRadius: 16,
-                    fontSize: 13,
-                    lineHeight: '20px',
-                    whiteSpace: 'nowrap',
-                    cursor: 'pointer',
-                    fontWeight: selected ? 500 : 400,
-                    background: selected ? '#eff8ff' : '#fff',
-                    color: selected ? '#1570ef' : '#475467',
-                    border: selected ? '1px solid #b2ddff' : '1px solid #e4e7ec',
-                    transition: 'all 0.15s ease',
-                    userSelect: 'none',
-                  }}
+            {/* 操作按钮行 */}
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Button
+                icon={<ReloadOutlined />}
+                onClick={loadAlerts}
+                loading={loading}
+                size="small"
+                style={{ flex: 1, borderRadius: 8, height: 32, color: '#344054' }}
+              >
+                {t('refresh')}
+              </Button>
+              {isAdmin && (
+                <Button
+                  icon={<PlayCircleOutlined />}
+                  onClick={handleManualTrigger}
+                  loading={triggering}
+                  size="small"
+                  style={{ flex: 1, borderRadius: 8, height: 32, color: '#344054' }}
                 >
-                  {item.label}
-                </div>
-              );
-            })}
-            {/* 分隔符 */}
-            <div style={{
-              width: 1,
-              alignSelf: 'stretch',
-              backgroundColor: '#e4e7ec',
-              flexShrink: 0,
-              margin: '2px 2px',
-            }} />
-            {([
-              { value: 'all' as const, label: t('filter.allCreators') },
-              { value: 'me' as const, label: t('filter.createdByMe') },
-            ] as const).map(item => {
-              const selected = creatorFilter === item.value;
-              return (
-                <div
-                  key={item.value}
-                  onClick={() => setCreatorFilter(item.value)}
-                  style={{
-                    padding: '4px 12px',
-                    borderRadius: 16,
-                    fontSize: 13,
-                    lineHeight: '20px',
-                    whiteSpace: 'nowrap',
-                    cursor: 'pointer',
-                    fontWeight: selected ? 500 : 400,
-                    background: selected ? '#eff8ff' : '#fff',
-                    color: selected ? '#1570ef' : '#475467',
-                    border: selected ? '1px solid #b2ddff' : '1px solid #e4e7ec',
-                    transition: 'all 0.15s ease',
-                    userSelect: 'none',
-                  }}
-                >
-                  {item.label}
-                </div>
-              );
-            })}
+                  {t('button.checkNow')}
+                </Button>
+              )}
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => navigate('/settings/alerts/new')}
+                size="small"
+                style={{
+                  flex: 1,
+                  borderRadius: 8,
+                  height: 32,
+                  fontWeight: 500,
+                  boxShadow: '0 1px 2px rgba(21, 112, 239, 0.3)',
+                }}
+              >
+                {t('create')}
+              </Button>
+            </div>
           </div>
         </div>
 

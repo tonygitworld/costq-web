@@ -346,11 +346,72 @@ export const UserManagement: React.FC = () => {
 
   return (
     <div style={{
-      padding: '24px',
+      padding: isMobile ? 0 : '24px',
       height: '100vh',
-      overflow: 'auto',
-      backgroundColor: '#f0f2f5'
+      overflow: isMobile ? 'hidden' : 'auto',
+      backgroundColor: isMobile ? '#f5f5f5' : '#f0f2f5',
+      display: isMobile ? 'flex' : 'block',
+      flexDirection: 'column',
     }}>
+      {isMobile ? (
+        <>
+          {/* 移动端顶部栏 */}
+          <div style={{
+            flexShrink: 0,
+            background: 'linear-gradient(to bottom, #ffffff, #fafbfc)',
+            boxShadow: '0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.04)',
+            zIndex: 10,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px 8px' }}>
+              <Button
+                icon={<ArrowLeftOutlined />}
+                onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
+                type="text"
+                size="small"
+                style={{ color: '#344054', width: 32, height: 32, borderRadius: 8 }}
+              />
+              <span style={{ fontSize: 17, fontWeight: 700, color: '#101828', letterSpacing: '-0.01em' }}>
+                {t('management.title')}
+              </span>
+            </div>
+            <div style={{ padding: '0 16px 12px', display: 'flex', gap: 8 }}>
+              <Input
+                placeholder={t('form.searchPlaceholder')}
+                prefix={<SearchOutlined style={{ color: '#98a2b3' }} />}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                allowClear
+                size="middle"
+                style={{ flex: 1, borderRadius: 10, backgroundColor: '#f2f4f7', border: '1px solid transparent', height: 36 }}
+              />
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={handleAdd}
+                size="small"
+                style={{ borderRadius: 8, height: 36, fontWeight: 500, boxShadow: '0 1px 2px rgba(21, 112, 239, 0.3)' }}
+              >
+                {t('management.addUser')}
+              </Button>
+            </div>
+          </div>
+          {/* 卡片列表 */}
+          <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px' }}>
+            <CardListView<UserData>
+              dataSource={filteredUsers}
+              rowKey="id"
+              fields={cardFields}
+              actions={cardActions}
+              loading={loading}
+              pagination={{
+                ...paginationProps,
+                total: filteredUsers.length,
+                showTotal: (total) => `共 ${total} 条`,
+              }}
+            />
+          </div>
+        </>
+      ) : (
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
         {/* 返回按钮 */}
         <Button
@@ -372,26 +433,6 @@ export const UserManagement: React.FC = () => {
 
         {/* 操作栏 */}
         <Card>
-          {isMobile ? (
-            <div style={{ marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <Input
-                placeholder={t('form.searchPlaceholder')}
-                prefix={<SearchOutlined />}
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                allowClear
-              />
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Button
-                  type="primary"
-                  icon={<PlusOutlined />}
-                  onClick={handleAdd}
-                >
-                  {t('management.addUser')}
-                </Button>
-              </div>
-            </div>
-          ) : (
             <Space style={{ marginBottom: 16, width: '100%', justifyContent: 'space-between' }}>
               <Input
                 placeholder={t('form.searchPlaceholder')}
@@ -409,23 +450,7 @@ export const UserManagement: React.FC = () => {
                 {t('management.addUser')}
               </Button>
             </Space>
-          )}
 
-          {/* 用户列表 */}
-          {isMobile ? (
-            <CardListView<UserData>
-              dataSource={filteredUsers}
-              rowKey="id"
-              fields={cardFields}
-              actions={cardActions}
-              loading={loading}
-              pagination={{
-                ...paginationProps,
-                total: filteredUsers.length,
-                showTotal: (total) => `共 ${total} 条`,
-              }}
-            />
-          ) : (
             <AWSStyleTable
               tableId="user-management"
               columns={columns}
@@ -445,9 +470,9 @@ export const UserManagement: React.FC = () => {
                 offsetHeader: 0
               }}
             />
-          )}
         </Card>
       </Space>
+      )}
 
       {/* 添加/编辑用户弹窗 */}
       <Modal

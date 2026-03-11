@@ -4,6 +4,7 @@ import { UserOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { useI18n } from '../../hooks/useI18n';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 const { Title } = Typography;
 
@@ -11,6 +12,7 @@ export const UserProfile: React.FC = () => {
   const navigate = useNavigate();
   const { user, organization } = useAuthStore();
   const { t } = useI18n(['user', 'common']);
+  const isMobile = useIsMobile();
 
   // 使用真实用户信息
   const userInfo = {
@@ -23,6 +25,130 @@ export const UserProfile: React.FC = () => {
     lastLoginAt: user?.last_login_at || '',
   };
 
+  // 个人信息字段列表（移动端复用）
+  const profileFields = [
+    { label: t('profile.username'), value: userInfo.username },
+    { label: t('profile.fullName'), value: userInfo.fullName || t('profile.noValue') },
+    { label: t('profile.organization'), value: userInfo.orgName },
+    {
+      label: t('profile.role'),
+      node: (
+        <Tag color={userInfo.role === 'admin' ? 'red' : 'blue'}>
+          {userInfo.role === 'admin' ? t('common:role.admin') : t('common:role.user')}
+        </Tag>
+      ),
+    },
+    {
+      label: t('profile.accountStatus'),
+      node: (
+        <Tag color={userInfo.isActive ? 'green' : 'default'}>
+          {userInfo.isActive ? t('common:status.active') : t('common:status.inactive')}
+        </Tag>
+      ),
+    },
+    {
+      label: t('profile.createdAt'),
+      value: userInfo.createdAt ? new Date(userInfo.createdAt).toLocaleString() : t('profile.noValue'),
+    },
+    {
+      label: t('profile.lastLoginAt'),
+      value: userInfo.lastLoginAt ? new Date(userInfo.lastLoginAt).toLocaleString() : t('profile.neverLogin'),
+    },
+  ];
+
+  // ========== 移动端布局 ==========
+  if (isMobile) {
+    return (
+      <div style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: '#f5f5f5',
+        overflow: 'hidden',
+      }}>
+        {/* 顶部栏 */}
+        <div style={{
+          flexShrink: 0,
+          background: 'linear-gradient(to bottom, #ffffff, #fafbfc)',
+          boxShadow: '0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.04)',
+          zIndex: 10,
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            padding: '12px 16px',
+          }}>
+            <Button
+              icon={<ArrowLeftOutlined />}
+              onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
+              type="text"
+              size="small"
+              style={{ color: '#344054', width: 32, height: 32, borderRadius: 8 }}
+            />
+            <span style={{ fontSize: 17, fontWeight: 700, color: '#101828', letterSpacing: '-0.01em' }}>
+              {t('profile.title')}
+            </span>
+          </div>
+        </div>
+
+        {/* 可滚动内容 */}
+        <div style={{ flex: 1, overflow: 'auto', padding: '16px' }}>
+          {/* 头像卡片 */}
+          <div style={{
+            background: '#fff',
+            borderRadius: 12,
+            border: '1px solid #eaecf0',
+            boxShadow: '0 1px 3px rgba(16,24,40,0.06)',
+            padding: '20px 16px',
+            marginBottom: 12,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 10,
+          }}>
+            <Avatar size={64} icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} />
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 18, fontWeight: 700, color: '#101828' }}>
+                {userInfo.fullName || userInfo.username}
+              </div>
+              <div style={{ color: '#667085', fontSize: 13, marginTop: 2 }}>@{userInfo.username}</div>
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <Tag color={userInfo.role === 'admin' ? 'red' : 'blue'}>
+                {userInfo.role === 'admin' ? t('common:role.admin') : t('common:role.user')}
+              </Tag>
+              <Tag color={userInfo.isActive ? 'green' : 'default'}>
+                {userInfo.isActive ? t('common:status.active') : t('common:status.inactive')}
+              </Tag>
+            </div>
+          </div>
+
+          {/* 详细信息 */}
+          <div style={{
+            background: '#fff',
+            borderRadius: 12,
+            border: '1px solid #eaecf0',
+            boxShadow: '0 1px 3px rgba(16,24,40,0.06)',
+            padding: '4px 16px',
+          }}>
+            {profileFields.map((item, idx) => (
+              <div key={item.label} style={{
+                padding: '12px 0',
+                borderBottom: idx < profileFields.length - 1 ? '1px solid #f2f4f7' : 'none',
+              }}>
+                <div style={{ color: '#667085', fontSize: 12, marginBottom: 3 }}>{item.label}</div>
+                <div style={{ color: '#344054', fontSize: 14 }}>
+                  {'node' in item ? item.node : (item.value || '-')}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ========== 桌面端布局（保持不变） ==========
   return (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
