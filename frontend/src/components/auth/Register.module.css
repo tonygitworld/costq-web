@@ -1,11 +1,11 @@
 ﻿/* ========================================
-   CostQ 鐧诲綍椤甸潰
-   Based on shadcn/ui pattern
+   CostQ 娉ㄥ唽椤甸潰
+   Based on shadcn/ui signup-01 block pattern
    Type scale: 20 / 14 / 14 / 12
    Input: 36px height, 8px radius, 1px border
    ======================================== */
 
-/* 琛ㄥ崟鏍囬 */
+/* 鏍囬鍖?*/
 .formHeader {
   margin-bottom: 28px;
   text-align: center;
@@ -28,19 +28,19 @@
 }
 
 /* 琛ㄥ崟 */
-.loginForm {
+.registerForm {
   margin-bottom: 0;
 }
 
-.loginForm :global(.ant-form-item) {
+.registerForm :global(.ant-form-item) {
   margin-bottom: 20px;
 }
 
-.loginForm :global(.ant-form-item-label) {
+.registerForm :global(.ant-form-item-label) {
   padding-bottom: 6px !important;
 }
 
-.loginForm :global(.ant-form-item-label > label) {
+.registerForm :global(.ant-form-item-label > label) {
   font-size: 14px;
   font-weight: 500;
   color: #0f172a;
@@ -50,8 +50,8 @@
 
 /* 杈撳叆妗?鈥?shadcn style: 36px, 1px border, 8px radius */
 .formInput,
-.loginForm :global(.ant-input-affix-wrapper),
-.loginForm :global(.ant-input-password) {
+.registerForm :global(.ant-input-affix-wrapper),
+.registerForm :global(.ant-input-password) {
   height: 42px !important;
   border-radius: 8px !important;
   border: 1px solid #e2e8f0 !important;
@@ -63,81 +63,102 @@
 }
 
 .formInput:hover,
-.loginForm :global(.ant-input-affix-wrapper:hover),
-.loginForm :global(.ant-input-password:hover) {
+.registerForm :global(.ant-input-affix-wrapper:hover),
+.registerForm :global(.ant-input-password:hover) {
   border-color: #cbd5e1 !important;
 }
 
 .formInput:focus,
-.loginForm :global(.ant-input-affix-wrapper:focus),
-.loginForm :global(.ant-input-affix-wrapper-focused),
-.loginForm :global(.ant-input-password:focus),
-.loginForm :global(.ant-input-password-focused) {
+.registerForm :global(.ant-input-affix-wrapper:focus),
+.registerForm :global(.ant-input-affix-wrapper-focused),
+.registerForm :global(.ant-input-password:focus),
+.registerForm :global(.ant-input-password-focused) {
   border-color: #2563eb !important;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
 }
 
 /* 杈撳叆妗嗗浘鏍?*/
 .inputIcon,
-.loginForm :global(.ant-input-prefix) {
+.registerForm :global(.ant-input-prefix) {
   color: #94a3b8;
   margin-right: 8px;
   font-size: 16px;
 }
 
 /* 杈撳叆妗嗗唴鏂囧瓧 */
-.loginForm :global(.ant-input) {
+.registerForm :global(.ant-input) {
   font-size: 14px !important;
   line-height: 1.5 !important;
 }
 
-.loginForm :global(.ant-input::placeholder) {
+.registerForm :global(.ant-input::placeholder) {
   color: #94a3b8;
   font-size: 14px !important;
 }
 
-.loginForm :global(.ant-input-suffix) {
+.registerForm :global(.ant-input-suffix) {
   color: #64748b;
 }
 
 /* 閿欒鐘舵€?*/
-.loginForm :global(.ant-form-item-has-error .ant-input-affix-wrapper),
-.loginForm :global(.ant-form-item-has-error .ant-input-password) {
+.registerForm :global(.ant-form-item-has-error .ant-input-affix-wrapper),
+.registerForm :global(.ant-form-item-has-error .ant-input-password) {
   border-color: #ef4444 !important;
 }
 
-.loginForm :global(.ant-form-item-has-error .ant-input-affix-wrapper:focus),
-.loginForm :global(.ant-form-item-has-error .ant-input-affix-wrapper-focused),
-.loginForm :global(.ant-form-item-has-error .ant-input-password:focus) {
+.registerForm :global(.ant-form-item-has-error .ant-input-affix-wrapper:focus),
+.registerForm :global(.ant-form-item-has-error .ant-input-affix-wrapper-focused),
+.registerForm :global(.ant-form-item-has-error .ant-input-password:focus) {
   border-color: #ef4444 !important;
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.08) !important;
 }
 
-.loginForm :global(.ant-form-item-explain-error) {
+.registerForm :global(.ant-form-item-explain-error) {
   font-size: 12px;
   line-height: 1.33;
   color: #ef4444;
   margin-top: 4px;
 }
 
-/* 蹇樿瀵嗙爜閾炬帴 */
-.forgotRow {
-  text-align: right;
-  margin-top: -12px;
-  margin-bottom: 8px;
+/* 涓ゅ垪甯冨眬锛堢粍缁囧悕 + 濮撳悕锛?*/
+.twoColumnRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
-.forgotLink {
-  font-size: 13px;
-  font-weight: 500;
-  color: #2563eb;
-  text-decoration: none;
-  transition: color 0.15s ease;
+/* 鍙戦€侀獙璇佺爜鎸夐挳 */
+.sendCodeButton {
+  min-width: 110px;
+  height: 42px !important;
+  border-radius: 8px !important;
+  border: 1px solid #bfdbfe !important;
+  background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%) !important;
+  color: #1d4ed8 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+  white-space: nowrap;
 }
 
-.forgotLink:hover {
-  color: #1d4ed8;
-  text-decoration: underline;
+.sendCodeButton:hover:not(:disabled) {
+  border-color: #93c5fd !important;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1) !important;
+}
+
+.sendCodeButton:disabled {
+  color: #94a3b8 !important;
+  border-color: #e2e8f0 !important;
+  background: #f8fafc !important;
+}
+
+/* 瀵嗙爜鎻愮ず */
+.passwordHint {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: -8px 0 20px 0;
+  line-height: 1.5;
 }
 
 /* 鎻愪氦鎸夐挳 */
@@ -151,7 +172,7 @@
   letter-spacing: 0.01em;
   transition: opacity 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease !important;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(37, 99, 235, 0.18) !important;
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
 .submitButton:hover:not(:disabled) {
@@ -163,10 +184,18 @@
   transform: translateY(0);
 }
 
+/* 娉ㄥ唽璇存槑 */
+.registerNote {
+  font-size: 12px;
+  color: #94a3b8;
+  text-align: center;
+  margin: 16px 0 0 0;
+  line-height: 1.6;
+}
+
 /* 琛ㄥ崟搴曢儴 */
 .formFooter {
   text-align: center;
-  padding-top: 20px;
   margin-top: 24px;
 }
 
@@ -176,7 +205,7 @@
   margin-right: 4px;
 }
 
-.registerLink {
+.loginLink {
   font-size: 14px;
   font-weight: 500;
   color: #2563eb;
@@ -184,7 +213,7 @@
   transition: color 0.15s ease;
 }
 
-.registerLink:hover {
+.loginLink:hover {
   color: #1d4ed8;
   text-decoration: underline;
 }
@@ -195,6 +224,11 @@
 @media (max-width: 640px) {
   .formTitle {
     font-size: 18px;
+  }
+
+  .twoColumnRow {
+    grid-template-columns: 1fr;
+    gap: 0;
   }
 }
 
@@ -207,26 +241,32 @@
     font-size: 13px;
   }
 
-  .loginForm :global(.ant-form-item) {
-    margin-bottom: 14px;
+  .registerForm :global(.ant-form-item) {
+    margin-bottom: 12px;
   }
 
   .formInput,
-  .loginForm :global(.ant-input-affix-wrapper),
-  .loginForm :global(.ant-input-password) {
+  .registerForm :global(.ant-input-affix-wrapper),
+  .registerForm :global(.ant-input-password) {
     height: 40px !important;
   }
 
   .submitButton {
     height: 40px !important;
   }
+
+  .sendCodeButton {
+    height: 40px !important;
+    min-width: 96px;
+    font-size: 13px !important;
+  }
 }
 
 /* ========================================
    鍙闂€?   ======================================== */
 
-.loginForm :global(.ant-input-affix-wrapper:focus-visible),
-.loginForm :global(.ant-input-password:focus-visible) {
+.registerForm :global(.ant-input-affix-wrapper:focus-visible),
+.registerForm :global(.ant-input-password:focus-visible) {
   outline: 2px solid #2563eb;
   outline-offset: 2px;
 }
@@ -236,8 +276,12 @@
   outline-offset: 2px !important;
 }
 
-.forgotLink:focus-visible,
-.registerLink:focus-visible {
+.sendCodeButton:focus-visible {
+  outline: 2px solid #2563eb !important;
+  outline-offset: 2px !important;
+}
+
+.loginLink:focus-visible {
   outline: 2px solid #2563eb;
   outline-offset: 2px;
   border-radius: 2px;

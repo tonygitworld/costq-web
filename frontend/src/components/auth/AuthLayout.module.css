@@ -1,5 +1,5 @@
-/* ========================================
-   AuthLayout — Full-screen centered auth container
+﻿/* ========================================
+   AuthLayout 鈥?Full-screen centered auth container
    Clean overlay, card-focused layout
    ======================================== */
 
@@ -8,11 +8,26 @@
   inset: 0;
   overflow-y: auto;
   overflow-x: hidden;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
+.waveBackground {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* Lighter overlay 鈥?let the wave show through more */
 .overlay {
-  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 70% 65% at 50% 45%,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 80%
+  );
 }
 
 .content {
@@ -26,23 +41,11 @@
   padding: 40px 24px;
 }
 
-.languageSwitcherWrapper {
+.languageSwitcher {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 24px;
+  right: 24px;
   z-index: 1000;
-  white-space: nowrap;
-}
-
-.languageSwitcherCard {
-  background-color: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  padding: 6px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  display: inline-flex;
-  align-items: center;
 }
 
 .backButton {
@@ -75,18 +78,13 @@
   outline-offset: 2px;
 }
 
-/* ── Responsive ── */
+/* 鈹€鈹€ Responsive 鈹€鈹€ */
 @media (max-width: 768px) {
   .content {
     padding: 24px 16px;
   }
 
   .languageSwitcher {
-    top: 16px;
-    right: 16px;
-  }
-
-  .languageSwitcherWrapper {
     top: 16px;
     right: 16px;
   }
@@ -103,7 +101,7 @@
   }
 }
 
-/* ── Reduced motion ── */
+/* 鈹€鈹€ Reduced motion 鈹€鈹€ */
 @media (prefers-reduced-motion: reduce) {
   .backButton {
     transition: none;
