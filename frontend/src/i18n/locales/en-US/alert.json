@@ -73,7 +73,7 @@
 
   "systemInfo": {
     "checkFrequency": "Check Frequency: Runs automatically once daily",
-    "executionTime": "Execution Time: Every day at 09:00 (UTC+8)",
+    "executionTime": "Execution Time: Every day at 03:00 (UTC+9/Asia/Tokyo)",
     "notificationMethod": "Notification: Email sent only when conditions are triggered",
     "aiParsing": "AI Parsing: System automatically extracts recipient emails from description"
   },
@@ -99,7 +99,7 @@
     "description": "Alert Description",
     "account": "Monitored Account",
     "frequency": "Check Frequency",
-    "frequencyValue": "⏰ Daily at 09:00 (UTC+8)",
+    "frequencyValue": "⏰ Daily at 03:00 (UTC+9/Asia/Tokyo)",
     "createdInfo": "Created By",
     "createdBy": "👤 {{name}} | 📅 Created {{time}}"
   },

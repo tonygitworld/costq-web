@@ -73,7 +73,7 @@
 
   "systemInfo": {
     "checkFrequency": "チェック頻度：毎日自動実行",
-    "executionTime": "実行時間：毎日 09:00 (UTC+8)",
+    "executionTime": "実行時間：毎日 03:00 (UTC+9/Asia/Tokyo)",
     "notificationMethod": "通知方法：条件がトリガーされた場合のみメール送信",
     "aiParsing": "AI解析：システムが説明から受信者メールを自動抽出"
   },
@@ -99,7 +99,7 @@
     "description": "アラート説明",
     "account": "監視アカウント",
     "frequency": "チェック頻度",
-    "frequencyValue": "⏰ 毎日 09:00 (UTC+8)",
+    "frequencyValue": "⏰ 毎日 03:00 (UTC+9/Asia/Tokyo)",
     "createdInfo": "作成情報",
     "createdBy": "👤 {{name}} | 📅 {{time}}に作成"
   },

@@ -73,7 +73,7 @@
 
   "systemInfo": {
     "checkFrequency": "检查频率：每天自动执行一次",
-    "executionTime": "执行时间：每天 09:00 (UTC+8)",
+    "executionTime": "执行时间：每天 03:00 (UTC+9/Asia/Tokyo)",
     "notificationMethod": "通知方式：仅在触发条件时发送邮件",
     "aiParsing": "AI 解析：系统会自动从描述中提取收件人邮箱"
   },
@@ -99,7 +99,7 @@
     "description": "告警描述",
     "account": "监控账号",
     "frequency": "检查频率",
-    "frequencyValue": "⏰ 每日 09:00 (UTC+8)",
+    "frequencyValue": "⏰ 每日 03:00 (UTC+9/Asia/Tokyo)",
     "createdInfo": "创建信息",
     "createdBy": "👤 {{name}} | 📅 创建于 {{time}}"
   },
