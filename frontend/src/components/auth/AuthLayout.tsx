@@ -33,7 +33,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
 
       {showLanguageSwitcher && (
         <div className={styles.languageSwitcher}>
-          <LanguageSwitcher />
+          <LanguageSwitcher showFlag={false} />
         </div>
       )}
 

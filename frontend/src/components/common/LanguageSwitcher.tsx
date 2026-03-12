@@ -33,12 +33,14 @@ interface LanguageSwitcherProps {
   type?: 'dropdown' | 'buttons';
   showIcon?: boolean;
   showText?: boolean;
+  showFlag?: boolean;
 }
 
 export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
   type = 'dropdown',
   showIcon = true,
-  showText = true
+  showText = true,
+  showFlag = true
 }) => {
   const { i18n } = useTranslation();
 
@@ -83,7 +85,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
       key: lang.key,
       label: (
         <Space size={10}>
-          <Flag language={lang.key} width={24} height={16} />
+          {showFlag && <Flag language={lang.key} width={24} height={16} />}
           <span style={{ fontSize: '14px' }}>{lang.label}</span>
           {currentLanguage === lang.key && (
             <span style={{ color: '#52c41a', marginLeft: '4px' }}>✓</span>
@@ -123,7 +125,7 @@ export const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({
           )}
           {showText && (
             <Space size={6}>
-              <Flag language={currentLang.key} width={20} height={14} />
+              {showFlag && <Flag language={currentLang.key} width={20} height={14} />}
               <span style={{ fontSize: '13px', color: 'inherit', fontWeight: 500 }}>
                 {currentLang.shortLabel}
               </span>
