@@ -10,7 +10,6 @@ import { UserManagement } from './components/user/UserManagement';
 import { AlertManagement } from './components/alert/AlertManagement';
 import { AlertForm } from './components/alert/AlertForm';
 import { AlertDetail } from './components/alert/AlertDetail';
-import { Login } from './components/auth/Login';
 import { EnterpriseLogin } from './components/auth/EnterpriseLogin';
 import { Register } from './components/auth/Register';
 import { Activate } from './components/auth/Activate';
