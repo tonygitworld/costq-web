@@ -5,6 +5,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh;
   padding: 0;
   background-color: white;
 }
@@ -51,7 +52,7 @@
 
   /* 给汉堡菜单按钮留出空间 */
   .main-content-container {
-    padding-top: 56px;
+    padding-top: calc(56px + env(safe-area-inset-top));
   }
 }
 
@@ -130,7 +131,7 @@
   height: 100vh;
   height: 100dvh;
   background-color: #ffffff;
-  padding-top: 56px;
+  padding-top: calc(56px + env(safe-area-inset-top));
 }
 
 /* 消息区域：占满剩余空间，可滚动 */
@@ -144,6 +145,13 @@
   flex-direction: column;
   scrollbar-width: thin;
   scrollbar-color: rgba(0,0,0,0.1) transparent;
+}
+
+/* 欢迎模式：禁用滚动，启用 flex 居中 */
+.mobile-message-area.mobile-welcome-mode {
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
 }
 
 .mobile-message-area::-webkit-scrollbar {

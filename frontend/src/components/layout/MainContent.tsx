@@ -55,7 +55,7 @@ export const MainContent: React.FC = () => {
     return (
       <Layout.Content className="main-content-mobile">
         {/* 消息/欢迎区域：可滚动 */}
-        <div className="mobile-message-area">
+        <div className={`mobile-message-area${isWelcomeMode ? ' mobile-welcome-mode' : ''}`}>
           {renderMessageArea()}
         </div>
 

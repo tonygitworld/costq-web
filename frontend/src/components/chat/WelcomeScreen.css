@@ -118,6 +118,8 @@
   width: 100%;
   flex: 1;
   justify-content: center;
+  align-items: center;
+  min-height: 0;
   animation: fadeInUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 

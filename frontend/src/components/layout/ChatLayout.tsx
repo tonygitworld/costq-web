@@ -159,7 +159,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
   const contentMarginLeft = collapsed ? 0 : sidebarWidth;
 
   return (
-    <Layout className={className} style={{ height: '100vh' }}>
+    <Layout className={className} style={{ height: '100dvh' }}>
       <Layout.Sider
         width={sidebarWidth}
         breakpoint="lg"
@@ -175,7 +175,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
         className="chat-layout-sider"
         style={{
           overflow: 'hidden', // ✅ 关键修复：改为 hidden 防止折叠时出现滚动条
-          height: '100vh',
+          height: '100dvh',
           position: 'fixed',
           left: 0,
           top: 0,
@@ -237,7 +237,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
         )}
 
         {/* 主内容区域 */}
-        <Layout.Content style={{ position: 'relative', height: '100vh' }}>
+        <Layout.Content style={{ position: 'relative', height: '100dvh' }}>
           {children || <MainContent />}
 
           {/* 连接状态已移到输入框左侧，此处不再显示 */}

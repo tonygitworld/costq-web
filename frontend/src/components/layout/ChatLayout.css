@@ -6,6 +6,7 @@
 .chat-layout-sider {
   overflow: auto;
   height: 100vh;
+  height: 100dvh;
   position: fixed;
   left: 0;
   top: 0;
@@ -132,16 +133,15 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 56px;
+  height: calc(56px + env(safe-area-inset-top));
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 8px;
+  padding-top: env(safe-area-inset-top);
   background-color: white;
   border-bottom: none;
   z-index: 1000;
-  /* iOS 顶部安全区域 */
-  padding-top: env(safe-area-inset-top);
 }
 
 .mobile-nav-title {
