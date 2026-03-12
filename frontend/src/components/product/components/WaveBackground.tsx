@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Renderer, Program, Mesh, Triangle } from 'ogl';
 
 const VERTEX = /* glsl */ `
@@ -107,7 +107,7 @@ const FRAGMENT = /* glsl */ `
     }
 
     // --- Waves (6 layers with depth) ---
-    // Layer 6 鈥?highest, most subtle
+    // Layer 6 — highest, most subtle
     float w6 = wave(uvA, 2.0, 0.03, 0.3, 0.5);
     float m6 = smoothstep(0.0, 0.08, (0.68 + w6) - uv.y);
     col = mix(col, WAVE6_COL, m6 * 0.2);
@@ -132,7 +132,7 @@ const FRAGMENT = /* glsl */ `
     float m2 = smoothstep(0.0, 0.04, (0.25 + w2) - uv.y);
     col = mix(col, WAVE2_COL, m2 * 0.58);
 
-    // Layer 1 鈥?closest, most vivid, with foam
+    // Layer 1 — closest, most vivid, with foam
     float w1 = wave(uvA, 6.0, 0.065, 1.0, 4.5);
     float edge1 = (0.14 + w1) - uv.y;
     float m1 = smoothstep(0.0, 0.035, edge1);

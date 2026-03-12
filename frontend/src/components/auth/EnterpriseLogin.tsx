@@ -1,4 +1,4 @@
-﻿import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Form, Input, Button, App as AntdApp } from 'antd';
 import { Mail, Lock } from 'lucide-react';
@@ -48,7 +48,7 @@ const EnterpriseLoginForm: React.FC = () => {
       message.success(t('login.success.login'));
       navigate('/');
     } catch (error: unknown) {
-      // 閫氳繃 ApiClientError.code 鍒ゆ柇閿欒绫诲瀷
+      // 通过 ApiClientError.code 判断错误类型
       const errorCode = error instanceof ApiClientError ? error.code : undefined;
 
       if (errorCode === 'TENANT_INACTIVE') {

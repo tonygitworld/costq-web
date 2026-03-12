@@ -1,5 +1,5 @@
-﻿/* ========================================
-   AuthLayout 鈥?Full-screen centered auth container
+/* ========================================
+   AuthLayout — Full-screen centered auth container
    Clean overlay, card-focused layout
    ======================================== */
 
@@ -16,7 +16,7 @@
   z-index: 0;
 }
 
-/* Lighter overlay 鈥?let the wave show through more */
+/* Lighter overlay — let the wave show through more */
 .overlay {
   position: absolute;
   inset: 0;
@@ -78,7 +78,7 @@
   outline-offset: 2px;
 }
 
-/* 鈹€鈹€ Responsive 鈹€鈹€ */
+/* ── Responsive ── */
 @media (max-width: 768px) {
   .content {
     padding: 24px 16px;
@@ -101,7 +101,7 @@
   }
 }
 
-/* 鈹€鈹€ Reduced motion 鈹€鈹€ */
+/* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
   .backButton {
     transition: none;

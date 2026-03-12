@@ -1,5 +1,5 @@
-﻿/* ========================================
-   FormCard 鈥?Clean elevated card
+/* ========================================
+   FormCard — Clean elevated card
    Subtle shadow, comfortable presence
    ======================================== */
 
@@ -36,7 +36,7 @@
   padding: 44px 44px 40px;
 }
 
-/* 鈹€鈹€ Responsive 鈹€鈹€ */
+/* ── Responsive ── */
 @media (max-width: 768px) {
   .card {
     max-width: 100%;
@@ -65,7 +65,7 @@
   }
 }
 
-/* 鈹€鈹€ Reduced motion 鈹€鈹€ */
+/* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
   .card {
     animation: none;

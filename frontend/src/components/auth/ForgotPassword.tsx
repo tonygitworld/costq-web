@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, App as AntdApp } from 'antd';
 import { Mail, Lock, CheckCircle2, MailCheck } from 'lucide-react';
