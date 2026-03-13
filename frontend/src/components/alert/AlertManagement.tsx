@@ -12,7 +12,7 @@ import {
   Typography,
   Tag,
   App,
-  Tooltip
+  Tooltip,
 } from 'antd';
 import {
   PlusOutlined,
@@ -23,7 +23,7 @@ import {
   DeleteOutlined,
   EyeOutlined,
   PlayCircleOutlined,
-  ArrowLeftOutlined
+  ArrowLeftOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
@@ -34,7 +34,11 @@ import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import { usePagination } from '../../hooks/usePagination';
 import { useI18n } from '../../hooks/useI18n';
 import { AWSStyleTable } from '../common/AWSStyleTable';
+import { CardListView, type CardField, type CardAction } from '../common/CardListView';
+import { MobilePageHeader } from '../common/MobilePageHeader';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import { TruncateText } from '../common/TruncateText';
+import { CollapsibleDescription } from '../common/CollapsibleDescription';
 import type { Alert } from '../../types/alert';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -73,6 +77,7 @@ export const AlertManagement: React.FC = () => {
   const { paginationProps } = usePagination(10);
 
   const isAdmin = currentUser?.role === 'admin';
+  const isMobile = useIsMobile();
 
   // 加载告警列表和账号列表
   useEffect(() => {
@@ -180,6 +185,59 @@ export const AlertManagement: React.FC = () => {
       }
     });
   };
+
+  // 移动端卡片字段配置
+  const cardFields: CardField<Alert>[] = [
+    {
+      label: t('table.columnName'),
+      key: 'display_name',
+      render: (text) => <span style={{ fontWeight: 600, color: '#101828' }}>{text}</span>,
+    },
+    {
+      label: t('table.columnDescription'),
+      key: 'description',
+      render: (text: string) => <CollapsibleDescription text={text} />,
+      fullWidth: true,
+    },
+    { label: t('table.columnCreator'), key: 'created_by_username', render: (v) => v || t('table.unknown') },
+    {
+      label: t('table.columnAccount'),
+      key: 'account_id',
+      render: (_: any, record: Alert) => getAccountName(record.account_id, record.account_type),
+    },
+    {
+      label: t('table.columnCreatedAt'),
+      key: 'created_at',
+      render: (v: string) => <span style={{ color: '#667085', fontSize: 12 }}>{dayjs(v).format('YYYY-MM-DD HH:mm')}</span>,
+    },
+    {
+      label: t('table.columnStatus'),
+      key: 'is_active',
+      render: (_: any, record: Alert) => getStatusDisplay(record),
+    },
+  ];
+
+  // 移动端卡片操作配置
+  const cardActions: CardAction<Alert>[] = [
+    {
+      label: t('detail'),
+      icon: <EyeOutlined />,
+      onClick: (record) => navigate(`/settings/alerts/${record.id}`),
+    },
+    {
+      label: t('edit'),
+      icon: <EditOutlined />,
+      onClick: (record) => navigate(`/settings/alerts/edit/${record.id}`),
+      hidden: (record) => record.user_id !== currentUser?.id && currentUser?.role !== 'admin',
+    },
+    {
+      label: t('delete'),
+      icon: <DeleteOutlined />,
+      danger: true,
+      onClick: (record) => handleDelete(record),
+      hidden: (record) => record.user_id !== currentUser?.id && currentUser?.role !== 'admin',
+    },
+  ];
 
   // 表格列定义
   const columns: ColumnsType<Alert> = [
@@ -293,106 +351,179 @@ export const AlertManagement: React.FC = () => {
     }
   ];
 
+  // 移动端 - 无Card包裹，直接渲染
+  if (isMobile) {
+    return (
+      <div style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: '#f5f5f5',
+        overflow: 'hidden',
+      }}>
+        {/* 顶部工具栏 */}
+        <MobilePageHeader title={t('title')} onBack={() => navigate('/')}>
+          {/* 搜索 + 筛选区域 */}
+          <div>
+            <Input
+              placeholder={t('filter.searchPlaceholder')}
+              prefix={<SearchOutlined style={{ color: '#98a2b3' }} />}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              allowClear
+              size="middle"
+              style={{ borderRadius: 10, backgroundColor: '#f2f4f7', border: '1px solid transparent', marginBottom: 8, height: 36 }}
+            />
+            <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
+              <Select value={statusFilter} onChange={setStatusFilter} size="middle" variant="filled" style={{ flex: 1 }}>
+                <Select.Option value="all">{t('filter.allStatus')}</Select.Option>
+                <Select.Option value="active">{t('filter.enabled')}</Select.Option>
+                <Select.Option value="inactive">{t('filter.disabled')}</Select.Option>
+              </Select>
+              <Select value={creatorFilter} onChange={setCreatorFilter} size="middle" variant="filled" style={{ flex: 1 }}>
+                <Select.Option value="all">{t('filter.allCreators')}</Select.Option>
+                <Select.Option value="me">{t('filter.createdByMe')}</Select.Option>
+              </Select>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Button icon={<ReloadOutlined />} onClick={loadAlerts} loading={loading} size="small" style={{ flex: 1, borderRadius: 8, height: 32, color: '#344054' }}>
+                {t('refresh')}
+              </Button>
+              {isAdmin && (
+                <Button icon={<PlayCircleOutlined />} onClick={handleManualTrigger} loading={triggering} size="small" style={{ flex: 1, borderRadius: 8, height: 32, color: '#344054' }}>
+                  {t('button.checkNow')}
+                </Button>
+              )}
+              <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/settings/alerts/new')} size="small" style={{ flex: 1, borderRadius: 8, height: 32, fontWeight: 500, boxShadow: '0 1px 2px rgba(21, 112, 239, 0.3)' }}>
+                {t('create')}
+              </Button>
+            </div>
+          </div>
+        </MobilePageHeader>
+
+        {/* 卡片列表区域 - 可滚动 */}
+        <div style={{
+          flex: 1,
+          overflow: 'auto',
+          padding: '12px 16px',
+          paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
+        }}>
+          <CardListView<Alert>
+            dataSource={filteredAlerts}
+            rowKey="id"
+            fields={cardFields}
+            actions={cardActions}
+            loading={loading}
+            pagination={{
+              ...paginationProps,
+              total: filteredAlerts.length,
+              showTotal: (total) => t('table.total', { count: total }),
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // 桌面端 - 保持原有布局不变
   return (
     <div style={{
       padding: '24px',
-      height: 'calc(100vh - 0px)', // 修改为自适应高度
+      height: 'calc(100vh - 0px)',
       overflow: 'auto',
       backgroundColor: '#f0f2f5'
     }}>
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
-        <Space style={{ width: '100%' }}>
-        <Button
-          icon={<ArrowLeftOutlined />}
-          onClick={() => navigate('/')}
-          type="text"
-        >
-          {t('common:button.back')}
-        </Button>
-        <Title level={3} style={{ margin: 0 }}>
-          <BellOutlined /> {t('title')}
-        </Title>
-      </Space>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <Button
+            icon={<ArrowLeftOutlined />}
+            onClick={() => navigate('/')}
+            type="text"
+          >
+            {t('common:button.back')}
+          </Button>
+          <Title level={3} style={{ margin: 0 }}>
+            <BellOutlined /> {t('title')}
+          </Title>
+        </div>
 
       <Card>
-        <Space style={{ marginBottom: 16, width: '100%', justifyContent: 'space-between' }}>
-          <Space>
-            <Search
-              placeholder={t('filter.searchPlaceholder')}
-              prefix={<SearchOutlined />}
-              style={{ width: 300 }}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              allowClear
-            />
-            <Select
-              value={statusFilter}
-              onChange={setStatusFilter}
-              style={{ width: 120 }}
-            >
-              <Select.Option value="all">{t('filter.allStatus')}</Select.Option>
-              <Select.Option value="active">{t('filter.enabled')}</Select.Option>
-              <Select.Option value="inactive">{t('filter.disabled')}</Select.Option>
-            </Select>
-            <Select
-              value={creatorFilter}
-              onChange={setCreatorFilter}
-              style={{ width: 120 }}
-            >
-              <Select.Option value="all">{t('filter.allCreators')}</Select.Option>
-              <Select.Option value="me">{t('filter.createdByMe')}</Select.Option>
-            </Select>
+          <Space style={{ marginBottom: 16, width: '100%', justifyContent: 'space-between' }}>
+            <Space>
+              <Search
+                placeholder={t('filter.searchPlaceholder')}
+                prefix={<SearchOutlined />}
+                style={{ width: 300 }}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                allowClear
+              />
+              <Select
+                value={statusFilter}
+                onChange={setStatusFilter}
+                style={{ width: 120 }}
+              >
+                <Select.Option value="all">{t('filter.allStatus')}</Select.Option>
+                <Select.Option value="active">{t('filter.enabled')}</Select.Option>
+                <Select.Option value="inactive">{t('filter.disabled')}</Select.Option>
+              </Select>
+              <Select
+                value={creatorFilter}
+                onChange={setCreatorFilter}
+                style={{ width: 120 }}
+              >
+                <Select.Option value="all">{t('filter.allCreators')}</Select.Option>
+                <Select.Option value="me">{t('filter.createdByMe')}</Select.Option>
+              </Select>
+            </Space>
+            <Space>
+              <Button
+                icon={<ReloadOutlined />}
+                onClick={loadAlerts}
+                loading={loading}
+              >
+                {t('refresh')}
+              </Button>
+              {isAdmin && (
+                <Tooltip title={t('tooltip.checkNow')}>
+                  <Button
+                    icon={<PlayCircleOutlined />}
+                    onClick={handleManualTrigger}
+                    loading={triggering}
+                  >
+                    {t('button.checkNow')}
+                  </Button>
+                </Tooltip>
+              )}
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => navigate('/settings/alerts/new')}
+              >
+                {t('create')}
+              </Button>
+            </Space>
           </Space>
-          <Space>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={loadAlerts}
-              loading={loading}
-            >
-              {t('refresh')}
-            </Button>
 
-            {isAdmin && (
-              <Tooltip title={t('tooltip.checkNow')}>
-                <Button
-                  icon={<PlayCircleOutlined />}
-                  onClick={handleManualTrigger}
-                  loading={triggering}
-                >
-                  {t('button.checkNow')}
-                </Button>
-              </Tooltip>
-            )}
-
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => navigate('/settings/alerts/new')}
-            >
-              {t('create')}
-            </Button>
-          </Space>
-        </Space>
-
-        <AWSStyleTable
-          tableId="alert-management"
-          columns={columns}
-          dataSource={filteredAlerts}
-          rowKey="id"
-          loading={loading}
-          pagination={{
-            ...paginationProps,
-            total: filteredAlerts.length,
-            showTotal: (total) => t('table.total', { count: total }),
-          }}
-          scroll={{
-            x: 1400,
-            y: 'calc(100vh - 400px)'
-          }}
-          sticky={{
-            offsetHeader: 0
-          }}
-        />
+          <AWSStyleTable
+            tableId="alert-management"
+            columns={columns}
+            dataSource={filteredAlerts}
+            rowKey="id"
+            loading={loading}
+            pagination={{
+              ...paginationProps,
+              total: filteredAlerts.length,
+              showTotal: (total) => t('table.total', { count: total }),
+            }}
+            scroll={{
+              x: 1400,
+              y: 'calc(100vh - 400px)'
+            }}
+            sticky={{
+              offsetHeader: 0
+            }}
+          />
       </Card>
       </Space>
     </div>

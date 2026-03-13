@@ -20,9 +20,10 @@ const { Title } = Typography;
 interface SidebarProps {
   isCollapsed?: boolean;
   onToggleCollapse?: (collapsed: boolean) => void;
+  onOpenSettings?: () => void;
 }
 
-export const Sidebar: FC<SidebarProps> = ({ isCollapsed = false, onToggleCollapse }) => {
+export const Sidebar: FC<SidebarProps> = ({ isCollapsed = false, onToggleCollapse, onOpenSettings }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const createNewChat = useChatStore(state => state.createNewChat);
@@ -182,7 +183,7 @@ export const Sidebar: FC<SidebarProps> = ({ isCollapsed = false, onToggleCollaps
 
       {/* 设置菜单 - 始终显示（在内部处理折叠状态） */}
       <div className={isCollapsed ? "sidebar-collapsed-settings" : "sidebar-menu-wrapper"}>
-        <SettingsMenu isCollapsed={isCollapsed} />
+        <SettingsMenu isCollapsed={isCollapsed} onOpenSettings={onOpenSettings} />
       </div>
     </div>
   );

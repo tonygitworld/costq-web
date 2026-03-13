@@ -50,7 +50,7 @@ export const SafeMarkdownRenderer: FC<SafeMarkdownRendererProps> = ({
             );
           },
           table: ({ children }) => (
-            <div style={{ overflowX: 'auto' }}>
+            <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', maxWidth: '100%' }}>
               <table>{children}</table>
             </div>
           ),

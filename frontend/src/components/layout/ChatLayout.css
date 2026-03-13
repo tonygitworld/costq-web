@@ -6,6 +6,7 @@
 .chat-layout-sider {
   overflow: auto;
   height: 100vh;
+  height: 100dvh;
   position: fixed;
   left: 0;
   top: 0;
@@ -123,5 +124,94 @@
 
   .chat-layout-main {
     margin-left: 0;
+  }
+}
+
+/* ===== 移动端顶部导航栏 ===== */
+.mobile-top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(56px + env(safe-area-inset-top));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  padding-top: env(safe-area-inset-top);
+  background-color: white;
+  border-bottom: none;
+  z-index: 1000;
+}
+
+.mobile-nav-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  letter-spacing: -0.01em;
+}
+
+.mobile-nav-btn {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 10px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333 !important;
+  font-size: 18px !important;
+}
+
+.mobile-nav-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* DeepSeek 风格图标按钮 */
+.mobile-icon-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #555;
+  transition: color 0.15s;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-icon-btn:active {
+  background: rgba(0, 0, 0, 0.08);
+  color: #1a1a1a;
+}
+
+@media (hover: hover) {
+  .mobile-icon-btn:hover {
+    background: rgba(0, 0, 0, 0.06);
+    color: #1a1a1a;
+  }
+}
+
+/* ===== 移动端侧边栏覆盖层适配 ===== */
+@media (max-width: 600px) {
+  /* 确保主内容区域在侧边栏打开时不受影响 */
+  .chat-layout-main {
+    margin-left: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* 防止 Layout.Content 在移动端溢出导致橡皮筋效果 */
+  .chat-layout-main .ant-layout-content {
+    overflow: hidden;
+  }
+
+  /* 移动端 Drawer 隐藏（已被 MobileSidebar 替代） */
+  .chat-layout-drawer {
+    display: none;
   }
 }

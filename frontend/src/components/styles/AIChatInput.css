@@ -230,3 +230,227 @@
     0 4px 20px rgba(218, 119, 86, 0.2),
     0 0 0 2px rgba(218, 119, 86, 0.6);
 }
+
+/* ===== 移动端响应式优化 ===== */
+@media (max-width: 600px) {
+  .ai-chat-input-container {
+    padding: 10px 12px;
+    border-radius: 16px;
+  }
+
+  .ai-chat-input-area {
+    margin-bottom: 4px;
+  }
+
+  .ai-chat-textarea {
+    font-size: 16px;
+    line-height: 1.5;
+    max-height: 120px !important;
+  }
+
+  /* 工具栏：单行，左右分布 */
+  .ai-chat-input-toolbar {
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
+    min-height: 36px;
+    margin-top: 0;
+  }
+
+  .toolbar-left {
+    flex: 0 0 auto;
+    gap: 2px;
+    padding-left: 0;
+    padding-top: 0;
+    border-top: none;
+  }
+
+  .toolbar-right {
+    flex: 1;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+
+  /* 图标按钮 */
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+  }
+
+  /* 发送按钮 */
+  .send-btn > div {
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 8px !important;
+  }
+}
+
+/* 移动端 ModelSelector / CloudServiceSelector 紧凑按钮样式 */
+.model-selector-mobile-btn,
+.cloud-selector-mobile-btn {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.model-selector-mobile-btn:hover,
+.cloud-selector-mobile-btn:hover {
+  color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* ===== 移动端豆包风格输入框 ===== */
+.mobile-chat-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  position: relative;
+}
+
+/* 1. 横向滚动胶囊标签栏 */
+.mobile-capsule-bar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 0 2px;
+}
+
+.mobile-capsule-bar::-webkit-scrollbar {
+  display: none;
+}
+
+/* 胶囊按钮通用样式 */
+.mobile-capsule-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  font-size: 13px;
+  color: #444;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+  font-family: inherit;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.mobile-capsule-btn:active {
+  background: #f0f0f0;
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+/* ModelSelector / CloudServiceSelector 在胶囊栏里的样式 */
+/* 2. 胶囊输入框 */
+.mobile-capsule-input {
+  display: flex;
+  flex-direction: column;
+  background: #f5f5f5;
+  border-radius: 24px;
+  padding: 4px;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.mobile-capsule-input.focused {
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+.mobile-capsule-input-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+}
+
+.mobile-capsule-textarea {
+  flex: 1;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #1f1f1f;
+  padding: 6px 4px;
+  margin: 0;
+  min-height: 24px;
+  max-height: 120px;
+  overflow-y: hidden;
+}
+
+.mobile-capsule-textarea::placeholder {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+/* 移动端发送按钮 */
+.mobile-send-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: #e8e8e8;
+  cursor: pointer;
+  transition: background 0.15s;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.mobile-send-btn.active {
+  background: #da7756;
+}
+
+.mobile-send-btn.active:active {
+  background: #c5603f;
+}
+
+.mobile-send-btn:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* 移动端附件按钮样式覆盖 */
+.mobile-capsule-input-row .icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+/* 3. AI 免责声明 */
+.mobile-ai-disclaimer {
+  text-align: center;
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.3);
+  padding: 0 16px;
+  user-select: none;
+}
+
+/* 移动端模板 Popover 宽度自适应 */
+@media (max-width: 600px) {
+  .mobile-template-popover.ant-popover {
+    position: fixed !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: auto !important;
+    transform: none !important;
+  }
+
+  .mobile-template-popover .ant-popover-inner {
+    width: 100%;
+  }
+
+  .mobile-template-popover .ant-popover-inner > div {
+    width: 100% !important;
+  }
+}

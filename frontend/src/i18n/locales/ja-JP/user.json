@@ -123,5 +123,8 @@
     "managePermissions": "権限を管理",
     "confirmDeleteUser": "削除の確認",
     "confirmDeleteDesc": "ユーザー\"{{username}}\"を削除してもよろしいですか？この操作は取り消せません。"
+  },
+  "pagination": {
+    "total": "全{{total}}件"
   }
 }

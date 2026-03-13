@@ -1,5 +1,9 @@
 {
   "selectModel": "Select Model",
+  "loading": "Loading...",
+  "loadFailed": "Load failed",
+  "noModels": "No models available",
+  "mobileLabel": "Model",
   "sonnet46": {
     "name": "Claude Sonnet 4.6",
     "description": "Latest flagship model with strongest reasoning"

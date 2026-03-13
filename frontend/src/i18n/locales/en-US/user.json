@@ -123,5 +123,8 @@
     "managePermissions": "Manage Permissions",
     "confirmDeleteUser": "Confirm Delete",
     "confirmDeleteDesc": "Are you sure you want to delete user \"{{username}}\"? This action cannot be undone."
+  },
+  "pagination": {
+    "total": "{{total}} total"
   }
 }

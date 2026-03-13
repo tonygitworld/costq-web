@@ -5,6 +5,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh;
   padding: 0;
   background-color: white;
 }
@@ -41,6 +42,18 @@
 /* ===== 响应式 ===== */
 @media (min-width: 1440px) {
   .main-content-container { padding: 0; }
+}
+
+/* 移动端：减少左右 padding */
+@media (max-width: 600px) {
+  .main-content-input-area {
+    padding: 0 8px 8px 8px;
+  }
+
+  /* 给汉堡菜单按钮留出空间 */
+  .main-content-container {
+    padding-top: calc(56px + env(safe-area-inset-top));
+  }
 }
 
 /* =========================================
@@ -80,6 +93,20 @@
   background-color: transparent;
 }
 
+/* 移动端：减少位移，避免内容被推出屏幕 */
+@media (max-width: 600px) {
+  .welcome-mode .welcome-screen-container {
+    transform: translateY(-28vh);
+    margin-bottom: 16px;
+  }
+
+  .welcome-mode .main-content-input-area {
+    transform: translateY(-28vh);
+    max-width: 100%;
+    padding: 0 8px;
+  }
+}
+
 /* 4. 增强内部输入框样式 (悬浮卡片感) */
 .welcome-mode .ai-chat-input-container {
   box-shadow:
@@ -95,4 +122,77 @@
   opacity: 0;
   pointer-events: none;
   position: absolute;
+}
+
+/* ===== 移动端专属布局 ===== */
+.main-content-mobile {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  background-color: #ffffff;
+  padding-top: calc(56px + env(safe-area-inset-top));
+  overflow: hidden; /* 防止整体容器滚动，避免 iOS 橡皮筋效果露出底部内容 */
+  overscroll-behavior: none; /* 禁止过度滚动 */
+}
+
+/* 消息区域：占满剩余空间，可滚动 */
+.mobile-message-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain; /* 防止滚动链传播到父容器 */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.1) transparent;
+  min-height: 0; /* flex 子元素需要 min-height:0 才能正确收缩 */
+}
+
+/* 欢迎模式：禁用滚动，启用 flex 居中 */
+.mobile-message-area.mobile-welcome-mode {
+  overflow: hidden;
+  justify-content: center;
+  align-items: center;
+  touch-action: none; /* 防止 iOS 触摸拖动导致页面弹跳 */
+  overscroll-behavior: none;
+}
+
+.mobile-message-area::-webkit-scrollbar {
+  width: 3px;
+}
+
+.mobile-message-area::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.1);
+  border-radius: 3px;
+}
+
+/* 输入框区域：固定在底部 */
+.mobile-input-area {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  background-color: #ffffff;
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+  position: relative; /* 确保在正常文档流中，不被滚动影响 */
+  z-index: 10;
+}
+
+/* 移动端输入框内部样式覆盖 */
+.mobile-input-area .message-input-container {
+  padding: 0 !important;
+}
+
+.mobile-input-area .ai-chat-input-container {
+  background-color: #ffffff !important;
+  border-radius: 16px !important;
+  padding: 10px 12px !important;
+  box-shadow:
+    0 1px 8px rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(0, 0, 0, 0.06) !important;
+}
+
+.mobile-input-area .ai-disclaimer {
+  display: none;
 }

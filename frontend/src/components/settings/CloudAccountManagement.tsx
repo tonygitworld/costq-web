@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Row, Col, Badge, Typography, Space, Button } from 'antd';
+import { Card, Row, Col, Badge, Typography, Space, Button, Segmented } from 'antd';
 import { CloudOutlined, GoogleOutlined, LockOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { MobilePageHeader } from '../common/MobilePageHeader';
 import { useNavigate } from 'react-router-dom';
 import { useAccountStore } from '../../stores/accountStore';
 import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import { AccountManagement } from '../common/AccountManagement';
 import { GCPAccountManagement } from '../gcp/GCPAccountManagement';
 import { useI18n } from '../../hooks/useI18n';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 import { logger } from '../../utils/logger';
 
@@ -29,8 +31,20 @@ export const CloudAccountManagement: React.FC = () => {
   const awsAccounts = useAccountStore(state => state.accounts);
   const gcpAccounts = useGCPAccountStore(state => state.accounts);
   const { t } = useI18n(['account', 'common']);
+  const isMobile = useIsMobile();
 
   const [selectedProvider, setSelectedProvider] = useState<CloudProvider>('aws');
+
+  // 处理返回按钮
+  const handleBack = () => {
+    if (isMobile) {
+      // 手机端：返回到设置页面
+      navigate('/settings', { replace: true });
+    } else {
+      // 桌面端：返回到首页
+      navigate('/');
+    }
+  };
 
   // 组件挂载时获取账号数量
   useEffect(() => {
@@ -180,60 +194,91 @@ export const CloudAccountManagement: React.FC = () => {
 
   return (
     <div style={{
-      padding: '24px',
-      minHeight: '100vh',
-      maxHeight: '100vh',
-      overflow: 'auto',
+      padding: isMobile ? 0 : '24px',
+      minHeight: isMobile ? '100dvh' : '100vh',
+      maxHeight: isMobile ? '100dvh' : '100vh',
+      overflow: isMobile ? 'hidden' : 'auto',
       display: 'flex',
       flexDirection: 'column'
     }}>
-      <div style={{
-        width: '100%',
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '24px'
-      }}>
-        {/* 返回按钮 - 左上角对齐 */}
-        <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-          <Button
-            icon={<ArrowLeftOutlined />}
-            onClick={() => navigate('/')}
-            type="text"
-          >
-            {t('common:button.back')}
-          </Button>
+      {isMobile ? (
+        /* ========== 移动端布局 ========== */
+        <div style={{ height: '100%', display: 'flex', flexDirection: 'column', backgroundColor: '#f5f5f5', overflow: 'hidden' }}>
+          {/* 顶部栏 */}
+          <MobilePageHeader title={t('management.title')} onBack={handleBack}>
+            <Segmented
+              options={providers.filter(p => !p.disabled).map(p => ({
+                label: (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '2px 0' }}>
+                    {React.cloneElement(p.icon as React.ReactElement, {
+                      style: { fontSize: '15px', color: (p.icon as React.ReactElement).props.style?.color }
+                    })}
+                    <span style={{ fontWeight: 500 }}>{p.name}</span>
+                    <span style={{ fontSize: '12px', color: 'rgba(0,0,0,0.35)', fontWeight: 400 }}>{p.count}</span>
+                  </div>
+                ),
+                value: p.key,
+              }))}
+              value={selectedProvider}
+              onChange={(v) => setSelectedProvider(v as CloudProvider)}
+              block
+            />
+          </MobilePageHeader>
+          {/* 内容区 */}
+          <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px', paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}>
+            {renderContent()}
+          </div>
         </div>
+      ) : (
+        /* ========== 桌面端布局（保持不变） ========== */
+        <div style={{
+          width: '100%',
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '24px'
+        }}>
+          {/* 返回按钮 */}
+          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <Button
+              icon={<ArrowLeftOutlined />}
+              onClick={handleBack}
+              type="text"
+            >
+              {t('common:button.back')}
+            </Button>
+          </div>
 
-        {/* 标题 */}
-        <Title level={3}>{t('management.title')}</Title>
+          {/* 标题 */}
+          <Title level={3} style={{ marginBottom: -8 }}>{t('management.title')}</Title>
 
-        {/* 主内容区域 */}
-        <Row gutter={24}>
-          {/* 左侧：云厂商选择 */}
-          <Col xs={24} sm={24} md={8} lg={6} xl={6}>
-            <div style={{
-              position: 'sticky',
-              top: 24,
-              maxHeight: 'calc(100vh - 200px)',
-              overflow: 'auto'
-            }}>
-              <Title level={5} style={{ marginBottom: 16 }}>{t('management.selectProvider')}</Title>
-              {providers.map(provider => renderProviderCard(provider))}
-            </div>
-          </Col>
+          {/* 主内容区域 */}
+          <Row gutter={24}>
+            {/* 左侧：云厂商选择 */}
+            <Col xs={24} sm={24} md={8} lg={6} xl={6}>
+              <div style={{
+                position: 'sticky',
+                top: 24,
+                maxHeight: 'calc(100vh - 200px)',
+                overflow: 'auto'
+              }}>
+                <Title level={5} style={{ marginBottom: 16 }}>{t('management.selectProvider')}</Title>
+                {providers.map(provider => renderProviderCard(provider))}
+              </div>
+            </Col>
 
-          {/* 右侧：账号列表 */}
-          <Col xs={24} sm={24} md={16} lg={18} xl={18}>
-            <div style={{
-              maxHeight: 'calc(100vh - 200px)',
-              overflow: 'auto'
-            }}>
-              {renderContent()}
-            </div>
-          </Col>
-        </Row>
-      </div>
+            {/* 右侧：账号列表 */}
+            <Col xs={24} sm={24} md={16} lg={18} xl={18}>
+              <div style={{
+                maxHeight: 'calc(100vh - 200px)',
+                overflow: 'auto'
+              }}>
+                {renderContent()}
+              </div>
+            </Col>
+          </Row>
+        </div>
+      )}
     </div>
   );
 };

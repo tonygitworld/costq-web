@@ -184,38 +184,15 @@ export const ChatHistory: FC = () => {
     }
   };
 
-  if (chatList.length === 0) {
-    return (
-      <div>
-        <Text style={{
-          color: 'rgba(255,255,255,0.75)',
-          fontSize: '14px',
-          fontWeight: 500,
-          display: 'block',
-          marginBottom: '16px',
-          letterSpacing: '0.3px'
-        }}>
-          💬 {t('sidebar.chatHistory')}
-        </Text>
-        <Empty
-          description={
-            <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: '12px' }}>
-              {t('history.noChatHistory')}
-            </Text>
-          }
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-        />
-      </div>
-    );
-  }
-
-  return (
-    <div>
+  // 头部区域（标题栏 + 选择工具栏），供外部 flex 布局使用
+  const header = (
+    <div style={{ flexShrink: 0 }}>
+      {/* 标题栏 */}
       <div style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: '16px'
+        marginBottom: isSelectionMode ? '8px' : '12px',
       }}>
         <Text style={{
           color: 'rgba(255,255,255,0.75)',
@@ -233,25 +210,15 @@ export const ChatHistory: FC = () => {
                 type="text"
                 size="small"
                 icon={<CheckSquareOutlined />}
-                onClick={toggleSelectionMode}
-                style={{
-                  color: 'rgba(255,255,255,0.65)',
-                  fontSize: '12px',
-                  padding: '0 6px',
-                  height: '24px'
-                }}
+                onClick={(e) => { e.stopPropagation(); toggleSelectionMode(); }}
+                style={{ color: 'rgba(255,255,255,0.65)', fontSize: '12px', padding: '0 6px', height: '24px' }}
               />
               <Button
                 type="text"
                 size="small"
                 icon={<DeleteOutlined />}
-                onClick={handleClearAll}
-                style={{
-                  color: 'rgba(255,255,255,0.65)',
-                  fontSize: '12px',
-                  padding: '0 6px',
-                  height: '24px'
-                }}
+                onClick={(e) => { e.stopPropagation(); handleClearAll(); }}
+                style={{ color: 'rgba(255,255,255,0.65)', fontSize: '12px', padding: '0 6px', height: '24px' }}
               />
             </>
           ) : (
@@ -259,64 +226,77 @@ export const ChatHistory: FC = () => {
               type="text"
               size="small"
               icon={<CloseSquareOutlined />}
-              onClick={toggleSelectionMode}
-              style={{
-                color: 'rgba(255,255,255,0.65)',
-                fontSize: '12px',
-                padding: '0 6px',
-                height: '24px'
-              }}
+              onClick={(e) => { e.stopPropagation(); toggleSelectionMode(); }}
+              style={{ color: 'rgba(255,255,255,0.65)', fontSize: '12px', padding: '0 6px', height: '24px' }}
             />
           )}
         </Space>
       </div>
 
+      {/* 选择工具栏 */}
       {isSelectionMode && (
-        <div style={{
-          backgroundColor: 'rgba(0, 0, 0, 0.04)',
-          padding: '10px 12px',
-          borderRadius: '6px',
-          marginBottom: '12px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '8px 12px',
+            marginBottom: '8px',
+            borderRadius: '8px',
+            backgroundColor: 'rgba(0,0,0,0.06)',
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
           <Space size={8}>
             <Checkbox
               checked={selectedChats.length === chatList.length}
               indeterminate={selectedChats.length > 0 && selectedChats.length < chatList.length}
-              onChange={toggleSelectAll}
-              style={{ color: 'rgba(255,255,255,0.85)' }}
+              onChange={(e) => { e.stopPropagation?.(); toggleSelectAll(); }}
+              onClick={(e) => e.stopPropagation()}
             >
-              <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: '12px' }}>
-                全选
-              </Text>
+              <Text style={{ color: 'rgba(68,71,70,0.85)', fontSize: '13px' }}>全选</Text>
             </Checkbox>
-            <Text style={{ color: 'rgba(255,255,255,0.65)', fontSize: '12px' }}>
+            <Text style={{ color: 'rgba(68,71,70,0.55)', fontSize: '12px' }}>
               已选 {selectedChats.length} 个
             </Text>
           </Space>
-
           <Button
             type="primary"
             size="small"
             danger
             icon={<DeleteOutlined />}
-            onClick={handleDeleteSelected}
+            onClick={(e) => { e.stopPropagation(); handleDeleteSelected(); }}
             disabled={selectedChats.length === 0}
-            style={{
-              fontSize: '12px',
-              height: '24px',
-              backgroundColor: selectedChats.length === 0 ? 'rgba(255,77,79,0.3)' : '#ff4d4f',
-              borderColor: selectedChats.length === 0 ? 'rgba(255,77,79,0.3)' : '#ff4d4f',
-              color: selectedChats.length === 0 ? 'rgba(255,255,255,0.4)' : '#ffffff'
-            }}
+            style={{ fontSize: '12px', height: '28px' }}
           >
             删除
           </Button>
         </div>
       )}
+    </div>
+  );
 
+  if (chatList.length === 0) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        {header}
+        <Empty
+          description={
+            <Text style={{ color: 'rgba(255,255,255,0.45)', fontSize: '12px' }}>
+              {t('history.noChatHistory')}
+            </Text>
+          }
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {header}
+      {/* 可滚动的历史列表 */}
+      <div className="sidebar-scrollable" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', minHeight: 0 }}>
       <Flex vertical gap={4}>
         {chatList.map((chat) => {
           const isActive = currentChatId === chat.id;
@@ -510,6 +490,7 @@ export const ChatHistory: FC = () => {
           );
         })}
       </Flex>
+      </div>
 
       <style>{`
         /* 删除按钮悬停显示 - 适配 Flex 布局 */

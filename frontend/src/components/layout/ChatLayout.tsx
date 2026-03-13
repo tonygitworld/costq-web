@@ -4,11 +4,14 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Layout, Button, Drawer } from 'antd';
 import { MenuOutlined } from '@ant-design/icons';
 import { Sidebar } from './Sidebar';
+import { MobileSidebar } from './MobileSidebar';
+import { MobileSettingsPage } from './MobileSettingsPage';
 import { MainContent } from './MainContent';
 import { ScrollIssueReporter } from '../common/ScrollIssueReporter';
 import { useChatStore } from '../../stores/chatStore';
 import { useAccountStore } from '../../stores/accountStore';
 import { useGCPAccountStore } from '../../stores/gcpAccountStore';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import './ChatLayout.css';
 
 import { logger } from '../../utils/logger';
@@ -20,12 +23,21 @@ interface ChatLayoutProps {
 
 export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) => {
   const [sidebarVisible, setSidebarVisible] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);  // 移动端响应式标志
+  const [settingsVisible, setSettingsVisible] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
-    // 从 localStorage 读取初始状态
     const stored = localStorage.getItem('sidebar-collapsed');
     return stored ? JSON.parse(stored) : false;
   });
+  const isMobile = useIsMobile();
+
+  // 切换到桌面端时重置移动端状态
+  useEffect(() => {
+    if (!isMobile) {
+      setSettingsVisible(false);
+      setSidebarVisible(false);
+    }
+  }, [isMobile]);
 
 
   // ✅ URL 路由支持：读取 sessionId 参数
@@ -147,7 +159,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
   const contentMarginLeft = collapsed ? 0 : sidebarWidth;
 
   return (
-    <Layout className={className} style={{ height: '100vh' }}>
+    <Layout className={className} style={{ height: '100dvh' }}>
       <Layout.Sider
         width={sidebarWidth}
         breakpoint="lg"
@@ -163,7 +175,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
         className="chat-layout-sider"
         style={{
           overflow: 'hidden', // ✅ 关键修复：改为 hidden 防止折叠时出现滚动条
-          height: '100vh',
+          height: '100dvh',
           position: 'fixed',
           left: 0,
           top: 0,
@@ -177,8 +189,36 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
       </Layout.Sider>
 
       <Layout className="chat-layout-main" style={{ marginLeft: collapsed ? 0 : contentMarginLeft, transition: 'margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1)' }}>
-        {/* 移动端菜单按钮 - 浮动显示 */}
-        {collapsed && (
+        {/* 移动端：固定顶部导航栏（设置子页面有自己的导航，不显示） */}
+        {isMobile && collapsed && !location.pathname.startsWith('/settings') && (
+          <div className="mobile-top-nav">
+            <button
+              className="mobile-icon-btn"
+              onClick={() => setSidebarVisible(true)}
+              aria-label="打开侧边栏"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                <line x1="3" y1="8" x2="15" y2="8"/>
+                <line x1="3" y1="16" x2="21" y2="16"/>
+              </svg>
+            </button>
+            <span className="mobile-nav-title">CostQ</span>
+            <button
+              className="mobile-icon-btn"
+              onClick={() => {
+                useChatStore.getState().createNewChat();
+              }}
+              aria-label="新建聊天"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+              </svg>
+            </button>
+          </div>
+        )}
+
+        {/* 桌面端：浮动汉堡按钮（保持原有） */}
+        {!isMobile && collapsed && (
           <div style={{ position: 'absolute', top: 16, left: 16, zIndex: 1000 }}>
             <Button
               type="text"
@@ -197,7 +237,7 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
         )}
 
         {/* 主内容区域 */}
-        <Layout.Content style={{ position: 'relative', height: '100vh' }}>
+        <Layout.Content style={{ position: 'relative', height: '100dvh' }}>
           {children || <MainContent />}
 
           {/* 连接状态已移到输入框左侧，此处不再显示 */}
@@ -210,23 +250,41 @@ export const ChatLayout: React.FC<ChatLayoutProps> = ({ className, children }) =
             <ConnectionStatus />
           </div> */}
 
-          {process.env.NODE_ENV === 'development' && <ScrollIssueReporter />}
+          {process.env.NODE_ENV === 'development' && !isMobile && <ScrollIssueReporter />}
         </Layout.Content>
       </Layout>
 
-      {/* 移动端：抽屉式侧边栏 */}
-      <Drawer
-        placement="left"
-        open={sidebarVisible}
-        onClose={() => setSidebarVisible(false)}
-        className="chat-layout-drawer"
-        styles={{
-          body: { padding: 0, backgroundColor: '#f7f8fa' }, // 适配现代极简风
-          header: { backgroundColor: '#f7f8fa', borderBottom: 'none' } // 无边框
-        }}
-      >
-        <Sidebar isCollapsed={false} />
-      </Drawer>
+      {/* 移动端：MobileSidebar + MobileSettingsPage */}
+      {isMobile ? (
+        <>
+          <MobileSidebar
+            visible={sidebarVisible}
+            onClose={() => setSidebarVisible(false)}
+            onOpenSettings={() => {
+              setSidebarVisible(false);
+              setSettingsVisible(true);
+            }}
+          />
+          <MobileSettingsPage
+            visible={settingsVisible}
+            onClose={() => setSettingsVisible(false)}
+          />
+        </>
+      ) : (
+        /* 桌面端：保持原有 Drawer + Sidebar 逻辑 */
+        <Drawer
+          placement="left"
+          open={sidebarVisible}
+          onClose={() => setSidebarVisible(false)}
+          className="chat-layout-drawer"
+          styles={{
+            body: { padding: 0, backgroundColor: '#f7f8fa' },
+            header: { backgroundColor: '#f7f8fa', borderBottom: 'none' }
+          }}
+        >
+          <Sidebar isCollapsed={false} />
+        </Drawer>
+      )}
     </Layout>
   );
 };

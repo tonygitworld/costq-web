@@ -30,6 +30,10 @@ import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import { usePagination } from '../../hooks/usePagination';
 import { useI18n } from '../../hooks/useI18n';
 import { AWSStyleTable } from '../common/AWSStyleTable';
+import { CardListView, type CardField } from '../common/CardListView';
+import { CollapsibleDescription } from '../common/CollapsibleDescription';
+import { MobilePageHeader } from '../common/MobilePageHeader';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import { TruncateText } from '../common/TruncateText';
 import type { AlertHistory } from '../../types/alert';
 import dayjs from 'dayjs';
@@ -65,6 +69,7 @@ export const AlertDetail: React.FC = () => {
   const { accounts: awsAccounts, fetchAccounts: fetchAWSAccounts } = useAccountStore();
   const { accounts: gcpAccounts, fetchAccounts: fetchGCPAccounts } = useGCPAccountStore();
   const { paginationProps } = usePagination(10);
+  const isMobile = useIsMobile();
 
   // 加载数据
   useEffect(() => {
@@ -187,6 +192,41 @@ export const AlertDetail: React.FC = () => {
   const successCount = alertHistory.filter(h => h.status === 'success').length;
   const successRate = totalExecutions > 0 ? Math.round((successCount / totalExecutions) * 100) : 0;
 
+  // 移动端执行历史卡片字段
+  const historyCardFields: CardField<AlertHistory>[] = [
+    {
+      label: t('history.columnTime'),
+      key: 'executed_at',
+      render: (v: string) => (
+        <span style={{ fontWeight: 600, color: '#101828', fontSize: 13 }}>
+          {dayjs(v).format('MM-DD HH:mm')}
+        </span>
+      ),
+    },
+    {
+      label: t('history.columnStatus'),
+      key: 'status',
+      render: (status: string) => (
+        <Tag color={status === 'success' ? 'success' : 'error'}>
+          {status === 'success' ? t('history.statusSuccess') : t('history.statusFailed')}
+        </Tag>
+      ),
+    },
+    {
+      label: t('history.columnTriggered'),
+      key: 'triggered',
+      render: (triggered: boolean) => (
+        triggered ? <Tag color="warning">{t('history.triggered')}</Tag> : <Tag>{t('history.notTriggered')}</Tag>
+      ),
+    },
+    {
+      label: t('history.columnResult'),
+      key: 'result_summary',
+      render: (text: string) => <CollapsibleDescription text={text || ''} />,
+      fullWidth: true,
+    },
+  ];
+
   // 执行历史表格列
   const historyColumns: ColumnsType<AlertHistory> = [
     {
@@ -248,6 +288,130 @@ export const AlertDetail: React.FC = () => {
     }
   ];
 
+  // ========== 移动端布局 ==========
+  if (isMobile) {
+    return (
+      <div style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: '#f5f5f5',
+        overflow: 'hidden',
+      }}>
+        {/* 顶部栏 */}
+        <MobilePageHeader
+          title={currentAlert.display_name}
+          onBack={() => navigate('/settings/alerts')}
+        >
+          {/* 操作按钮 */}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Button icon={<EditOutlined />} onClick={() => navigate(`/settings/alerts/edit/${id}`)} size="small" style={{ flex: 1, borderRadius: 8, height: 32, color: '#344054' }}>
+              {t('edit')}
+            </Button>
+            <Button icon={<SendOutlined />} onClick={handleTest} loading={savingAlert} size="small" style={{ flex: 1, borderRadius: 8, height: 32, color: '#344054' }}>
+              {t('test')}
+            </Button>
+            <Button danger icon={<DeleteOutlined />} onClick={handleDelete} size="small" style={{ flex: 1, borderRadius: 8, height: 32 }}>
+              {t('delete')}
+            </Button>
+          </div>
+        </MobilePageHeader>
+
+        {/* 可滚动内容区 */}
+        <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px', paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}>
+          {/* 统计概览 - 2x2 网格 */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 10,
+            marginBottom: 12,
+          }}>
+            {[
+              { label: t('overview.status'), value: currentAlert.is_active ? t('overview.enabled') : t('overview.disabled'), prefix: currentAlert.is_active ? '🟢' : '🔴' },
+              { label: t('overview.executions'), value: totalExecutions },
+              { label: t('overview.triggers'), value: triggeredCount },
+              { label: t('overview.successRate'), value: `${successRate}%` },
+            ].map((item) => (
+              <div key={item.label} style={{
+                background: '#fff',
+                borderRadius: 10,
+                padding: '12px 14px',
+                border: '1px solid #eaecf0',
+                boxShadow: '0 1px 2px rgba(16,24,40,0.04)',
+              }}>
+                <div style={{ color: '#667085', fontSize: 12, marginBottom: 4 }}>{item.label}</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#101828' }}>
+                  {item.prefix && <span style={{ marginRight: 4 }}>{item.prefix}</span>}
+                  {item.value}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* 告警配置 */}
+          <div style={{
+            background: '#fff',
+            borderRadius: 12,
+            border: '1px solid #eaecf0',
+            boxShadow: '0 1px 3px rgba(16,24,40,0.06)',
+            padding: '14px 16px',
+            marginBottom: 12,
+          }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: '#101828', marginBottom: 10 }}>
+              {t('card.config')}
+            </div>
+            {[
+              { label: t('config.description'), value: null, node: <CollapsibleDescription text={currentAlert.description} /> },
+              { label: t('config.account'), value: null, node: getAccountName() },
+              { label: t('config.frequency'), value: t('config.frequencyValue') },
+              { label: t('config.createdInfo'), value: t('config.createdBy', { name: currentAlert.created_by_username || t('table.unknown'), time: dayjs(currentAlert.created_at).fromNow() }) },
+            ].map((item) => (
+              <div key={item.label} style={{ padding: '8px 0', borderBottom: '1px solid #f2f4f7' }}>
+                <div style={{ color: '#667085', fontSize: 12, marginBottom: 2 }}>{item.label}</div>
+                <div style={{ color: '#344054', fontSize: 13, lineHeight: 1.5 }}>
+                  {item.node || item.value || '-'}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* 执行历史 */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 10,
+          }}>
+            <span style={{ fontSize: 14, fontWeight: 600, color: '#101828' }}>
+              {t('card.history')} ({totalExecutions})
+            </span>
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={loadData}
+              loading={loading}
+              type="text"
+              size="small"
+              style={{ color: '#667085' }}
+            />
+          </div>
+
+          <CardListView<AlertHistory>
+            dataSource={alertHistory}
+            rowKey="id"
+            fields={historyCardFields}
+            loading={loading}
+            pagination={{
+              ...paginationProps,
+              total: alertHistory.length,
+              showTotal: (total) => t('history.pagination', { total }),
+            }}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // ========== 桌面端布局（保持不变） ==========
   return (
     <div style={{
       height: '100vh',

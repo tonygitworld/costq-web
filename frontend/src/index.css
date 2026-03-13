@@ -26,11 +26,13 @@ code, pre, .code-block, .ant-typography code {
 
 #root {
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 
 .app {
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 
@@ -73,6 +75,7 @@ code, pre, .code-block, .ant-typography code {
 /* Chat layout styles */
 .chat-layout {
   height: 100vh;
+  height: 100dvh;
 }
 
 .chat-layout .ant-layout-sider {

@@ -26,6 +26,8 @@
   "input": {
     "placeholder": "输入您的问题... (Enter 发送, Shift+Enter 换行)",
     "placeholderNoAccount": "💡 请先选择云账号，然后即可开始提问...",
+    "mobilePlaceholder": "输入问题...",
+    "mobilePlaceholderNoAccount": "请先选择云账号",
     "sendButton": "发送",
     "stopButton": "停止",
     "stopping": "停止中...",
@@ -33,6 +35,8 @@
     "connected": "已连接",
     "disconnected": "未连接"
   },
+  "aiDisclaimer": "AI 生成内容仅供参考",
+  "aiDisclaimerDesktop": "AI 生成内容仅供参考，请核实关键成本信息。",
   "message": {
     "assistant": "Assistant",
     "copyContent": "复制内容",
@@ -49,10 +53,13 @@
   },
   "template": {
     "title": "💰 成本优化助手",
+    "mobileTitle": "成本优化助手",
+    "mobileDescription": "选择模板快速分析",
     "description": "选择模板快速分析 AWS/GCP 成本",
     "favoriteTemplates": "收藏的模板",
     "systemTemplates": "系统模板",
     "myTemplate": "我的",
+    "mobileLabel": "模板",
     "category": {
       "cost": "成本分析",
       "optimization": "优化建议",
@@ -74,14 +81,26 @@
   },
   "toolCall": {
     "calling": "调用中",
+    "callingTool": "调用工具: {{name}}",
+    "callingStatus": "执行中",
+    "successStatus": "完成",
+    "errorStatus": "失败",
     "success": "成功",
     "error": "失败",
+    "executing": "(正在执行...)",
+    "arguments": "📊 调用参数",
+    "resultLabel": "📊 返回结果",
+    "errorLabel": "❌ 错误信息",
+    "details": "详情",
     "duration": "耗时 {{seconds}}秒",
     "viewDetails": "查看详情",
     "hideDetails": "隐藏详情",
-    "arguments": "调用参数",
     "result": "返回结果",
     "errorInfo": "错误信息"
+  },
+  "accessibility": {
+    "back": "返回",
+    "closeSidebar": "关闭侧边栏"
   },
   "history": {
     "newChat": "新对话",
@@ -122,6 +141,9 @@
   },
   "cloudSelector": {
     "selectService": "选择云服务",
+    "mobileLabel": "云账号",
+    "loading": "正在加载云账号...",
+    "selectedCount": "已选 {{count}} 个账号",
     "accountsCount": "{{count}} 个账号",
     "remove": "移除",
     "back": "返回",
@@ -137,5 +159,8 @@
     "cacheRead": "缓存读取",
     "cacheWrite": "缓存写入",
     "cacheRate": "{{rate}}%"
+  },
+  "pagination": {
+    "total": "共 {{total}} 条"
   }
 }

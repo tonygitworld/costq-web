@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useI18n } from '../../hooks/useI18n';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 // 添加旋转动画样式
 const spinKeyframes = `
@@ -85,6 +86,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
     return initialSelectedAccountIds;
   };
 
+  const isMobile = useIsMobile();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>(loadSelectedAccounts());
   const [currentView, setCurrentView] = useState<ViewType>('providers');
@@ -173,7 +175,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
             borderRadius: '50%',
             animation: 'spin 1s linear infinite'
           }} />
-          <span>正在加载云账号...</span>
+          <span>{t('cloudSelector.loading')}</span>
         </div>
       );
     }
@@ -583,19 +585,93 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
     }
   };
 
+  // 移动端：紧凑图标按钮（云图标 + 选中数量徽章）
+  // 获取移动端显示文本
+  const getMobileLabel = () => {
+    if (selectedAccountsCount === 0) return t('cloudSelector.mobileLabel');
+    const allAccounts = [...(awsAccounts || []), ...(gcpAccounts || [])];
+    const firstSelected = allAccounts.find(acc => selectedAccountIds.includes(acc.id));
+    const name = firstSelected?.name || t('cloudSelector.mobileLabel');
+    const shortName = name.length > 6 ? name.slice(0, 6) + '…' : name;
+    if (selectedAccountsCount === 1) return shortName;
+    return `${shortName} +${selectedAccountsCount - 1}`;
+  };
+
+  const mobileTrigger = (
+    <button
+      className="mobile-capsule-btn"
+      title={selectedAccountsCount > 0 ? t('cloudSelector.selectedCount', { count: selectedAccountsCount }) : t('cloudSelector.selectService')}
+    >
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+      </svg>
+      <span>{getMobileLabel()}</span>
+    </button>
+  );
+
+  // 桌面端：完整下拉框
+  const desktopTrigger = (
+    <div
+      style={{
+        position: 'relative',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '180px',
+        height: '32px',
+        backgroundColor: loading ? '#f5f5f5' : '#ffffff',
+        border: `1px solid ${loading ? '#e0e0e0' : '#d9d9d9'}`,
+        borderRadius: '6px',
+        padding: '0 8px',
+        cursor: loading ? 'not-allowed' : 'pointer',
+        transition: 'all 0.2s',
+        boxShadow: '0 2px 0 rgba(0, 0, 0, 0.02)',
+        flexShrink: 0,
+        opacity: loading ? 0.7 : 1,
+      }}
+      onMouseEnter={(e) => {
+        if (!loading) {
+          e.currentTarget.style.borderColor = '#4096ff';
+          e.currentTarget.style.boxShadow = '0 0 0 2px rgba(5, 145, 255, 0.06)';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!loading) {
+          e.currentTarget.style.borderColor = '#d9d9d9';
+          e.currentTarget.style.boxShadow = '0 2px 0 rgba(0, 0, 0, 0.02)';
+        }
+      }}
+      title={loading ? t('cloudSelector.loading') : t('cloudSelector.selectService')}
+    >
+      {renderTriggerContent()}
+      <span style={{
+        marginLeft: '4px',
+        color: 'rgba(0, 0, 0, 0.25)',
+        fontSize: '12px',
+        transition: 'transform 0.3s',
+        transform: isPopoverOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+        display: 'inline-flex',
+        alignItems: 'center',
+      }}>
+        <svg viewBox="64 64 896 896" width="1em" height="1em" fill="currentColor" aria-hidden="true">
+          <path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path>
+        </svg>
+      </span>
+    </div>
+  );
+
   return (
     <Popover
       content={renderContent()}
       trigger="click"
       open={isPopoverOpen && !loading}
       onOpenChange={(visible) => {
-        if (loading) return; // 加载时不允许操作
+        if (loading) return;
         setIsPopoverOpen(visible);
         if (!visible) {
-          // 关闭时重置视图
           setCurrentView('providers');
           setSelectedProviderId(null);
-          setSearchKeyword(''); // 清空搜索关键词
+          setSearchKeyword('');
         }
       }}
       placement="top"
@@ -610,56 +686,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
         }
       }}
     >
-      {/* 触发按钮 */}
-      <div
-        style={{
-          position: 'relative',
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: '180px',              // 固定宽度
-          height: '32px',
-          backgroundColor: loading ? '#f5f5f5' : '#ffffff',
-          border: `1px solid ${loading ? '#e0e0e0' : '#d9d9d9'}`,
-          borderRadius: '6px',
-          padding: '0 8px',
-          cursor: loading ? 'not-allowed' : 'pointer',
-          transition: 'all 0.2s',
-          boxShadow: '0 2px 0 rgba(0, 0, 0, 0.02)',
-          flexShrink: 0,             // 防止被压缩
-          opacity: loading ? 0.7 : 1,
-        }}
-        onMouseEnter={(e) => {
-          if (!loading) {
-            e.currentTarget.style.borderColor = '#4096ff';
-            e.currentTarget.style.boxShadow = '0 0 0 2px rgba(5, 145, 255, 0.06)';
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!loading) {
-            e.currentTarget.style.borderColor = '#d9d9d9';
-            e.currentTarget.style.boxShadow = '0 2px 0 rgba(0, 0, 0, 0.02)';
-          }
-        }}
-        title={loading ? "正在加载云账号..." : "选择云服务"}
-      >
-        {renderTriggerContent()}
-
-        {/* 下拉箭头 - 使用 Ant Design 样式 */}
-        <span style={{
-          marginLeft: '4px',
-          color: 'rgba(0, 0, 0, 0.25)',
-          fontSize: '12px',
-          transition: 'transform 0.3s',
-          transform: isPopoverOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-          display: 'inline-flex',
-          alignItems: 'center',
-        }}>
-          <svg viewBox="64 64 896 896" width="1em" height="1em" fill="currentColor" aria-hidden="true">
-            <path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path>
-          </svg>
-        </span>
-      </div>
+      {isMobile ? mobileTrigger : desktopTrigger}
     </Popover>
   );
 };

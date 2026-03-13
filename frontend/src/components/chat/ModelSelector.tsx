@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Popover } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useModelStore } from '../../stores/modelStore';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import CheckmarkIcon from '../icons/CheckmarkIcon';
 
 // 添加旋转动画样式
@@ -43,6 +44,7 @@ export const ModelSelector: React.FC = () => {
   } = useModelStore();
 
   const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
+  const isMobile = useIsMobile();
 
   // 组件挂载时获取模型列表
   useEffect(() => {
@@ -53,25 +55,19 @@ export const ModelSelector: React.FC = () => {
 
   // 渲染触发按钮内容
   const renderTriggerContent = () => {
+    // Sparkles 图标（通用）
+    const sparklesIcon = (
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+      </svg>
+    );
+
     // 加载状态：显示加载动画和文本
     if (loading) {
       return (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          color: 'rgba(0, 0, 0, 0.45)',
-          fontSize: '13px'
-        }}>
-          <div style={{
-            width: '14px',
-            height: '14px',
-            border: '2px solid #f3f3f3',
-            borderTop: '2px solid #1890ff',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
-          }} />
-          <span>加载中...</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'rgba(0, 0, 0, 0.45)', fontSize: '13px' }}>
+          <div style={{ width: '14px', height: '14px', border: '2px solid #f3f3f3', borderTop: '2px solid #1890ff', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+          <span>{t('loading')}</span>
         </div>
       );
     }
@@ -79,14 +75,9 @@ export const ModelSelector: React.FC = () => {
     // 错误状态
     if (error) {
       return (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          color: 'rgba(0, 0, 0, 0.45)',
-          fontSize: '13px'
-        }}>
-          <span>加载失败</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'rgba(0, 0, 0, 0.45)', fontSize: '13px' }}>
+          {sparklesIcon}
+          <span>{t('loadFailed')}</span>
         </div>
       );
     }
@@ -94,16 +85,8 @@ export const ModelSelector: React.FC = () => {
     // 显示当前选中的模型名称
     if (selectedModel) {
       return (
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          color: 'rgba(0, 0, 0, 0.88)',
-          fontSize: '13px'
-        }}>
-          <svg viewBox="0 0 24 24" width="14px" height="14px" fill="currentColor" aria-hidden="true">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-          </svg>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'rgba(0, 0, 0, 0.88)', fontSize: '13px' }}>
+          {sparklesIcon}
           <span>{t(`${selectedModel.name}.name`)}</span>
         </div>
       );
@@ -111,13 +94,8 @@ export const ModelSelector: React.FC = () => {
 
     // 默认状态
     return (
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '6px',
-        color: 'rgba(0, 0, 0, 0.25)',
-        fontSize: '13px'
-      }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'rgba(0, 0, 0, 0.45)', fontSize: '13px' }}>
+        {sparklesIcon}
         <span>{t('selectModel')}</span>
       </div>
     );
@@ -134,7 +112,7 @@ export const ModelSelector: React.FC = () => {
     if (loading) {
       return (
         <div style={{ padding: '24px 16px', textAlign: 'center', color: '#999', fontSize: '13px' }}>
-          加载中...
+          {t('loading')}
         </div>
       );
     }
@@ -150,7 +128,7 @@ export const ModelSelector: React.FC = () => {
     if (models.length === 0) {
       return (
         <div style={{ padding: '24px 16px', textAlign: 'center', color: '#999', fontSize: '13px' }}>
-          暂无可用模型
+          {t('noModels')}
         </div>
       );
     }
@@ -208,6 +186,70 @@ export const ModelSelector: React.FC = () => {
     );
   };
 
+  // 移动端：胶囊标签按钮 (Sparkles ✨ + 模型名)
+  const mobileTrigger = (
+    <button
+      className="mobile-capsule-btn"
+      title={selectedModel ? t(`${selectedModel.name}.name`) : t('selectModel')}
+    >
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+      </svg>
+      <span>{selectedModel ? t(`${selectedModel.name}.name`) : t('mobileLabel')}</span>
+    </button>
+  );
+
+  // 桌面端：完整下拉框
+  const desktopTrigger = (
+    <div
+      style={{
+        position: 'relative',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '180px',
+        height: '32px',
+        backgroundColor: loading ? '#f5f5f5' : '#ffffff',
+        border: `1px solid ${loading ? '#e0e0e0' : '#d9d9d9'}`,
+        borderRadius: '6px',
+        padding: '0 8px',
+        cursor: loading ? 'not-allowed' : 'pointer',
+        transition: 'all 0.2s',
+        boxShadow: '0 2px 0 rgba(0, 0, 0, 0.02)',
+        flexShrink: 0,
+        opacity: loading ? 0.7 : 1,
+      }}
+      onMouseEnter={(e) => {
+        if (!loading) {
+          e.currentTarget.style.borderColor = '#4096ff';
+          e.currentTarget.style.boxShadow = '0 0 0 2px rgba(5, 145, 255, 0.06)';
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!loading) {
+          e.currentTarget.style.borderColor = '#d9d9d9';
+          e.currentTarget.style.boxShadow = '0 2px 0 rgba(0, 0, 0, 0.02)';
+        }
+      }}
+      title={loading ? t('loading') : t('selectModel')}
+    >
+      {renderTriggerContent()}
+      <span style={{
+        marginLeft: '4px',
+        color: 'rgba(0, 0, 0, 0.25)',
+        fontSize: '12px',
+        transition: 'transform 0.3s',
+        transform: isPopoverOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+        display: 'inline-flex',
+        alignItems: 'center',
+      }}>
+        <svg viewBox="64 64 896 896" width="1em" height="1em" fill="currentColor" aria-hidden="true">
+          <path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path>
+        </svg>
+      </span>
+    </div>
+  );
+
   return (
     <Popover
       content={renderContent()}
@@ -229,56 +271,7 @@ export const ModelSelector: React.FC = () => {
         }
       }}
     >
-      {/* 触发按钮 */}
-      <div
-        style={{
-          position: 'relative',
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: '180px',
-          height: '32px',
-          backgroundColor: loading ? '#f5f5f5' : '#ffffff',
-          border: `1px solid ${loading ? '#e0e0e0' : '#d9d9d9'}`,
-          borderRadius: '6px',
-          padding: '0 8px',
-          cursor: loading ? 'not-allowed' : 'pointer',
-          transition: 'all 0.2s',
-          boxShadow: '0 2px 0 rgba(0, 0, 0, 0.02)',
-          flexShrink: 0,
-          opacity: loading ? 0.7 : 1,
-        }}
-        onMouseEnter={(e) => {
-          if (!loading) {
-            e.currentTarget.style.borderColor = '#4096ff';
-            e.currentTarget.style.boxShadow = '0 0 0 2px rgba(5, 145, 255, 0.06)';
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!loading) {
-            e.currentTarget.style.borderColor = '#d9d9d9';
-            e.currentTarget.style.boxShadow = '0 2px 0 rgba(0, 0, 0, 0.02)';
-          }
-        }}
-        title={loading ? "加载中..." : t('selectModel')}
-      >
-        {renderTriggerContent()}
-
-        {/* 下拉箭头 */}
-        <span style={{
-          marginLeft: '4px',
-          color: 'rgba(0, 0, 0, 0.25)',
-          fontSize: '12px',
-          transition: 'transform 0.3s',
-          transform: isPopoverOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-          display: 'inline-flex',
-          alignItems: 'center',
-        }}>
-          <svg viewBox="64 64 896 896" width="1em" height="1em" fill="currentColor" aria-hidden="true">
-            <path d="M884 256h-75c-5.1 0-9.9 2.5-12.9 6.6L512 654.2 227.9 262.6c-3-4.1-7.8-6.6-12.9-6.6h-75c-6.5 0-10.3 7.4-6.5 12.7l352.6 486.1c12.8 17.6 39 17.6 51.7 0l352.6-486.1c3.9-5.3.1-12.7-6.4-12.7z"></path>
-          </svg>
-        </span>
-      </div>
+      {isMobile ? mobileTrigger : desktopTrigger}
     </Popover>
   );
 };

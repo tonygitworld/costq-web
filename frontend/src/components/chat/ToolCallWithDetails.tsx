@@ -5,6 +5,8 @@ import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { type ToolCallData } from '../../types/chat';
 import { ToolCallSummary } from './ToolCallSummary';
 import { JsonDisplay } from './JsonDisplay';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import { useI18n } from '../../hooks/useI18n';
 
 interface ToolCallWithDetailsProps {
   toolCall: ToolCallData;
@@ -14,15 +16,17 @@ export const ToolCallWithDetails: FC<ToolCallWithDetailsProps> = ({ toolCall }) 
   // ✨ 调用中时自动展开，完成后可折叠
   const [showDetails, setShowDetails] = useState(false);
   const isCalling = toolCall.status === 'calling';
+  const isMobile = useIsMobile();
+  const { t } = useI18n('chat');
 
   // ✅ 修复：检查是否真的有内容（空对象不算有内容）
   const hasArgs = toolCall.args && Object.keys(toolCall.args).length > 0;
-  const hasDetails = hasArgs || toolCall.result || toolCall.error;
+  const hasDetails = hasArgs || toolCall.result || toolCall.error || (isMobile && toolCall.description);
 
   // 🔧 修改：不自动展开，只有用户点击时才显示详情
   const shouldShowDetails = hasDetails && showDetails;
 
-  // 详情按钮（只在完成后显示）
+  // 详情按钮
   const detailsButton = hasDetails && !isCalling ? (
     <Button
       type="text"
@@ -30,50 +34,78 @@ export const ToolCallWithDetails: FC<ToolCallWithDetailsProps> = ({ toolCall }) 
       onClick={() => setShowDetails(!showDetails)}
       icon={showDetails ? <UpOutlined /> : <DownOutlined />}
       style={{
-        fontSize: '12px',
+        fontSize: isMobile ? '11px' : '12px',
         color: '#667eea',
-        height: '24px',
-        padding: '0 8px'
+        height: isMobile ? '22px' : '24px',
+        padding: isMobile ? '0 4px' : '0 8px',
       }}
     >
-      详情
+      {isMobile ? '' : t('toolCall.details')}
     </Button>
   ) : null;
+
+  // 移动端详情面板样式
+  const detailsPanelStyle = isMobile ? {
+    marginTop: '4px',
+    padding: '8px 10px',
+    backgroundColor: '#f9fafb',
+    borderRadius: '6px',
+    border: '1px solid #e5e5e5',
+    fontSize: '12px',
+  } : {
+    marginTop: '8px',
+    padding: '12px',
+    backgroundColor: '#fafafa',
+    borderRadius: '6px',
+    border: '1px solid #e8e8e8',
+  };
+
+  const labelStyle = isMobile ? {
+    fontSize: '12px',
+    fontWeight: 600 as const,
+    marginBottom: '4px',
+    color: '#595959',
+    display: 'flex' as const,
+    alignItems: 'center' as const,
+    gap: '4px',
+  } : {
+    fontSize: '13px',
+    fontWeight: 600 as const,
+    marginBottom: '8px',
+    color: '#595959',
+    display: 'flex' as const,
+    alignItems: 'center' as const,
+    gap: '6px',
+  };
 
   return (
     <div>
       {/* 工具调用摘要（包含详情按钮）*/}
-      <ToolCallSummary toolCall={toolCall} detailsButton={detailsButton} />
+      <ToolCallSummary toolCall={toolCall} detailsButton={detailsButton} expanded={showDetails} />
 
       {/* 详情展开内容 - 调用中自动显示，完成后可折叠 */}
       {shouldShowDetails && (
-        <div style={{
-          marginTop: '8px',
-          padding: '12px',
-          backgroundColor: '#fafafa',
-          borderRadius: '6px',
-          border: '1px solid #e8e8e8'
-        }}>
+        <div style={detailsPanelStyle}>
+          {/* 移动端展开时显示描述（排除与工具名重复的描述） */}
+          {isMobile && toolCall.description && toolCall.description !== `调用工具: ${toolCall.name}` && (
+            <div style={{
+              marginBottom: (hasArgs || toolCall.result || toolCall.error) ? '10px' : '0',
+              color: '#595959',
+              fontSize: '12px',
+              lineHeight: 1.5,
+            }}>
+              {toolCall.description}
+            </div>
+          )}
+
           {/* 调用参数 - 仅当有非空参数时显示 */}
           {toolCall.args && Object.keys(toolCall.args).length > 0 && (
-            <div style={{ marginBottom: toolCall.result || toolCall.error ? '16px' : '0' }}>
-              <div style={{
-                fontSize: '13px',
-                fontWeight: 600,
-                marginBottom: '8px',
-                color: '#595959',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}>
-                📊 调用参数
+            <div style={{ marginBottom: toolCall.result || toolCall.error ? (isMobile ? '10px' : '16px') : '0' }}>
+              <div style={labelStyle}>
+                {t('toolCall.arguments')}
                 {isCalling && (
-                  <span style={{
-                    fontSize: '12px',
-                    color: '#1890ff',
-                    fontWeight: 'normal'
-                  }}>
-                    (正在执行...)
+                  <span style={{ fontSize: '12px', color: '#1890ff', fontWeight: 'normal' }}>
+                    {t('toolCall.executing')}
                   </span>
                 )}
               </div>
@@ -84,13 +116,8 @@ export const ToolCallWithDetails: FC<ToolCallWithDetailsProps> = ({ toolCall }) 
           {/* 返回结果 - 只在有结果时显示 */}
           {toolCall.result && !isCalling && (
             <div>
-              <div style={{
-                fontSize: '13px',
-                fontWeight: 600,
-                marginBottom: '8px',
-                color: '#595959'
-              }}>
-                📊 返回结果
+              <div style={labelStyle}>
+                {t('toolCall.resultLabel')}
               </div>
               <JsonDisplay data={toolCall.result} />
             </div>
@@ -99,21 +126,17 @@ export const ToolCallWithDetails: FC<ToolCallWithDetailsProps> = ({ toolCall }) 
           {/* 错误信息 */}
           {toolCall.error && (
             <div>
-              <div style={{
-                fontSize: '13px',
-                fontWeight: 600,
-                marginBottom: '8px',
-                color: '#ff4d4f'
-              }}>
-                ❌ 错误信息
+              <div style={{ ...labelStyle, color: '#ff4d4f' }}>
+                {t('toolCall.errorLabel')}
               </div>
               <div style={{
-                padding: '8px 12px',
+                padding: isMobile ? '6px 8px' : '8px 12px',
                 backgroundColor: '#fff2f0',
                 borderRadius: '4px',
                 color: '#ff4d4f',
-                fontSize: '13px',
-                fontFamily: 'Monaco, Consolas, monospace'
+                fontSize: isMobile ? '12px' : '13px',
+                fontFamily: 'Monaco, Consolas, monospace',
+                wordBreak: 'break-word' as const,
               }}>
                 {toolCall.error}
               </div>

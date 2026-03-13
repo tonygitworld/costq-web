@@ -3,6 +3,9 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Form, Input, Button, App as AntdApp } from 'antd';
 import { Mail, Lock } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
+import { useChatStore } from '../../stores/chatStore';
+import { useAccountStore } from '../../stores/accountStore';
+import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import { UnauthorizedError, ForbiddenError, ApiClientError } from '../../services/errors';
 import { useI18n } from '../../hooks/useI18n';
 import { AuthLayout } from './AuthLayout';
@@ -15,6 +18,7 @@ const EnterpriseLoginForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const login = useAuthStore((state) => state.login);
+  const { loadFromStorage } = useChatStore();
   const { t } = useI18n('auth');
   const { message, modal } = AntdApp.useApp();
 
@@ -31,8 +35,18 @@ const EnterpriseLoginForm: React.FC = () => {
     setLoading(true);
     try {
       await login(values.email, values.password);
+
+      // 登录成功后加载用户数据
+      await loadFromStorage();
+      const { fetchAccounts: fetchAWSAccounts } = useAccountStore.getState();
+      const { fetchAccounts: fetchGCPAccounts } = useGCPAccountStore.getState();
+      await Promise.all([
+        fetchAWSAccounts().catch(() => {}),
+        fetchGCPAccounts().catch(() => {}),
+      ]);
+
       message.success(t('login.success.login'));
-      navigate('/chat');
+      navigate('/');
     } catch (error: unknown) {
       // 通过 ApiClientError.code 判断错误类型
       const errorCode = error instanceof ApiClientError ? error.code : undefined;

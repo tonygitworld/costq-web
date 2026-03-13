@@ -1,0 +1,281 @@
+/**
+ * 移动端设置子页面全局适配样式
+ *
+ * 所有规则在 @media (max-width: 600px) 内，不影响桌面端。
+ * 覆盖 Ant Design 组件默认样式，确保设置子页面在手机端无水平溢出。
+ *
+ * 需求: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7
+ */
+
+@media (max-width: 600px) {
+
+  /* ===== 1. 所有设置子页面容器：防止水平溢出 ===== */
+  /* 需求 5.7 */
+  [style*="padding: '24px'"],
+  [style*="padding: 24px"],
+  div[style*="maxWidth"] {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  /* 通用页面容器（UserProfile, ChangePassword, CloudAccount, UserManagement, Ops 页面） */
+  .ant-space {
+    max-width: 100vw;
+  }
+
+  /* ===== 2. 个人资料页面（UserProfile）：单列布局 ===== */
+  /* 需求 5.1 */
+
+  /* 头像和名称区域：移动端垂直排列 */
+  .ant-card .ant-space-vertical {
+    width: 100% !important;
+  }
+
+  /* Ant Design Descriptions 组件单列适配 */
+  .ant-descriptions {
+    width: 100% !important;
+  }
+
+  .ant-descriptions-view {
+    overflow-x: hidden !important;
+  }
+
+  .ant-descriptions-row {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .ant-descriptions-item {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 8px 12px !important;
+    width: 100% !important;
+  }
+
+  .ant-descriptions-item-label {
+    width: auto !important;
+    min-width: unset !important;
+    font-weight: 500;
+  }
+
+  .ant-descriptions-item-content {
+    width: 100% !important;
+    word-break: break-word;
+  }
+
+  /* bordered 模式下的 table 布局修正 */
+  .ant-descriptions.ant-descriptions-bordered .ant-descriptions-view {
+    display: block !important;
+  }
+
+  .ant-descriptions.ant-descriptions-bordered .ant-descriptions-view > table {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .ant-descriptions.ant-descriptions-bordered .ant-descriptions-view > table > tbody {
+    display: block !important;
+  }
+
+  .ant-descriptions.ant-descriptions-bordered .ant-descriptions-row {
+    display: flex !important;
+    flex-direction: column !important;
+    border: none !important;
+  }
+
+  .ant-descriptions.ant-descriptions-bordered .ant-descriptions-item-label,
+  .ant-descriptions.ant-descriptions-bordered .ant-descriptions-item-content {
+    display: block !important;
+    border: none !important;
+    padding: 6px 12px !important;
+  }
+
+  .ant-descriptions.ant-descriptions-bordered .ant-descriptions-item-label {
+    background-color: #fafafa !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+  }
+
+  /* ===== 3. 修改密码页面（ChangePassword）：单列布局 ===== */
+  /* 需求 5.2 */
+
+  .ant-form {
+    width: 100% !important;
+  }
+
+  .ant-form-item {
+    width: 100% !important;
+  }
+
+  .ant-input-password,
+  .ant-input-affix-wrapper {
+    width: 100% !important;
+  }
+
+
+  /* ===== 4. 云账号管理页面：服务商卡片响应式布局 ===== */
+  /* 需求 5.3 */
+
+  /* Row/Col 响应式：云服务商选择区域全宽 */
+  .ant-row {
+    flex-wrap: wrap !important;
+  }
+
+  /* ===== 5. 表格子页面：水平滚动支持 ===== */
+  /* 需求 5.4 - 用户管理、AWS/GCP 账号管理、租户管理、审计日志、Token 用量 */
+
+  .ant-table-wrapper {
+    overflow-x: auto !important;
+    max-width: 100vw !important;
+  }
+
+  .ant-table {
+    min-width: unset !important;
+  }
+
+  .ant-table-container {
+    overflow-x: auto !important;
+  }
+
+  /* 表格外层 Card 容器也需要防溢出 */
+  .ant-card {
+    max-width: 100vw !important;
+    overflow: hidden !important;
+  }
+
+  .ant-card-body {
+    overflow-x: auto !important;
+    padding: 12px !important;
+  }
+
+  /* 表格操作栏在移动端垂直排列 */
+  .ant-card-body > .ant-space[style*="justifyContent"] {
+    flex-wrap: wrap !important;
+  }
+
+  /* 搜索框在移动端全宽 */
+  .ant-input-affix-wrapper[style*="width: 300px"],
+  .ant-input-search[style*="width: 240px"],
+  .ant-input[style*="width: 180px"] {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* 筛选栏 Space wrap 在移动端全宽 */
+  .ant-space-wrap {
+    width: 100% !important;
+  }
+
+  .ant-space-wrap > .ant-space-item {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  /* Select 筛选器在移动端自适应宽度 */
+  .ant-select[style*="width: 120px"],
+  .ant-select[style*="width: 160px"],
+  .ant-select[style*="width: 200px"],
+  .ant-select[style*="width: 240px"] {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* DatePicker 在移动端自适应 */
+  .ant-picker-range {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* ===== 6. 运营 Dashboard：统计卡片响应式布局 ===== */
+  /* 需求 5.6 */
+
+  /* 统计卡片：每行 1-2 个 */
+  .ant-col[class*="ant-col-6"],
+  .ant-col[class*="ant-col-5"],
+  .ant-col[class*="ant-col-4"] {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+  }
+
+  /* 租户状态概览：每行 1 个 */
+  .ant-col[class*="ant-col-12"] {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Statistic 组件文字不截断 */
+  .ant-statistic-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 12px !important;
+  }
+
+  .ant-statistic-content {
+    font-size: 20px !important;
+  }
+
+  .ant-statistic-content-value {
+    font-size: 20px !important;
+  }
+
+  /* Dashboard 标题栏在移动端垂直排列 */
+  div[style*="justifyContent: 'space-between'"],
+  div[style*="justify-content: space-between"] {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  /* Segmented 控件在移动端不溢出 */
+  .ant-segmented {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+  }
+
+  /* ===== 7. 顶部返回按钮和标题栏不被截断 ===== */
+  /* 需求 5.5 */
+
+  .ant-typography h3,
+  .ant-typography h4 {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .ant-btn-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  /* Tabs 在移动端可滚动 */
+  .ant-tabs-nav {
+    max-width: 100vw !important;
+    overflow-x: auto !important;
+  }
+
+  /* Token 用量页面：汇总卡片每行 2 个 */
+  .ant-col.ant-col-5 {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+  }
+
+  .ant-col.ant-col-4 {
+    flex: 0 0 50% !important;
+    max-width: 50% !important;
+  }
+
+  /* 分页器在移动端简化 */
+  .ant-pagination {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 4px !important;
+  }
+
+  .ant-pagination-total-text {
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
+    margin-bottom: 4px !important;
+  }
+
+}

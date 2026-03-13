@@ -1,5 +1,9 @@
 {
   "selectModel": "选择模型",
+  "loading": "加载中...",
+  "loadFailed": "加载失败",
+  "noModels": "暂无可用模型",
+  "mobileLabel": "模型",
   "sonnet46": {
     "name": "Claude Sonnet 4.6",
     "description": "最新旗舰模型，推理能力最强"

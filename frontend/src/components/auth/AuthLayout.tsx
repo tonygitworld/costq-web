@@ -9,7 +9,6 @@ interface AuthLayoutProps {
   showLanguageSwitcher?: boolean;
   showBackButton?: boolean;
   backTo?: string;
-  onBack?: () => void;
 }
 
 export const AuthLayout: React.FC<AuthLayoutProps> = ({
@@ -17,38 +16,30 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({
   showLanguageSwitcher = true,
   showBackButton = true,
   backTo = '/',
-  onBack,
 }) => {
   const navigate = useNavigate();
 
-  const handleBack = () => {
-    if (onBack) {
-      onBack();
-    } else {
-      navigate(backTo);
-    }
-  };
-
   return (
     <div className={styles.container}>
-      <div className={styles.overlay} aria-hidden="true" />
+      {/* 纯 CSS 静态背景 */}
+      <div className={styles.gradientBg} aria-hidden="true" />
+      <div className={styles.glowOrb1} aria-hidden="true" />
+      <div className={styles.glowOrb2} aria-hidden="true" />
 
       <div className={styles.content}>
         {children}
       </div>
 
       {showLanguageSwitcher && (
-        <div className={styles.languageSwitcherWrapper}>
-          <div className={styles.languageSwitcherCard}>
-            <LanguageSwitcher showIcon={false} showText={true} />
-          </div>
+        <div className={styles.languageSwitcher}>
+          <LanguageSwitcher showFlag={false} />
         </div>
       )}
 
       {showBackButton && (
         <button
           className={styles.backButton}
-          onClick={handleBack}
+          onClick={() => navigate(backTo)}
           aria-label="Back"
           type="button"
         >

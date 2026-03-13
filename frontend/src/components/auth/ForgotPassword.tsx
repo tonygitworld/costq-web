@@ -6,7 +6,7 @@ import { useI18n } from '../../hooks/useI18n';
 import { AuthLayout } from './AuthLayout';
 import { FormCard } from './FormCard';
 import { authApi } from '../../services/api/authApi';
-import { getErrorCode, getErrorMessage } from '../../utils/ErrorHandler';
+import { getErrorMessage } from '../../utils/ErrorHandler';
 import styles from './ForgotPassword.module.css';
 
 const ForgotPasswordForm: React.FC = () => {
@@ -84,18 +84,9 @@ const ForgotPasswordForm: React.FC = () => {
   const handleVerifyCode = async () => {
     try {
       await form.validateFields(['verification_code']);
-      const code = form.getFieldValue('verification_code');
-      setLoading(true);
-      await authApi.verifyResetCode(email, code);
       setStep(3);
-    } catch (error: any) {
-      if (error?.errorFields) return;
-      form.setFields([{
-        name: 'verification_code',
-        errors: [getErrorMessage(error, t('forgotPassword.errors.invalidCode'))],
-      }]);
-    } finally {
-      setLoading(false);
+    } catch {
+      // form validation error
     }
   };
 
@@ -110,25 +101,7 @@ const ForgotPasswordForm: React.FC = () => {
       setStep(4);
     } catch (error: any) {
       if (error?.errorFields) return;
-      // 验证码错误时跳回step2并在验证码输入框显示错误
-      const errMsg = getErrorMessage(error, t('forgotPassword.errors.resetFailed'));
-      const errorCode = getErrorCode(error);
-      const isCodeError = errorCode === 'CODE_MISMATCH'
-        || errorCode === 'CODE_EXPIRED'
-        || errorCode === 'CODE_NOT_FOUND'
-        || errorCode === 'CODE_USED'
-        || errorCode === 'MAX_ATTEMPTS_EXCEEDED';
-      if (isCodeError) {
-        setStep(2);
-        setTimeout(() => {
-          form.setFields([{
-            name: 'verification_code',
-            errors: [errMsg],
-          }]);
-        }, 100);
-      } else {
-        message.error(errMsg);
-      }
+      message.error(getErrorMessage(error, t('forgotPassword.errors.resetFailed')));
     } finally {
       setLoading(false);
     }
@@ -178,7 +151,7 @@ const ForgotPasswordForm: React.FC = () => {
         >
           <Input
             prefix={<Mail size={18} className={styles.inputIcon} />}
-            placeholder={t('forgotPassword.emailPlaceholder')}
+            placeholder={t('login.emailPlaceholder')}
             size="large"
             className={styles.formInput}
             autoComplete="email"
@@ -306,18 +279,8 @@ const ForgotPasswordForm: React.FC = () => {
     </>
   );
 
-  const handleBack = () => {
-    if (step === 1) {
-      navigate('/login');
-    } else if (step === 2) {
-      setStep(1);
-    } else if (step === 3) {
-      setStep(2);
-    }
-  };
-
   return (
-    <AuthLayout showBackButton={step !== 4} onBack={handleBack}>
+    <AuthLayout showBackButton={true} backTo="/login">
       <FormCard>
         {step === 1 && renderEmailStep()}
         {step === 2 && renderCodeStep()}
