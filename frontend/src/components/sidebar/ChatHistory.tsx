@@ -289,14 +289,21 @@ export const ChatHistory: FC = () => {
 
       {isSelectionMode && (
         <div style={{
-          backgroundColor: 'rgba(0, 0, 0, 0.04)',
+          backgroundColor: '#f7f8fa',
+          padding: '0 0 8px 0',
+          marginBottom: '4px',
+          position: 'sticky',
+          top: '36px',
+          zIndex: 9,
+        }} onClick={(e) => e.stopPropagation()}>
+        <div style={{
+          backgroundColor: 'rgba(0, 0, 0, 0.06)',
           padding: '10px 12px',
           borderRadius: '6px',
-          marginBottom: '12px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
-        }} onClick={(e) => e.stopPropagation()}>
+        }}>
           <Space size={8}>
             <Checkbox
               checked={selectedChats.length === chatList.length}
@@ -337,6 +344,7 @@ export const ChatHistory: FC = () => {
           >
             删除
           </Button>
+        </div>
         </div>
       )}
 
