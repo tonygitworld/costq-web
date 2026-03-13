@@ -233,7 +233,10 @@ export const ChatHistory: FC = () => {
                 type="text"
                 size="small"
                 icon={<CheckSquareOutlined />}
-                onClick={toggleSelectionMode}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleSelectionMode();
+                }}
                 style={{
                   color: 'rgba(255,255,255,0.65)',
                   fontSize: '12px',
@@ -245,7 +248,10 @@ export const ChatHistory: FC = () => {
                 type="text"
                 size="small"
                 icon={<DeleteOutlined />}
-                onClick={handleClearAll}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleClearAll();
+                }}
                 style={{
                   color: 'rgba(255,255,255,0.65)',
                   fontSize: '12px',
@@ -259,7 +265,10 @@ export const ChatHistory: FC = () => {
               type="text"
               size="small"
               icon={<CloseSquareOutlined />}
-              onClick={toggleSelectionMode}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleSelectionMode();
+              }}
               style={{
                 color: 'rgba(255,255,255,0.65)',
                 fontSize: '12px',
