@@ -77,3 +77,10 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
+
+/* 移动端：防止 iOS Safari 整页橡皮筋弹跳 */
+@media (max-width: 768px) {
+  html, body {
+    overscroll-behavior: none;
+  }
+}

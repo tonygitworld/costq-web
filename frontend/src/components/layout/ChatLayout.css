@@ -205,6 +205,11 @@
     z-index: 1;
   }
 
+  /* 防止 Layout.Content 在移动端溢出导致橡皮筋效果 */
+  .chat-layout-main .ant-layout-content {
+    overflow: hidden;
+  }
+
   /* 移动端 Drawer 隐藏（已被 MobileSidebar 替代） */
   .chat-layout-drawer {
     display: none;

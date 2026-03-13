@@ -132,6 +132,8 @@
   height: 100dvh;
   background-color: #ffffff;
   padding-top: calc(56px + env(safe-area-inset-top));
+  overflow: hidden; /* 防止整体容器滚动，避免 iOS 橡皮筋效果露出底部内容 */
+  overscroll-behavior: none; /* 禁止过度滚动 */
 }
 
 /* 消息区域：占满剩余空间，可滚动 */
@@ -140,11 +142,13 @@
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain; /* 防止滚动链传播到父容器 */
   position: relative;
   display: flex;
   flex-direction: column;
   scrollbar-width: thin;
   scrollbar-color: rgba(0,0,0,0.1) transparent;
+  min-height: 0; /* flex 子元素需要 min-height:0 才能正确收缩 */
 }
 
 /* 欢迎模式：禁用滚动，启用 flex 居中 */
@@ -152,6 +156,8 @@
   overflow: hidden;
   justify-content: center;
   align-items: center;
+  touch-action: none; /* 防止 iOS 触摸拖动导致页面弹跳 */
+  overscroll-behavior: none;
 }
 
 .mobile-message-area::-webkit-scrollbar {
@@ -169,6 +175,8 @@
   padding: 8px 12px;
   background-color: #ffffff;
   padding-bottom: max(8px, env(safe-area-inset-bottom));
+  position: relative; /* 确保在正常文档流中，不被滚动影响 */
+  z-index: 10;
 }
 
 /* 移动端输入框内部样式覆盖 */
