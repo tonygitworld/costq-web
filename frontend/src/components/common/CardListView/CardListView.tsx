@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Spin, Empty, Pagination, Button } from 'antd';
 import './CardListView.css';
 
@@ -84,6 +84,26 @@ export function CardListView<T>({
   emptyText,
 }: CardListViewProps<T>) {
   const allData = dataSource ?? [];
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // 页码变化时，找到最近的可滚动父容器并滚到顶部
+  useEffect(() => {
+    if (!pagination || !containerRef.current) return;
+    // 向上遍历 DOM 找到第一个声明了 overflow auto/scroll 的祖先（不管当前是否有滚动条）
+    let el: HTMLElement | null = containerRef.current.parentElement;
+    while (el && el !== document.body) {
+      const { overflowY, overflow } = window.getComputedStyle(el);
+      const isScrollable = (overflowY === 'auto' || overflowY === 'scroll' || overflow === 'auto' || overflow === 'scroll');
+      if (isScrollable) {
+        el.scrollTop = 0;
+        return;
+      }
+      el = el.parentElement;
+    }
+    // 兜底：滚动 window
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination ? pagination.current : null]);
 
   // 在组件内部做分页切片，确保只渲染当前页的数据
   const data = pagination
@@ -168,7 +188,9 @@ export function CardListView<T>({
 
   return (
     <Spin spinning={loading}>
-      {content}
+      <div ref={containerRef}>
+        {content}
+      </div>
       {pagination && (
         <div className="card-list-view-pagination">
           <Pagination
