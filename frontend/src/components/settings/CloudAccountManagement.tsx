@@ -194,8 +194,8 @@ export const CloudAccountManagement: React.FC = () => {
   return (
     <div style={{
       padding: isMobile ? 0 : '24px',
-      minHeight: '100vh',
-      maxHeight: '100vh',
+      minHeight: isMobile ? '100dvh' : '100vh',
+      maxHeight: isMobile ? '100dvh' : '100vh',
       overflow: isMobile ? 'hidden' : 'auto',
       display: 'flex',
       flexDirection: 'column'
@@ -243,7 +243,7 @@ export const CloudAccountManagement: React.FC = () => {
             </div>
           </div>
           {/* 内容区 */}
-          <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px' }}>
+          <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px', paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}>
             {renderContent()}
           </div>
         </div>

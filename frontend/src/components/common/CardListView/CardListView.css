@@ -138,6 +138,7 @@
   display: flex;
   justify-content: center;
   margin-top: 16px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
 }
 
 /* --- Empty State --- */

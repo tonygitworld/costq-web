@@ -362,7 +362,7 @@ export const UserManagement: React.FC = () => {
   return (
     <div style={{
       padding: isMobile ? 0 : '24px',
-      height: '100vh',
+      height: isMobile ? '100dvh' : '100vh',
       overflow: isMobile ? 'hidden' : 'auto',
       backgroundColor: isMobile ? '#f5f5f5' : '#f0f2f5',
       display: isMobile ? 'flex' : 'block',
@@ -411,7 +411,7 @@ export const UserManagement: React.FC = () => {
             </div>
           </div>
           {/* 卡片列表 */}
-          <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px' }}>
+          <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px', paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}>
             <CardListView<UserData>
               dataSource={filteredUsers}
               rowKey="id"
