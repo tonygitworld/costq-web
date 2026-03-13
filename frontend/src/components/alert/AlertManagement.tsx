@@ -406,7 +406,7 @@ export const AlertManagement: React.FC = () => {
           flex: 1,
           overflow: 'auto',
           padding: '12px 16px',
-          paddingBottom: 'max(100px, calc(env(safe-area-inset-bottom) + 80px))',
+          paddingBottom: 'max(24px, env(safe-area-inset-bottom))',
         }}>
           <CardListView<Alert>
             dataSource={filteredAlerts}

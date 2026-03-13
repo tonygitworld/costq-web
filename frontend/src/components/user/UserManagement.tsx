@@ -395,7 +395,7 @@ export const UserManagement: React.FC = () => {
             </div>
           </MobilePageHeader>
           {/* 卡片列表 */}
-          <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px', paddingBottom: 'max(100px, calc(env(safe-area-inset-bottom) + 80px))' }}>
+          <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px', paddingBottom: 'max(24px, env(safe-area-inset-bottom))' }}>
             <CardListView<UserData>
               dataSource={filteredUsers}
               rowKey="id"

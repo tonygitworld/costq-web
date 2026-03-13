@@ -84,7 +84,7 @@ export const ChangePassword: React.FC = () => {
         <MobilePageHeader title={t('changePassword.title')} onBack={handleBack} />
 
         {/* 可滚动内容 */}
-        <div style={{ flex: 1, overflow: 'auto', padding: '16px', paddingBottom: 'max(100px, calc(env(safe-area-inset-bottom) + 80px))' }}>
+        <div style={{ flex: 1, overflow: 'auto', padding: '16px', paddingBottom: 'max(24px, env(safe-area-inset-bottom))' }}>
           <Card style={{ borderRadius: 12, border: '1px solid #eaecf0', boxShadow: '0 1px 3px rgba(16,24,40,0.06)' }}>
             <Form
               form={form}
