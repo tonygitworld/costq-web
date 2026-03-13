@@ -86,7 +86,7 @@ export const UserProfile: React.FC = () => {
         <MobilePageHeader title={t('profile.title')} onBack={handleBack} />
 
         {/* 可滚动内容 */}
-        <div style={{ flex: 1, overflow: 'auto', padding: '16px' }}>
+        <div style={{ flex: 1, overflow: 'auto', padding: '16px', paddingBottom: 'max(24px, env(safe-area-inset-bottom))' }}>
           {/* 头像卡片 */}
           <div style={{
             background: '#fff',
