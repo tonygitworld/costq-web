@@ -35,6 +35,7 @@ import { usePagination } from '../../hooks/usePagination';
 import { useI18n } from '../../hooks/useI18n';
 import { AWSStyleTable } from '../common/AWSStyleTable';
 import { CardListView, type CardField, type CardAction } from '../common/CardListView';
+import { MobilePageHeader } from '../common/MobilePageHeader';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { TruncateText } from '../common/TruncateText';
 import { CollapsibleDescription } from '../common/CollapsibleDescription';
@@ -361,32 +362,9 @@ export const AlertManagement: React.FC = () => {
         overflow: 'hidden',
       }}>
         {/* 顶部工具栏 */}
-        <div style={{
-          flexShrink: 0,
-          background: 'linear-gradient(to bottom, #ffffff, #fafbfc)',
-          boxShadow: '0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.04)',
-          zIndex: 10,
-        }}>
-          {/* 第一行：返回 + 标题 */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            padding: '12px 16px 8px',
-          }}>
-            <Button
-              icon={<ArrowLeftOutlined />}
-              onClick={() => navigate('/')}
-              type="text"
-              size="small"
-              style={{ color: '#344054', width: 32, height: 32, borderRadius: 8 }}
-            />
-            <span style={{ fontSize: 17, fontWeight: 700, color: '#101828', letterSpacing: '-0.01em' }}>
-              {t('title')}
-            </span>
-          </div>
-
+        <MobilePageHeader title={t('title')} onBack={() => navigate('/')}>
           {/* 搜索 + 筛选区域 */}
-          <div style={{ padding: '0 16px 12px' }}>
+          <div>
             <Input
               placeholder={t('filter.searchPlaceholder')}
               prefix={<SearchOutlined style={{ color: '#98a2b3' }} />}
@@ -394,78 +372,34 @@ export const AlertManagement: React.FC = () => {
               onChange={(e) => setSearchText(e.target.value)}
               allowClear
               size="middle"
-              style={{
-                borderRadius: 10,
-                backgroundColor: '#f2f4f7',
-                border: '1px solid transparent',
-                marginBottom: 8,
-                height: 36,
-              }}
+              style={{ borderRadius: 10, backgroundColor: '#f2f4f7', border: '1px solid transparent', marginBottom: 8, height: 36 }}
             />
             <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
-              <Select
-                value={statusFilter}
-                onChange={setStatusFilter}
-                size="middle"
-                variant="filled"
-                style={{ flex: 1 }}
-              >
+              <Select value={statusFilter} onChange={setStatusFilter} size="middle" variant="filled" style={{ flex: 1 }}>
                 <Select.Option value="all">{t('filter.allStatus')}</Select.Option>
                 <Select.Option value="active">{t('filter.enabled')}</Select.Option>
                 <Select.Option value="inactive">{t('filter.disabled')}</Select.Option>
               </Select>
-              <Select
-                value={creatorFilter}
-                onChange={setCreatorFilter}
-                size="middle"
-                variant="filled"
-                style={{ flex: 1 }}
-              >
+              <Select value={creatorFilter} onChange={setCreatorFilter} size="middle" variant="filled" style={{ flex: 1 }}>
                 <Select.Option value="all">{t('filter.allCreators')}</Select.Option>
                 <Select.Option value="me">{t('filter.createdByMe')}</Select.Option>
               </Select>
             </div>
-
-            {/* 操作按钮行 */}
             <div style={{ display: 'flex', gap: 8 }}>
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={loadAlerts}
-                loading={loading}
-                size="small"
-                style={{ flex: 1, borderRadius: 8, height: 32, color: '#344054' }}
-              >
+              <Button icon={<ReloadOutlined />} onClick={loadAlerts} loading={loading} size="small" style={{ flex: 1, borderRadius: 8, height: 32, color: '#344054' }}>
                 {t('refresh')}
               </Button>
               {isAdmin && (
-                <Button
-                  icon={<PlayCircleOutlined />}
-                  onClick={handleManualTrigger}
-                  loading={triggering}
-                  size="small"
-                  style={{ flex: 1, borderRadius: 8, height: 32, color: '#344054' }}
-                >
+                <Button icon={<PlayCircleOutlined />} onClick={handleManualTrigger} loading={triggering} size="small" style={{ flex: 1, borderRadius: 8, height: 32, color: '#344054' }}>
                   {t('button.checkNow')}
                 </Button>
               )}
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                onClick={() => navigate('/settings/alerts/new')}
-                size="small"
-                style={{
-                  flex: 1,
-                  borderRadius: 8,
-                  height: 32,
-                  fontWeight: 500,
-                  boxShadow: '0 1px 2px rgba(21, 112, 239, 0.3)',
-                }}
-              >
+              <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/settings/alerts/new')} size="small" style={{ flex: 1, borderRadius: 8, height: 32, fontWeight: 500, boxShadow: '0 1px 2px rgba(21, 112, 239, 0.3)' }}>
                 {t('create')}
               </Button>
             </div>
           </div>
-        </div>
+        </MobilePageHeader>
 
         {/* 卡片列表区域 - 可滚动 */}
         <div style={{

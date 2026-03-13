@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Space, Tag, Typography, Input, Modal, Form, message, Select, App } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, ArrowLeftOutlined, KeyOutlined } from '@ant-design/icons';
+import { MobilePageHeader } from '../common/MobilePageHeader';
 import { useNavigate } from 'react-router-dom';
 import type { ColumnsType } from 'antd/es/table';
 // useAuthStore - 保留用于未来权限控制扩展
@@ -371,25 +372,8 @@ export const UserManagement: React.FC = () => {
       {isMobile ? (
         <>
           {/* 移动端顶部栏 */}
-          <div style={{
-            flexShrink: 0,
-            background: 'linear-gradient(to bottom, #ffffff, #fafbfc)',
-            boxShadow: '0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.04)',
-            zIndex: 10,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px 8px' }}>
-              <Button
-                icon={<ArrowLeftOutlined />}
-                onClick={handleBack}
-                type="text"
-                size="small"
-                style={{ color: '#344054', width: 32, height: 32, borderRadius: 8 }}
-              />
-              <span style={{ fontSize: 17, fontWeight: 700, color: '#101828', letterSpacing: '-0.01em' }}>
-                {t('management.title')}
-              </span>
-            </div>
-            <div style={{ padding: '0 16px 12px', display: 'flex', gap: 8 }}>
+          <MobilePageHeader title={t('management.title')} onBack={handleBack}>
+            <div style={{ display: 'flex', gap: 8 }}>
               <Input
                 placeholder={t('form.searchPlaceholder')}
                 prefix={<SearchOutlined style={{ color: '#98a2b3' }} />}
@@ -409,7 +393,7 @@ export const UserManagement: React.FC = () => {
                 {t('management.addUser')}
               </Button>
             </div>
-          </div>
+          </MobilePageHeader>
           {/* 卡片列表 */}
           <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px', paddingBottom: 'max(100px, calc(env(safe-area-inset-bottom) + 80px))' }}>
             <CardListView<UserData>

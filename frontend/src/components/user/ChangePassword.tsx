@@ -7,6 +7,7 @@ import { useI18n } from '../../hooks/useI18n';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { apiClient } from '../../services/apiClient';
 import { getErrorMessage } from '../../utils/ErrorHandler';
+import { MobilePageHeader } from '../common/MobilePageHeader';
 
 const { Title } = Typography;
 
@@ -80,25 +81,7 @@ export const ChangePassword: React.FC = () => {
         overflow: 'hidden',
       }}>
         {/* 顶部栏 */}
-        <div style={{
-          flexShrink: 0,
-          background: 'linear-gradient(to bottom, #ffffff, #fafbfc)',
-          boxShadow: '0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.04)',
-          zIndex: 10,
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px' }}>
-            <Button
-              icon={<ArrowLeftOutlined />}
-              onClick={handleBack}
-              type="text"
-              size="small"
-              style={{ color: '#344054', width: 32, height: 32, borderRadius: 8 }}
-            />
-            <span style={{ fontSize: 17, fontWeight: 700, color: '#101828', letterSpacing: '-0.01em' }}>
-              {t('changePassword.title')}
-            </span>
-          </div>
-        </div>
+        <MobilePageHeader title={t('changePassword.title')} onBack={handleBack} />
 
         {/* 可滚动内容 */}
         <div style={{ flex: 1, overflow: 'auto', padding: '16px', paddingBottom: 'max(100px, calc(env(safe-area-inset-bottom) + 80px))' }}>

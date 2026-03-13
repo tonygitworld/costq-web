@@ -32,6 +32,7 @@ import { useI18n } from '../../hooks/useI18n';
 import { AWSStyleTable } from '../common/AWSStyleTable';
 import { CardListView, type CardField } from '../common/CardListView';
 import { CollapsibleDescription } from '../common/CollapsibleDescription';
+import { MobilePageHeader } from '../common/MobilePageHeader';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { TruncateText } from '../common/TruncateText';
 import type { AlertHistory } from '../../types/alert';
@@ -298,70 +299,23 @@ export const AlertDetail: React.FC = () => {
         overflow: 'hidden',
       }}>
         {/* 顶部栏 */}
-        <div style={{
-          flexShrink: 0,
-          background: 'linear-gradient(to bottom, #ffffff, #fafbfc)',
-          boxShadow: '0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.04)',
-          zIndex: 10,
-        }}>
-          {/* 返回 + 标题 */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            padding: '12px 16px 8px',
-          }}>
-            <Button
-              icon={<ArrowLeftOutlined />}
-              onClick={() => navigate('/settings/alerts')}
-              type="text"
-              size="small"
-              style={{ color: '#344054', width: 32, height: 32, borderRadius: 8 }}
-            />
-            <span style={{
-              fontSize: 17,
-              fontWeight: 700,
-              color: '#101828',
-              letterSpacing: '-0.01em',
-              flex: 1,
-              minWidth: 0,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}>
-              {currentAlert.display_name}
-            </span>
-          </div>
-
+        <MobilePageHeader
+          title={currentAlert.display_name}
+          onBack={() => navigate('/settings/alerts')}
+        >
           {/* 操作按钮 */}
-          <div style={{ display: 'flex', gap: 8, padding: '0 16px 12px' }}>
-            <Button
-              icon={<EditOutlined />}
-              onClick={() => navigate(`/settings/alerts/edit/${id}`)}
-              size="small"
-              style={{ flex: 1, borderRadius: 8, height: 32, color: '#344054' }}
-            >
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Button icon={<EditOutlined />} onClick={() => navigate(`/settings/alerts/edit/${id}`)} size="small" style={{ flex: 1, borderRadius: 8, height: 32, color: '#344054' }}>
               {t('edit')}
             </Button>
-            <Button
-              icon={<SendOutlined />}
-              onClick={handleTest}
-              loading={savingAlert}
-              size="small"
-              style={{ flex: 1, borderRadius: 8, height: 32, color: '#344054' }}
-            >
+            <Button icon={<SendOutlined />} onClick={handleTest} loading={savingAlert} size="small" style={{ flex: 1, borderRadius: 8, height: 32, color: '#344054' }}>
               {t('test')}
             </Button>
-            <Button
-              danger
-              icon={<DeleteOutlined />}
-              onClick={handleDelete}
-              size="small"
-              style={{ flex: 1, borderRadius: 8, height: 32 }}
-            >
+            <Button danger icon={<DeleteOutlined />} onClick={handleDelete} size="small" style={{ flex: 1, borderRadius: 8, height: 32 }}>
               {t('delete')}
             </Button>
           </div>
-        </div>
+        </MobilePageHeader>
 
         {/* 可滚动内容区 */}
         <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px', paddingBottom: 40 }}>

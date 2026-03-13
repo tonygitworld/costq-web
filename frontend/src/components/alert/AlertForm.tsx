@@ -18,6 +18,7 @@ import { ArrowLeftOutlined, SaveOutlined, SendOutlined } from '@ant-design/icons
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAlertStore } from '../../stores/alertStore';
 import { useAuthStore } from '../../stores/authStore';
+import { MobilePageHeader } from '../common/MobilePageHeader';
 import { useAccountStore } from '../../stores/accountStore';
 import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import { useI18n } from '../../hooks/useI18n';
@@ -184,25 +185,10 @@ export const AlertForm: React.FC = () => {
       }}>
         {/* 标题 */}
         {isMobile ? (
-          <div style={{
-            flexShrink: 0,
-            background: 'linear-gradient(to bottom, #ffffff, #fafbfc)',
-            boxShadow: '0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.04)',
-            zIndex: 10,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px 12px' }}>
-              <Button
-                icon={<ArrowLeftOutlined />}
-                onClick={() => navigate('/settings/alerts')}
-                type="text"
-                size="small"
-                style={{ color: '#344054', width: 32, height: 32, borderRadius: 8 }}
-              />
-              <span style={{ fontSize: 17, fontWeight: 700, color: '#101828', letterSpacing: '-0.01em' }}>
-                📝 {isEdit ? t('edit') : t('create')}
-              </span>
-            </div>
-          </div>
+          <MobilePageHeader
+            title={`📝 ${isEdit ? t('edit') : t('create')}`}
+            onBack={() => navigate('/settings/alerts')}
+          />
         ) : (
           <Space>
             <Button
