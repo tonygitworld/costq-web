@@ -171,6 +171,166 @@ export const AlertForm: React.FC = () => {
     }
   };
 
+  // ========== 移动端布局 ==========
+  if (isMobile) {
+    return (
+      <div style={{
+        height: '100dvh',
+        display: 'flex',
+        flexDirection: 'column',
+        backgroundColor: '#f5f5f5',
+        overflow: 'hidden',
+      }}>
+        {/* 顶部栏 */}
+        <MobilePageHeader
+          title={`📝 ${isEdit ? t('edit') : t('create')}`}
+          onBack={() => navigate('/settings/alerts')}
+        />
+
+        {/* 可滚动内容区 */}
+        <div style={{
+          flex: 1,
+          overflow: 'auto',
+          padding: '12px 12px',
+          paddingBottom: 'max(16px, env(safe-area-inset-bottom))',
+        }}>
+          <Space direction="vertical" size={12} style={{ width: '100%' }}>
+            <Card title={t('card.basicInfo')} size="small">
+              <Form form={form} layout="vertical" autoComplete="off" size="small">
+                <Form.Item
+                  label={t('form.name')}
+                  name="display_name"
+                  rules={[
+                    { required: true, message: t('form.nameRequired') },
+                    { max: 50, message: t('form.nameMaxLength', { max: 50 }) }
+                  ]}
+                  style={{ marginBottom: 12 }}
+                >
+                  <Input placeholder={t('form.namePlaceholder')} maxLength={50} />
+                </Form.Item>
+
+                <Alert message={t('tips.nameHint')} type="info" showIcon style={{ marginBottom: 12, fontSize: 12 }} />
+
+                <Form.Item
+                  label={t('form.account')}
+                  name="account_id"
+                  rules={[{ required: true, message: t('form.accountRequired') }]}
+                  style={{ marginBottom: 12 }}
+                >
+                  <Select
+                    placeholder={t('form.accountPlaceholder')}
+                    showSearch
+                    optionFilterProp="children"
+                    filterOption={(input, option) =>
+                      (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                    }
+                    options={[
+                      ...awsAccounts.map(account => ({
+                        value: account.id,
+                        label: `☁️ ${t('account.aws')} - ${account.alias || account.account_id}`,
+                        account
+                      })),
+                      ...gcpAccounts.map(account => ({
+                        value: account.id,
+                        label: `🔵 ${t('account.gcp')} - ${account.account_name || account.project_id}`,
+                        account
+                      }))
+                    ]}
+                  />
+                </Form.Item>
+
+                <Alert message={t('tips.accountHint')} type="info" showIcon style={{ marginBottom: 12, fontSize: 12 }} />
+
+                <Form.Item
+                  label={t('form.description')}
+                  name="description"
+                  rules={[
+                    { required: true, message: t('form.descriptionRequired') },
+                    { min: 10, message: t('form.descriptionMinLength', { min: 10 }) }
+                  ]}
+                  style={{ marginBottom: 12 }}
+                >
+                  <TextArea placeholder={t('form.descriptionPlaceholder')} rows={4} maxLength={500} showCount />
+                </Form.Item>
+
+                <Alert message={t('tips.descriptionHint')} type="info" showIcon style={{ marginBottom: 0, fontSize: 12 }} />
+              </Form>
+            </Card>
+
+            <Card title={t('card.examples')} size="small">
+              <div style={{ fontSize: 13 }}>
+                <Paragraph style={{ marginBottom: 8 }}>
+                  <Text type="secondary">{t('examples.title')}</Text>
+                </Paragraph>
+                <ul style={{ paddingLeft: 16, margin: 0 }}>
+                  <li style={{ marginBottom: 4 }}><Text code style={{ fontSize: 12 }}>{t('examples.ec2Cost')}</Text></li>
+                  <li style={{ marginBottom: 4 }}><Text code style={{ fontSize: 12 }}>{t('examples.riCoverage')}</Text></li>
+                  <li style={{ marginBottom: 4 }}><Text code style={{ fontSize: 12 }}>{t('examples.unusedEbs')}</Text></li>
+                  <li><Text code style={{ fontSize: 12 }}>{t('examples.s3Growth')}</Text></li>
+                </ul>
+              </div>
+            </Card>
+
+            <Card size="small">
+              <Alert
+                message={t('card.systemInfo')}
+                description={
+                  <ul style={{ paddingLeft: 16, marginBottom: 0, fontSize: 12 }}>
+                    <li>{t('systemInfo.checkFrequency')}</li>
+                    <li>{t('systemInfo.executionTime')}</li>
+                    <li>{t('systemInfo.notificationMethod')}</li>
+                    <li>{t('systemInfo.aiParsing')}</li>
+                  </ul>
+                }
+                type="info"
+                showIcon
+              />
+            </Card>
+          </Space>
+        </div>
+
+        {/* 底部按钮栏 — flex-shrink: 0，始终可见，不遮挡内容 */}
+        <div style={{
+          flexShrink: 0,
+          background: '#fff',
+          borderTop: '1px solid #f0f0f0',
+          boxShadow: '0 -2px 8px rgba(0,0,0,0.08)',
+          padding: '8px 12px',
+          paddingBottom: 'max(8px, env(safe-area-inset-bottom))',
+        }}>
+          <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+            <Button size="small" onClick={() => navigate('/settings/alerts')} style={{ fontSize: 12, padding: '0 8px' }}>
+              {t('cancel')}
+            </Button>
+            <Space size={6}>
+              <Button
+                type="default"
+                size="small"
+                icon={<SendOutlined />}
+                onClick={() => handleSave(true)}
+                loading={savingAlert}
+                style={{ fontSize: 12, padding: '0 8px' }}
+              >
+                {t('button.saveAndTest')}
+              </Button>
+              <Button
+                type="primary"
+                size="small"
+                icon={<SaveOutlined />}
+                onClick={() => handleSave(false)}
+                loading={savingAlert}
+                style={{ fontSize: 12, padding: '0 8px' }}
+              >
+                {t('save')}
+              </Button>
+            </Space>
+          </Space>
+        </div>
+      </div>
+    );
+  }
+
+  // ========== 桌面端布局 ==========
   return (
     <div style={{
       height: '100vh',
@@ -178,216 +338,131 @@ export const AlertForm: React.FC = () => {
       background: '#f0f2f5',
       position: 'relative'
     }}>
-      <Space direction="vertical" size={isMobile ? 12 : 'large'} style={{
+      <Space direction="vertical" size="large" style={{
         width: '100%',
-        padding: isMobile ? '0' : '24px',
+        padding: '24px',
         paddingBottom: 0
       }}>
-        {/* 标题 */}
-        {isMobile ? (
-          <MobilePageHeader
-            title={`📝 ${isEdit ? t('edit') : t('create')}`}
-            onBack={() => navigate('/settings/alerts')}
-          />
-        ) : (
-          <Space>
-            <Button
-              icon={<ArrowLeftOutlined />}
-              onClick={() => navigate('/settings/alerts')}
-            >
-              {t('back')}
-            </Button>
-            <Title level={3}>
-              📝 {isEdit ? t('edit') : t('create')}
-            </Title>
-          </Space>
-        )}
-
-      {/* 表单 */}
-      <div style={isMobile ? { padding: '0 12px' } : undefined}>
-      <Card title={t('card.basicInfo')} size={isMobile ? 'small' : 'default'}>
-        <Form
-          form={form}
-          layout="vertical"
-          autoComplete="off"
-          size={isMobile ? 'small' : 'middle'}
-        >
-          <Form.Item
-            label={t('form.name')}
-            name="display_name"
-            rules={[
-              { required: true, message: t('form.nameRequired') },
-              { max: 50, message: t('form.nameMaxLength', { max: 50 }) }
-            ]}
-            style={isMobile ? { marginBottom: 12 } : undefined}
-          >
-            <Input
-              placeholder={t('form.namePlaceholder')}
-              maxLength={50}
-            />
-          </Form.Item>
-
-          <Alert
-            message={t('tips.nameHint')}
-            type="info"
-            showIcon
-            style={{ marginBottom: isMobile ? 12 : 16, fontSize: isMobile ? 12 : undefined }}
-          />
-
-          {/* ✅ 新增：账号选择 */}
-          <Form.Item
-            label={t('form.account')}
-            name="account_id"
-            rules={[
-              { required: true, message: t('form.accountRequired') }
-            ]}
-            style={isMobile ? { marginBottom: 12 } : undefined}
-          >
-            <Select
-              placeholder={t('form.accountPlaceholder')}
-              showSearch
-              optionFilterProp="children"
-              filterOption={(input, option) =>
-                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-              }
-              options={[
-                // AWS 账号
-                ...awsAccounts.map(account => ({
-                  value: account.id,
-                  label: `☁️ ${t('account.aws')} - ${account.alias || account.account_id}`,
-                  account
-                })),
-                // GCP 账号
-                ...gcpAccounts.map(account => ({
-                  value: account.id,
-                  label: `🔵 ${t('account.gcp')} - ${account.account_name || account.project_id}`,
-                  account
-                }))
-              ]}
-            />
-          </Form.Item>
-
-          <Alert
-            message={t('tips.accountHint')}
-            type="info"
-            showIcon
-            style={{ marginBottom: isMobile ? 12 : 16, fontSize: isMobile ? 12 : undefined }}
-          />
-
-          <Form.Item
-            label={t('form.description')}
-            name="description"
-            rules={[
-              { required: true, message: t('form.descriptionRequired') },
-              { min: 10, message: t('form.descriptionMinLength', { min: 10 }) }
-            ]}
-            style={isMobile ? { marginBottom: 12 } : undefined}
-          >
-            <TextArea
-              placeholder={t('form.descriptionPlaceholder')}
-              rows={isMobile ? 4 : 6}
-              maxLength={500}
-              showCount
-            />
-          </Form.Item>
-
-          <Alert
-            message={t('tips.descriptionHint')}
-            type="info"
-            showIcon
-            style={{ marginBottom: isMobile ? 8 : 16, fontSize: isMobile ? 12 : undefined }}
-          />
-        </Form>
-      </Card>
-
-      {/* 示例卡片 */}
-      <Card title={t('card.examples')} size={isMobile ? 'small' : 'default'}>
-        <div style={isMobile ? { fontSize: 13 } : undefined}>
-          <Paragraph style={isMobile ? { marginBottom: 8 } : undefined}>
-            <Text type="secondary">{t('examples.title')}</Text>
-          </Paragraph>
-          <ul style={{ paddingLeft: isMobile ? 16 : 20, margin: 0 }}>
-            <li style={isMobile ? { marginBottom: 4 } : undefined}>
-              <Text code style={isMobile ? { fontSize: 12 } : undefined}>{t('examples.ec2Cost')}</Text>
-            </li>
-            <li style={isMobile ? { marginBottom: 4 } : undefined}>
-              <Text code style={isMobile ? { fontSize: 12 } : undefined}>{t('examples.riCoverage')}</Text>
-            </li>
-            <li style={isMobile ? { marginBottom: 4 } : undefined}>
-              <Text code style={isMobile ? { fontSize: 12 } : undefined}>{t('examples.unusedEbs')}</Text>
-            </li>
-            <li>
-              <Text code style={isMobile ? { fontSize: 12 } : undefined}>{t('examples.s3Growth')}</Text>
-            </li>
-          </ul>
-        </div>
-      </Card>
-
-      {/* 系统说明 */}
-      <Card size={isMobile ? 'small' : 'default'}>
-        <Alert
-          message={t('card.systemInfo')}
-          description={
-            <ul style={{ paddingLeft: isMobile ? 16 : 20, marginBottom: 0, fontSize: isMobile ? 12 : undefined }}>
-              <li>{t('systemInfo.checkFrequency')}</li>
-              <li>{t('systemInfo.executionTime')}</li>
-              <li>{t('systemInfo.notificationMethod')}</li>
-              <li>{t('systemInfo.aiParsing')}</li>
-            </ul>
-          }
-          type="info"
-          showIcon
-        />
-      </Card>
-      </div>
-
-      {/* 操作按钮 - 固定在底部 */}
-      <div style={{
-        position: 'sticky',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        background: '#fff',
-        padding: isMobile ? '8px 12px' : '16px 24px',
-        paddingBottom: isMobile ? 'max(8px, env(safe-area-inset-bottom))' : '16px',
-        borderTop: '1px solid #f0f0f0',
-        boxShadow: '0 -2px 8px rgba(0,0,0,0.08)',
-        zIndex: 100,
-        marginLeft: isMobile ? 0 : '-24px',
-        marginRight: isMobile ? 0 : '-24px',
-        marginBottom: isMobile ? 0 : '-24px'
-      }}>
-        <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-          <Button size={isMobile ? 'small' : 'middle'} onClick={() => navigate('/settings/alerts')}
-            style={isMobile ? { fontSize: 12, padding: '0 8px' } : undefined}
-          >
-            {t('cancel')}
+        <Space>
+          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/settings/alerts')}>
+            {t('back')}
           </Button>
-          <Space size={isMobile ? 6 : 8}>
-            <Button
-              type="default"
-              size={isMobile ? 'small' : 'middle'}
-              icon={<SendOutlined />}
-              onClick={() => handleSave(true)}
-              loading={savingAlert}
-              style={isMobile ? { fontSize: 12, padding: '0 8px' } : undefined}
-            >
-              {isMobile ? '测试' : t('button.saveAndTest')}
-            </Button>
-            <Button
-              type="primary"
-              size={isMobile ? 'small' : 'middle'}
-              icon={<SaveOutlined />}
-              onClick={() => handleSave(false)}
-              loading={savingAlert}
-              style={isMobile ? { fontSize: 12, padding: '0 8px' } : undefined}
-            >
-              {t('save')}
-            </Button>
-          </Space>
+          <Title level={3}>
+            📝 {isEdit ? t('edit') : t('create')}
+          </Title>
         </Space>
-      </div>
-    </Space>
+
+        <Card title={t('card.basicInfo')}>
+          <Form form={form} layout="vertical" autoComplete="off">
+            <Form.Item
+              label={t('form.name')}
+              name="display_name"
+              rules={[
+                { required: true, message: t('form.nameRequired') },
+                { max: 50, message: t('form.nameMaxLength', { max: 50 }) }
+              ]}
+            >
+              <Input placeholder={t('form.namePlaceholder')} maxLength={50} />
+            </Form.Item>
+
+            <Alert message={t('tips.nameHint')} type="info" showIcon style={{ marginBottom: 16 }} />
+
+            <Form.Item
+              label={t('form.account')}
+              name="account_id"
+              rules={[{ required: true, message: t('form.accountRequired') }]}
+            >
+              <Select
+                placeholder={t('form.accountPlaceholder')}
+                showSearch
+                optionFilterProp="children"
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
+                options={[
+                  ...awsAccounts.map(account => ({
+                    value: account.id,
+                    label: `☁️ ${t('account.aws')} - ${account.alias || account.account_id}`,
+                    account
+                  })),
+                  ...gcpAccounts.map(account => ({
+                    value: account.id,
+                    label: `🔵 ${t('account.gcp')} - ${account.account_name || account.project_id}`,
+                    account
+                  }))
+                ]}
+              />
+            </Form.Item>
+
+            <Alert message={t('tips.accountHint')} type="info" showIcon style={{ marginBottom: 16 }} />
+
+            <Form.Item
+              label={t('form.description')}
+              name="description"
+              rules={[
+                { required: true, message: t('form.descriptionRequired') },
+                { min: 10, message: t('form.descriptionMinLength', { min: 10 }) }
+              ]}
+            >
+              <TextArea placeholder={t('form.descriptionPlaceholder')} rows={6} maxLength={500} showCount />
+            </Form.Item>
+
+            <Alert message={t('tips.descriptionHint')} type="info" showIcon style={{ marginBottom: 16 }} />
+          </Form>
+        </Card>
+
+        <Card title={t('card.examples')}>
+          <Paragraph><Text type="secondary">{t('examples.title')}</Text></Paragraph>
+          <ul style={{ paddingLeft: 20, margin: 0 }}>
+            <li><Text code>{t('examples.ec2Cost')}</Text></li>
+            <li><Text code>{t('examples.riCoverage')}</Text></li>
+            <li><Text code>{t('examples.unusedEbs')}</Text></li>
+            <li><Text code>{t('examples.s3Growth')}</Text></li>
+          </ul>
+        </Card>
+
+        <Card>
+          <Alert
+            message={t('card.systemInfo')}
+            description={
+              <ul style={{ paddingLeft: 20, marginBottom: 0 }}>
+                <li>{t('systemInfo.checkFrequency')}</li>
+                <li>{t('systemInfo.executionTime')}</li>
+                <li>{t('systemInfo.notificationMethod')}</li>
+                <li>{t('systemInfo.aiParsing')}</li>
+              </ul>
+            }
+            type="info"
+            showIcon
+          />
+        </Card>
+
+        {/* 操作按钮 - sticky 底部 */}
+        <div style={{
+          position: 'sticky',
+          bottom: 0,
+          background: '#fff',
+          padding: '16px 24px',
+          borderTop: '1px solid #f0f0f0',
+          boxShadow: '0 -2px 8px rgba(0,0,0,0.08)',
+          zIndex: 100,
+          marginLeft: '-24px',
+          marginRight: '-24px',
+          marginBottom: '-24px'
+        }}>
+          <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+            <Button onClick={() => navigate('/settings/alerts')}>{t('cancel')}</Button>
+            <Space size={8}>
+              <Button type="default" icon={<SendOutlined />} onClick={() => handleSave(true)} loading={savingAlert}>
+                {t('button.saveAndTest')}
+              </Button>
+              <Button type="primary" icon={<SaveOutlined />} onClick={() => handleSave(false)} loading={savingAlert}>
+                {t('save')}
+              </Button>
+            </Space>
+          </Space>
+        </div>
+      </Space>
     </div>
   );
 };
