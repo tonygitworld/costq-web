@@ -289,12 +289,16 @@ export const ChatHistory: FC = () => {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
-        }}>
+        }} onClick={(e) => e.stopPropagation()}>
           <Space size={8}>
             <Checkbox
               checked={selectedChats.length === chatList.length}
               indeterminate={selectedChats.length > 0 && selectedChats.length < chatList.length}
-              onChange={toggleSelectAll}
+              onChange={(e) => {
+                e.stopPropagation?.();
+                toggleSelectAll();
+              }}
+              onClick={(e) => e.stopPropagation()}
               style={{ color: 'rgba(255,255,255,0.85)' }}
             >
               <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: '12px' }}>
@@ -311,7 +315,10 @@ export const ChatHistory: FC = () => {
             size="small"
             danger
             icon={<DeleteOutlined />}
-            onClick={handleDeleteSelected}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDeleteSelected();
+            }}
             disabled={selectedChats.length === 0}
             style={{
               fontSize: '12px',
