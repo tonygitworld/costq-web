@@ -48,6 +48,21 @@ export const UserManagement: React.FC = () => {
   const { paginationProps } = usePagination(10);
   const isMobile = useIsMobile();
 
+  // 处理返回按钮
+  const handleBack = () => {
+    if (isMobile) {
+      // 手机端：返回到设置页面
+      navigate('/settings', { replace: true });
+    } else {
+      // 桌面端：返回到历史记录或首页
+      if (window.history.length > 1) {
+        navigate(-1);
+      } else {
+        navigate('/');
+      }
+    }
+  };
+
   // const { logout } = useAuthStore();
 
   // 删除用户功能 - 自动刷新 Token
@@ -365,7 +380,7 @@ export const UserManagement: React.FC = () => {
             <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px 8px' }}>
               <Button
                 icon={<ArrowLeftOutlined />}
-                onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
+                onClick={handleBack}
                 type="text"
                 size="small"
                 style={{ color: '#344054', width: 32, height: 32, borderRadius: 8 }}
@@ -416,13 +431,7 @@ export const UserManagement: React.FC = () => {
         {/* 返回按钮 */}
         <Button
           icon={<ArrowLeftOutlined />}
-          onClick={() => {
-            if (window.history.length > 1) {
-              navigate(-1);
-            } else {
-              navigate('/');
-            }
-          }}
+          onClick={handleBack}
           type="text"
         >
           {t('common:button.back')}

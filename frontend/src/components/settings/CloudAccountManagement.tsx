@@ -34,6 +34,17 @@ export const CloudAccountManagement: React.FC = () => {
 
   const [selectedProvider, setSelectedProvider] = useState<CloudProvider>('aws');
 
+  // 处理返回按钮
+  const handleBack = () => {
+    if (isMobile) {
+      // 手机端：返回到设置页面
+      navigate('/settings', { replace: true });
+    } else {
+      // 桌面端：返回到首页
+      navigate('/');
+    }
+  };
+
   // 组件挂载时获取账号数量
   useEffect(() => {
     // ✅ 优化：顺序加载而非并行加载，减少并发请求压力
@@ -202,7 +213,7 @@ export const CloudAccountManagement: React.FC = () => {
             <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px 8px' }}>
               <Button
                 icon={<ArrowLeftOutlined />}
-                onClick={() => navigate('/')}
+                onClick={handleBack}
                 type="text"
                 size="small"
                 style={{ color: '#344054', width: 32, height: 32, borderRadius: 8 }}
@@ -249,7 +260,7 @@ export const CloudAccountManagement: React.FC = () => {
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <Button
               icon={<ArrowLeftOutlined />}
-              onClick={() => navigate('/')}
+              onClick={handleBack}
               type="text"
             >
               {t('common:button.back')}
