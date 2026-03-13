@@ -42,8 +42,6 @@
   margin: 0;
   line-height: 1.2;
   letter-spacing: -0.01em;
-  text-align: center;
-  padding: 0 16px;
   word-break: break-word;
 
   /* 动画：右 -> 左 */
@@ -55,6 +53,7 @@
   .welcome-title-serif {
     font-size: 1.6rem;
     padding: 0 8px;
+    text-align: center;
   }
 }
 
