@@ -200,7 +200,6 @@ export function CardListView<T>({
             onChange={pagination.onChange}
             showTotal={pagination.showTotal}
             size="small"
-            hideOnSinglePage
             showSizeChanger
             pageSizeOptions={['5', '10', '20', '50']}
           />
