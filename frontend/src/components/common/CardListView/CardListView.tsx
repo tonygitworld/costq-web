@@ -83,9 +83,17 @@ export function CardListView<T>({
   pagination,
   emptyText,
 }: CardListViewProps<T>) {
-  const data = dataSource ?? [];
+  const allData = dataSource ?? [];
 
-  const content = data.length === 0 ? (
+  // 在组件内部做分页切片，确保只渲染当前页的数据
+  const data = pagination
+    ? allData.slice(
+        (pagination.current - 1) * pagination.pageSize,
+        pagination.current * pagination.pageSize
+      )
+    : allData;
+
+  const content = allData.length === 0 ? (
     <div className="card-list-view-empty">
       <Empty description={emptyText} />
     </div>
@@ -171,6 +179,8 @@ export function CardListView<T>({
             showTotal={pagination.showTotal}
             size="small"
             hideOnSinglePage
+            showSizeChanger
+            pageSizeOptions={['5', '10', '20', '50']}
           />
         </div>
       )}
