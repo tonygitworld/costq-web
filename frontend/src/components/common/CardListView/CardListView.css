@@ -135,14 +135,10 @@
 
 /* --- Pagination --- */
 .card-list-view-pagination {
-  position: sticky;
-  bottom: 0;
   display: flex;
   justify-content: center;
   margin-top: 16px;
-  padding: 10px 0 max(12px, env(safe-area-inset-bottom));
-  background: #fff;
-  border-top: 1px solid #f2f4f7;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
 }
 
 /* --- Empty State --- */
