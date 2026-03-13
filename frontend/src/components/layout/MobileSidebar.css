@@ -112,12 +112,10 @@
 /* ===== ChatHistory 区域 ===== */
 .mobile-sidebar-history {
   flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  overscroll-behavior: contain;
   min-height: 0;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* ===== 底部分隔线 ===== */
