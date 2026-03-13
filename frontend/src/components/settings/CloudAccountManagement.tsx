@@ -243,7 +243,7 @@ export const CloudAccountManagement: React.FC = () => {
             </div>
           </div>
           {/* 内容区 */}
-          <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px', paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}>
+          <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px', paddingBottom: 'max(100px, calc(env(safe-area-inset-bottom) + 80px))' }}>
             {renderContent()}
           </div>
         </div>
