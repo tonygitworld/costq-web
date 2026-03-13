@@ -318,7 +318,7 @@ export const AlertDetail: React.FC = () => {
         </MobilePageHeader>
 
         {/* 可滚动内容区 */}
-        <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px', paddingBottom: 'max(24px, env(safe-area-inset-bottom))' }}>
+        <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px', paddingBottom: '12px' }}>
           {/* 统计概览 - 2x2 网格 */}
           <div style={{
             display: 'grid',

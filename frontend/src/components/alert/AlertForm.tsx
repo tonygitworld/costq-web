@@ -181,7 +181,7 @@ export const AlertForm: React.FC = () => {
       <Space direction="vertical" size={isMobile ? 12 : 'large'} style={{
         width: '100%',
         padding: isMobile ? '0' : '24px',
-        paddingBottom: 'max(24px, env(safe-area-inset-bottom))'
+        paddingBottom: 0
       }}>
         {/* 标题 */}
         {isMobile ? (
@@ -349,6 +349,7 @@ export const AlertForm: React.FC = () => {
         right: 0,
         background: '#fff',
         padding: isMobile ? '8px 12px' : '16px 24px',
+        paddingBottom: isMobile ? 'max(8px, env(safe-area-inset-bottom))' : '16px',
         borderTop: '1px solid #f0f0f0',
         boxShadow: '0 -2px 8px rgba(0,0,0,0.08)',
         zIndex: 100,
