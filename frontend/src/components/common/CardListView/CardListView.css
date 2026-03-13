@@ -138,7 +138,7 @@
   display: flex;
   justify-content: center;
   margin-top: 16px;
-  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
 }
 
 /* --- Empty State --- */

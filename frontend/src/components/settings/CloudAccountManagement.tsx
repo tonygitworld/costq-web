@@ -225,7 +225,7 @@ export const CloudAccountManagement: React.FC = () => {
             />
           </MobilePageHeader>
           {/* 内容区 */}
-          <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px', paddingBottom: 'max(24px, env(safe-area-inset-bottom))' }}>
+          <div style={{ flex: 1, overflow: 'auto', padding: '12px 16px', paddingBottom: '12px' }}>
             {renderContent()}
           </div>
         </div>
