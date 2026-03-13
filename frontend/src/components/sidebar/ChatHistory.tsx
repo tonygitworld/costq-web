@@ -215,7 +215,14 @@ export const ChatHistory: FC = () => {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: '16px'
+        marginBottom: '16px',
+        position: 'sticky',
+        top: 0,
+        zIndex: 10,
+        backgroundColor: '#f7f8fa',
+        paddingTop: '4px',
+        paddingBottom: '4px',
+        marginTop: '-4px',
       }}>
         <Text style={{
           color: 'rgba(255,255,255,0.75)',
