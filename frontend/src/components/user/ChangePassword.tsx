@@ -4,6 +4,7 @@ import { ArrowLeftOutlined, LockOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { useI18n } from '../../hooks/useI18n';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import { apiClient } from '../../services/apiClient';
 import { getErrorMessage } from '../../utils/ErrorHandler';
 
@@ -23,6 +24,22 @@ export const ChangePassword: React.FC = () => {
   const { logout } = useAuthStore();
   const { t } = useI18n(['user', 'common']);
   const { modal, message } = App.useApp();
+  const isMobile = useIsMobile();
+
+  // 处理返回按钮
+  const handleBack = () => {
+    if (isMobile) {
+      // 手机端：返回到设置页面
+      navigate('/settings', { replace: true });
+    } else {
+      // 桌面端：返回到历史记录或首页
+      if (window.history.length > 1) {
+        navigate(-1);
+      } else {
+        navigate('/');
+      }
+    }
+  };
 
   const handleSubmit = async (values: PasswordFormValues) => {
     setLoading(true);
@@ -58,13 +75,7 @@ export const ChangePassword: React.FC = () => {
         {/* 返回按钮 */}
         <Button
           icon={<ArrowLeftOutlined />}
-          onClick={() => {
-            if (window.history.length > 1) {
-              navigate(-1);
-            } else {
-              navigate('/');
-            }
-          }}
+          onClick={handleBack}
           type="text"
         >
           {t('common:button.back')}

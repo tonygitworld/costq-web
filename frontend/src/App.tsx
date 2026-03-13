@@ -4,6 +4,7 @@ import { App as AntdApp } from 'antd';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ChatLayout } from './components/layout/ChatLayout';
 import { CloudAccountManagement } from './components/settings/CloudAccountManagement';
+import { SettingsHome } from './components/settings/SettingsHome';
 import { UserProfile } from './components/user/UserProfile';
 import { ChangePassword } from './components/user/ChangePassword';
 import { UserManagement } from './components/user/UserManagement';
@@ -125,6 +126,18 @@ const AppContent: FC = () => {
           <ProtectedRoute>
             <ChatLayout>
               <CloudAccountManagement />
+            </ChatLayout>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* 设置主页 - 显示设置菜单 */}
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <ChatLayout>
+              <SettingsHome />
             </ChatLayout>
           </ProtectedRoute>
         }
