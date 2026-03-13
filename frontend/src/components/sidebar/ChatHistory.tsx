@@ -296,7 +296,7 @@ export const ChatHistory: FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {header}
       {/* 可滚动的历史列表 */}
-      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', minHeight: 0 }}>
+      <div className="sidebar-scrollable" style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', minHeight: 0 }}>
       <Flex vertical gap={4}>
         {chatList.map((chat) => {
           const isActive = currentChatId === chat.id;

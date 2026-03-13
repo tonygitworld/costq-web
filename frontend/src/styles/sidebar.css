@@ -223,6 +223,24 @@
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
+.sidebar-scrollable::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-scrollable::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.sidebar-scrollable::-webkit-scrollbar-thumb {
+  background: transparent !important;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.sidebar-scrollable:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2) !important;
+}
+
 
 /* ===== 7. 聊天历史项 (ChatGPT 胶囊风格) ===== */
 
