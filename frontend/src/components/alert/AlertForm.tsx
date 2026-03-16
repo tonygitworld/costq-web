@@ -333,7 +333,8 @@ export const AlertForm: React.FC = () => {
   // ========== 桌面端布局 ==========
   return (
     <div style={{
-      minHeight: '100%',
+      height: '100%',
+      overflow: 'auto',
       background: '#f0f2f5',
       position: 'relative'
     }}>

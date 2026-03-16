@@ -414,7 +414,7 @@ export const AlertDetail: React.FC = () => {
   // ========== 桌面端布局（保持不变） ==========
   return (
     <div style={{
-      height: '100vh',
+      height: '100%',
       overflow: 'auto',
       background: '#f0f2f5',
       position: 'relative'
