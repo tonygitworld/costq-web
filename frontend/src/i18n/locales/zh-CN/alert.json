@@ -17,7 +17,7 @@
     "nameRequired": "请输入告警名称",
     "nameMaxLength": "名称不能超过{{max}}个字符",
     "description": "告警描述 (自然语言)",
-    "descriptionPlaceholder": "# 发送频率\n每天\n\n# 数据查询\n本月至今的总成本\n\n# 触发条件\n超过 $1000\n\n# 执行动作\n发送邮件到 admin@example.com",
+    "descriptionPlaceholder": "# 发送频率\n每天\n# 数据查询\n本月至今的总成本\n# 触发条件\n超过 $1000\n# 执行动作\n发送邮件到 admin@example.com",
     "descriptionRequired": "请输入告警描述",
     "descriptionMinLength": "描述至少{{min}}个字符",
     "account": "选择账号",
