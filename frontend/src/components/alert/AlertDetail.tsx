@@ -522,7 +522,7 @@ export const AlertDetail: React.FC = () => {
         <Space direction="vertical" style={{ width: '100%' }} size="middle">
           <div>
             <Text strong>{t('config.description')}</Text>
-            <Paragraph style={{ marginTop: 8 }}>
+            <Paragraph style={{ marginTop: 8, whiteSpace: 'pre-wrap' }}>
               {currentAlert.description}
             </Paragraph>
           </div>
