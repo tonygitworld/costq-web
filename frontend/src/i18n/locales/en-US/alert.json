@@ -17,7 +17,7 @@
     "nameRequired": "Please enter alert name",
     "nameMaxLength": "Name cannot exceed {{max}} characters",
     "description": "Alert Description (Natural Language)",
-    "descriptionPlaceholder": "When Savings Plans utilization is below 95%, send email to ops@example.com and admin@example.com",
+    "descriptionPlaceholder": "# Frequency\nDaily\n\n# Data Query\nTotal cost month-to-date\n\n# Trigger Condition\nExceeds $1000\n\n# Action\nSend email to admin@example.com",
     "descriptionRequired": "Please enter alert description",
     "descriptionMinLength": "Description must be at least {{min}} characters",
     "account": "Select Account",

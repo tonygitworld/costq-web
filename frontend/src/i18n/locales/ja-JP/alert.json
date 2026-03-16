@@ -17,7 +17,7 @@
     "nameRequired": "アラート名を入力してください",
     "nameMaxLength": "名前は{{max}}文字以内で入力してください",
     "description": "アラート説明（自然言語）",
-    "descriptionPlaceholder": "Savings Plans の利用率が 95% を下回った場合、ops@example.com と admin@example.com にメールを送信",
+    "descriptionPlaceholder": "# 送信頻度\n毎日\n\n# データクエリ\n今月の累計コスト\n\n# トリガー条件\n$1000を超えた場合\n\n# アクション\nadmin@example.com にメール送信",
     "descriptionRequired": "アラート説明を入力してください",
     "descriptionMinLength": "説明は{{min}}文字以上で入力してください",
     "account": "アカウント選択",
