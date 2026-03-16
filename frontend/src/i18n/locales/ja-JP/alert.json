@@ -4,6 +4,16 @@
   "edit": "アラート編集",
   "delete": "削除",
   "detail": "詳細",
+  "actions": {
+    "enable": "有効化",
+    "disable": "無効化",
+    "editShort": "編集"
+  },
+  "status": {
+    "enabled": "有効",
+    "disabled": "無効",
+    "loading": "切替中"
+  },
   "back": "戻る",
   "cancel": "キャンセル",
   "save": "保存",
@@ -52,7 +62,10 @@
     "deleteFailed": "削除に失敗しました",
     "triggerSuccess": "システムスキャンをトリガーしました。後でログを確認してください",
     "triggerFailed": "トリガーに失敗しました",
-    "userNotLoaded": "ユーザー情報が読み込まれていません"
+    "userNotLoaded": "ユーザー情報が読み込まれていません",
+    "enableSuccess": "アラートを有効化しました",
+    "disableSuccess": "アラートを無効化しました",
+    "toggleFailed": "アラートステータスの切り替えに失敗しました"
   },
 
   "confirm": {
@@ -132,7 +145,8 @@
     "notSet": "未設定",
     "columnCreator": "作成者",
     "columnAccount": "関連アカウント",
-    "columnCreatedAt": "作成日時"
+    "columnCreatedAt": "作成日時",
+    "columnLastExecuted": "実行時間"
   },
 
   "filter": {

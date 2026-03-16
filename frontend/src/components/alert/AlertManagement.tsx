@@ -13,6 +13,7 @@ import {
   Tag,
   App,
   Tooltip,
+  Switch,
 } from 'antd';
 import {
   PlusOutlined,
@@ -24,6 +25,9 @@ import {
   EyeOutlined,
   PlayCircleOutlined,
   ArrowLeftOutlined,
+  PauseCircleOutlined,
+  CheckOutlined,
+  CloseOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
@@ -63,6 +67,7 @@ export const AlertManagement: React.FC = () => {
     loading,
     fetchAlerts,
     deleteAlert,
+    toggleAlert,
     triggerScheduler,
   } = useAlertStore();
 
@@ -74,6 +79,7 @@ export const AlertManagement: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [creatorFilter, setCreatorFilter] = useState<'all' | 'me'>('all');
   const [triggering, setTriggering] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
   const { paginationProps } = usePagination(10);
 
   const isAdmin = currentUser?.role === 'admin';
@@ -109,6 +115,20 @@ export const AlertManagement: React.FC = () => {
       message.error(msg);
     } finally {
       setTriggering(false);
+    }
+  };
+
+  // 切换告警状态
+  const handleToggleStatus = async (alertId: string, checked: boolean) => {
+    setTogglingId(alertId);
+    try {
+      await toggleAlert(alertId);
+      message.success(checked ? t('message.enableSuccess') : t('message.disableSuccess'));
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : t('message.toggleFailed');
+      message.error(msg);
+    } finally {
+      setTogglingId(null);
     }
   };
 
@@ -225,9 +245,16 @@ export const AlertManagement: React.FC = () => {
       onClick: (record) => navigate(`/settings/alerts/${record.id}`),
     },
     {
-      label: t('edit'),
+      label: t('actions.editShort'),
       icon: <EditOutlined />,
       onClick: (record) => navigate(`/settings/alerts/edit/${record.id}`),
+      hidden: (record) => record.user_id !== currentUser?.id && currentUser?.role !== 'admin',
+    },
+    {
+      label: (record) => record.is_active ? t('actions.disable') : t('actions.enable'),
+      icon: (record) => record.is_active ? <PauseCircleOutlined /> : <PlayCircleOutlined />,
+      onClick: (record) => handleToggleStatus(record.id, !record.is_active),
+      loading: (record) => togglingId === record.id,
       hidden: (record) => record.user_id !== currentUser?.id && currentUser?.role !== 'admin',
     },
     {
@@ -241,17 +268,6 @@ export const AlertManagement: React.FC = () => {
 
   // 表格列定义
   const columns: ColumnsType<Alert> = [
-    {
-      title: '●',
-      key: 'indicator',
-      width: 40,
-      minWidth: 32,
-      render: (_, record) => (
-        <span style={{ fontSize: '20px' }}>
-          {record.is_active ? '🟢' : '🔴'}
-        </span>
-      )
-    },
     {
       title: t('table.columnName'),
       dataIndex: 'display_name',
@@ -297,22 +313,35 @@ export const AlertManagement: React.FC = () => {
       render: (_, record) => record.created_by_username || t('table.unknown')
     },
     {
-      title: t('table.columnStatus'),
-      key: 'status',
+      title: t('table.columnLastExecuted'),
+      key: 'last_executed',
       width: 150,
       minWidth: 95,
-      sorter: (a, b) => Number(a.is_active) - Number(b.is_active),
+      sorter: (a, b) => {
+        const aTime = a.last_executed_at ? new Date(a.last_executed_at).getTime() : 0;
+        const bTime = b.last_executed_at ? new Date(b.last_executed_at).getTime() : 0;
+        return aTime - bTime;
+      },
       showSorterTooltip: false,
-      render: (_, record) => getStatusDisplay(record)
+      render: (_, record) => {
+        if (!record.is_active) {
+          return <Tag color="default">{t('table.statusDisabled')}</Tag>;
+        }
+        if (!record.last_executed_at) {
+          return <Tag color="default">{t('table.statusNeverExecuted')}</Tag>;
+        }
+        return <Tag color="success">{dayjs(record.last_executed_at).fromNow()}</Tag>;
+      }
     },
     {
       title: t('table.columnActions'),
       key: 'action',
-      width: 250,
-      minWidth: 55,
+      width: 320,
+      minWidth: 140,
       fixed: 'right',
       render: (_, record) => {
         const isOwnerOrAdmin = record.user_id === currentUser?.id || isAdmin;
+        const isToggling = togglingId === record.id;
 
         return (
           <Space size="small">
@@ -334,6 +363,25 @@ export const AlertManagement: React.FC = () => {
                 >
                   {t('edit')}
                 </Button>
+                <Tag
+                  color={record.is_active ? 'success' : 'default'}
+                  style={{ cursor: 'pointer', userSelect: 'none' }}
+                  onClick={() => !isToggling && handleToggleStatus(record.id, !record.is_active)}
+                >
+                  {isToggling ? (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                      <span className="anticon anticon-loading">
+                        <svg viewBox="0 0 1024 1024" focusable="false" data-icon="loading" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path d="M988 548c-19.9 0-36-16.1-36-36 0-59.4-11.6-117-34.6-171.3a440.45 440.45 0 00-94.3-139.9 437.71 437.71 0 00-139.9-94.3C629 83.6 571.4 72 512 72c-19.9 0-36-16.1-36-36s16.1-36 36-36c69.1 0 136.2 13.5 199.3 40.3C772.3 66 827 103 874 150c47 47 83.9 101.8 109.7 162.7 26.7 63.1 40.2 130.2 40.2 199.3.1 19.9-16.1 36-35.9 36z"></path></svg>
+                      </span>
+                      {t('status.loading')}
+                    </span>
+                  ) : (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                      {record.is_active ? <CheckOutlined /> : <CloseOutlined />}
+                      {record.is_active ? t('status.enabled') : t('status.disabled')}
+                    </span>
+                  )}
+                </Tag>
                 <Button
                   type="link"
                   size="small"

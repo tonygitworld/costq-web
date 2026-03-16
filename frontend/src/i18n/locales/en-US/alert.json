@@ -4,6 +4,16 @@
   "edit": "Edit Alert",
   "delete": "Delete",
   "detail": "Details",
+  "actions": {
+    "enable": "Enable",
+    "disable": "Disable",
+    "editShort": "Edit"
+  },
+  "status": {
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "loading": "Loading"
+  },
   "back": "Back",
   "cancel": "Cancel",
   "save": "Save",
@@ -52,7 +62,10 @@
     "deleteFailed": "Failed to delete",
     "triggerSuccess": "System scan triggered, please check logs later",
     "triggerFailed": "Failed to trigger",
-    "userNotLoaded": "User information not loaded"
+    "userNotLoaded": "User information not loaded",
+    "enableSuccess": "Alert enabled",
+    "disableSuccess": "Alert disabled",
+    "toggleFailed": "Failed to toggle alert status"
   },
 
   "confirm": {
@@ -132,7 +145,8 @@
     "notSet": "Not Set",
     "columnCreator": "Creator",
     "columnAccount": "Account",
-    "columnCreatedAt": "Created At"
+    "columnCreatedAt": "Created At",
+    "columnLastExecuted": "Last Executed"
   },
 
   "filter": {

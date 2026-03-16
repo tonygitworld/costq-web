@@ -17,9 +17,9 @@ export interface CardField<T> {
 /** 操作按钮配置 */
 export interface CardAction<T> {
   /** 按钮文本 */
-  label: string;
+  label: string | ((record: T) => string);
   /** Ant Design 图标 */
-  icon?: React.ReactNode;
+  icon?: React.ReactNode | ((record: T) => React.ReactNode);
   /** 点击回调 */
   onClick: (record: T) => void;
   /** 是否为危险操作（红色按钮） */
@@ -166,18 +166,24 @@ export function CardListView<T>({
             </div>
             {visibleActions && visibleActions.length > 0 && (
               <div className="card-list-view-actions">
-                {visibleActions.map((action) => (
-                  <Button
-                    key={action.label}
-                    size="small"
-                    icon={action.icon}
-                    danger={action.danger}
-                    loading={action.loading?.(record)}
-                    onClick={() => action.onClick(record)}
-                  >
-                    {action.label}
-                  </Button>
-                ))}
+                {visibleActions.map((action) => {
+                  const label = typeof action.label === 'function' ? action.label(record) : action.label;
+                  const icon = typeof action.icon === 'function' ? action.icon(record) : action.icon;
+                  const isLoading = action.loading?.(record);
+
+                  return (
+                    <Button
+                      key={label}
+                      size="small"
+                      icon={icon}
+                      danger={action.danger}
+                      loading={isLoading}
+                      onClick={() => action.onClick(record)}
+                    >
+                      {label}
+                    </Button>
+                  );
+                })}
               </div>
             )}
           </div>

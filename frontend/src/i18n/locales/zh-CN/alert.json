@@ -4,6 +4,16 @@
   "edit": "编辑告警",
   "delete": "删除",
   "detail": "详情",
+  "actions": {
+    "enable": "启用",
+    "disable": "禁用",
+    "editShort": "编辑"
+  },
+  "status": {
+    "enabled": "已启用",
+    "disabled": "已禁用",
+    "loading": "切换中"
+  },
   "back": "返回",
   "cancel": "取消",
   "save": "保存",
@@ -52,7 +62,10 @@
     "deleteFailed": "删除失败",
     "triggerSuccess": "已触发系统扫描，请稍后查看日志",
     "triggerFailed": "触发失败",
-    "userNotLoaded": "用户信息未加载"
+    "userNotLoaded": "用户信息未加载",
+    "enableSuccess": "告警已启用",
+    "disableSuccess": "告警已禁用",
+    "toggleFailed": "切换告警状态失败"
   },
 
   "confirm": {
@@ -132,7 +145,8 @@
     "notSet": "未设置",
     "columnCreator": "创建者",
     "columnAccount": "关联账号",
-    "columnCreatedAt": "创建时间"
+    "columnCreatedAt": "创建时间",
+    "columnLastExecuted": "执行时间"
   },
 
   "filter": {
