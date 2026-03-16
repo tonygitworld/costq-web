@@ -113,6 +113,7 @@
     "columnResult": "结果摘要",
     "statusSuccess": "成功",
     "statusFailed": "失败",
+    "statusRunning": "执行中",
     "triggered": "已触发",
     "notTriggered": "未触发"
   },

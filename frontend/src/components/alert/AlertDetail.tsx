@@ -21,6 +21,7 @@ import {
   DeleteOutlined,
   SendOutlined,
   ReloadOutlined,
+  LoadingOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -144,6 +145,34 @@ export const AlertDetail: React.FC = () => {
     }
   };
 
+  // ⭐ 获取执行状态的显示配置
+  const getExecutionStatus = (record: AlertHistory) => {
+    // 如果没有完成时间，说明正在执行中
+    if (!record.completed_at) {
+      return {
+        status: 'running',
+        color: 'blue',
+        icon: <LoadingOutlined spin />,
+        text: t('history.statusRunning'),
+      };
+    }
+    // 已完成，根据 success 判断
+    if (record.status === 'success') {
+      return {
+        status: 'success',
+        color: 'success',
+        icon: '✅',
+        text: t('history.statusSuccess'),
+      };
+    }
+    return {
+      status: 'failed',
+      color: 'error',
+      icon: '❌',
+      text: t('history.statusFailed'),
+    };
+  };
+
   // 显示加载状态
   if (loading && !currentAlert) {
     return (
@@ -206,11 +235,14 @@ export const AlertDetail: React.FC = () => {
     {
       label: t('history.columnStatus'),
       key: 'status',
-      render: (status: string) => (
-        <Tag color={status === 'success' ? 'success' : 'error'}>
-          {status === 'success' ? t('history.statusSuccess') : t('history.statusFailed')}
-        </Tag>
-      ),
+      render: (_: string, record: AlertHistory) => {
+        const statusConfig = getExecutionStatus(record);
+        return (
+          <Tag color={statusConfig.color} icon={statusConfig.status === 'running' ? <LoadingOutlined spin /> : null}>
+            {statusConfig.text}
+          </Tag>
+        );
+      },
     },
     {
       label: t('history.columnTriggered'),
@@ -234,11 +266,14 @@ export const AlertDetail: React.FC = () => {
       key: 'indicator',
       width: 36,
       minWidth: 28,
-      render: (_, record) => (
-        <span style={{ fontSize: '16px' }}>
-          {record.status === 'success' ? '✅' : '❌'}
-        </span>
-      )
+      render: (_, record) => {
+        const statusConfig = getExecutionStatus(record);
+        return (
+          <span style={{ fontSize: '16px' }}>
+            {statusConfig.status === 'running' ? <LoadingOutlined spin /> : statusConfig.icon}
+          </span>
+        );
+      }
     },
     {
       title: t('history.columnTime'),
@@ -258,11 +293,14 @@ export const AlertDetail: React.FC = () => {
       minWidth: 70,
       sorter: (a, b) => a.status.localeCompare(b.status),
       showSorterTooltip: false,
-      render: (status) => (
-        <Tag color={status === 'success' ? 'success' : 'error'}>
-          {status === 'success' ? t('history.statusSuccess') : t('history.statusFailed')}
-        </Tag>
-      )
+      render: (_, record) => {
+        const statusConfig = getExecutionStatus(record);
+        return (
+          <Tag color={statusConfig.color} icon={statusConfig.status === 'running' ? <LoadingOutlined spin /> : null}>
+            {statusConfig.text}
+          </Tag>
+        );
+      }
     },
     {
       title: t('history.columnTriggered'),
