@@ -262,20 +262,6 @@ export const AlertDetail: React.FC = () => {
   // 执行历史表格列
   const historyColumns: ColumnsType<AlertHistory> = [
     {
-      title: '●',
-      key: 'indicator',
-      width: 36,
-      minWidth: 28,
-      render: (_, record) => {
-        const statusConfig = getExecutionStatus(record);
-        return (
-          <span style={{ fontSize: '16px' }}>
-            {statusConfig.status === 'running' ? <LoadingOutlined spin /> : statusConfig.icon}
-          </span>
-        );
-      }
-    },
-    {
       title: t('history.columnTime'),
       dataIndex: 'executed_at',
       key: 'executed_at',
