@@ -22,6 +22,7 @@ export interface AlertHistory {
   id: string;
   alert_id: string;
   executed_at: string;
+  completed_at?: string;  // ⭐ 新增：完成时间（为空表示执行中）
   status: 'success' | 'failed';
   triggered: boolean;
   result_summary: string;

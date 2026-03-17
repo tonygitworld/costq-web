@@ -250,7 +250,7 @@ export const AlertForm: React.FC = () => {
                   ]}
                   style={{ marginBottom: 12 }}
                 >
-                  <TextArea placeholder={t('form.descriptionPlaceholder')} rows={4} maxLength={500} showCount />
+                  <TextArea placeholder={t('form.descriptionPlaceholder')} rows={8} maxLength={500} showCount />
                 </Form.Item>
 
                 <Alert message={t('tips.descriptionHint')} type="info" showIcon style={{ marginBottom: 0, fontSize: 12 }} />
@@ -333,7 +333,8 @@ export const AlertForm: React.FC = () => {
   // ========== 桌面端布局 ==========
   return (
     <div style={{
-      minHeight: '100%',
+      height: '100%',
+      overflow: 'auto',
       background: '#f0f2f5',
       position: 'relative'
     }}>
@@ -403,7 +404,7 @@ export const AlertForm: React.FC = () => {
                 { min: 10, message: t('form.descriptionMinLength', { min: 10 }) }
               ]}
             >
-              <TextArea placeholder={t('form.descriptionPlaceholder')} rows={6} maxLength={500} showCount />
+              <TextArea placeholder={t('form.descriptionPlaceholder')} rows={9} maxLength={500} showCount />
             </Form.Item>
 
             <Alert message={t('tips.descriptionHint')} type="info" showIcon style={{ marginBottom: 16 }} />

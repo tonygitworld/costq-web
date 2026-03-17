@@ -13,6 +13,7 @@ import {
   Tag,
   App,
   Tooltip,
+  Switch,
 } from 'antd';
 import {
   PlusOutlined,
@@ -24,6 +25,7 @@ import {
   EyeOutlined,
   PlayCircleOutlined,
   ArrowLeftOutlined,
+  PauseCircleOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import { useNavigate } from 'react-router-dom';
@@ -63,6 +65,7 @@ export const AlertManagement: React.FC = () => {
     loading,
     fetchAlerts,
     deleteAlert,
+    toggleAlert,
     triggerScheduler,
   } = useAlertStore();
 
@@ -74,6 +77,7 @@ export const AlertManagement: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [creatorFilter, setCreatorFilter] = useState<'all' | 'me'>('all');
   const [triggering, setTriggering] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
   const { paginationProps } = usePagination(10);
 
   const isAdmin = currentUser?.role === 'admin';
@@ -109,6 +113,20 @@ export const AlertManagement: React.FC = () => {
       message.error(msg);
     } finally {
       setTriggering(false);
+    }
+  };
+
+  // 切换告警状态
+  const handleToggleStatus = async (alertId: string, checked: boolean) => {
+    setTogglingId(alertId);
+    try {
+      await toggleAlert(alertId);
+      message.success(checked ? t('message.enableSuccess') : t('message.disableSuccess'));
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : t('message.toggleFailed');
+      message.error(msg);
+    } finally {
+      setTogglingId(null);
     }
   };
 
@@ -225,9 +243,16 @@ export const AlertManagement: React.FC = () => {
       onClick: (record) => navigate(`/settings/alerts/${record.id}`),
     },
     {
-      label: t('edit'),
+      label: t('actions.editShort'),
       icon: <EditOutlined />,
       onClick: (record) => navigate(`/settings/alerts/edit/${record.id}`),
+      hidden: (record) => record.user_id !== currentUser?.id && currentUser?.role !== 'admin',
+    },
+    {
+      label: (record) => record.is_active ? t('actions.disable') : t('actions.enable'),
+      icon: (record) => record.is_active ? <PauseCircleOutlined /> : <PlayCircleOutlined />,
+      onClick: (record) => handleToggleStatus(record.id, !record.is_active),
+      loading: (record) => togglingId === record.id,
       hidden: (record) => record.user_id !== currentUser?.id && currentUser?.role !== 'admin',
     },
     {
@@ -242,17 +267,6 @@ export const AlertManagement: React.FC = () => {
   // 表格列定义
   const columns: ColumnsType<Alert> = [
     {
-      title: '●',
-      key: 'indicator',
-      width: 40,
-      minWidth: 32,
-      render: (_, record) => (
-        <span style={{ fontSize: '20px' }}>
-          {record.is_active ? '🟢' : '🔴'}
-        </span>
-      )
-    },
-    {
       title: t('table.columnName'),
       dataIndex: 'display_name',
       key: 'display_name',
@@ -266,7 +280,7 @@ export const AlertManagement: React.FC = () => {
       title: t('table.columnDescription'),
       dataIndex: 'description',
       key: 'description',
-      width: 280,
+      width: 200,
       minWidth: 110,
       sorter: (a, b) => a.description.localeCompare(b.description),
       showSorterTooltip: false,
@@ -297,22 +311,35 @@ export const AlertManagement: React.FC = () => {
       render: (_, record) => record.created_by_username || t('table.unknown')
     },
     {
-      title: t('table.columnStatus'),
-      key: 'status',
+      title: t('table.columnLastExecuted'),
+      key: 'last_executed',
       width: 150,
       minWidth: 95,
-      sorter: (a, b) => Number(a.is_active) - Number(b.is_active),
+      sorter: (a, b) => {
+        const aTime = a.last_executed_at ? new Date(a.last_executed_at).getTime() : 0;
+        const bTime = b.last_executed_at ? new Date(b.last_executed_at).getTime() : 0;
+        return aTime - bTime;
+      },
       showSorterTooltip: false,
-      render: (_, record) => getStatusDisplay(record)
+      render: (_, record) => {
+        if (!record.is_active) {
+          return <Tag color="default">{t('table.statusDisabled')}</Tag>;
+        }
+        if (!record.last_executed_at) {
+          return <Tag color="default">{t('table.statusNeverExecuted')}</Tag>;
+        }
+        return <Tag color="success">{dayjs(record.last_executed_at).fromNow()}</Tag>;
+      }
     },
     {
       title: t('table.columnActions'),
       key: 'action',
-      width: 250,
-      minWidth: 55,
+      width: 320,
+      minWidth: 140,
       fixed: 'right',
       render: (_, record) => {
         const isOwnerOrAdmin = record.user_id === currentUser?.id || isAdmin;
+        const isToggling = togglingId === record.id;
 
         return (
           <Space size="small">
@@ -334,6 +361,17 @@ export const AlertManagement: React.FC = () => {
                 >
                   {t('edit')}
                 </Button>
+                <Switch
+                  checked={record.is_active}
+                  loading={isToggling}
+                  checkedChildren="ON"
+                  unCheckedChildren="OFF"
+                  onChange={() => handleToggleStatus(record.id, !record.is_active)}
+                  style={{
+                    backgroundColor: record.is_active ? '#52c41a' : undefined,
+                    minWidth: 44,
+                  }}
+                />
                 <Button
                   type="link"
                   size="small"

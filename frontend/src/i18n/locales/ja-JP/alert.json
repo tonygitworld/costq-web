@@ -1,9 +1,19 @@
 {
   "title": "アラート管理",
   "create": "アラート作成",
-  "edit": "アラート編集",
+  "edit": "編集",
   "delete": "削除",
   "detail": "詳細",
+  "actions": {
+    "enable": "有効化",
+    "disable": "無効化",
+    "editShort": "編集"
+  },
+  "status": {
+    "enabled": "有効",
+    "disabled": "無効",
+    "loading": "切替中"
+  },
   "back": "戻る",
   "cancel": "キャンセル",
   "save": "保存",
@@ -17,7 +27,7 @@
     "nameRequired": "アラート名を入力してください",
     "nameMaxLength": "名前は{{max}}文字以内で入力してください",
     "description": "アラート説明（自然言語）",
-    "descriptionPlaceholder": "Savings Plans の利用率が 95% を下回った場合、ops@example.com と admin@example.com にメールを送信",
+    "descriptionPlaceholder": "# 送信頻度\n毎日\n# データクエリ\n今月の累計コスト\n# トリガー条件\n$1000を超えた場合\n# アクション\nadmin@example.com にメール送信",
     "descriptionRequired": "アラート説明を入力してください",
     "descriptionMinLength": "説明は{{min}}文字以上で入力してください",
     "account": "アカウント選択",
@@ -52,7 +62,10 @@
     "deleteFailed": "削除に失敗しました",
     "triggerSuccess": "システムスキャンをトリガーしました。後でログを確認してください",
     "triggerFailed": "トリガーに失敗しました",
-    "userNotLoaded": "ユーザー情報が読み込まれていません"
+    "userNotLoaded": "ユーザー情報が読み込まれていません",
+    "enableSuccess": "アラートを有効化しました",
+    "disableSuccess": "アラートを無効化しました",
+    "toggleFailed": "アラートステータスの切り替えに失敗しました"
   },
 
   "confirm": {
@@ -113,6 +126,7 @@
     "columnResult": "結果概要",
     "statusSuccess": "成功",
     "statusFailed": "失敗",
+    "statusRunning": "実行中",
     "triggered": "トリガー済み",
     "notTriggered": "未トリガー"
   },
@@ -131,7 +145,8 @@
     "notSet": "未設定",
     "columnCreator": "作成者",
     "columnAccount": "関連アカウント",
-    "columnCreatedAt": "作成日時"
+    "columnCreatedAt": "作成日時",
+    "columnLastExecuted": "実行時間"
   },
 
   "filter": {

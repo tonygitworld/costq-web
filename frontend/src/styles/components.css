@@ -246,7 +246,6 @@ h4.ant-typography {
 /* ===== 表格样式 ===== */
 .ant-table {
   border-radius: var(--radius-lg);
-  overflow: hidden;
 }
 
 .ant-table-thead > tr > th {

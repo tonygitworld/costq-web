@@ -1,9 +1,19 @@
 {
   "title": "Alert Management",
   "create": "Create Alert",
-  "edit": "Edit Alert",
+  "edit": "Edit",
   "delete": "Delete",
   "detail": "Details",
+  "actions": {
+    "enable": "Enable",
+    "disable": "Disable",
+    "editShort": "Edit"
+  },
+  "status": {
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "loading": "Loading"
+  },
   "back": "Back",
   "cancel": "Cancel",
   "save": "Save",
@@ -17,7 +27,7 @@
     "nameRequired": "Please enter alert name",
     "nameMaxLength": "Name cannot exceed {{max}} characters",
     "description": "Alert Description (Natural Language)",
-    "descriptionPlaceholder": "When Savings Plans utilization is below 95%, send email to ops@example.com and admin@example.com",
+    "descriptionPlaceholder": "# Frequency\nDaily\n# Data Query\nTotal cost month-to-date\n# Trigger Condition\nExceeds $1000\n# Action\nSend email to admin@example.com",
     "descriptionRequired": "Please enter alert description",
     "descriptionMinLength": "Description must be at least {{min}} characters",
     "account": "Select Account",
@@ -52,7 +62,10 @@
     "deleteFailed": "Failed to delete",
     "triggerSuccess": "System scan triggered, please check logs later",
     "triggerFailed": "Failed to trigger",
-    "userNotLoaded": "User information not loaded"
+    "userNotLoaded": "User information not loaded",
+    "enableSuccess": "Alert enabled",
+    "disableSuccess": "Alert disabled",
+    "toggleFailed": "Failed to toggle alert status"
   },
 
   "confirm": {
@@ -113,6 +126,7 @@
     "columnResult": "Result Summary",
     "statusSuccess": "Success",
     "statusFailed": "Failed",
+    "statusRunning": "Running",
     "triggered": "Triggered",
     "notTriggered": "Not Triggered"
   },
@@ -131,7 +145,8 @@
     "notSet": "Not Set",
     "columnCreator": "Creator",
     "columnAccount": "Account",
-    "columnCreatedAt": "Created At"
+    "columnCreatedAt": "Created At",
+    "columnLastExecuted": "Last Executed"
   },
 
   "filter": {
