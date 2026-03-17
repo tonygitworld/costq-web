@@ -367,6 +367,10 @@ export const AlertManagement: React.FC = () => {
                   checkedChildren="ON"
                   unCheckedChildren="OFF"
                   onChange={() => handleToggleStatus(record.id, !record.is_active)}
+                  style={{
+                    backgroundColor: record.is_active ? '#52c41a' : undefined,
+                    minWidth: 44,
+                  }}
                 />
                 <Button
                   type="link"
