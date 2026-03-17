@@ -1,7 +1,7 @@
 {
   "title": "告警管理",
   "create": "新建告警",
-  "edit": "编辑告警",
+  "edit": "编辑",
   "delete": "删除",
   "detail": "详情",
   "actions": {
