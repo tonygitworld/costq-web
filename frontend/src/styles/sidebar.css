@@ -346,6 +346,28 @@
     background-color: rgba(0, 0, 0, 0.08) !important;
   }
 
+  .chat-history-item,
+  .chat-history-item-title,
+  .chat-history-item-time {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  .chat-history-item {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .gemini-dropdown-menu,
+  .gemini-dropdown-menu .ant-dropdown-menu,
+  .gemini-dropdown-menu .ant-dropdown-menu-item,
+  .gemini-dropdown-menu .ant-dropdown-menu-title-content,
+  .gemini-dropdown-menu .ant-dropdown-menu-item-icon {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
   /* 手机端隐藏三个点，改用长按菜单 */
   .trailing-group {
     display: none !important;

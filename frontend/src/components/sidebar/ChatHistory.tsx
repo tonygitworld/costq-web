@@ -34,11 +34,12 @@ export const ChatHistory: FC<ChatHistoryProps> = ({ onItemClick }) => {
   const [openMobileMenuChatId, setOpenMobileMenuChatId] = useState<string | null>(null);
   const longPressTimerRef = useRef<number | null>(null);
   const longPressTriggeredRef = useRef(false);
+  const touchMovedRef = useRef(false);
   const touchStartPositionRef = useRef<{ x: number; y: number } | null>(null);
   const { t } = useI18n(['chat', 'common']);
 
   const LONG_PRESS_DURATION = 500;
-  const TOUCH_MOVE_THRESHOLD = 10;
+  const TOUCH_MOVE_THRESHOLD = 12;
 
   // ... (保留 loadChats useEffect)
 
@@ -276,11 +277,16 @@ export const ChatHistory: FC<ChatHistoryProps> = ({ onItemClick }) => {
     }
 
     longPressTriggeredRef.current = false;
+    touchMovedRef.current = false;
     const touch = e.touches[0];
     touchStartPositionRef.current = { x: touch.clientX, y: touch.clientY };
     setLongPressChatId(chatId);
 
     longPressTimerRef.current = window.setTimeout(() => {
+      if (touchMovedRef.current) {
+        return;
+      }
+
       longPressTriggeredRef.current = true;
       if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
         navigator.vibrate(50);
@@ -290,7 +296,7 @@ export const ChatHistory: FC<ChatHistoryProps> = ({ onItemClick }) => {
   };
 
   const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (!isMobile || !touchStartPositionRef.current || longPressTimerRef.current === null) {
+    if (!isMobile || !touchStartPositionRef.current) {
       return;
     }
 
@@ -299,6 +305,7 @@ export const ChatHistory: FC<ChatHistoryProps> = ({ onItemClick }) => {
     const deltaY = Math.abs(touch.clientY - touchStartPositionRef.current.y);
 
     if (deltaX > TOUCH_MOVE_THRESHOLD || deltaY > TOUCH_MOVE_THRESHOLD) {
+      touchMovedRef.current = true;
       clearLongPressState();
     }
   };
@@ -311,10 +318,13 @@ export const ChatHistory: FC<ChatHistoryProps> = ({ onItemClick }) => {
     e.stopPropagation();
     const wasLongPress = longPressTriggeredRef.current;
     const menuWasOpen = openMobileMenuChatId !== null;
+    const didMove = touchMovedRef.current;
+
     clearLongPressState();
     longPressTriggeredRef.current = false;
+    touchMovedRef.current = false;
 
-    if (!wasLongPress && !menuWasOpen) {
+    if (!wasLongPress && !menuWasOpen && !didMove) {
       handleChatItemClick(chatId);
     }
   };
@@ -326,6 +336,7 @@ export const ChatHistory: FC<ChatHistoryProps> = ({ onItemClick }) => {
 
     clearLongPressState();
     longPressTriggeredRef.current = false;
+    touchMovedRef.current = false;
   };
 
   useEffect(() => {
