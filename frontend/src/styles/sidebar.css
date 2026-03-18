@@ -316,11 +316,6 @@
   color: rgb(26, 26, 26) !important;
 }
 
-/* 默认：隐藏图钉列（桌面端使用右侧图钉） */
-.chat-history-pin-prefix {
-  display: none;
-}
-
 /* ===== 7.1 移动端适配 (修复 iOS Safari 双击问题) ===== */
 /* iOS Safari 对带 :hover 视觉变化的 div，第一次触摸仅触发 hover 不触发 click */
 /* 使用 max-width: 600px 与 useIsMobile hook 保持一致 */
@@ -347,29 +342,13 @@
     background-color: rgba(0, 0, 0, 0.06) !important;
   }
 
-  /* 减小左侧内边距，让图钉列靠左对齐 */
-  .chat-history-item {
-    padding-left: 4px !important;
-    margin-left: 2px !important;
+  .chat-history-item.long-pressing {
+    background-color: rgba(0, 0, 0, 0.08) !important;
   }
 
-  /* 三个点菜单始终可见 */
+  /* 手机端隐藏三个点，改用长按菜单 */
   .trailing-group {
-    opacity: 1 !important;
-  }
-
-  /* 隐藏右侧图钉图标（改为标题前缀显示） */
-  .chat-history-item .pin-icon-wrapper {
     display: none !important;
-  }
-
-  /* 显示图钉列 */
-  .chat-history-pin-prefix {
-    display: flex !important;
-    width: 16px;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
   }
 }
 
