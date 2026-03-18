@@ -316,6 +316,51 @@
   color: rgb(26, 26, 26) !important;
 }
 
+/* ===== 7.1 触摸设备适配 (修复 iOS Safari 双击问题) ===== */
+/* iOS Safari 对带 :hover 视觉变化的 div，第一次触摸仅触发 hover 不触发 click */
+@media (hover: none) and (pointer: coarse) {
+  /* 禁用 hover 效果，避免 iOS Safari 吞掉第一次 click */
+  .chat-history-item:hover {
+    background-color: transparent !important;
+  }
+
+  .chat-history-item:hover .chat-history-item-time {
+    opacity: 1 !important;
+  }
+
+  .chat-history-item:hover .pin-icon-wrapper {
+    opacity: 1 !important;
+  }
+
+  .chat-history-item:hover .trailing-group {
+    opacity: 0 !important;
+  }
+
+  /* 触摸按压反馈 */
+  .chat-history-item:active {
+    background-color: rgba(0, 0, 0, 0.06) !important;
+  }
+
+  /* 三个点菜单始终可见 */
+  .trailing-group {
+    opacity: 1 !important;
+  }
+
+  /* 隐藏右侧图钉图标（改为标题前缀显示） */
+  .chat-history-item .pin-icon-wrapper {
+    display: none !important;
+  }
+
+  /* 显示标题前缀图钉图标 */
+  .chat-history-pin-prefix {
+    display: inline-block !important;
+  }
+}
+
+/* 桌面端：隐藏标题前缀图钉（使用右侧图钉） */
+.chat-history-pin-prefix {
+  display: none;
+}
 
 /* ===== 8. 底部设置菜单区域 ===== */
 

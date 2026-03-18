@@ -397,7 +397,18 @@ export const ChatHistory: FC<ChatHistoryProps> = ({ onItemClick }) => {
                         onClick={(e) => e.stopPropagation()}
                       />
                     ) : (
-                      chat.title
+                      <>
+                        {chat.isPinned && (
+                          <PushpinOutlined className="chat-history-pin-prefix" style={{
+                            transform: 'rotate(-45deg)',
+                            fontSize: '11px',
+                            marginRight: '4px',
+                            color: 'rgb(68, 71, 70)',
+                            flexShrink: 0,
+                          }} />
+                        )}
+                        {chat.title}
+                      </>
                     )}
                   </div>
                   <div className="chat-history-item-time" style={{
