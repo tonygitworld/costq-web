@@ -140,20 +140,19 @@ export const useAlertStore = create<AlertStore>((set) => ({
     }
   },
 
-  // 切换告警状态
+  // 切换告警状态（不使用通用 loading，组件层通过 togglingId 控制 Switch loading）
   toggleAlert: async (id: string) => {
-    set({ loading: true, error: null });
+    set({ error: null });
     try {
       const alert = await alertApi.toggle(id);
       set(state => ({
         alerts: state.alerts.map(a => a.id === id ? alert : a),
         currentAlert: state.currentAlert?.id === id ? alert : state.currentAlert,
-        loading: false
       }));
       return alert;
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : '切换告警状态失败';
-      set({ error: message, loading: false });
+      set({ error: message });
       throw error;
     }
   },
