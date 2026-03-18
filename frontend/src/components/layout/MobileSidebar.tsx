@@ -99,7 +99,7 @@ export const MobileSidebar: FC<MobileSidebarProps> = ({ visible, onClose, onOpen
 
         {/* ChatHistory 列表 */}
         <div className="mobile-sidebar-history" onClick={onClose}>
-          <ChatHistory />
+          <ChatHistory onItemClick={onClose} />
         </div>
 
         {/* 底部分隔线 */}

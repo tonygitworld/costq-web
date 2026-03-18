@@ -1,10 +1,11 @@
 // ChatHistory component - Chat history list
-import { type FC, useEffect, useState } from 'react';
+import { type FC, useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Flex, Typography, Empty, Button, Checkbox, Space, App, message, Dropdown, Input } from 'antd';
 import { DeleteOutlined, CheckSquareOutlined, CloseSquareOutlined, MoreOutlined, EditOutlined, PushpinOutlined } from '@ant-design/icons';
 import { useChatStore } from '../../stores/chatStore';
 import { useI18n } from '../../hooks/useI18n';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
@@ -14,16 +15,31 @@ dayjs.extend(relativeTime);
 
 const { Text } = Typography;
 
-export const ChatHistory: FC = () => {
+interface ChatHistoryProps {
+  /** 点击聊天项后的回调（移动端用于关闭侧边栏） */
+  onItemClick?: () => void;
+}
+
+export const ChatHistory: FC<ChatHistoryProps> = ({ onItemClick }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { modal } = App.useApp();
+  const isMobile = useIsMobile();
   const { chats, currentChatId, switchToChat, loadFromStorage, deleteChat, deleteChats, clearAllChats, messages, togglePinChat, renameChat } = useChatStore();
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedChats, setSelectedChats] = useState<string[]>([]);
   const [editingChatId, setEditingChatId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
+  const [longPressChatId, setLongPressChatId] = useState<string | null>(null);
+  const [openMobileMenuChatId, setOpenMobileMenuChatId] = useState<string | null>(null);
+  const longPressTimerRef = useRef<number | null>(null);
+  const longPressTriggeredRef = useRef(false);
+  const touchMovedRef = useRef(false);
+  const touchStartPositionRef = useRef<{ x: number; y: number } | null>(null);
   const { t } = useI18n(['chat', 'common']);
+
+  const LONG_PRESS_DURATION = 500;
+  const TOUCH_MOVE_THRESHOLD = 12;
 
   // ... (保留 loadChats useEffect)
 
@@ -184,6 +200,151 @@ export const ChatHistory: FC = () => {
     }
   };
 
+  const clearLongPressState = () => {
+    if (longPressTimerRef.current !== null) {
+      window.clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+    setLongPressChatId(null);
+    touchStartPositionRef.current = null;
+  };
+
+  const getChatActionMenuItems = (chat: (typeof chatList)[number]) => ([
+    {
+      key: 'pin',
+      label: chat.isPinned ? t('history.unpin') : t('history.pin'),
+      icon: <PushpinOutlined style={{ fontSize: '18px', transform: chat.isPinned ? 'rotate(-45deg)' : 'none' }} />,
+      className: 'gemini-menu-item',
+      onClick: (e: any) => {
+        e.domEvent.stopPropagation();
+        setOpenMobileMenuChatId(null);
+        togglePinChat(chat.id);
+      }
+    },
+    {
+      key: 'rename',
+      label: t('history.rename'),
+      icon: <EditOutlined style={{ fontSize: '18px' }} />,
+      className: 'gemini-menu-item',
+      onClick: (e: any) => {
+        e.domEvent.stopPropagation();
+        setOpenMobileMenuChatId(null);
+        handleStartRename(chat.id, chat.title);
+      }
+    },
+    {
+      key: 'delete',
+      label: t('common:button.delete'),
+      icon: <DeleteOutlined style={{ fontSize: '18px' }} />,
+      danger: true,
+      className: 'gemini-menu-item',
+      onClick: (e: any) => {
+        setOpenMobileMenuChatId(null);
+        handleDeleteSingle(chat.id, e);
+      },
+    },
+  ]);
+
+  const handleChatItemClick = (chatId: string) => {
+    if (isMobile && openMobileMenuChatId) {
+      return;
+    }
+
+    const isChatPath = location.pathname === '/' || location.pathname.startsWith('/c/');
+    const isActive = currentChatId === chatId;
+
+    if (isActive && isChatPath) {
+      onItemClick?.();
+      return;
+    }
+
+    if (isSelectionMode) {
+      toggleChatSelection(chatId);
+      return;
+    }
+
+    if (!isChatPath) {
+      navigate('/');
+    }
+
+    switchToChat(chatId);
+    onItemClick?.();
+  };
+
+  const handleTouchStart = (chatId: string, e: React.TouchEvent<HTMLDivElement>) => {
+    if (!isMobile || isSelectionMode || editingChatId === chatId) {
+      return;
+    }
+
+    longPressTriggeredRef.current = false;
+    touchMovedRef.current = false;
+    const touch = e.touches[0];
+    touchStartPositionRef.current = { x: touch.clientX, y: touch.clientY };
+    setLongPressChatId(chatId);
+
+    longPressTimerRef.current = window.setTimeout(() => {
+      if (touchMovedRef.current) {
+        return;
+      }
+
+      longPressTriggeredRef.current = true;
+      if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+        navigator.vibrate(50);
+      }
+      setOpenMobileMenuChatId(chatId);
+    }, LONG_PRESS_DURATION);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!isMobile || !touchStartPositionRef.current) {
+      return;
+    }
+
+    const touch = e.touches[0];
+    const deltaX = Math.abs(touch.clientX - touchStartPositionRef.current.x);
+    const deltaY = Math.abs(touch.clientY - touchStartPositionRef.current.y);
+
+    if (deltaX > TOUCH_MOVE_THRESHOLD || deltaY > TOUCH_MOVE_THRESHOLD) {
+      touchMovedRef.current = true;
+      clearLongPressState();
+    }
+  };
+
+  const handleTouchEnd = (chatId: string, e: React.TouchEvent<HTMLDivElement>) => {
+    if (!isMobile) {
+      return;
+    }
+
+    e.stopPropagation();
+    const wasLongPress = longPressTriggeredRef.current;
+    const menuWasOpen = openMobileMenuChatId !== null;
+    const didMove = touchMovedRef.current;
+
+    clearLongPressState();
+    longPressTriggeredRef.current = false;
+    touchMovedRef.current = false;
+
+    if (!wasLongPress && !menuWasOpen && !didMove) {
+      handleChatItemClick(chatId);
+    }
+  };
+
+  const handleTouchCancel = () => {
+    if (!isMobile) {
+      return;
+    }
+
+    clearLongPressState();
+    longPressTriggeredRef.current = false;
+    touchMovedRef.current = false;
+  };
+
+  useEffect(() => {
+    return () => {
+      clearLongPressState();
+    };
+  }, []);
+
   // 头部区域（标题栏 + 选择工具栏），供外部 flex 布局使用
   const header = (
     <div style={{ flexShrink: 0 }}>
@@ -305,24 +466,18 @@ export const ChatHistory: FC = () => {
           return (
             <div
               key={chat.id}
-              className={`chat-history-item ${isActive ? 'chat-history-item-active' : ''} ${isSelected ? 'chat-history-item-selected' : ''}`}
+              className={`chat-history-item ${isActive ? 'chat-history-item-active' : ''} ${isSelected ? 'chat-history-item-selected' : ''} ${longPressChatId === chat.id ? 'long-pressing' : ''}`}
               onClick={(e) => {
-                const isChatPath = location.pathname === '/' || location.pathname.startsWith('/c/');
-
-                // ✅ 关键修复：只有在聊天页面且是当前会话时才跳过（防抖）
-                // 在设置页面等非聊天页面时，即使点击当前会话也应该导航回去
-                if (isActive && isChatPath) return;
-
-                if (isSelectionMode) {
-                  toggleChatSelection(chat.id);
-                } else {
-                  // ✅ 修复：如果在设置页面等非聊天页面，先导航到聊天页面
-                  if (!isChatPath) {
-                    navigate('/');
-                  }
-                  switchToChat(chat.id);
+                e.stopPropagation();
+                if (isMobile) {
+                  return;
                 }
+                handleChatItemClick(chat.id);
               }}
+              onTouchStart={(e) => handleTouchStart(chat.id, e)}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={(e) => handleTouchEnd(chat.id, e)}
+              onTouchCancel={handleTouchCancel}
             >
               <div style={{
                 width: '100%',
@@ -413,78 +568,84 @@ export const ChatHistory: FC = () => {
               )}
 
               {!isSelectionMode && (
-                <div
-                  className={`trailing-group ${chat.isPinned ? 'pinned' : ''}`}
-                  onClick={(e) => {
-                    // ✅ 关键修复：完全阻止事件冒泡到父级 chat-history-item
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                  style={{
-                    position: 'absolute',
-                  right: '6px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  opacity: 0,
-                  transition: 'opacity 0.2s',
-                  zIndex: 2
-                }}>
-                  <Dropdown
-                    menu={{
-                      items: [
-                        {
-                          key: 'pin',
-                          label: chat.isPinned ? t('history.unpin') : t('history.pin'),
-                          icon: <PushpinOutlined style={{ fontSize: '18px', transform: chat.isPinned ? 'rotate(-45deg)' : 'none' }} />,
-                          className: 'gemini-menu-item',
-                          onClick: (e) => {
-                            e.domEvent.stopPropagation();
-                            togglePinChat(chat.id);
-                          }
-                        },
-                        {
-                          key: 'rename',
-                          label: t('history.rename'),
-                          icon: <EditOutlined style={{ fontSize: '18px' }} />,
-                          className: 'gemini-menu-item',
-                          onClick: (e) => {
-                            e.domEvent.stopPropagation();
-                            handleStartRename(chat.id, chat.title);
-                          }
-                        },
-                        {
-                          key: 'delete',
-                          label: t('common:button.delete'),
-                          icon: <DeleteOutlined style={{ fontSize: '18px' }} />,
-                          danger: true,
-                          className: 'gemini-menu-item',
-                          onClick: (e) => handleDeleteSingle(chat.id, e as any),
-                        },
-                      ],
-                      className: 'gemini-dropdown-menu'
-                    }}
-                    trigger={['click']}
-                    placement="bottomLeft"
-                  >
-                    <div
-                      className="trailing action-button"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '24px',
-                        height: '24px',
-                        borderRadius: '50%',
-                        color: 'rgb(115, 114, 108)',
-                        cursor: 'pointer',
-                        fontSize: '20px',
-                        marginLeft: '4px',
+                <>
+                  {isMobile && openMobileMenuChatId === chat.id && (
+                    <Dropdown
+                      open
+                      onOpenChange={(open) => {
+                        if (!open) {
+                          setOpenMobileMenuChatId(null);
+                        }
                       }}
+                      menu={{
+                        items: getChatActionMenuItems(chat),
+                        className: 'gemini-dropdown-menu'
+                      }}
+                      trigger={['click']}
+                      placement="bottomLeft"
                     >
-                      <MoreOutlined />
-                    </div>
-                  </Dropdown>
-                </div>
+                      <div
+                        style={{
+                          position: 'absolute',
+                          right: '6px',
+                          top: '50%',
+                          width: '1px',
+                          height: '1px',
+                          transform: 'translateY(-50%)',
+                          pointerEvents: 'none'
+                        }}
+                      />
+                    </Dropdown>
+                  )}
+
+                  <div
+                    className={`trailing-group ${chat.isPinned ? 'pinned' : ''}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    style={{
+                      position: 'absolute',
+                      right: '6px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      opacity: 0,
+                      transition: 'opacity 0.2s',
+                      zIndex: 2
+                    }}>
+                    <Dropdown
+                      menu={{
+                        items: getChatActionMenuItems(chat),
+                        className: 'gemini-dropdown-menu'
+                      }}
+                      onOpenChange={(open) => {
+                        if (!open) {
+                          setOpenMobileMenuChatId(null);
+                        }
+                      }}
+                      trigger={['click']}
+                      placement="bottomLeft"
+                    >
+                      <div
+                        className="trailing action-button"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '24px',
+                          height: '24px',
+                          borderRadius: '50%',
+                          color: 'rgb(115, 114, 108)',
+                          cursor: 'pointer',
+                          fontSize: '20px',
+                          marginLeft: '4px',
+                        }}
+                      >
+                        <MoreOutlined />
+                      </div>
+                    </Dropdown>
+                  </div>
+                </>
               )}
             </div>
           );
