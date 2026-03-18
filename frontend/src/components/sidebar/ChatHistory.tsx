@@ -352,13 +352,7 @@ export const ChatHistory: FC<ChatHistoryProps> = ({ onItemClick }) => {
                 )}
 
                 {/* 手机端：固定宽度的图钉列，保证所有标题对齐 */}
-                <span className="chat-history-pin-prefix" style={{
-                  width: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                }}>
+                <span className="chat-history-pin-prefix">
                   {chat.isPinned && (
                     <PushpinOutlined style={{
                       transform: 'rotate(-45deg)',
