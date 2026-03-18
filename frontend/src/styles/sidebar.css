@@ -341,6 +341,12 @@
     background-color: rgba(0, 0, 0, 0.06) !important;
   }
 
+  /* 减小左侧内边距，让图钉列靠左对齐 */
+  .chat-history-item {
+    padding-left: 4px !important;
+    margin-left: 2px !important;
+  }
+
   /* 三个点菜单始终可见 */
   .trailing-group {
     opacity: 1 !important;
