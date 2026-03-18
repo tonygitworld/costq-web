@@ -14,7 +14,12 @@ dayjs.extend(relativeTime);
 
 const { Text } = Typography;
 
-export const ChatHistory: FC = () => {
+interface ChatHistoryProps {
+  /** 点击聊天项后的回调（移动端用于关闭侧边栏） */
+  onItemClick?: () => void;
+}
+
+export const ChatHistory: FC<ChatHistoryProps> = ({ onItemClick }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { modal } = App.useApp();
@@ -307,20 +312,26 @@ export const ChatHistory: FC = () => {
               key={chat.id}
               className={`chat-history-item ${isActive ? 'chat-history-item-active' : ''} ${isSelected ? 'chat-history-item-selected' : ''}`}
               onClick={(e) => {
+                e.stopPropagation(); // ✅ 阻止冒泡到父级容器，避免 iOS Safari 事件冲突
                 const isChatPath = location.pathname === '/' || location.pathname.startsWith('/c/');
 
                 // ✅ 关键修复：只有在聊天页面且是当前会话时才跳过（防抖）
                 // 在设置页面等非聊天页面时，即使点击当前会话也应该导航回去
-                if (isActive && isChatPath) return;
+                if (isActive && isChatPath) {
+                  onItemClick?.(); // 移动端：即使是当前会话，也关闭侧边栏
+                  return;
+                }
 
                 if (isSelectionMode) {
                   toggleChatSelection(chat.id);
+                  // 选择模式下不关闭侧边栏
                 } else {
                   // ✅ 修复：如果在设置页面等非聊天页面，先导航到聊天页面
                   if (!isChatPath) {
                     navigate('/');
                   }
                   switchToChat(chat.id);
+                  onItemClick?.(); // 移动端：切换会话后关闭侧边栏
                 }
               }}
             >
