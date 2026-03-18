@@ -351,6 +351,23 @@ export const ChatHistory: FC<ChatHistoryProps> = ({ onItemClick }) => {
                   />
                 )}
 
+                {/* 手机端：固定宽度的图钉列，保证所有标题对齐 */}
+                <span className="chat-history-pin-prefix" style={{
+                  width: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}>
+                  {chat.isPinned && (
+                    <PushpinOutlined style={{
+                      transform: 'rotate(-45deg)',
+                      fontSize: '12px',
+                      color: 'rgb(68, 71, 70)',
+                    }} />
+                  )}
+                </span>
+
                 <div style={{ flex: 1, minWidth: 0, overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: '2px' }}>
                   <div
                     className="chat-history-item-title"
@@ -397,18 +414,7 @@ export const ChatHistory: FC<ChatHistoryProps> = ({ onItemClick }) => {
                         onClick={(e) => e.stopPropagation()}
                       />
                     ) : (
-                      <>
-                        {chat.isPinned && (
-                          <PushpinOutlined className="chat-history-pin-prefix" style={{
-                            transform: 'rotate(-45deg)',
-                            fontSize: '11px',
-                            marginRight: '4px',
-                            color: 'rgb(68, 71, 70)',
-                            flexShrink: 0,
-                          }} />
-                        )}
-                        {chat.title}
-                      </>
+                      chat.title
                     )}
                   </div>
                   <div className="chat-history-item-time" style={{

@@ -351,13 +351,13 @@
     display: none !important;
   }
 
-  /* 显示标题前缀图钉图标 */
+  /* 显示图钉列 */
   .chat-history-pin-prefix {
-    display: inline-block !important;
+    display: flex !important;
   }
 }
 
-/* 桌面端：隐藏标题前缀图钉（使用右侧图钉） */
+/* 桌面端：隐藏图钉列（使用右侧图钉） */
 .chat-history-pin-prefix {
   display: none;
 }
