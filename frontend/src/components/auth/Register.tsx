@@ -279,6 +279,7 @@ export const Register: React.FC = () => {
                   <a href={`${LEGAL_BASE}/legal/privacy?lang=${language}`} target="_blank" rel="noopener noreferrer">
                     {t('register.agreement.privacy')}
                   </a>
+                  {t('register.agreement.suffix')}
                 </Checkbox>
               </Form.Item>
 
