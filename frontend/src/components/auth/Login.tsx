@@ -44,7 +44,7 @@ export const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const login = useAuthStore(state => state.login);
   const { loadFromStorage } = useChatStore();
-  const { t } = useI18n('auth');
+  const { t, language } = useI18n('auth');
   const { message, modal } = App.useApp();
 
   // ✅ 新增：错误信息状态（持久化显示）
@@ -81,18 +81,18 @@ export const Login: React.FC = () => {
 
       if (errorCode === 'TENANT_INACTIVE') {
         modal.warning({
-          title: '账号审核中',
-          content: errorMessage || '你的账号正在审核中，审核通过后即可登录。如有疑问请联系管理员。',
-          okText: '我知道了'
+          title: t('login.errors.tenantInactive'),
+          content: errorMessage || t('login.errors.tenantInactiveDesc'),
+          okText: t('login.errors.understood')
         });
         return;
       }
 
       if (errorCode === 'USER_DISABLED' || errorCode === 'ACCOUNT_DISABLED') {
         modal.error({
-          title: '账号已被禁用',
-          content: '你的账号已被管理员禁用，请联系管理员。',
-          okText: '我知道了'
+          title: t('login.errors.accountDisabled'),
+          content: t('login.errors.accountDisabledDesc'),
+          okText: t('login.errors.understood')
         });
         return;
       }
@@ -283,6 +283,16 @@ export const Login: React.FC = () => {
                 {t('login.registerLink')}
               </Link>
             </Text>
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: '12px' }}>
+            <a href={`https://costq.jp/legal/terms?lang=${language}`} target="_blank" rel="noopener noreferrer">
+              {t('login.legal.terms')}
+            </a>
+            <span style={{ margin: '0 8px', color: '#d9d9d9' }}>|</span>
+            <a href={`https://costq.jp/legal/privacy?lang=${language}`} target="_blank" rel="noopener noreferrer">
+              {t('login.legal.privacy')}
+            </a>
           </div>
         </Form>
         </Card>

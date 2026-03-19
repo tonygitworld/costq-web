@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Form, Input, Button, message } from 'antd';
+import { Form, Input, Button, Checkbox, message } from 'antd';
 import { Building2, User, Mail, Lock, MailCheck } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useI18n } from '../../hooks/useI18n';
@@ -9,6 +9,8 @@ import { FormCard } from './FormCard';
 import { authApi } from '../../services/api/authApi';
 import { getErrorMessage } from '../../utils/ErrorHandler';
 import styles from './Register.module.css';
+
+const LEGAL_BASE = 'https://costq.jp';
 
 interface FormValidationError {
   errorFields?: unknown[];
@@ -23,7 +25,7 @@ export const Register: React.FC = () => {
   const [countdown, setCountdown] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const register = useAuthStore(state => state.register);
-  const { t } = useI18n('auth');
+  const { t, language } = useI18n('auth');
 
   useEffect(() => {
     return () => {
@@ -256,6 +258,29 @@ export const Register: React.FC = () => {
                 />
               </Form.Item>
               <p className={styles.passwordHint}>{t('register.passwordHint')}</p>
+
+              <Form.Item
+                name="agreement"
+                valuePropName="checked"
+                rules={[
+                  {
+                    validator: (_, value) => value
+                      ? Promise.resolve()
+                      : Promise.reject(new Error(t('register.validation.agreementRequired'))),
+                  },
+                ]}
+              >
+                <Checkbox>
+                  {t('register.agreement.prefix')}
+                  <a href={`${LEGAL_BASE}/legal/terms?lang=${language}`} target="_blank" rel="noopener noreferrer">
+                    {t('register.agreement.terms')}
+                  </a>
+                  {t('register.agreement.and')}
+                  <a href={`${LEGAL_BASE}/legal/privacy?lang=${language}`} target="_blank" rel="noopener noreferrer">
+                    {t('register.agreement.privacy')}
+                  </a>
+                </Checkbox>
+              </Form.Item>
 
               <Button
                 type="primary"
