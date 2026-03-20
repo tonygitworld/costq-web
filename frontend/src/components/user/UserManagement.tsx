@@ -228,39 +228,42 @@ export const UserManagement: React.FC = () => {
     setIsPermissionModalVisible(true);
   };
 
-  const handleDelete = async (user: UserData) => {
-    // 先获取影响数据
-    let impact = {
-      chat_session_count: 0,
-      aws_perm_count: 0,
-      gcp_perm_count: 0,
-      alert_count: 0,
+  const handleDelete = (user: UserData) => {
+    type ImpactData = {
+      chat_session_count: number;
+      aws_perm_count: number;
+      gcp_perm_count: number;
+      alert_count: number;
     };
-    try {
-      const res = await apiClient.get<typeof impact>(`/users/${user.id}/delete-impact`);
-      impact = res;
-    } catch {
-      // 获取失败不阻断删除流程，显示默认空数据
-    }
 
-    modal.confirm({
-      title: t('actions.deleteImpactTitle', { username: user.username }),
-      icon: <DeleteOutlined style={{ color: '#ff4d4f' }} />,
-      content: (
-        <div style={{ marginTop: 8 }}>
-          <p style={{ color: '#595959', marginBottom: 12 }}>
-            {t('actions.deleteImpactWarning')}
-          </p>
+    const renderContent = (impact: ImpactData | null) => (
+      <div style={{ marginTop: 8 }}>
+        <p style={{ color: '#595959', marginBottom: 12 }}>
+          {t('actions.deleteImpactWarning')}
+        </p>
+        {impact === null ? (
+          <div style={{ textAlign: 'center', padding: '8px 0', color: '#999' }}>
+            {t('actions.deleteImpactLoading')}
+          </div>
+        ) : (
           <ul style={{ paddingLeft: 20, margin: 0, color: '#262626' }}>
             <li>{t('actions.deleteImpactChatSessions', { count: impact.chat_session_count })}</li>
             <li>{t('actions.deleteImpactAwsPerms', { count: impact.aws_perm_count })}</li>
             <li>{t('actions.deleteImpactGcpPerms', { count: impact.gcp_perm_count })}</li>
             <li>{t('actions.deleteImpactAlerts', { count: impact.alert_count })}</li>
           </ul>
-        </div>
-      ),
+        )}
+      </div>
+    );
+
+    // 立即弹窗，okButton 先 disabled，等数据加载完再启用
+    const { update } = modal.confirm({
+      title: t('actions.deleteImpactTitle', { username: user.username }),
+      icon: <DeleteOutlined style={{ color: '#ff4d4f' }} />,
+      content: renderContent(null),
       okType: 'danger',
       okText: t('common:button.delete'),
+      okButtonProps: { disabled: true },
       cancelText: t('common:button.cancel'),
       onOk: async () => {
         try {
@@ -272,6 +275,21 @@ export const UserManagement: React.FC = () => {
         }
       },
     });
+
+    // 后台加载影响数据，回来后更新弹窗内容并启用删除按钮
+    apiClient.get<ImpactData>(`/users/${user.id}/delete-impact`)
+      .then((res) => {
+        update({
+          content: renderContent(res),
+          okButtonProps: { disabled: false },
+        });
+      })
+      .catch(() => {
+        update({
+          content: renderContent({ chat_session_count: 0, aws_perm_count: 0, gcp_perm_count: 0, alert_count: 0 }),
+          okButtonProps: { disabled: false },
+        });
+      });
   };
 
   const handleModalOk = async () => {
