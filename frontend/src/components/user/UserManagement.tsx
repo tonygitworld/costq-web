@@ -24,6 +24,14 @@ dayjs.extend(timezone);
 const { Title } = Typography;
 const { Option } = Select;
 
+// 注入 shimmer 骨架屏动画
+if (typeof document !== 'undefined' && !document.querySelector('#shimmer-animation')) {
+  const style = document.createElement('style');
+  style.id = 'shimmer-animation';
+  style.textContent = `@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`;
+  document.head.appendChild(style);
+}
+
 interface UserData {
   id: string;
   username: string;
@@ -249,8 +257,17 @@ export const UserManagement: React.FC = () => {
           {t('actions.deleteImpactWarning')}
         </p>
         {impact === null ? (
-          <div style={{ textAlign: 'center', padding: '12px 0', color: '#999', fontSize: 13 }}>
-            {t('actions.deleteImpactLoading')}
+          // Skeleton 骨架屏：高度与加载后一致（4行 × 约48px）
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} style={{
+                height: 40,
+                borderRadius: 6,
+                background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
+                backgroundSize: '200% 100%',
+                animation: 'shimmer 1.4s infinite',
+              }} />
+            ))}
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
