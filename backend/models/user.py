@@ -86,6 +86,7 @@ class User(Base):
 
     # ✅ 新增：聊天会话关联
     chat_sessions = relationship("ChatSession", back_populates="user", cascade="all, delete-orphan")
+    consents = relationship("UserConsent", back_populates="user", cascade="all, delete-orphan")
 
     def to_dict(self):
         """转换为字典"""

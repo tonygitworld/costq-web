@@ -92,12 +92,18 @@ class AuditLogger:
         self.log(user_id, org_id, "login", ip_address=ip_address)
 
     def log_login_failed(
-        self, email: str, reason: str, ip_address: str | None = None, user_agent: str | None = None
+        self,
+        email: str,
+        reason: str,
+        ip_address: str | None = None,
+        user_agent: str | None = None,
+        user_id: str | None = None,
+        org_id: str | None = None,
     ):
         """记录失败的登录尝试"""
         self.log(
-            user_id="system",
-            org_id="system",
+            user_id=user_id or SYSTEM_UUID,
+            org_id=org_id or SYSTEM_UUID,
             action="login_failed",
             details={"email": email, "reason": reason},
             ip_address=ip_address,

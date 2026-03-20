@@ -158,6 +158,7 @@ async def register(register_request: RegisterRequest, request: Request):
 
     from backend.database import get_db
     from backend.services.email_verification_service import get_email_verification_service
+    from backend.services.consent_service import ConsentService
 
     logger.info(
         f"📝 收到注册请求 - 组织名称: {register_request.organization_name}, 邮箱: {register_request.email}"
@@ -191,37 +192,49 @@ async def register(register_request: RegisterRequest, request: Request):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="该邮箱已被使用")
 
         # 3. 创建新组织（默认禁用，等待管理员审核）
-        organization = user_storage.create_organization(
-            name=register_request.organization_name,
-            description=f"由 {register_request.email} 创建的组织",
-            is_active=False,  # ✅ 直接在创建时设置为禁用状态
-        )
-        logger.info("- org_id: %s", organization['id'])
-
-        # 4. 创建首个用户（组织管理员，使用邮箱作为用户名）
         try:
+            organization = user_storage.create_organization(
+                name=register_request.organization_name,
+                description=f"由 {register_request.email} 创建的组织",
+                is_active=False,
+                db=db,
+            )
+            logger.info("- org_id: %s", organization['id'])
+
+            # 4. 创建首个用户（组织管理员，使用邮箱作为用户名）
             new_user = user_storage.create_user(
                 org_id=organization["id"],
-                username=register_request.email,  # 使用邮箱作为用户名
-                email=register_request.email,  # 添加 email 字段
+                username=register_request.email,
+                email=register_request.email,
                 password_hash=hash_password(register_request.password),
                 full_name=register_request.full_name,
-                role="admin",  # 首个用户自动成为组织管理员
+                role="admin",
+                db=db,
             )
-        except ValueError as e:
-            # 如果用户创建失败，理论上不应该发生（因为是首个用户）
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
-        # ✅ 5. 标记邮箱为已验证
-        db.execute(
-            text("""
-            UPDATE users
-            SET email_verified_at = :now
-            WHERE id = :user_id
-        """),
-            {"now": datetime.now(UTC), "user_id": new_user["id"]},
-        )
-        db.commit()
+            # 5. 标记邮箱为已验证
+            db.execute(
+                text("""
+                UPDATE users
+                SET email_verified_at = :now
+                WHERE id = :user_id
+            """),
+                {"now": datetime.now(UTC), "user_id": new_user["id"]},
+            )
+
+            # 6. 记录协议同意
+            consent_service = ConsentService(db)
+            consent_service.record_consents(
+                user_id=new_user["id"],
+                org_id=organization["id"],
+                ip_address=request.client.host if request.client else None,
+                user_agent=request.headers.get("user-agent"),
+            )
+
+            db.commit()
+        except ValueError as e:
+            db.rollback()
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
 
         # 移除敏感信息
         user_data = {k: v for k, v in new_user.items() if k != "password_hash"}
@@ -267,7 +280,7 @@ async def register(register_request: RegisterRequest, request: Request):
     except HTTPException:
         raise
     except Exception as e:
-        logger.error("❌ 注册失败: {str(e)}")
+        logger.error("❌ 注册失败: %s", str(e), exc_info=True)
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"注册失败: {str(e)}"
@@ -305,16 +318,10 @@ async def login(login_request: LoginRequest, request: Request):
                 break
 
     if not user:
-        # ✅ 记录失败的登录尝试
+        # ✅ 未知身份的失败登录仅记录应用日志，不写 audit_logs
         logger.warning(
             f"⚠️ 登录失败 - 邮箱: {login_request.email}, "
             f"IP: {ip_address or 'unknown'}, 原因: 邮箱或密码错误"
-        )
-        audit_logger.log_login_failed(
-            email=login_request.email,
-            reason="invalid_credentials",
-            ip_address=ip_address,
-            user_agent=user_agent,
         )
 
         # ✅ 返回结构化错误（向后兼容：detail 可以是字符串或字典）
@@ -362,6 +369,8 @@ async def login(login_request: LoginRequest, request: Request):
             reason="tenant_inactive",
             ip_address=ip_address,
             user_agent=user_agent,
+            user_id=user["id"],
+            org_id=user["org_id"],
         )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

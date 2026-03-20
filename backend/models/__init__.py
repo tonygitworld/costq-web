@@ -9,6 +9,7 @@ from backend.models.gcp_account import GCPAccount
 from backend.models.monitoring import AlertHistory, MonitoringConfig
 from backend.models.permission import AWSAccountPermission, GCPAccountPermission
 from backend.models.prompt_template import PromptTemplate
+from backend.models.user_consent import UserConsent
 from backend.models.user import Organization, User
 
 __all__ = [
@@ -22,6 +23,7 @@ __all__ = [
     "AWSAccount",
     "GCPAccount",
     "PromptTemplate",
+    "UserConsent",
     "MonitoringConfig",
     "AlertHistory",
     "AlertExecutionLog",

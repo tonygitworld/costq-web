@@ -4,6 +4,7 @@ import uuid
 from datetime import datetime, timezone
 
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 
 from backend.database import get_db
 from backend.models.permission import AWSAccountPermission, GCPAccountPermission
@@ -35,7 +36,13 @@ class UserStoragePostgreSQL:
 
     # ==================== 组织管理 ====================
 
-    def create_organization(self, name: str, description: str = None, is_active: bool = False) -> dict:
+    def create_organization(
+        self,
+        name: str,
+        description: str = None,
+        is_active: bool = False,
+        db: Session | None = None,
+    ) -> dict:
         """创建组织
 
         Args:
@@ -43,7 +50,8 @@ class UserStoragePostgreSQL:
             description: 组织描述（可选）
             is_active: 是否激活（默认False，需要管理员审核）
         """
-        db = self._get_db()
+        owns_session = db is None
+        db = db or self._get_db()
         try:
             org_id = str(uuid.uuid4())
             org = Organization(
@@ -55,15 +63,18 @@ class UserStoragePostgreSQL:
                 updated_at=_utc_now(),
             )
             db.add(org)
-            db.commit()
-            db.refresh(org)
+            db.flush()
+            if owns_session:
+                db.commit()
+                db.refresh(org)
 
             return org.to_dict()  # ✅ 使用 to_dict() 确保数据一致性
         except IntegrityError:
             db.rollback()
             raise ValueError(f"组织已存在: {name}")
         finally:
-            db.close()
+            if owns_session:
+                db.close()
 
     def get_organization_by_id(self, org_id: str) -> dict | None:
         """根据ID获取组织"""
@@ -133,9 +144,11 @@ class UserStoragePostgreSQL:
         email: str = None,
         full_name: str = None,
         role: str = "user",
+        db: Session | None = None,
     ) -> dict:
         """创建用户"""
-        db = self._get_db()
+        owns_session = db is None
+        db = db or self._get_db()
         try:
             # 如果没有提供 email，使用 username 作为默认值
             if not email:
@@ -154,8 +167,10 @@ class UserStoragePostgreSQL:
                 updated_at=_utc_now(),
             )
             db.add(user)
-            db.commit()
-            db.refresh(user)
+            db.flush()
+            if owns_session:
+                db.commit()
+                db.refresh(user)
 
             return user.to_dict()
         except IntegrityError as e:
@@ -164,7 +179,8 @@ class UserStoragePostgreSQL:
                 raise ValueError(f"邮箱已存在: {email}")
             raise ValueError(f"用户名已存在: {username}")
         finally:
-            db.close()
+            if owns_session:
+                db.close()
 
     def get_user_by_id(self, user_id: str) -> dict | None:
         """根据ID获取用户"""
