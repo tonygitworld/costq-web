@@ -237,8 +237,8 @@ export const UserManagement: React.FC = () => {
       alert_count: 0,
     };
     try {
-      const res = await apiClient.get(`/users/${user.id}/delete-impact`);
-      impact = res.data;
+      const res = await apiClient.get<typeof impact>(`/users/${user.id}/delete-impact`);
+      impact = res;
     } catch {
       // 获取失败不阻断删除流程，显示默认空数据
     }
