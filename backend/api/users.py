@@ -2,10 +2,16 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field, field_validator
+from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from backend.services.audit_logger import get_audit_logger
 from backend.services.user_storage import get_user_storage
 from backend.utils.auth import get_current_admin_user, hash_password
+from backend.database import get_db
+from backend.models.chat import ChatSession
+from backend.models.permission import AWSAccountPermission, GCPAccountPermission
+from backend.models.monitoring import MonitoringConfig
 
 import logging
 
@@ -266,6 +272,58 @@ async def change_user_password(
     user_storage.update_password(user_id, hash_password(request.new_password))
 
     return {"message": "密码修改成功"}
+
+
+@router.get("/{user_id}/delete-impact")
+async def get_user_delete_impact(
+    user_id: str,
+    current_user: dict = Depends(get_current_admin_user),
+    db: Session = Depends(get_db),
+):
+    """
+    获取删除用户的影响预览
+
+    **权限：** 仅管理员
+    **说明：** 返回删除该用户时会级联删除的数据统计
+    """
+    user_storage = get_user_storage()
+    user = user_storage.get_user_by_id(user_id)
+
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="用户不存在")
+
+    if user["org_id"] != current_user["org_id"]:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="无权查看其他组织的用户")
+
+    chat_session_count = (
+        db.query(func.count(ChatSession.id))
+        .filter(ChatSession.user_id == user_id)
+        .scalar() or 0
+    )
+    aws_perm_count = (
+        db.query(func.count(AWSAccountPermission.id))
+        .filter(AWSAccountPermission.user_id == user_id)
+        .scalar() or 0
+    )
+    gcp_perm_count = (
+        db.query(func.count(GCPAccountPermission.id))
+        .filter(GCPAccountPermission.user_id == user_id)
+        .scalar() or 0
+    )
+    alert_count = (
+        db.query(func.count(MonitoringConfig.id))
+        .filter(MonitoringConfig.user_id == user_id)
+        .scalar() or 0
+    )
+
+    return {
+        "user_id": user_id,
+        "username": user["username"],
+        "chat_session_count": chat_session_count,
+        "aws_perm_count": aws_perm_count,
+        "gcp_perm_count": gcp_perm_count,
+        "alert_count": alert_count,
+    }
 
 
 @router.delete("/{user_id}")

@@ -121,8 +121,15 @@
     "delete": "削除",
     "authorize": "権限",
     "managePermissions": "権限を管理",
-    "confirmDeleteUser": "削除の確認",
-    "confirmDeleteDesc": "ユーザー\"{{username}}\"を削除してもよろしいですか？この操作は取り消せません。"
+    "confirmDeleteUser": "ユーザー削除の確認",
+    "confirmDeleteDesc": "ユーザー\"{{username}}\"を削除してもよろしいですか？この操作は取り消せません。",
+    "deleteImpactTitle": "ユーザー \"{{username}}\" を削除しますか？",
+    "deleteImpactWarning": "以下のデータが永久に削除されます（元に戻せません）：",
+    "deleteImpactChatSessions": "チャット履歴 {{count}} 件",
+    "deleteImpactAwsPerms": "AWS アカウント権限 {{count}} 件",
+    "deleteImpactGcpPerms": "GCP アカウント権限 {{count}} 件",
+    "deleteImpactAlerts": "アラート設定 {{count}} 件",
+    "deleteImpactLoading": "影響データを読み込んでいます..."
   },
   "pagination": {
     "total": "全{{total}}件"

@@ -121,8 +121,15 @@
     "delete": "Delete",
     "authorize": "Permissions",
     "managePermissions": "Manage Permissions",
-    "confirmDeleteUser": "Confirm Delete",
-    "confirmDeleteDesc": "Are you sure you want to delete user \"{{username}}\"? This action cannot be undone."
+    "confirmDeleteUser": "Confirm Delete User",
+    "confirmDeleteDesc": "Are you sure you want to delete user \"{{username}}\"? This action cannot be undone.",
+    "deleteImpactTitle": "Delete user \"{{username}}\"?",
+    "deleteImpactWarning": "The following data will be permanently deleted and cannot be recovered:",
+    "deleteImpactChatSessions": "{{count}} chat session(s)",
+    "deleteImpactAwsPerms": "{{count}} AWS account permission(s)",
+    "deleteImpactGcpPerms": "{{count}} GCP account permission(s)",
+    "deleteImpactAlerts": "{{count}} alert config(s)",
+    "deleteImpactLoading": "Loading impact data..."
   },
   "pagination": {
     "total": "{{total}} total"

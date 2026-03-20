@@ -228,16 +228,42 @@ export const UserManagement: React.FC = () => {
     setIsPermissionModalVisible(true);
   };
 
-  const handleDelete = (user: UserData) => {
+  const handleDelete = async (user: UserData) => {
+    // 先获取影响数据
+    let impact = {
+      chat_session_count: 0,
+      aws_perm_count: 0,
+      gcp_perm_count: 0,
+      alert_count: 0,
+    };
+    try {
+      const res = await apiClient.get(`/users/${user.id}/delete-impact`);
+      impact = res.data;
+    } catch {
+      // 获取失败不阻断删除流程，显示默认空数据
+    }
+
     modal.confirm({
-      title: t('actions.confirmDeleteUser'),
-      content: t('actions.confirmDeleteDesc', { username: user.username }),
+      title: t('actions.deleteImpactTitle', { username: user.username }),
+      icon: <DeleteOutlined style={{ color: '#ff4d4f' }} />,
+      content: (
+        <div style={{ marginTop: 8 }}>
+          <p style={{ color: '#595959', marginBottom: 12 }}>
+            {t('actions.deleteImpactWarning')}
+          </p>
+          <ul style={{ paddingLeft: 20, margin: 0, color: '#262626' }}>
+            <li>{t('actions.deleteImpactChatSessions', { count: impact.chat_session_count })}</li>
+            <li>{t('actions.deleteImpactAwsPerms', { count: impact.aws_perm_count })}</li>
+            <li>{t('actions.deleteImpactGcpPerms', { count: impact.gcp_perm_count })}</li>
+            <li>{t('actions.deleteImpactAlerts', { count: impact.alert_count })}</li>
+          </ul>
+        </div>
+      ),
       okType: 'danger',
       okText: t('common:button.delete'),
       cancelText: t('common:button.cancel'),
       onOk: async () => {
         try {
-          // ✅ 使用 apiClient，自动处理 Token 刷新和 401 错误
           await apiClient.delete(`/users/${user.id}`);
           message.success(t('message.deleteSuccess'));
           fetchUsers();
@@ -339,24 +365,7 @@ export const UserManagement: React.FC = () => {
       label: t('actions.delete'),
       icon: <DeleteOutlined />,
       danger: true,
-      onClick: (record) => {
-        Modal.confirm({
-          title: t('actions.confirmDeleteUser'),
-          content: t('actions.confirmDeleteDesc', { username: record.username }),
-          okType: 'danger',
-          okText: t('common:button.delete'),
-          cancelText: t('common:button.cancel'),
-          onOk: async () => {
-            try {
-              await apiClient.delete(`/users/${record.id}`);
-              message.success(t('message.deleteSuccess'));
-              fetchUsers();
-            } catch (error: unknown) {
-              message.error(getErrorMessage(error, t('message.deleteFailed')));
-            }
-          },
-        });
-      },
+      onClick: (record) => handleDelete(record),
     },
   ];
 
