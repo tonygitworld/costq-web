@@ -236,22 +236,44 @@ export const UserManagement: React.FC = () => {
       alert_count: number;
     };
 
+    const impactItems = (impact: ImpactData) => [
+      { icon: '💬', label: t('actions.deleteImpactChatSessions', { count: impact.chat_session_count }), count: impact.chat_session_count },
+      { icon: '🔑', label: t('actions.deleteImpactAwsPerms', { count: impact.aws_perm_count }), count: impact.aws_perm_count },
+      { icon: '🔑', label: t('actions.deleteImpactGcpPerms', { count: impact.gcp_perm_count }), count: impact.gcp_perm_count },
+      { icon: '🔔', label: t('actions.deleteImpactAlerts', { count: impact.alert_count }), count: impact.alert_count },
+    ];
+
     const renderContent = (impact: ImpactData | null) => (
       <div style={{ marginTop: 8 }}>
-        <p style={{ color: '#595959', marginBottom: 12 }}>
+        <p style={{ color: '#595959', marginBottom: 12, fontSize: 14 }}>
           {t('actions.deleteImpactWarning')}
         </p>
         {impact === null ? (
-          <div style={{ textAlign: 'center', padding: '8px 0', color: '#999' }}>
+          <div style={{ textAlign: 'center', padding: '12px 0', color: '#999', fontSize: 13 }}>
             {t('actions.deleteImpactLoading')}
           </div>
         ) : (
-          <ul style={{ paddingLeft: 20, margin: 0, color: '#262626' }}>
-            <li>{t('actions.deleteImpactChatSessions', { count: impact.chat_session_count })}</li>
-            <li>{t('actions.deleteImpactAwsPerms', { count: impact.aws_perm_count })}</li>
-            <li>{t('actions.deleteImpactGcpPerms', { count: impact.gcp_perm_count })}</li>
-            <li>{t('actions.deleteImpactAlerts', { count: impact.alert_count })}</li>
-          </ul>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {impactItems(impact).map((item, idx) => {
+              const isZero = item.count === 0;
+              return (
+                <div key={idx} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  padding: '8px 12px',
+                  borderRadius: 6,
+                  background: isZero ? '#fafafa' : '#fff2f0',
+                  border: `1px solid ${isZero ? '#f0f0f0' : '#ffccc7'}`,
+                }}>
+                  <span style={{ fontSize: 15, flexShrink: 0 }}>{item.icon}</span>
+                  <span style={{ flex: 1, fontSize: 13, color: isZero ? '#bfbfbf' : '#595959' }}>
+                    {item.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
     );
