@@ -285,12 +285,22 @@ export const Login: React.FC = () => {
             </Text>
           </div>
 
-          <div style={{ textAlign: 'center', marginTop: '12px' }}>
-            <a href={`https://costq.jp/legal/terms?lang=${language}`} target="_blank" rel="noopener noreferrer">
+          <div style={{ textAlign: 'center', marginTop: '12px', paddingBottom: '4px' }}>
+            <a
+              href={`https://costq.jp/legal/terms?lang=${language}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '#8c8c8c', fontSize: '13px' }}
+            >
               {t('login.legal.terms')}
             </a>
             <span style={{ margin: '0 8px', color: '#d9d9d9' }}>|</span>
-            <a href={`https://costq.jp/legal/privacy?lang=${language}`} target="_blank" rel="noopener noreferrer">
+            <a
+              href={`https://costq.jp/legal/privacy?lang=${language}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '#8c8c8c', fontSize: '13px' }}
+            >
               {t('login.legal.privacy')}
             </a>
           </div>

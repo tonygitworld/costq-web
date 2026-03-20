@@ -19,7 +19,7 @@ const EnterpriseLoginForm: React.FC = () => {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const login = useAuthStore((state) => state.login);
   const { loadFromStorage } = useChatStore();
-  const { t } = useI18n('auth');
+  const { t, language } = useI18n('auth');
   const { message, modal } = AntdApp.useApp();
 
   useEffect(() => {
@@ -156,6 +156,28 @@ const EnterpriseLoginForm: React.FC = () => {
           <Link to="/register" className={styles.registerLink}>
             {t('login.registerLink')}
           </Link>
+        </div>
+
+        <div className={styles.legalFooter}>
+          {t('login.legal.prefix')}
+          <a
+            href={`https://costq.jp/legal/terms?lang=${language}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.legalLink}
+          >
+            {t('login.legal.terms')}
+          </a>
+          {t('login.legal.and')}
+          <a
+            href={`https://costq.jp/legal/privacy?lang=${language}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.legalLink}
+          >
+            {t('login.legal.privacy')}
+          </a>
+          {t('login.legal.suffix')}
         </div>
       </FormCard>
     </AuthLayout>
