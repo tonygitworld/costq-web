@@ -1,6 +1,6 @@
 // d:\costq\web\costq-web\frontend\src\components\chat\CloudServiceSelector.tsx
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useI18n } from '../../hooks/useI18n';
 import { useIsMobile } from '../../hooks/useIsMobile';
 
@@ -52,13 +52,14 @@ type ViewType = 'providers' | 'accounts';
 const STORAGE_KEY = 'cloud_service_selected_accounts';
 
 /**
- * 云服务选择器组件 - Popover下拉菜单版本
+ * 云服务选择器组件 - Popover下拉菜单版本（单选模式）
  *
  * 功能特性：
  * - 顶部弹出下拉菜单
- * - 支持多选AWS和GCP账号
+ * - 单选AWS或GCP账号
+ * - 无账号的云服务商自动隐藏
+ * - 仅一种云有账号时跳过云商层级，直接展示账号列表
  * - localStorage持久化用户选择
- * - 显示选中数量徽章
  * - 当前选中项显示对勾标记
  */
 export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
@@ -70,25 +71,28 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
 }) => {
   const { t } = useI18n('chat');
 
-  // 从localStorage加载已选择的账号ID
-  const loadSelectedAccounts = (): string[] => {
+  // 从localStorage加载已选择的账号ID（单选：只取第一个）
+  const loadSelectedAccountId = (): string | null => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) {
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed[0]; // 兼容旧多选数据：只取第一个
+        }
+        if (typeof parsed === 'string') {
           return parsed;
         }
       }
     } catch (error) {
       console.warn('Failed to load selected accounts from localStorage:', error);
     }
-    return initialSelectedAccountIds;
+    return initialSelectedAccountIds.length > 0 ? initialSelectedAccountIds[0] : null;
   };
 
   const isMobile = useIsMobile();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const [selectedAccountIds, setSelectedAccountIds] = useState<string[]>(loadSelectedAccounts());
+  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(loadSelectedAccountId());
   const [currentView, setCurrentView] = useState<ViewType>('providers');
   const [selectedProviderId, setSelectedProviderId] = useState<string | null>(null);
   const [searchKeyword, setSearchKeyword] = useState<string>('');
@@ -96,18 +100,19 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
   // 保存到localStorage
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(selectedAccountIds));
+      const value = selectedAccountId ? [selectedAccountId] : [];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
     } catch (error) {
       console.warn('Failed to save selected accounts to localStorage:', error);
     }
-  }, [selectedAccountIds]);
+  }, [selectedAccountId]);
 
-  // 通知父组件选择变化
+  // 通知父组件选择变化（保持 string[] 接口不变）
   useEffect(() => {
-    onSelectionChange(selectedAccountIds);
-  }, [selectedAccountIds, onSelectionChange]);
+    onSelectionChange(selectedAccountId ? [selectedAccountId] : []);
+  }, [selectedAccountId, onSelectionChange]);
 
-  // 构建云服务商数据
+  // 构建云服务商数据（过滤掉无账号的云商）
   const cloudProviders: CloudProvider[] = useMemo(() => [
     {
       id: 'aws',
@@ -121,12 +126,24 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
       icon: <GCPLogo size={16} />,
       accounts: gcpAccounts || [],
     },
-  ], [awsAccounts, gcpAccounts]);
+  ].filter(p => p.accounts.length > 0), [awsAccounts, gcpAccounts]);
+
+  // 是否只有一种云有账号（用于跳级判断）
+  const isSingleProvider = cloudProviders.length === 1;
 
   const selectedProvider = useMemo(
     () => cloudProviders.find(p => p.id === selectedProviderId),
     [selectedProviderId, cloudProviders]
   );
+
+  // 计算 Popover 打开时的初始视图
+  const getInitialView = useCallback((): { view: ViewType; providerId: string | null } => {
+    if (isSingleProvider) {
+      // 只有一种云有账号：跳过 providers 层，直接展示账号
+      return { view: 'accounts', providerId: cloudProviders[0].id };
+    }
+    return { view: 'providers', providerId: null };
+  }, [isSingleProvider, cloudProviders]);
 
   // 处理提供商点击
   const handleProviderClick = (providerId: string) => {
@@ -134,30 +151,35 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
     setCurrentView('accounts');
   };
 
-  // 处理返回提供商列表
+  // 处理返回提供商列表（仅多云时可用）
   const handleBackClick = () => {
     setCurrentView('providers');
     setSelectedProviderId(null);
-    setSearchKeyword(''); // 清空搜索关键词
+    setSearchKeyword('');
   };
 
-  // 处理账号点击（切换选中状态）
+  // 处理账号点击（单选：选中即替换，再次点击取消选择）
   const handleAccountClick = (accountId: string) => {
-    setSelectedAccountIds(prev => {
-      if (prev.includes(accountId)) {
-        return prev.filter(id => id !== accountId);
-      } else {
-        return [...prev, accountId];
-      }
-    });
+    if (selectedAccountId === accountId) {
+      // 再次点击已选中的账号 → 取消选择
+      setSelectedAccountId(null);
+    } else {
+      // 选中新账号 → 替换
+      setSelectedAccountId(accountId);
+    }
+    // 单选后自动关闭 Popover
+    setTimeout(() => {
+      setIsPopoverOpen(false);
+      const initial = getInitialView();
+      setCurrentView(initial.view);
+      setSelectedProviderId(initial.providerId);
+      setSearchKeyword('');
+    }, 150); // 短暂延迟让用户看到选中效果
   };
-
-  // 获取所有选中的账号
-  const selectedAccountsCount = selectedAccountIds.length;
 
   // 渲染触发按钮内容
   const renderTriggerContent = () => {
-    // 加载状态：显示加载动画和文本
+    // 加载状态
     if (loading) {
       return (
         <div style={{
@@ -180,7 +202,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
       );
     }
 
-    if (selectedAccountsCount === 0) {
+    if (!selectedAccountId) {
       // 未选择：显示默认文本
       return (
         <div style={{
@@ -196,137 +218,51 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
       );
     }
 
-    // 已选择：显示账号chips（只显示1个 + 剩余数量）
+    // 已选择：显示单个账号
     const allAccounts = [...(awsAccounts || []), ...(gcpAccounts || [])];
+    const account = allAccounts.find(acc => acc.id === selectedAccountId);
 
-    // ✅ 按照用户选择顺序排序账号（先选的在前，后选的在后）
-    const selectedAccounts = selectedAccountIds
-      .map(id => allAccounts.find(acc => acc.id === id))
-      .filter((acc): acc is NonNullable<typeof acc> => acc !== undefined);
-
-    // 只显示1个账号chip，其余显示为 +n
-    const displayAccounts = selectedAccounts.slice(0, 1);
-    // n = 总选中数 - 1（因为显示了1个）
-    const remainingCount = selectedAccounts.length - 1;
-
-    const chips = displayAccounts.map((account) => {
-      // ✅ 更可靠的判断方式：直接检查账号是否在 awsAccounts 中
-      const isAWS = awsAccounts?.some(acc => acc.id === account.id) ?? false;
-      const logo = isAWS ? <AWSLogo size={12} /> : <GCPLogo size={12} />;
-
-      // 智能截断：超过10个字符就截断
-      const displayName = account.name.length > 10
-        ? account.name.slice(0, 10) + '...'
-        : account.name;
-
+    if (!account) {
+      // 选中的账号已不存在（可能被删除了），清除选择
       return (
-        <span
-          key={account.id}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '4px',
-            padding: '0 4px 0 8px',
-            backgroundColor: '#f5f5f5',
-            border: '1px solid #f0f0f0',
-            borderRadius: '4px',
-            fontSize: '13px',
-            color: 'rgba(0, 0, 0, 0.88)',
-            fontWeight: 400,
-            maxWidth: '140px',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            lineHeight: '22px',
-            transition: 'all 0.2s',
-            cursor: 'default',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#e6e6e6';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#f5f5f5';
-          }}
-        >
-          {logo}
-          <span style={{
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap'
-          }}>
-            {displayName}
-          </span>
-          {/* 关闭按钮 - 点击移除该账号 */}
-          <span
-            onClick={(e) => {
-              e.stopPropagation();
-              handleAccountClick(account.id);
-            }}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginLeft: '2px',
-              padding: '2px',
-              borderRadius: '2px',
-              cursor: 'pointer',
-              color: 'rgba(0, 0, 0, 0.45)',
-              transition: 'all 0.2s',
-              fontSize: '10px',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = '#ff4d4f';
-              e.currentTarget.style.backgroundColor = 'rgba(255, 77, 79, 0.1)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = 'rgba(0, 0, 0, 0.45)';
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }}
-            title={t('cloudSelector.remove')}
-          >
-            <svg viewBox="64 64 896 896" width="1em" height="1em" fill="currentColor" aria-hidden="true" style={{ display: 'inline-block' }}>
-              <path d="M799.86 166.31c.02 0 .04.02.08.06l57.69 57.7c.04.03.05.05.06.08a.12.12 0 010 .06c0 .03-.02.05-.06.09L569.93 512l287.7 287.7c.04.04.05.06.06.09a.12.12 0 010 .07c0 .02-.02.04-.06.08l-57.7 57.69c-.03.04-.05.05-.07.06a.12.12 0 01-.07 0c-.03 0-.05-.02-.09-.06L512 569.93l-287.7 287.7c-.04.04-.06.05-.09.06a.12.12 0 01-.07 0c-.02 0-.04-.02-.08-.06l-57.69-57.7c-.04-.03-.05-.05-.06-.07a.12.12 0 010-.07c0-.03.02-.05.06-.09L454.07 512l-287.7-287.7c-.04-.04-.05-.06-.06-.09a.12.12 0 010-.07c0-.02.02-.04.06-.08l57.7-57.69c.03-.04.05-.05.07-.06a.12.12 0 01.07 0c.03 0 .05.02.09.06L512 454.07l287.7-287.7c.04-.04.06-.05.09-.06a.12.12 0 01.07 0z"></path>
-            </svg>
-          </span>
-        </span>
-      );
-    });
-
-    // 如果有超过1个账号，显示"+n"（n = 总选中数 - 1）
-    if (remainingCount > 0) {
-      chips.push(
-        <span key="more" style={{
-          display: 'inline-flex',
+        <div style={{
+          display: 'flex',
           alignItems: 'center',
-          padding: '0 8px',
-          backgroundColor: 'rgba(0, 0, 0, 0.06)',
-          border: 'none',
-          borderRadius: '4px',
-          fontSize: '13px',
-          color: 'rgba(0, 0, 0, 0.65)',
-          fontWeight: 400,
-          lineHeight: '22px',
-          transition: 'all 0.2s',
-          flexShrink: 0,
+          gap: '6px',
+          color: 'rgba(0, 0, 0, 0.25)',
+          fontSize: '13px'
         }}>
-          +{remainingCount}
-        </span>
+          <CloudIcon size="14px" color="rgba(0, 0, 0, 0.45)" />
+          <span>{t('cloudSelector.selectService')}</span>
+        </div>
       );
     }
+
+    const isAWS = awsAccounts?.some(acc => acc.id === account.id) ?? false;
+    const logo = isAWS ? <AWSLogo size={12} /> : <GCPLogo size={12} />;
+    const displayName = account.name.length > 12
+      ? account.name.slice(0, 12) + '...'
+      : account.name;
 
     return (
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '4px',
+        gap: '6px',
         color: 'rgba(0, 0, 0, 0.88)',
         fontSize: '13px',
-        flexWrap: 'nowrap',
-        overflow: 'hidden',
         flex: 1,
         minWidth: 0,
+        overflow: 'hidden',
       }}>
-        {chips}
+        {logo}
+        <span style={{
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}>
+          {displayName}
+        </span>
       </div>
     );
   };
@@ -334,7 +270,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
   // 渲染内容
   const renderContent = () => {
     if (currentView === 'providers') {
-      // 渲染提供商列表 - 紧凑布局，无多余空白
+      // 渲染提供商列表（仅显示有账号的云商）
       return (
         <div style={{ width: '280px', padding: '4px 0' }}>
           {cloudProviders.map((provider) => (
@@ -389,44 +325,46 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
               borderBottom: '1px solid #f0f0f0',
             }}
           >
-            {/* 返回按钮 */}
-            <button
-              onClick={handleBackClick}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  handleBackClick();
-                }
-              }}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '28px',
-                height: '28px',
-                padding: 0,
-                cursor: 'pointer',
-                borderRadius: '4px',
-                border: 'none',
-                backgroundColor: 'transparent',
-                transition: 'background-color 0.2s',
-                flexShrink: 0,
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#f5f5f5';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-              }}
-              title={t('cloudSelector.back')}
-              aria-label={t('cloudSelector.backToList')}
-            >
-              <svg viewBox="64 64 896 896" width="16px" height="16px" fill="#595959" aria-hidden="true" style={{ display: 'inline-block' }}>
-                <path d="M872 572H266.8l144.3-144c13.8-13.8 13.8-36.2 0-50s-36.2-13.8-50 0L146.8 550.4c-13.8 13.8-13.8 36.2 0 50l213.3 213.3c13.8 13.8 36.2 13.8 50 0 13.8-13.8 13.8-36.2 0-50L266.8 620H872c19.4 0 35-15.6 35-35s-15.6-35-35-35z"></path>
-              </svg>
-            </button>
+            {/* 返回按钮：仅当有多个云商时显示 */}
+            {!isSingleProvider && (
+              <button
+                onClick={handleBackClick}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleBackClick();
+                  }
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '28px',
+                  height: '28px',
+                  padding: 0,
+                  cursor: 'pointer',
+                  borderRadius: '4px',
+                  border: 'none',
+                  backgroundColor: 'transparent',
+                  transition: 'background-color 0.2s',
+                  flexShrink: 0,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f5f5f5';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+                title={t('cloudSelector.back')}
+                aria-label={t('cloudSelector.backToList')}
+              >
+                <svg viewBox="64 64 896 896" width="16px" height="16px" fill="#595959" aria-hidden="true" style={{ display: 'inline-block' }}>
+                  <path d="M872 572H266.8l144.3-144c13.8-13.8 13.8-36.2 0-50s-36.2-13.8-50 0L146.8 550.4c-13.8 13.8-13.8 36.2 0 50l213.3 213.3c13.8 13.8 36.2 13.8 50 0 13.8-13.8 13.8-36.2 0-50L266.8 620H872c19.4 0 35-15.6 35-35s-15.6-35-35-35z"></path>
+                </svg>
+              </button>
+            )}
 
-            {/* 搜索框 - 使用原生 input 避免 Ant Design 焦点样式变化 */}
+            {/* 搜索框 */}
             <div
               style={{
                 flex: 1,
@@ -507,7 +445,7 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
                 }
 
                 return filteredAccounts.map((account) => {
-                const isSelected = selectedAccountIds.includes(account.id);
+                const isSelected = selectedAccountId === account.id;
                 return (
                   <div
                     key={account.id}
@@ -546,12 +484,10 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
                           {account.name}
                         </div>
                         <div style={{ fontSize: '11px', color: '#999' }}>
-                          {/* ✅ 使用 selectedProvider.id 判断，更可靠 */}
                           {(() => {
                             const isAWS = selectedProvider?.id === 'aws';
 
                             if (isAWS) {
-                              // AWS: 显示账号ID和区域
                               return (
                                 <>
                                   {account.accountId || account.id}
@@ -559,7 +495,6 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
                                 </>
                               );
                             } else {
-                              // GCP: 显示项目ID和服务账号
                               return (
                                 <>
                                   <span style={{ color: '#4285F4', fontWeight: 500 }}>项目:</span> {account.accountId || account.id}
@@ -585,22 +520,19 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
     }
   };
 
-  // 移动端：紧凑图标按钮（云图标 + 选中数量徽章）
-  // 获取移动端显示文本
+  // 移动端显示文本
   const getMobileLabel = () => {
-    if (selectedAccountsCount === 0) return t('cloudSelector.mobileLabel');
+    if (!selectedAccountId) return t('cloudSelector.mobileLabel');
     const allAccounts = [...(awsAccounts || []), ...(gcpAccounts || [])];
-    const firstSelected = allAccounts.find(acc => selectedAccountIds.includes(acc.id));
-    const name = firstSelected?.name || t('cloudSelector.mobileLabel');
-    const shortName = name.length > 6 ? name.slice(0, 6) + '…' : name;
-    if (selectedAccountsCount === 1) return shortName;
-    return `${shortName} +${selectedAccountsCount - 1}`;
+    const selected = allAccounts.find(acc => acc.id === selectedAccountId);
+    const name = selected?.name || t('cloudSelector.mobileLabel');
+    return name.length > 6 ? name.slice(0, 6) + '…' : name;
   };
 
   const mobileTrigger = (
     <button
       className="mobile-capsule-btn"
-      title={selectedAccountsCount > 0 ? t('cloudSelector.selectedCount', { count: selectedAccountsCount }) : t('cloudSelector.selectService')}
+      title={selectedAccountId ? getMobileLabel() : t('cloudSelector.selectService')}
     >
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
@@ -668,9 +600,15 @@ export const CloudServiceSelector: React.FC<CloudServiceSelectorProps> = ({
       onOpenChange={(visible) => {
         if (loading) return;
         setIsPopoverOpen(visible);
-        if (!visible) {
-          setCurrentView('providers');
-          setSelectedProviderId(null);
+        if (visible) {
+          // 打开时：根据云商数量决定初始视图
+          const initial = getInitialView();
+          setCurrentView(initial.view);
+          setSelectedProviderId(initial.providerId);
+        } else {
+          const initial = getInitialView();
+          setCurrentView(initial.view);
+          setSelectedProviderId(initial.providerId);
           setSearchKeyword('');
         }
       }}

@@ -357,7 +357,6 @@ class AlertService:
                     .filter(
                         MonitoringConfig.id == params.alert_id,
                         MonitoringConfig.org_id == params.org_id,
-                        MonitoringConfig.user_id == params.user_id,
                     )
                     .first()
                 )

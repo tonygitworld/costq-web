@@ -24,6 +24,14 @@ dayjs.extend(timezone);
 const { Title } = Typography;
 const { Option } = Select;
 
+// 注入 shimmer 骨架屏动画
+if (typeof document !== 'undefined' && !document.querySelector('#shimmer-animation')) {
+  const style = document.createElement('style');
+  style.id = 'shimmer-animation';
+  style.textContent = `@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`;
+  document.head.appendChild(style);
+}
+
 interface UserData {
   id: string;
   username: string;
@@ -229,15 +237,75 @@ export const UserManagement: React.FC = () => {
   };
 
   const handleDelete = (user: UserData) => {
-    modal.confirm({
-      title: t('actions.confirmDeleteUser'),
-      content: t('actions.confirmDeleteDesc', { username: user.username }),
+    type ImpactData = {
+      chat_session_count: number;
+      aws_perm_count: number;
+      gcp_perm_count: number;
+      alert_count: number;
+    };
+
+    const impactItems = (impact: ImpactData) => [
+      { icon: '💬', label: t('actions.deleteImpactChatSessions', { count: impact.chat_session_count }), count: impact.chat_session_count },
+      { icon: '🔑', label: t('actions.deleteImpactAwsPerms', { count: impact.aws_perm_count }), count: impact.aws_perm_count },
+      { icon: '🔑', label: t('actions.deleteImpactGcpPerms', { count: impact.gcp_perm_count }), count: impact.gcp_perm_count },
+      { icon: '🔔', label: t('actions.deleteImpactAlerts', { count: impact.alert_count }), count: impact.alert_count },
+    ];
+
+    const renderContent = (impact: ImpactData | null) => (
+      <div style={{ marginTop: 8 }}>
+        <p style={{ color: '#595959', marginBottom: 12, fontSize: 14 }}>
+          {t('actions.deleteImpactWarning')}
+        </p>
+        {impact === null ? (
+          // Skeleton 骨架屏：高度与加载后一致（4行 × 约48px）
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} style={{
+                height: 40,
+                borderRadius: 6,
+                background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
+                backgroundSize: '200% 100%',
+                animation: 'shimmer 1.4s infinite',
+              }} />
+            ))}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {impactItems(impact).map((item, idx) => {
+              const isZero = item.count === 0;
+              return (
+                <div key={idx} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  padding: '8px 12px',
+                  borderRadius: 6,
+                  background: isZero ? '#fafafa' : '#fff2f0',
+                  border: `1px solid ${isZero ? '#f0f0f0' : '#ffccc7'}`,
+                }}>
+                  <span style={{ fontSize: 15, flexShrink: 0 }}>{item.icon}</span>
+                  <span style={{ flex: 1, fontSize: 13, color: isZero ? '#bfbfbf' : '#595959' }}>
+                    {item.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+
+    // 立即弹窗，okButton 先 disabled，等数据加载完再启用
+    const { update } = modal.confirm({
+      title: t('actions.deleteImpactTitle', { username: user.username }),
+      icon: <DeleteOutlined style={{ color: '#ff4d4f' }} />,
+      content: renderContent(null),
       okType: 'danger',
       okText: t('common:button.delete'),
+      okButtonProps: { disabled: true },
       cancelText: t('common:button.cancel'),
       onOk: async () => {
         try {
-          // ✅ 使用 apiClient，自动处理 Token 刷新和 401 错误
           await apiClient.delete(`/users/${user.id}`);
           message.success(t('message.deleteSuccess'));
           fetchUsers();
@@ -246,6 +314,21 @@ export const UserManagement: React.FC = () => {
         }
       },
     });
+
+    // 后台加载影响数据，回来后更新弹窗内容并启用删除按钮
+    apiClient.get<ImpactData>(`/users/${user.id}/delete-impact`)
+      .then((res) => {
+        update({
+          content: renderContent(res),
+          okButtonProps: { disabled: false },
+        });
+      })
+      .catch(() => {
+        update({
+          content: renderContent({ chat_session_count: 0, aws_perm_count: 0, gcp_perm_count: 0, alert_count: 0 }),
+          okButtonProps: { disabled: false },
+        });
+      });
   };
 
   const handleModalOk = async () => {
@@ -339,24 +422,7 @@ export const UserManagement: React.FC = () => {
       label: t('actions.delete'),
       icon: <DeleteOutlined />,
       danger: true,
-      onClick: (record) => {
-        Modal.confirm({
-          title: t('actions.confirmDeleteUser'),
-          content: t('actions.confirmDeleteDesc', { username: record.username }),
-          okType: 'danger',
-          okText: t('common:button.delete'),
-          cancelText: t('common:button.cancel'),
-          onOk: async () => {
-            try {
-              await apiClient.delete(`/users/${record.id}`);
-              message.success(t('message.deleteSuccess'));
-              fetchUsers();
-            } catch (error: unknown) {
-              message.error(getErrorMessage(error, t('message.deleteFailed')));
-            }
-          },
-        });
-      },
+      onClick: (record) => handleDelete(record),
     },
   ];
 
