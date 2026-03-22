@@ -366,6 +366,7 @@ export const MessageItem = memo(MessageItemComponent, (prevProps, nextProps) => 
     prevMsg.showStatus === nextMsg.showStatus &&
     prevMsg.imageAttachments?.length === nextMsg.imageAttachments?.length &&
     prevMsg.excelAttachments?.length === nextMsg.excelAttachments?.length &&
-    prevMsg.documentAttachments?.length === nextMsg.documentAttachments?.length
+    prevMsg.documentAttachments?.length === nextMsg.documentAttachments?.length &&
+    prevMsg.tokenUsage === nextMsg.tokenUsage
   );
 });
