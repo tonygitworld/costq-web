@@ -397,9 +397,10 @@ class AWSBedrockAgentProvider(AgentProvider):
                 enhanced_query = f"""用户查询: {query}
 
 当前查询的 GCP 账号:
+- 账号 ID: {account_id_to_use}
 - 账号名称: {gcp_account_info.get("account_name", "Unknown")}
-- GCP 项目 ID: {gcp_account_info.get("project_id", "Unknown")}
-- 组织 ID: {gcp_account_info.get("organization_id", "Unknown")}
+
+重要：调用 GCP 工具时，account_id 参数必须使用: {account_id_to_use}
 """
             else:
                 # ✅ 使用 AWS 账号 ID（12位数字）而不是 UUID
