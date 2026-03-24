@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { GCPAccount, GCPAccountFormData, GCPAccountUpdateData } from '../types/gcpAccount';
 import { gcpAccountApi } from '../services/api/gcpAccountApi';
-
+import { useAuthStore } from './authStore';
 import { logger } from '../utils/logger';
 
 interface GCPAccountState {
