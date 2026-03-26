@@ -178,12 +178,12 @@ class AWSBedrockAgentProvider(AgentProvider):
             if account_ids:
                 audit_logger.log_query(
                     user_id, org_id, query, account_ids, "aws",
-                    session_id=session_id, query_id=query_id,
+                    session_id=session_id, query_id=query_id, model_id=model_id,
                 )
             if gcp_account_ids:
                 audit_logger.log_query(
                     user_id, org_id, query, gcp_account_ids, "gcp",
-                    session_id=session_id, query_id=query_id,
+                    session_id=session_id, query_id=query_id, model_id=model_id,
                 )
 
             # 权限验证
@@ -701,17 +701,12 @@ class AWSBedrockAgentProvider(AgentProvider):
                     # ✅ 回写 token_usage 到审计日志（不受会话删除影响）
                     if token_usage_data and session_id:
                         try:
-                            # ⭐ 添加 model_id 到 token_usage_data，用于运营后台模型维度统计
-                            token_usage_with_model = {
-                                **token_usage_data,
-                                "model_id": model_id or "unknown",
-                            }
                             await asyncio.get_event_loop().run_in_executor(
                                 None,
                                 audit_logger.update_query_token_usage,
                                 query_id,
                                 session_id,
-                                token_usage_with_model,
+                                token_usage_data,
                             )
                         except Exception as e:
                             logger.error(

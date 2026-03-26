@@ -124,6 +124,7 @@ class AuditLogger:
         account_type: str = "aws",
         session_id: str | None = None,
         query_id: str | None = None,
+        model_id: str | None = None,
     ):
         """记录查询操作
 
@@ -135,14 +136,20 @@ class AuditLogger:
             account_type: 账号类型（aws/gcp）
             session_id: 会话ID
             query_id: 请求级唯一标识，用于后续精确回写 token_usage
+            model_id: AI 模型 ID，用于运营后台按模型维度统计 Token 用量
         """
+        details: dict = {}
+        if query_id:
+            details["query_id"] = query_id
+        if model_id:
+            details["model_id"] = model_id
         self.log(
             user_id=user_id,
             org_id=org_id,
             action="query",
             resource_type=f"{account_type}_account",
             resource_id=",".join(account_ids[:3]) if account_ids else None,
-            details={"query_id": query_id} if query_id else None,
+            details=details if details else None,
             session_id=session_id,
         )
 
