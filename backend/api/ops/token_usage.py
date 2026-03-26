@@ -11,7 +11,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
-from sqlalchemy import Integer, and_, cast, func
+from sqlalchemy import Integer, String, and_, cast, func
 from sqlalchemy.orm import Session
 from sqlalchemy.dialects.postgresql import JSONB
 
@@ -301,7 +301,7 @@ def get_token_usage_by_org(
         )
         .join(
             Organization,
-            AuditLog.org_id == Organization.id,
+            cast(AuditLog.org_id, String) == cast(Organization.id, String),
         )
         .filter(and_(*filters))
         .group_by(AuditLog.org_id, Organization.name)
@@ -396,8 +396,14 @@ def get_token_usage_by_user(
             sum_cache_write.label("cache_write_tokens"),
             total_expr.label("total_tokens"),
         )
-        .join(User, AuditLog.user_id == User.id)
-        .join(Organization, User.org_id == Organization.id)
+        .join(
+            User,
+            cast(AuditLog.user_id, String) == cast(User.id, String),
+        )
+        .join(
+            Organization,
+            cast(User.org_id, String) == cast(Organization.id, String),
+        )
         .filter(and_(*filters))
         .group_by(
             AuditLog.user_id,
