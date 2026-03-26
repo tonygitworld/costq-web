@@ -6,9 +6,6 @@ import {
   CloudOutlined,
   TeamOutlined,
   ControlOutlined,
-  DashboardOutlined,
-  FileSearchOutlined,
-  BarChartOutlined,
   UserOutlined,
   GlobalOutlined,
   LogoutOutlined,
@@ -28,7 +25,6 @@ export interface MobileSettingsPageProps {
 export const MobileSettingsPage: FC<MobileSettingsPageProps> = ({ visible, onClose }) => {
   const navigate = useNavigate();
   const isAdmin = useAuthStore(state => state.isAdmin);
-  const isSuperAdmin = useAuthStore(state => state.isSuperAdmin);
   const logout = useAuthStore(state => state.logout);
   const { t } = useI18n(['chat', 'common']);
 
@@ -167,59 +163,6 @@ export const MobileSettingsPage: FC<MobileSettingsPageProps> = ({ visible, onClo
           </>
         )}
 
-        {/* 运营后台分组 - 仅超级管理员 */}
-        {isSuperAdmin() && (
-          <>
-            <div className="mobile-settings-divider" />
-            <div className="mobile-settings-group">
-              <div className="mobile-settings-group-title">{t('chat:sidebar.opsBackend')}</div>
-
-              {/* 运营 Dashboard */}
-              <button
-                className="mobile-settings-item"
-                onClick={() => handleNavigate('/ops/dashboard')}
-              >
-                <div className="mobile-settings-item-icon"><DashboardOutlined /></div>
-                <div className="mobile-settings-item-content">
-                  <span className="mobile-settings-item-label">{t('chat:sidebar.opsDashboard')}</span>
-                </div>
-              </button>
-
-              {/* 租户管理 */}
-              <button
-                className="mobile-settings-item"
-                onClick={() => handleNavigate('/ops/tenants')}
-              >
-                <div className="mobile-settings-item-icon"><TeamOutlined /></div>
-                <div className="mobile-settings-item-content">
-                  <span className="mobile-settings-item-label">{t('chat:sidebar.tenantManagement')}</span>
-                </div>
-              </button>
-
-              {/* 审计日志 */}
-              <button
-                className="mobile-settings-item"
-                onClick={() => handleNavigate('/ops/audit-logs')}
-              >
-                <div className="mobile-settings-item-icon"><FileSearchOutlined /></div>
-                <div className="mobile-settings-item-content">
-                  <span className="mobile-settings-item-label">{t('chat:sidebar.auditLogs')}</span>
-                </div>
-              </button>
-
-              {/* Token 用量 */}
-              <button
-                className="mobile-settings-item"
-                onClick={() => handleNavigate('/ops/token-usage')}
-              >
-                <div className="mobile-settings-item-icon"><BarChartOutlined /></div>
-                <div className="mobile-settings-item-content">
-                  <span className="mobile-settings-item-label">{t('chat:sidebar.tokenUsage')}</span>
-                </div>
-              </button>
-            </div>
-          </>
-        )}
       </div>
     </div>
   );

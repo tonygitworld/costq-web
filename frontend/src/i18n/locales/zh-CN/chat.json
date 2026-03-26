@@ -16,12 +16,7 @@
     "notificationSettings": "通知设置",
     "cloudAccounts": "云账号管理",
     "userManagement": "用户管理",
-    "alertManagement": "告警管理",
-    "opsBackend": "运营后台",
-    "opsDashboard": "运营 Dashboard",
-    "tenantManagement": "租户管理",
-    "auditLogs": "审计日志",
-    "tokenUsage": "Token 用量"
+    "alertManagement": "告警管理"
   },
   "input": {
     "placeholder": "输入您的问题... (Enter 发送, Shift+Enter 换行)",

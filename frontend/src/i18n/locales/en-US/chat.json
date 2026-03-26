@@ -16,12 +16,7 @@
     "notificationSettings": "Notification Settings",
     "cloudAccounts": "Cloud Accounts",
     "userManagement": "User Management",
-    "alertManagement": "Alert Management",
-    "opsBackend": "Operations Backend",
-    "opsDashboard": "Operations Dashboard",
-    "tenantManagement": "Tenant Management",
-    "auditLogs": "Audit Logs",
-    "tokenUsage": "Token Usage"
+    "alertManagement": "Alert Management"
   },
   "input": {
     "placeholder": "Type your question... (Enter to send, Shift+Enter for new line)",

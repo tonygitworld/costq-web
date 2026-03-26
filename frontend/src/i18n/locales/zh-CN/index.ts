@@ -6,7 +6,6 @@ import user from './user.json';
 import template from './template.json';
 import alert from './alert.json';
 import error from './error.json';
-import ops from './ops.json';
 import gcp from './gcp.json';
 import models from './models.json';
 
@@ -19,7 +18,6 @@ export default {
   template,
   alert,
   error,
-  ops,
   gcp,
   models
 };

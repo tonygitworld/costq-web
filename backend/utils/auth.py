@@ -14,14 +14,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# 超级管理员白名单（MVP 阶段硬编码）
-# 后续可迁移到数据库或配置文件
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SUPER_ADMIN_EMAILS: list[str] = [
-    "liyuguang@marshotspot.com",
-]
-
 # JWT 配置（从统一配置中心获取）
 SECRET_KEY = settings.JWT_SECRET_KEY
 ALGORITHM = settings.JWT_ALGORITHM
@@ -298,37 +290,3 @@ def authenticate_user(username: str, password: str) -> dict | None:
     if not verify_password(password, user.get("password_hash")):
         return None
     return user
-
-
-async def get_current_super_admin(
-    current_user: dict = Depends(get_current_user),
-) -> dict:
-    """
-    获取当前超级管理员用户（依赖注入）
-
-    用于运营后台 API 的权限控制，仅允许白名单中的邮箱访问。
-
-    Args:
-        current_user: 当前登录用户信息
-
-    Returns:
-        dict: 当前用户信息（已验证为超级管理员）
-
-    Raises:
-        HTTPException: 403 如果用户不是超级管理员
-    """
-    user_email = current_user.get("email", "").lower().strip()
-    allowed_emails = [e.lower().strip() for e in SUPER_ADMIN_EMAILS]
-
-    if user_email not in allowed_emails:
-        logger.warning(
-            f"超级管理员权限拒绝 - User: {current_user.get('username')}, "
-            f"Email: {user_email}, User ID: {current_user.get('id')}"
-        )
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="需要超级管理员权限",
-        )
-
-    logger.info("超级管理员验证通过 - Email: %s", user_email)
-    return current_user

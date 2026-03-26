@@ -6,9 +6,6 @@ import { UnauthorizedError } from '../services/errors';
 import { notifyAuthError, redirectToLogin } from '../utils/authNotifications';
 import { logger } from '../utils/logger';
 
-// 超级管理员白名单（与后端保持一致）
-const SUPER_ADMIN_EMAILS = ['liyuguang@marshotspot.com'];
-
 interface User {
   id: string;
   org_id: string;
@@ -58,7 +55,6 @@ interface AuthState {
 
   // 辅助方法
   isAdmin: () => boolean;
-  isSuperAdmin: () => boolean;
   getAuthHeaders: () => { Authorization: string } | Record<string, never>;
 }
 
@@ -299,13 +295,6 @@ export const useAuthStore = create<AuthState>()(
       isAdmin: () => {
         const { user } = get();
         return user?.role === 'admin';
-      },
-
-      // 是否是超级管理员（运营后台权限）
-      isSuperAdmin: () => {
-        const { user } = get();
-        if (!user?.username) return false;
-        return SUPER_ADMIN_EMAILS.includes(user.username.toLowerCase().trim());
       },
 
       // 获取认证请求头

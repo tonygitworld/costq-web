@@ -16,8 +16,7 @@ import { Register } from './components/auth/Register';
 import { Activate } from './components/auth/Activate';
 import { ForgotPassword } from './components/auth/ForgotPassword';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
-import { SuperAdminRoute } from './routes/SuperAdminRoute';
-import { OpsDashboard, TenantList, TenantDetail, AuditLogs, OpsTokenUsage } from './components/ops';
+
 import { SSEProvider } from './contexts/SSEContext';
 import { I18nProvider } from './components/common/I18nProvider';
 import { useAuthStore } from './stores/authStore';
@@ -226,24 +225,6 @@ const AppContent: FC = () => {
           </ProtectedRoute>
         }
       />
-
-      {/* 运营后台 - 需要超级管理员权限 */}
-      <Route
-        path="/ops/*"
-        element={
-          <ProtectedRoute>
-            <SuperAdminRoute />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="dashboard" element={<ChatLayout><OpsDashboard /></ChatLayout>} />
-        <Route path="tenants" element={<ChatLayout><TenantList /></ChatLayout>} />
-        <Route path="tenants/:tenantId" element={<ChatLayout><TenantDetail /></ChatLayout>} />
-        <Route path="audit-logs" element={<ChatLayout><AuditLogs /></ChatLayout>} />
-        <Route path="token-usage" element={<ChatLayout><OpsTokenUsage /></ChatLayout>} />
-        {/* 默认跳转 */}
-        <Route path="" element={<Navigate to="dashboard" replace />} />
-      </Route>
 
       {/* 为了兼容旧路径，添加重定向 */}
       <Route path="/alerts" element={<Navigate to="/settings/alerts" replace />} />

@@ -16,12 +16,7 @@
     "notificationSettings": "通知設定",
     "cloudAccounts": "クラウドアカウント管理",
     "userManagement": "ユーザー管理",
-    "alertManagement": "アラート管理",
-    "opsBackend": "運用バックエンド",
-    "opsDashboard": "運用ダッシュボード",
-    "tenantManagement": "テナント管理",
-    "auditLogs": "監査ログ",
-    "tokenUsage": "Token 使用量"
+    "alertManagement": "アラート管理"
   },
   "input": {
     "placeholder": "ご質問を入力してください... (Enterで送信、Shift+Enterで改行)",

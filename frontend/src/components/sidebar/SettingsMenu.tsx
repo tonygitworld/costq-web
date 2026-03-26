@@ -7,9 +7,6 @@ import {
   SettingOutlined,
   TeamOutlined,
   ControlOutlined,
-  DashboardOutlined,
-  FileSearchOutlined,
-  BarChartOutlined,
   UserOutlined,
   GlobalOutlined,
   LogoutOutlined,
@@ -30,7 +27,6 @@ interface SettingsMenuProps {
 export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false, onOpenSettings }) => {
   const navigate = useNavigate();
   const isAdmin = useAuthStore(state => state.isAdmin);
-  const isSuperAdmin = useAuthStore(state => state.isSuperAdmin);
   const logout = useAuthStore(state => state.logout);
   const { t } = useI18n(['chat', 'common']);
   const isMobile = useIsMobile();
@@ -288,98 +284,6 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false, onOpe
         </div>
       )}
 
-      {/* 分隔线 */}
-      <div className="settings-menu-divider" />
-
-
-
-      {/* 运营后台菜单 - 仅超级管理员 */}
-      {isSuperAdmin() && (
-        <div className="settings-menu-group">
-          <div className="settings-menu-group-title">{t('chat:sidebar.opsBackend')}</div>
-          <div className="settings-menu-items">
-            {/* 运营 Dashboard */}
-            <div
-              className="settings-menu-item"
-              onClick={() => handleNavigate('/ops/dashboard')}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  handleNavigate('/ops/dashboard');
-                }
-              }}
-            >
-              <div className="settings-menu-item-icon">
-                <DashboardOutlined />
-              </div>
-              <div className="settings-menu-item-content">
-                <span className="settings-menu-item-label">{t('chat:sidebar.opsDashboard')}</span>
-              </div>
-            </div>
-
-            {/* 租户管理 */}
-            <div
-              className="settings-menu-item"
-              onClick={() => handleNavigate('/ops/tenants')}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  handleNavigate('/ops/tenants');
-                }
-              }}
-            >
-              <div className="settings-menu-item-icon">
-                <TeamOutlined />
-              </div>
-              <div className="settings-menu-item-content">
-                <span className="settings-menu-item-label">{t('chat:sidebar.tenantManagement')}</span>
-              </div>
-            </div>
-
-            {/* 审计日志 */}
-            <div
-              className="settings-menu-item"
-              onClick={() => handleNavigate('/ops/audit-logs')}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  handleNavigate('/ops/audit-logs');
-                }
-              }}
-            >
-              <div className="settings-menu-item-icon">
-                <FileSearchOutlined />
-              </div>
-              <div className="settings-menu-item-content">
-                <span className="settings-menu-item-label">{t('chat:sidebar.auditLogs')}</span>
-              </div>
-            </div>
-
-            {/* Token 用量 */}
-            <div
-              className="settings-menu-item"
-              onClick={() => handleNavigate('/ops/token-usage')}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  handleNavigate('/ops/token-usage');
-                }
-              }}
-            >
-              <div className="settings-menu-item-icon">
-                <BarChartOutlined />
-              </div>
-              <div className="settings-menu-item-content">
-                <span className="settings-menu-item-label">{t('chat:sidebar.tokenUsage')}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 
