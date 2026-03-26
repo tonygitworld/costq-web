@@ -176,9 +176,15 @@ class AWSBedrockAgentProvider(AgentProvider):
             # 记录审计日志
             audit_logger = get_audit_logger()
             if account_ids:
-                audit_logger.log_query(user_id, org_id, query, account_ids, "aws", session_id=session_id)
+                audit_logger.log_query(
+                    user_id, org_id, query, account_ids, "aws",
+                    session_id=session_id, query_id=query_id,
+                )
             if gcp_account_ids:
-                audit_logger.log_query(user_id, org_id, query, gcp_account_ids, "gcp", session_id=session_id)
+                audit_logger.log_query(
+                    user_id, org_id, query, gcp_account_ids, "gcp",
+                    session_id=session_id, query_id=query_id,
+                )
 
             # 权限验证
             user_storage = get_user_storage()
@@ -691,6 +697,22 @@ class AWSBedrockAgentProvider(AgentProvider):
                             )
                         except Exception as e:
                             logger.error("保存助手响应失败: %s", e, exc_info=True)
+
+                    # ✅ 回写 token_usage 到审计日志（不受会话删除影响）
+                    if token_usage_data and session_id:
+                        try:
+                            await asyncio.get_event_loop().run_in_executor(
+                                None,
+                                audit_logger.update_query_token_usage,
+                                query_id,
+                                session_id,
+                                token_usage_data,
+                            )
+                        except Exception as e:
+                            logger.error(
+                                "token_usage 回写审计日志失败: %s",
+                                e, exc_info=True,
+                            )
 
                     # 发送成功complete事件（包含 token_usage）
                     complete_event = {

@@ -1,7 +1,8 @@
 """Token 用量统计 API
 
 提供全平台、按组织、按用户三个维度的 Token 消耗聚合查询。
-数据来源于 chat_messages.message_metadata 中的 token_usage 字段，
+
+数据来源于 audit_logs.details 中的 token_usage 字段（不受会话删除影响），
 通过 PostgreSQL JSON 操作符提取并聚合。
 """
 
@@ -12,9 +13,10 @@ from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
 from sqlalchemy import Integer, and_, cast, func
 from sqlalchemy.orm import Session
+from sqlalchemy.dialects.postgresql import JSONB
 
 from backend.database import get_db
-from backend.models.chat import ChatMessage, ChatSession
+from backend.models.audit_log import AuditLog
 from backend.models.user import Organization, User
 from backend.utils.auth import get_current_super_admin
 
@@ -34,7 +36,7 @@ class TokenUsageSummaryResponse(BaseModel):
     total_cache_read_tokens: int
     total_cache_write_tokens: int
     total_tokens: int
-    total_messages: int
+    total_queries: int
     start_date: str
     end_date: str
 
@@ -87,11 +89,15 @@ class TokenUsageByUserResponse(BaseModel):
 # 辅助函数
 # ----------------------------------------------------------------
 
+# ✅ 将 Text 类型的 details 列 CAST 为 JSONB，安全处理 JSON 操作
+_details_jsonb = cast(AuditLog.details, JSONB)
+
 
 def _token_field(field_name: str) -> Any:
-    """从 message_metadata -> token_usage -> field_name 提取整数值。
+    """从 audit_logs.details -> token_usage -> field_name 提取整数值。
 
-    使用 COALESCE 确保缺失字段返回 0，避免 NULL 影响聚合结果。
+    audit_logs.details 是 Text 列（存储 JSON 字符串），
+    通过 CAST(details AS JSONB) 转换后用 PostgreSQL JSON 操作符提取。
 
     Args:
         field_name: token_usage 中的字段名
@@ -103,9 +109,7 @@ def _token_field(field_name: str) -> Any:
     """
     return func.coalesce(
         cast(
-            ChatMessage.message_metadata[
-                "token_usage"
-            ][field_name].as_string(),
+            _details_jsonb["token_usage"][field_name].as_string(),
             Integer,
         ),
         0,
@@ -145,8 +149,8 @@ def _build_base_filters(
 ) -> tuple[list[Any], datetime, datetime]:
     """构建基础过滤条件。
 
-    仅聚合 role='assistant' 的消息，支持时间范围筛选，
-    默认最近 30 天。
+    仅聚合 action='query' 且含 token_usage 的审计日志，
+    支持时间范围筛选，默认最近 30 天。
 
     Args:
         start_date: 开始时间（可选）
@@ -162,16 +166,22 @@ def _build_base_filters(
     actual_end = end_date or now
 
     # ✅ 如果 end_date 是当天零点（前端传 YYYY-MM-DD 格式），
-    # 扩展到当天 23:59:59.999999，确保包含当天所有消息
-    if actual_end.hour == 0 and actual_end.minute == 0 and actual_end.second == 0:
+    # 扩展到当天 23:59:59.999999，确保包含当天所有记录
+    if (actual_end.hour == 0
+            and actual_end.minute == 0
+            and actual_end.second == 0
+            and actual_end.microsecond == 0):
         actual_end = actual_end.replace(
             hour=23, minute=59, second=59, microsecond=999999
         )
 
     filters: list[Any] = [
-        ChatMessage.role == "assistant",
-        ChatMessage.created_at >= actual_start,
-        ChatMessage.created_at <= actual_end,
+        AuditLog.action == "query",
+        AuditLog.timestamp >= actual_start,
+        AuditLog.timestamp <= actual_end,
+        # ✅ 只统计已回写 token_usage 的记录
+        AuditLog.details.isnot(None),
+        _details_jsonb["token_usage"].isnot(None),
     ]
 
     return filters, actual_start, actual_end
@@ -196,13 +206,15 @@ def get_token_usage_summary(
 ) -> TokenUsageSummaryResponse:
     """获取全平台 Token 用量汇总。
 
+    从 audit_logs 聚合，不受会话删除影响。
+
     Args:
         start_date: 开始日期（可选，默认 30 天前）
         end_date: 结束日期（可选，默认当前时间）
 
     Returns:
         全平台 input/output/cache_read/cache_write
-        tokens 总计及消息数
+        tokens 总计及查询数
     """
     filters, actual_start, actual_end = _build_base_filters(
         start_date, end_date
@@ -221,7 +233,7 @@ def get_token_usage_summary(
         func.coalesce(
             func.sum(_token_field("cache_write_tokens")), 0
         ).label("total_cache_write"),
-        func.count(ChatMessage.id).label("total_messages"),
+        func.count(AuditLog.id).label("total_queries"),
     ).filter(
         and_(*filters)
     ).one()
@@ -235,7 +247,7 @@ def get_token_usage_summary(
         total_cache_read_tokens=int(result.total_cache_read),
         total_cache_write_tokens=int(result.total_cache_write),
         total_tokens=total_input + total_output,
-        total_messages=int(result.total_messages),
+        total_queries=int(result.total_queries),
         start_date=actual_start.strftime("%Y-%m-%d"),
         end_date=actual_end.strftime("%Y-%m-%d"),
     )
@@ -258,8 +270,7 @@ def get_token_usage_by_org(
 ) -> TokenUsageByOrgResponse:
     """按组织维度聚合 Token 用量。
 
-    通过 chat_messages JOIN chat_sessions（获取 org_id）
-    JOIN organizations（获取组织名称）进行聚合。
+    从 audit_logs JOIN organizations 聚合，不受会话删除影响。
     结果按总 Token 数（input + output）降序排列。
 
     Args:
@@ -278,10 +289,9 @@ def get_token_usage_by_org(
         total_expr,
     ) = _build_token_agg_exprs()
 
-    # JOIN chat_sessions 和 organizations
     base_query = (
         db.query(
-            ChatSession.org_id,
+            AuditLog.org_id,
             Organization.name.label("org_name"),
             sum_input.label("input_tokens"),
             sum_output.label("output_tokens"),
@@ -290,15 +300,11 @@ def get_token_usage_by_org(
             total_expr.label("total_tokens"),
         )
         .join(
-            ChatSession,
-            ChatMessage.session_id == ChatSession.id,
-        )
-        .join(
             Organization,
-            ChatSession.org_id == Organization.id,
+            AuditLog.org_id == Organization.id,
         )
         .filter(and_(*filters))
-        .group_by(ChatSession.org_id, Organization.name)
+        .group_by(AuditLog.org_id, Organization.name)
     )
 
     total = base_query.count()
@@ -352,8 +358,8 @@ def get_token_usage_by_user(
 ) -> TokenUsageByUserResponse:
     """按用户维度聚合 Token 用量。
 
-    通过 chat_messages JOIN users（获取用户名）
-    JOIN organizations（获取组织名称）进行聚合。
+    从 audit_logs JOIN users JOIN organizations 聚合，
+    不受会话删除影响。
     支持按 org_id 筛选特定组织下的用户。
     结果按总 Token 数（input + output）降序排列。
 
@@ -378,10 +384,9 @@ def get_token_usage_by_user(
     if org_id:
         filters.append(User.org_id == org_id)
 
-    # JOIN users 和 organizations
     base_query = (
         db.query(
-            ChatMessage.user_id,
+            AuditLog.user_id,
             User.username,
             User.org_id.label("org_id"),
             Organization.name.label("org_name"),
@@ -391,11 +396,11 @@ def get_token_usage_by_user(
             sum_cache_write.label("cache_write_tokens"),
             total_expr.label("total_tokens"),
         )
-        .join(User, ChatMessage.user_id == User.id)
+        .join(User, AuditLog.user_id == User.id)
         .join(Organization, User.org_id == Organization.id)
         .filter(and_(*filters))
         .group_by(
-            ChatMessage.user_id,
+            AuditLog.user_id,
             User.username,
             User.org_id,
             Organization.name,

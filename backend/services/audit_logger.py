@@ -4,6 +4,7 @@ import json
 import uuid
 from datetime import datetime, timezone
 
+from sqlalchemy import String, cast
 from sqlalchemy.orm import Session
 
 from backend.database import get_db
@@ -122,8 +123,9 @@ class AuditLogger:
         account_ids: list[str],
         account_type: str = "aws",
         session_id: str | None = None,
+        query_id: str | None = None,
     ):
-        """记录查询操作（保留query参数用于兼容性，但不记录详细信息）
+        """记录查询操作
 
         Args:
             user_id: 用户ID
@@ -132,6 +134,7 @@ class AuditLogger:
             account_ids: 账号ID列表
             account_type: 账号类型（aws/gcp）
             session_id: 会话ID
+            query_id: 请求级唯一标识，用于后续精确回写 token_usage
         """
         self.log(
             user_id=user_id,
@@ -139,9 +142,73 @@ class AuditLogger:
             action="query",
             resource_type=f"{account_type}_account",
             resource_id=",".join(account_ids[:3]) if account_ids else None,
-            details=None,
+            details={"query_id": query_id} if query_id else None,
             session_id=session_id,
         )
+
+    def update_query_token_usage(
+        self,
+        query_id: str,
+        session_id: str,
+        token_usage: dict,
+    ) -> None:
+        """将 token_usage 回写到对应 query 审计日志的 details 字段。
+
+        通过 details 中的 query_id 精确匹配，避免并发下串写。
+
+        Args:
+            query_id: 请求级唯一标识（与 log_query 写入的一致）
+            session_id: 会话ID（备用匹配）
+            token_usage: Token 统计数据字典
+        """
+        if not query_id or not token_usage:
+            return
+
+        db: Session = next(get_db())
+        try:
+            # ✅ 优先按 query_id 精确匹配
+            # details 是 jsonb 列，需要 cast 为 text 再做文本匹配
+            audit_log = (
+                db.query(AuditLog)
+                .filter(
+                    AuditLog.action == "query",
+                    AuditLog.session_id == session_id,
+                    cast(AuditLog.details, String).contains(query_id),
+                )
+                .order_by(AuditLog.timestamp.desc())
+                .first()
+            )
+
+            if not audit_log:
+                logger.warning(
+                    "未找到 query_id=%s 的审计日志，跳过 token_usage 回写",
+                    query_id,
+                )
+                return
+
+            # 合并 details：保留已有字段，追加 token_usage
+            existing = {}
+            if audit_log.details:
+                try:
+                    existing = json.loads(audit_log.details)
+                except (json.JSONDecodeError, TypeError):
+                    existing = {}
+
+            existing["token_usage"] = token_usage
+            audit_log.details = json.dumps(existing)
+            db.commit()
+
+            logger.debug(
+                "📊 token_usage 已回写到审计日志 - query_id=%s",
+                query_id,
+            )
+        except Exception as e:
+            db.rollback()
+            logger.error(
+                "token_usage 回写审计日志失败: %s", e, exc_info=True
+            )
+        finally:
+            db.close()
 
     def log_account_create(
         self,

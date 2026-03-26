@@ -291,7 +291,7 @@ export const OpsTokenUsage: React.FC = () => {
             <Card>
               <Statistic
                 title={t('tokenUsage.summary.totalMessages')}
-                value={summary?.total_messages ?? '-'}
+                value={summary?.total_queries ?? '-'}
                 formatter={(v) =>
                   typeof v === 'number' ? v.toLocaleString() : v
                 }

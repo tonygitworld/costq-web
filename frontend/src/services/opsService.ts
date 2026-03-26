@@ -166,7 +166,7 @@ export interface TokenUsageSummary {
   total_cache_read_tokens: number;
   total_cache_write_tokens: number;
   total_tokens: number;
-  total_messages: number;
+  total_queries: number;
   start_date: string;
   end_date: string;
 }
