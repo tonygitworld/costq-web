@@ -10,6 +10,7 @@ import {
   UserOutlined,
   GlobalOutlined,
   LogoutOutlined,
+  FileTextOutlined,
 } from '@ant-design/icons';
 import { useAuthStore } from '../../stores/authStore';
 import { useAccountStore } from '../../stores/accountStore';
@@ -277,6 +278,26 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false, onOpe
               </div>
               <div className="settings-menu-item-content">
                 <span className="settings-menu-item-label">{t('chat:sidebar.userManagement')}</span>
+              </div>
+            </div>
+
+            {/* Invoice */}
+            <div
+              className="settings-menu-item"
+              onClick={() => handleNavigate('/settings/invoices')}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  handleNavigate('/settings/invoices');
+                }
+              }}
+            >
+              <div className="settings-menu-item-icon">
+                <FileTextOutlined />
+              </div>
+              <div className="settings-menu-item-content">
+                <span className="settings-menu-item-label">Invoice</span>
               </div>
             </div>
 
