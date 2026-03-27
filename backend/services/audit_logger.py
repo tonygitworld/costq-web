@@ -4,7 +4,7 @@ import json
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import String, cast
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from backend.database import get_db
@@ -56,7 +56,8 @@ class AuditLogger:
             session_id: 会话ID，仅query操作有值
         """
         log_id = str(uuid.uuid4())
-        details_json = json.dumps(details) if details else None
+        # ✅ 修复：jsonb 列直接接受 dict，不需要 json.dumps（避免存成字符串再被 psycopg2 二次序列化）
+        details_value = details if details else None
 
         db: Session = next(get_db())
         try:
@@ -67,7 +68,7 @@ class AuditLogger:
                 action=action,
                 resource_type=resource_type,
                 resource_id=resource_id,
-                details=details_json,
+                details=details_value,
                 ip_address=ip_address,
                 user_agent=user_agent,
                 session_id=session_id,
@@ -173,18 +174,34 @@ class AuditLogger:
 
         db: Session = next(get_db())
         try:
-            # ✅ 优先按 query_id 精确匹配
-            # details 是 jsonb 列，需要 cast 为 text 再做文本匹配
+            # ✅ 用 jsonb ->> 操作符精确匹配 query_id，比 text cast 更可靠
             audit_log = (
                 db.query(AuditLog)
                 .filter(
                     AuditLog.action == "query",
                     AuditLog.session_id == session_id,
-                    cast(AuditLog.details, String).contains(query_id),
+                    text("details->>'query_id' = :qid").bindparams(qid=query_id),
                 )
                 .order_by(AuditLog.timestamp.desc())
                 .first()
             )
+            logger.info("📊 [token_usage回写] 精确匹配结果: %s", audit_log.id if audit_log else None)
+
+            # 找不到时降级
+            if not audit_log:
+                logger.warning(
+                    "按 query_id 未找到审计日志，降级按 session_id 匹配 - query_id=%s, session_id=%s",
+                    query_id, session_id,
+                )
+                audit_log = (
+                    db.query(AuditLog)
+                    .filter(
+                        AuditLog.action == "query",
+                        AuditLog.session_id == session_id,
+                    )
+                    .order_by(AuditLog.timestamp.desc())
+                    .first()
+                )
 
             if not audit_log:
                 logger.warning(
@@ -196,19 +213,19 @@ class AuditLogger:
             # 合并 details：保留已有字段，追加 token_usage
             existing = {}
             if audit_log.details:
-                try:
-                    existing = json.loads(audit_log.details)
-                except (json.JSONDecodeError, TypeError):
-                    existing = {}
+                if isinstance(audit_log.details, dict):
+                    existing = dict(audit_log.details)  # ✅ 拷贝，避免原地修改
+                else:
+                    try:
+                        existing = json.loads(audit_log.details)
+                    except (json.JSONDecodeError, TypeError):
+                        existing = {}
 
             existing["token_usage"] = token_usage
-            audit_log.details = json.dumps(existing)
+            # ✅ 赋值新 dict，SQLAlchemy 能检测到引用变化并生成 UPDATE
+            audit_log.details = existing
             db.commit()
-
-            logger.debug(
-                "📊 token_usage 已回写到审计日志 - query_id=%s",
-                query_id,
-            )
+            logger.debug("📊 token_usage 已回写到审计日志 - query_id=%s", query_id)
         except Exception as e:
             db.rollback()
             logger.error(

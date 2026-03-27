@@ -174,6 +174,7 @@ class AWSBedrockAgentProvider(AgentProvider):
                 return
 
             # 记录审计日志
+            # ✅ 修复：无论账号列表是否为空，都必须写入审计日志（保证 query_id/model_id 被记录）
             audit_logger = get_audit_logger()
             if account_ids:
                 audit_logger.log_query(
@@ -183,6 +184,12 @@ class AWSBedrockAgentProvider(AgentProvider):
             if gcp_account_ids:
                 audit_logger.log_query(
                     user_id, org_id, query, gcp_account_ids, "gcp",
+                    session_id=session_id, query_id=query_id, model_id=model_id,
+                )
+            if not account_ids and not gcp_account_ids:
+                # 未选择具体账号时，仍记录查询（account_ids 为空列表）
+                audit_logger.log_query(
+                    user_id, org_id, query, [], "aws",
                     session_id=session_id, query_id=query_id, model_id=model_id,
                 )
 
