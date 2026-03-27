@@ -11,7 +11,7 @@ import { useI18n } from '../../hooks/useI18n';
 const { Title, Text } = Typography;
 
 export default function InvoiceTab() {
-  const { t } = useI18n(['common']);
+  const { t } = useI18n(['invoice', 'common']);
 
   const { data, isLoading } = useQuery({
     queryKey: ['invoices'],
@@ -23,13 +23,13 @@ export default function InvoiceTab() {
       const res = await invoiceApi.download(invoice.id);
       window.open(res.download_url, '_blank');
     } catch {
-      message.error('Download failed');
+      message.error(t('invoice:downloadFailed'));
     }
   };
 
   const columns = [
     {
-      title: 'Invoice #',
+      title: t('invoice:invoiceNumber'),
       dataIndex: 'invoice_number',
       render: (v: string) => (
         <Space>
@@ -39,31 +39,31 @@ export default function InvoiceTab() {
       ),
     },
     {
-      title: 'Period',
+      title: t('invoice:period'),
       render: (_: unknown, r: Invoice) =>
         `${r.period_year}-${String(r.period_month).padStart(2, '0')}`,
     },
     {
-      title: 'Cloud Spend',
+      title: t('invoice:cloudSpend'),
       dataIndex: 'cloud_cost_total',
       align: 'right' as const,
       render: (v: number) =>
         `$${v.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
     },
     {
-      title: 'Service Fee',
+      title: t('invoice:serviceFee'),
       dataIndex: 'costq_fee',
       align: 'right' as const,
       render: (v: number) =>
         `$${v.toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
     },
     {
-      title: 'Status',
+      title: t('invoice:status'),
       dataIndex: 'status',
-      render: () => <Tag color="success">Generated</Tag>,
+      render: () => <Tag color="success">{t('invoice:statusGenerated')}</Tag>,
     },
     {
-      title: 'Date',
+      title: t('invoice:date'),
       dataIndex: 'generated_at',
       render: (v: string) =>
         v ? dayjs(v).format('YYYY-MM-DD') : '-',
@@ -72,7 +72,7 @@ export default function InvoiceTab() {
       title: '',
       width: 80,
       render: (_: unknown, r: Invoice) => (
-        <Tooltip title="Download PDF">
+        <Tooltip title={t('invoice:download')}>
           <Button
             type="link"
             icon={<DownloadOutlined />}
@@ -86,11 +86,11 @@ export default function InvoiceTab() {
   return (
     <div style={{ maxWidth: 900 }}>
       <Title level={4} style={{ marginBottom: 24 }}>
-        Invoice
+        {t('invoice:title')}
       </Title>
 
       {data?.items?.length === 0 && !isLoading ? (
-        <Empty description="No invoices yet" />
+        <Empty description={t('invoice:noInvoices')} />
       ) : (
         <Table
           rowKey="id"
