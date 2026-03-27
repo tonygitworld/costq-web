@@ -1,0 +1,13 @@
+{
+  "title": "Invoice",
+  "invoiceNumber": "Invoice 番号",
+  "period": "請求期間",
+  "cloudSpend": "クラウド支出",
+  "serviceFee": "サービス料",
+  "status": "ステータス",
+  "date": "生成日",
+  "download": "PDF ダウンロード",
+  "downloadFailed": "ダウンロードリンクの取得に失敗しました",
+  "noInvoices": "Invoiceはまだありません",
+  "statusGenerated": "生成済み"
+}

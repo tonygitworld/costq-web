@@ -8,6 +8,7 @@ import alert from './alert.json';
 import error from './error.json';
 import gcp from './gcp.json';
 import models from './models.json';
+import invoice from './invoice.json';
 
 export default {
   common,
@@ -19,5 +20,6 @@ export default {
   alert,
   error,
   gcp,
-  models
+  models,
+  invoice
 };
