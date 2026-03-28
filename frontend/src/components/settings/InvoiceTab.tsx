@@ -1,7 +1,7 @@
 /**
  * Settings - Invoice Tab（客户侧）
  */
-import { Button, Empty, message, Space, Table, Tag, Tooltip, Typography } from 'antd';
+import { Alert, Button, Empty, message, Space, Table, Tag, Tooltip, Typography } from 'antd';
 import { DownloadOutlined, FileTextOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
@@ -13,7 +13,7 @@ const { Title, Text } = Typography;
 export default function InvoiceTab() {
   const { t } = useI18n(['invoice', 'common']);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['invoices'],
     queryFn: invoiceApi.list,
   });
@@ -88,6 +88,16 @@ export default function InvoiceTab() {
       <Title level={4} style={{ marginBottom: 24 }}>
         {t('invoice:title')}
       </Title>
+
+      {isError ? (
+        <Alert
+          type="error"
+          showIcon
+          message={t('common:errors.loadFailed', { defaultValue: 'Load failed' })}
+          description={error instanceof Error ? error.message : undefined}
+          style={{ marginBottom: 16 }}
+        />
+      ) : null}
 
       {data?.items?.length === 0 && !isLoading ? (
         <Empty description={t('invoice:noInvoices')} />

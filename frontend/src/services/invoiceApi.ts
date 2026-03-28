@@ -25,10 +25,10 @@ export interface InvoiceListResponse {
 
 export const invoiceApi = {
   list: () =>
-    apiClient.get<InvoiceListResponse>('/api/v1/invoices'),
+    apiClient.get<InvoiceListResponse>('/v1/invoices'),
 
   download: (id: string) =>
     apiClient.get<{ download_url: string; expires_in: number }>(
-      `/api/v1/invoices/${id}/download`
+      `/v1/invoices/${id}/download`
     ),
 };
