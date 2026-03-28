@@ -3,6 +3,7 @@
 from typing import Any
 
 from sqlalchemy import Column, DateTime, String, Text
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.sql import func
 
 from backend.models.base import Base
@@ -19,7 +20,7 @@ class AuditLog(Base):
     action = Column(String(50), nullable=False, index=True)
     resource_type = Column(String(50))
     resource_id = Column(String(255))
-    details = Column(Text)  # JSON string
+    details = Column(JSONB)  # ✅ 与数据库实际类型一致，操作 dict，psycopg2 自动序列化/反序列化
     ip_address = Column(String(45))
     user_agent = Column(String(255))
     timestamp = Column(DateTime(timezone=True), default=func.now(), index=True)
