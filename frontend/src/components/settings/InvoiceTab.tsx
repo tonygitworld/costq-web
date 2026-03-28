@@ -143,7 +143,7 @@ export default function InvoiceTab() {
   ];
 
   return (
-    <div style={{ width: '100%', maxWidth: 1100 }}>
+    <div style={{ width: '100%', minWidth: 0 }}>
       <Title level={4} style={{ marginBottom: 24 }}>
         {t('invoice:title')}
       </Title>
