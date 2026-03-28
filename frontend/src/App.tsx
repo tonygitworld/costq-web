@@ -12,6 +12,9 @@ import { AlertManagement } from './components/alert/AlertManagement';
 import { AlertForm } from './components/alert/AlertForm';
 import { AlertDetail } from './components/alert/AlertDetail';
 import { EnterpriseLogin } from './components/auth/EnterpriseLogin';
+
+// 懒加载 Invoice Tab
+const InvoiceTab = React.lazy(() => import('./components/settings/InvoiceTab'));
 import { Register } from './components/auth/Register';
 import { Activate } from './components/auth/Activate';
 import { ForgotPassword } from './components/auth/ForgotPassword';
@@ -228,6 +231,20 @@ const AppContent: FC = () => {
 
       {/* 为了兼容旧路径，添加重定向 */}
       <Route path="/alerts" element={<Navigate to="/settings/alerts" replace />} />
+
+      {/* Invoice */}
+      <Route
+        path="/settings/invoices"
+        element={
+          <ProtectedRoute>
+            <ChatLayout>
+              <React.Suspense fallback={<div style={{ padding: 24 }}>Loading...</div>}>
+                <InvoiceTab />
+              </React.Suspense>
+            </ChatLayout>
+          </ProtectedRoute>
+        }
+      />
 
       {/* 404 跳转 */}
       <Route path="*" element={<Navigate to="/" replace />} />

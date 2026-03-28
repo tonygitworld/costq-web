@@ -1,0 +1,13 @@
+{
+  "title": "Invoice",
+  "invoiceNumber": "Invoice #",
+  "period": "Period",
+  "cloudSpend": "Cloud Spend",
+  "serviceFee": "Service Fee",
+  "status": "Status",
+  "date": "Date",
+  "download": "Download PDF",
+  "downloadFailed": "Failed to get download link",
+  "noInvoices": "No invoices yet",
+  "statusGenerated": "Generated"
+}

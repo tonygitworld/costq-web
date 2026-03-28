@@ -1,0 +1,13 @@
+{
+  "title": "Invoice",
+  "invoiceNumber": "Invoice 编号",
+  "period": "账期",
+  "cloudSpend": "云支出",
+  "serviceFee": "服务费",
+  "status": "状态",
+  "date": "生成时间",
+  "download": "下载 PDF",
+  "downloadFailed": "下载链接获取失败",
+  "noInvoices": "暂无 Invoice",
+  "statusGenerated": "已生成"
+}
