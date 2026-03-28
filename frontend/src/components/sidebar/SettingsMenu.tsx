@@ -29,7 +29,7 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false, onOpe
   const navigate = useNavigate();
   const isAdmin = useAuthStore(state => state.isAdmin);
   const logout = useAuthStore(state => state.logout);
-  const { t } = useI18n(['chat', 'common']);
+  const { t } = useI18n(['chat', 'common', 'invoice']);
   const isMobile = useIsMobile();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -226,6 +226,31 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false, onOpe
         </div>
       </div>
 
+      {/* Invoice（所有用户可见） */}
+      <div className="settings-menu-divider" />
+      <div className="settings-menu-group">
+        <div className="settings-menu-items">
+          <div
+            className="settings-menu-item"
+            onClick={() => handleNavigate('/settings/invoices')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                handleNavigate('/settings/invoices');
+              }
+            }}
+          >
+            <div className="settings-menu-item-icon">
+              <FileTextOutlined />
+            </div>
+            <div className="settings-menu-item-content">
+              <span className="settings-menu-item-label">{t('invoice:title')}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* 分隔线 - 仅管理员 */}
       {isAdmin() && <div className="settings-menu-divider" />}
 
@@ -278,26 +303,6 @@ export const SettingsMenu: FC<SettingsMenuProps> = ({ isCollapsed = false, onOpe
               </div>
               <div className="settings-menu-item-content">
                 <span className="settings-menu-item-label">{t('chat:sidebar.userManagement')}</span>
-              </div>
-            </div>
-
-            {/* Invoice */}
-            <div
-              className="settings-menu-item"
-              onClick={() => handleNavigate('/settings/invoices')}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  handleNavigate('/settings/invoices');
-                }
-              }}
-            >
-              <div className="settings-menu-item-icon">
-                <FileTextOutlined />
-              </div>
-              <div className="settings-menu-item-content">
-                <span className="settings-menu-item-label">Invoice</span>
               </div>
             </div>
 
