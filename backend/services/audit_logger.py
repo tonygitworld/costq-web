@@ -151,8 +151,9 @@ class AuditLogger:
         query_id: str,
         session_id: str,
         token_usage: dict,
+        model_id: str | None = None,
     ) -> None:
-        """将 token_usage 回写到对应 query 审计日志的 details 字段。
+        """将 token_usage 和 model_id 回写到对应 query 审计日志的 details 字段。
 
         通过 details 中的 query_id 精确匹配，避免并发下串写。
 
@@ -160,6 +161,7 @@ class AuditLogger:
             query_id: 请求级唯一标识（与 log_query 写入的一致）
             session_id: 会话ID（备用匹配）
             token_usage: Token 统计数据字典
+            model_id: 使用的模型 ID（用于 costq-admin token 用量按模型统计）
         """
         if not query_id or not token_usage:
             return
@@ -186,7 +188,7 @@ class AuditLogger:
                 )
                 return
 
-            # 合并 details：保留已有字段，追加 token_usage
+            # 合并 details：保留已有字段，追加 token_usage 和 model_id
             existing = {}
             if audit_log.details:
                 try:
@@ -195,12 +197,15 @@ class AuditLogger:
                     existing = {}
 
             existing["token_usage"] = token_usage
+            if model_id:
+                existing["model_id"] = model_id
             audit_log.details = json.dumps(existing)
             db.commit()
 
             logger.debug(
-                "📊 token_usage 已回写到审计日志 - query_id=%s",
+                "📊 token_usage 已回写到审计日志 - query_id=%s, model_id=%s",
                 query_id,
+                model_id,
             )
         except Exception as e:
             db.rollback()

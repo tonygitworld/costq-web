@@ -698,7 +698,7 @@ class AWSBedrockAgentProvider(AgentProvider):
                         except Exception as e:
                             logger.error("保存助手响应失败: %s", e, exc_info=True)
 
-                    # ✅ 回写 token_usage 到审计日志（不受会话删除影响）
+                    # ✅ 回写 token_usage 和 model_id 到审计日志（不受会话删除影响）
                     if token_usage_data and session_id:
                         try:
                             await asyncio.get_event_loop().run_in_executor(
@@ -707,6 +707,7 @@ class AWSBedrockAgentProvider(AgentProvider):
                                 query_id,
                                 session_id,
                                 token_usage_data,
+                                model_id,
                             )
                         except Exception as e:
                             logger.error(
