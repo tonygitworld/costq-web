@@ -39,9 +39,9 @@ interface AuthState {
   refreshFailed: boolean;  // ✅ 标记刷新是否失败（Refresh Token 过期）
 
   // 操作方法
-  register: (orgName: string, username: string, password: string, fullName?: string, verificationCode?: string) => Promise<{
-    user: User;
-    organization: Organization;
+  register: (orgName: string, username: string, password: string, fullName?: string, verificationCode?: string, marketplaceSessionToken?: string) => Promise<{
+    user?: User;
+    organization?: Organization;
     access_token?: string;
     refresh_token?: string;
     requires_activation?: boolean;
@@ -77,7 +77,7 @@ export const useAuthStore = create<AuthState>()(
         refreshFailed: false,  // ✅ 标记刷新是否失败
 
       // 注册（创建组织）
-      register: async (orgName: string, email: string, password: string, fullName?: string, verificationCode?: string) => {
+      register: async (orgName: string, email: string, password: string, fullName?: string, verificationCode?: string, marketplaceSessionToken?: string) => {
         set({ loading: true, error: null });
         try {
           const data = await authApi.register({
@@ -87,6 +87,7 @@ export const useAuthStore = create<AuthState>()(
             organization_name: orgName,
             full_name: fullName,
             verification_code: verificationCode || '', // ✅ 新增：邮箱验证码
+            marketplace_session_token: marketplaceSessionToken,
           });
 
           logger.debug('🔍 Register response:', data);

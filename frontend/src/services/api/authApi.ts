@@ -16,6 +16,7 @@ export interface RegisterRequest {
   organization_name: string;
   full_name?: string;
   verification_code: string;  // ✅ 新增：邮箱验证码
+  marketplace_session_token?: string;
 }
 
 export interface User {

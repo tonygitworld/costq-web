@@ -11,6 +11,7 @@ from sqlalchemy import text
 
 from backend.config.settings import get_settings
 from backend.services.audit_logger import get_audit_logger
+from backend.services.marketplace_service import MarketplaceService
 from backend.services.user_storage import get_user_storage
 from backend.utils.auth import (
     create_access_token,
@@ -50,6 +51,9 @@ class RegisterRequest(BaseModel):
     verification_code: str = Field(
         ..., min_length=6, max_length=6, description="邮箱验证码"
     )  # ✅ 新增
+    marketplace_session_token: str | None = Field(
+        default=None, description="Marketplace onboarding session token"
+    )
 
     @field_validator("email")
     @classmethod
@@ -231,7 +235,18 @@ async def register(register_request: RegisterRequest, request: Request):
                 user_agent=request.headers.get("user-agent"),
             )
 
+            if register_request.marketplace_session_token:
+                marketplace_service = MarketplaceService(db)
+                marketplace_service.bind_session_to_organization(
+                    session_token=register_request.marketplace_session_token,
+                    organization_id=organization["id"],
+                    user_id=new_user["id"],
+                    activate_organization=True,
+                )
+
             db.commit()
+            if register_request.marketplace_session_token:
+                organization = user_storage.get_organization_by_id(organization["id"])
         except ValueError as e:
             db.rollback()
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
@@ -245,7 +260,11 @@ async def register(register_request: RegisterRequest, request: Request):
             logger.info("- user_id: %s, email: %s", new_user['id'], register_request.email)
 
             response_data = {
-                "message": "注册成功，账号正在审核中，审核通过后即可登录使用",
+                "message": (
+                    "注册成功，Marketplace 订阅正在同步中，请稍后重新登录。"
+                    if register_request.marketplace_session_token
+                    else "注册成功，账号正在审核中，审核通过后即可登录使用"
+                ),
                 "requires_activation": True,
                 "user": user_data,
                 "organization": organization,

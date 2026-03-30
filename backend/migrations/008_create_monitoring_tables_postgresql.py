@@ -10,8 +10,11 @@
     python backend/migrations/008_create_monitoring_tables_postgresql.py
 """
 
-from loguru import logger
+import logging
+
 from sqlalchemy import text
+
+logger = logging.getLogger(__name__)
 
 
 def upgrade(db):
@@ -159,7 +162,7 @@ def upgrade(db):
             ORDER BY table_name
         """))
         tables = [row[0] for row in result.fetchall()]
-        logger.info(f"📊 已创建的表: {tables}")
+        logger.info("📊 已创建的表: %s", tables)
 
         # 检查索引
         result = db.execute(text("""
@@ -171,12 +174,12 @@ def upgrade(db):
         """))
         logger.info("📇 已创建的索引:")
         for row in result.fetchall():
-            logger.info(f"  - {row[0]}.{row[1]}")
+            logger.info("  - %s.%s", row[0], row[1])
 
         logger.info("✅ 迁移完成！")
 
     except Exception as e:
-        logger.error(f"❌ 迁移失败: {e}")
+        logger.error("❌ 迁移失败: %s", e)
         db.rollback()
         raise
 
@@ -200,7 +203,7 @@ def downgrade(db):
         logger.info("✅ 回滚完成")
 
     except Exception as e:
-        logger.error(f"❌ 回滚失败: {e}")
+        logger.error("❌ 回滚失败: %s", e)
         db.rollback()
         raise
 

@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: marketplace-metering
+  namespace: costq-fastapi
+  labels:
+    app: costq-fastapi
+    component: marketplace-metering
+spec:
+  schedule: "15 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        metadata:
+          labels:
+            app: costq-fastapi
+            component: marketplace-metering
+        spec:
+          restartPolicy: Never
+          serviceAccountName: costq-fastapi-sa
+          containers:
+            - name: marketplace-metering
+              image: 000451883532.dkr.ecr.ap-northeast-1.amazonaws.com/costq-fastapi:app-latest
+              imagePullPolicy: Always
+              command:
+                - python
+                - -m
+                - backend.jobs.marketplace_metering_job
+              envFrom:
+                - configMapRef:
+                    name: costq-fastapi-config
+                - secretRef:
+                    name: costq-fastapi-secrets
+              resources:
+                requests:
+                  cpu: "250m"
+                  memory: "512Mi"
+                limits:
+                  cpu: "1000m"
+                  memory: "1Gi"

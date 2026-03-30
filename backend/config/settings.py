@@ -63,6 +63,31 @@ class Settings(BaseSettings):
     # 资源区域（RDS等）
     # 在本地开发时，这通常是目标云环境的区域
     AWS_REGION: str = Field(default="ap-northeast-1", description="AWS资源区域")
+    MARKETPLACE_REGION: str = Field(
+        default="us-east-1", description="AWS Marketplace API 区域"
+    )
+    MARKETPLACE_PRODUCT_CODE: str = Field(
+        default="", description="AWS Marketplace Product Code"
+    )
+    MARKETPLACE_SELLER_ACCOUNT_ID: str = Field(
+        default="", description="AWS Marketplace Seller Account ID"
+    )
+    MARKETPLACE_FULFILLMENT_RETURN_URL: str = Field(
+        default="http://localhost:5173/marketplace/onboarding",
+        description="Marketplace 订阅跳转后的前端落地页",
+    )
+    MARKETPLACE_SUBSCRIPTION_SNS_TOPIC_ARN: str = Field(
+        default="", description="Marketplace 订阅通知 SNS Topic ARN"
+    )
+    MARKETPLACE_ENTITLEMENT_SNS_TOPIC_ARN: str = Field(
+        default="", description="Marketplace entitlement 通知 SNS Topic ARN"
+    )
+    MARKETPLACE_ONBOARDING_TOKEN_EXPIRE_MINUTES: int = Field(
+        default=120, description="Marketplace onboarding session 有效期（分钟）"
+    )
+    MARKETPLACE_ENABLE_TEST_MODE: bool = Field(
+        default=False, description="是否启用 Marketplace 测试模式"
+    )
 
     # ==================== 云资源配置 ====================
     # AWS Secrets Manager 密钥名称
@@ -247,6 +272,14 @@ class Settings(BaseSettings):
     def get_cors_origins_list(self) -> list[str]:
         """获取CORS允许的来源列表"""
         return [origin.strip() for origin in self.CORS_ORIGINS.split(",")]
+
+    def get_marketplace_allowed_sns_topic_arns(self) -> set[str]:
+        """返回允许接收的 Marketplace SNS Topic ARN 集合"""
+        allowed = {
+            self.MARKETPLACE_SUBSCRIPTION_SNS_TOPIC_ARN.strip(),
+            self.MARKETPLACE_ENTITLEMENT_SNS_TOPIC_ARN.strip(),
+        }
+        return {arn for arn in allowed if arn}
 
     def get_database_url(self) -> str:
         """
