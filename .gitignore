@@ -66,6 +66,9 @@ temp/
 *.tmp
 
 # Deployment
-deployment/
+deployment/*
+!deployment/k8s/
+!deployment/k8s/**
+!deployment/*.md
 
 .deepvcode/

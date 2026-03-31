@@ -6,22 +6,31 @@ metadata:
   labels:
     app: costq-fastapi
     component: marketplace-metering
+    environment: production
+  annotations:
+    description: "AWS Marketplace hourly metering job for CostQ"
 spec:
   schedule: "15 * * * *"
+  timeZone: "Asia/Tokyo"
+  suspend: false
   concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
       backoffLimit: 1
+      ttlSecondsAfterFinished: 86400
       template:
         metadata:
           labels:
             app: costq-fastapi
             component: marketplace-metering
+            environment: production
         spec:
           restartPolicy: Never
           serviceAccountName: costq-fastapi-sa
+          terminationGracePeriodSeconds: 30
           containers:
             - name: marketplace-metering
               image: 000451883532.dkr.ecr.ap-northeast-1.amazonaws.com/costq-fastapi:app-latest
@@ -30,6 +39,11 @@ spec:
                 - python
                 - -m
                 - backend.jobs.marketplace_metering_job
+              args:
+                - --fail-on-error
+              env:
+                - name: PYTHONUNBUFFERED
+                  value: "1"
               envFrom:
                 - configMapRef:
                     name: costq-fastapi-config

@@ -179,6 +179,27 @@ costq-web/
 - **App 容器**: FastAPI (端口 8000)
 - **Nginx 容器**: 静态文件服务 (端口 80)
 
+### Marketplace Metering CronJob
+
+- 清单文件: [deployment/k8s/marketplace-metering-cronjob.yaml](/Users/liyuguang/data/gitworld/costq/costq-web/deployment/k8s/marketplace-metering-cronjob.yaml)
+- 作用: 每小时执行一次 AWS Marketplace metering job
+- 执行入口: `python -m backend.jobs.marketplace_metering_job --fail-on-error`
+- 默认调度: `Asia/Tokyo` 时区每小时第 15 分钟
+
+部署:
+
+```bash
+kubectl apply -f deployment/k8s/marketplace-metering-cronjob.yaml
+```
+
+查看状态:
+
+```bash
+kubectl get cronjob marketplace-metering -n costq-fastapi
+kubectl get jobs -n costq-fastapi -l component=marketplace-metering
+kubectl logs -n costq-fastapi job/<job-name>
+```
+
 ## 监控和日志
 
 ### CloudWatch 日志组
