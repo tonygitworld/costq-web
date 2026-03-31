@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from backend.database import get_db
+from backend.config.settings import settings
 from backend.services.marketplace_metering_service import MarketplaceMeteringService
 from backend.services.marketplace_notification_service import MarketplaceNotificationService
 from backend.services.marketplace_service import MarketplaceService
@@ -80,6 +81,15 @@ async def get_onboarding_session_status(
 @router.post("/sns")
 async def marketplace_sns_handler(request: Request, db: Session = Depends(get_db)):
     """接收 AWS Marketplace SNS 通知"""
+    if not settings.MARKETPLACE_ENABLE_WEB_SNS_HANDLER:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=(
+                "Marketplace SNS handler is disabled in web app. "
+                "Use CloudFormation integration path instead."
+            ),
+        )
+
     raw_body = await request.body()
     try:
         envelope = json.loads(raw_body.decode("utf-8"))
@@ -169,6 +179,15 @@ async def meter_marketplace_usage(
     db: Session = Depends(get_db),
 ):
     """为当前组织计算并上报 Marketplace metering"""
+    if not settings.MARKETPLACE_ENABLE_WEB_METERING_API:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=(
+                "Marketplace metering API is disabled in web app. "
+                "Use CloudFormation/Lambda metering pipeline instead."
+            ),
+        )
+
     service = MarketplaceMeteringService(db)
     try:
         result = service.submit_metering(

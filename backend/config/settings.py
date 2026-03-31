@@ -88,6 +88,12 @@ class Settings(BaseSettings):
     MARKETPLACE_ENABLE_TEST_MODE: bool = Field(
         default=False, description="是否启用 Marketplace 测试模式"
     )
+    MARKETPLACE_ENABLE_WEB_SNS_HANDLER: bool = Field(
+        default=False, description="是否启用 Web API 直接处理 Marketplace SNS 通知"
+    )
+    MARKETPLACE_ENABLE_WEB_METERING_API: bool = Field(
+        default=False, description="是否启用 Web API 触发 Marketplace metering 上报"
+    )
 
     # ==================== 云资源配置 ====================
     # AWS Secrets Manager 密钥名称
