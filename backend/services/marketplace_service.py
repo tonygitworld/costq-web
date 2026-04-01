@@ -455,6 +455,36 @@ class MarketplaceService:
         self.db.flush()
         return notification
 
+    def revoke_all_agreements(
+        self,
+        customer: MarketplaceCustomer,
+        *,
+        payload: dict[str, Any] | None = None,
+    ) -> None:
+        """unsubscribe-success 时把该 customer 所有 active/pending agreements 标为 inactive。
+        SNS payload 里 unsubscribe-success 通常不含 agreement_id/license_arn，
+        所以不能依赖 upsert_agreement 的查找逻辑，直接批量更新。
+        """
+        agreements = (
+            self.db.query(MarketplaceAgreement)
+            .filter(
+                MarketplaceAgreement.marketplace_customer_id == customer.id,
+                MarketplaceAgreement.status.in_(["active", "unsubscribe-pending"]),
+            )
+            .all()
+        )
+        for agreement in agreements:
+            agreement.status = "inactive"
+            if payload:
+                agreement.entitlement_payload = payload
+        customer.last_synced_at = _utc_now()
+        logger.info(
+            "Revoked %d agreements for customer_id=%s reason=unsubscribe-success",
+            len(agreements),
+            customer.id,
+        )
+        self.db.flush()
+
     def upsert_agreement(
         self,
         *,

@@ -227,14 +227,9 @@ class MarketplaceNotificationService:
                 customer, reason="unsubscribe-pending"
             )
         elif action == "unsubscribe-success":
-            self.marketplace_service.upsert_agreement(
-                customer=customer,
-                agreement_id=agreement_id,
-                license_arn=license_arn,
-                offer_id=offer_id,
-                status="inactive",
-                entitlement_payload=payload,
-            )
+            # SNS payload 里 unsubscribe-success 通常不含 agreement_id/license_arn
+            # 直接把该 customer 所有 active/unsubscribe-pending agreements 标为 inactive
+            self.marketplace_service.revoke_all_agreements(customer, payload=payload)
             self.marketplace_service.update_customer_access(
                 customer, reason="unsubscribe-success"
             )
