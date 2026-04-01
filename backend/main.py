@@ -32,6 +32,7 @@ from .api.prompt_templates import router as prompt_templates_router
 from .api.users import router as users_router
 
 from .api.invoices import router as invoices_router
+from .api.marketplace import router as marketplace_router
 from .api.sse import sse_query_endpoint_v2, SSEQueryRequestV2
 from .config.settings import settings
 from .utils.auth import get_current_user
@@ -293,6 +294,7 @@ app.include_router(alerts_router)  # 告警管理路由 (Alert MCP Server)
 # P2-3: 禁用监控 API（安全考虑）
 app.include_router(monitoring_router)  # Phase 4: 监控路由（简化版）
 app.include_router(invoices_router)  # Invoice 客户侧（只读）
+app.include_router(marketplace_router)  # AWS Marketplace 集成
 
 # 挂载静态文件（开发环境禁用缓存）
 class NoCacheStaticFiles(StaticFiles):

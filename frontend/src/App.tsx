@@ -16,6 +16,7 @@ import { EnterpriseLogin } from './components/auth/EnterpriseLogin';
 // 懒加载 Invoice Tab
 const InvoiceTab = React.lazy(() => import('./components/settings/InvoiceTab'));
 import { Register } from './components/auth/Register';
+import { MarketplaceOnboarding } from './components/auth/MarketplaceOnboarding';
 import { Activate } from './components/auth/Activate';
 import { ForgotPassword } from './components/auth/ForgotPassword';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -83,6 +84,11 @@ const AppContent: FC = () => {
         element={
           isAuthenticated ? <Navigate to="/" replace /> : <Register />
         }
+      />
+
+      <Route
+        path="/marketplace/onboarding"
+        element={<MarketplaceOnboarding />}
       />
 
       {/* 激活账号页面 */}

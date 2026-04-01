@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Form, Input, Button, App as AntdApp } from 'antd';
 import { Mail, Lock } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
@@ -10,10 +10,12 @@ import { UnauthorizedError, ForbiddenError, ApiClientError } from '../../service
 import { useI18n } from '../../hooks/useI18n';
 import { AuthLayout } from './AuthLayout';
 import { FormCard } from './FormCard';
+import { marketplaceApi } from '../../services/api/marketplaceApi';
 import styles from './EnterpriseLogin.module.css';
 
 const EnterpriseLoginForm: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
@@ -21,6 +23,7 @@ const EnterpriseLoginForm: React.FC = () => {
   const { loadFromStorage } = useChatStore();
   const { t, language } = useI18n('auth');
   const { message, modal } = AntdApp.useApp();
+  const marketplaceSessionToken = searchParams.get('marketplace_session');
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -35,6 +38,10 @@ const EnterpriseLoginForm: React.FC = () => {
     setLoading(true);
     try {
       await login(values.email, values.password);
+
+      if (marketplaceSessionToken) {
+        await marketplaceApi.claimOnboardingSession(marketplaceSessionToken);
+      }
 
       // 登录成功后加载用户数据
       await loadFromStorage();
@@ -79,7 +86,7 @@ const EnterpriseLoginForm: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [login, navigate, t, message, modal]);
+  }, [login, loadFromStorage, marketplaceSessionToken, navigate, t, message, modal]);
 
   return (
     <AuthLayout>
@@ -134,9 +141,9 @@ const EnterpriseLoginForm: React.FC = () => {
           </Form.Item>
 
           <div className={styles.forgotRow}>
-            <Link to="/forgot-password" className={styles.forgotLink}>
-              {t('login.forgotPassword')}
-            </Link>
+          <Link to="/forgot-password" className={styles.forgotLink}>
+            {t('login.forgotPassword')}
+          </Link>
           </div>
 
           <Button
@@ -153,7 +160,10 @@ const EnterpriseLoginForm: React.FC = () => {
 
         <div className={styles.formFooter}>
           <span className={styles.footerText}>{t('login.noAccount')}</span>
-          <Link to="/register" className={styles.registerLink}>
+          <Link
+            to={marketplaceSessionToken ? `/register?marketplace_session=${encodeURIComponent(marketplaceSessionToken)}` : "/register"}
+            className={styles.registerLink}
+          >
             {t('login.registerLink')}
           </Link>
         </div>

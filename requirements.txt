@@ -20,6 +20,7 @@ botocore>=1.35.0
 
 # === GCP SDK ===
 google-auth>=2.29.0
+google-cloud-bigquery>=3.25.0
 google-cloud-billing>=1.12.0
 google-cloud-resource-manager>=1.12.0
 

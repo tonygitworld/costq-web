@@ -11,6 +11,13 @@ from backend.models.permission import AWSAccountPermission, GCPAccountPermission
 from backend.models.prompt_template import PromptTemplate
 from backend.models.user_consent import UserConsent
 from backend.models.invoice import Invoice
+from backend.models.marketplace import (
+    MarketplaceAgreement,
+    MarketplaceCustomer,
+    MarketplaceMeteringRecord,
+    MarketplaceNotification,
+    MarketplaceOnboardingSession,
+)
 from backend.models.user import Organization, User
 
 __all__ = [
@@ -29,4 +36,9 @@ __all__ = [
     "AlertHistory",
     "AlertExecutionLog",
     "Invoice",
+    "MarketplaceCustomer",
+    "MarketplaceAgreement",
+    "MarketplaceOnboardingSession",
+    "MarketplaceNotification",
+    "MarketplaceMeteringRecord",
 ]

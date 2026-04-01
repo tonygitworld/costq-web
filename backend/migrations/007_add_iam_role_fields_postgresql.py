@@ -11,8 +11,11 @@
     python backend/migrations/007_add_iam_role_fields_postgresql.py
 """
 
-from loguru import logger
+import logging
+
 from sqlalchemy import text
+
+logger = logging.getLogger(__name__)
 
 def upgrade(db):
     """升级数据库 - 添加 IAM Role 字段"""
@@ -86,7 +89,7 @@ def upgrade(db):
             db.commit()
             logger.info("✅ auth_type 索引创建成功")
         except Exception as e:
-            logger.warning(f"⚠️  索引可能已存在: {e}")
+            logger.warning("⚠️  索引可能已存在: %s", e)
 
         # 7. 验证迁移结果
         logger.info("🔍 验证迁移结果...")
@@ -100,12 +103,12 @@ def upgrade(db):
 
         logger.info("📊 新增字段信息:")
         for row in result.fetchall():
-            logger.info(f"  - {row[0]}: {row[1]} (默认值: {row[2]})")
+            logger.info("  - %s: %s (默认值: %s)", row[0], row[1], row[2])
 
         logger.info("✅ 迁移完成！")
 
     except Exception as e:
-        logger.error(f"❌ 迁移失败: {e}")
+        logger.error("❌ 迁移失败: %s", e)
         db.rollback()
         raise
 
@@ -130,7 +133,7 @@ def downgrade(db):
         logger.info("✅ 回滚完成")
 
     except Exception as e:
-        logger.error(f"❌ 回滚失败: {e}")
+        logger.error("❌ 回滚失败: %s", e)
         db.rollback()
         raise
 
@@ -157,7 +160,7 @@ if __name__ == "__main__":
         logger.info("✅ 迁移执行成功！")
         logger.info("=" * 60)
     except Exception as e:
-        logger.error(f"\n❌ 迁移执行失败: {e}")
+        logger.error("\n❌ 迁移执行失败: %s", e)
         db.rollback()
         raise
     finally:

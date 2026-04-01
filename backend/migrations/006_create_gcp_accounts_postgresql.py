@@ -4,8 +4,11 @@ Revision ID: 006
 Create Date: 2025-10-22 06:30:00
 """
 
+import logging
+
 from sqlalchemy import text
-from loguru import logger
+
+logger = logging.getLogger(__name__)
 
 
 def upgrade(db):
@@ -68,7 +71,7 @@ if __name__ == "__main__":
         upgrade(db)
         logger.info("✅ 迁移执行成功")
     except Exception as e:
-        logger.error(f"❌ 迁移执行失败: {e}")
+        logger.error("❌ 迁移执行失败: %s", e)
         db.rollback()
         raise
     finally:

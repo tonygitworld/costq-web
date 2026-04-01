@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Form, Input, Button, Checkbox, message } from 'antd';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { Form, Input, Button, Checkbox, message, Alert } from 'antd';
 import { Building2, User, Mail, Lock, MailCheck } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { useI18n } from '../../hooks/useI18n';
@@ -18,6 +18,7 @@ interface FormValidationError {
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
@@ -26,6 +27,7 @@ export const Register: React.FC = () => {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const register = useAuthStore(state => state.register);
   const { t, language } = useI18n('auth');
+  const marketplaceSessionToken = searchParams.get('marketplace_session') || undefined;
 
   useEffect(() => {
     return () => {
@@ -87,7 +89,8 @@ export const Register: React.FC = () => {
         values.email,
         values.password,
         values.full_name || undefined,
-        values.verification_code
+        values.verification_code,
+        marketplaceSessionToken
       );
       if (response?.requires_activation === true) {
         setRegistrationSuccess(true);
@@ -125,6 +128,16 @@ export const Register: React.FC = () => {
               <h2 className={styles.formTitle}>{t('register.title')}</h2>
               <p className={styles.formSubtitle}>{t('register.subtitle')}</p>
             </div>
+
+            {marketplaceSessionToken && (
+              <Alert
+                type="info"
+                showIcon
+                message="AWS Marketplace subscription detected"
+                description="Complete registration to bind this CostQ organization to your AWS Marketplace purchase."
+                style={{ marginBottom: 24 }}
+              />
+            )}
 
             <Form
               form={form}

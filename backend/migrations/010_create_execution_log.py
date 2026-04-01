@@ -11,8 +11,11 @@
     python backend/migrations/010_create_execution_log.py
 """
 
-from loguru import logger
+import logging
+
 from sqlalchemy import text
+
+logger = logging.getLogger(__name__)
 
 
 def upgrade(db):
@@ -138,7 +141,7 @@ def upgrade(db):
             AND table_name = 'alert_execution_logs'
         """))
         tables = [row[0] for row in result.fetchall()]
-        logger.info(f"📊 已创建的表: {tables}")
+        logger.info("📊 已创建的表: %s", tables)
 
         # 检查字段
         result = db.execute(text("""
@@ -151,7 +154,7 @@ def upgrade(db):
         logger.info("📋 字段信息:")
         for row in result.fetchall():
             nullable_str = "NULL" if row[2] == 'YES' else "NOT NULL"
-            logger.info(f"  - {row[0]}: {row[1]} ({nullable_str})")
+            logger.info("  - %s: %s (%s)", row[0], row[1], nullable_str)
 
         # 检查索引
         result = db.execute(text("""
@@ -163,12 +166,12 @@ def upgrade(db):
         """))
         logger.info("📇 已创建的索引:")
         for row in result.fetchall():
-            logger.info(f"  - {row[0]}")
+            logger.info("  - %s", row[0])
 
         logger.info("✅ 迁移完成！")
 
     except Exception as e:
-        logger.error(f"❌ 迁移失败: {e}")
+        logger.error("❌ 迁移失败: %s", e)
         db.rollback()
         raise
 
@@ -186,7 +189,7 @@ def downgrade(db):
         logger.info("✅ 回滚完成")
 
     except Exception as e:
-        logger.error(f"❌ 回滚失败: {e}")
+        logger.error("❌ 回滚失败: %s", e)
         db.rollback()
         raise
 
@@ -213,7 +216,7 @@ if __name__ == "__main__":
         logger.info("✅ 迁移执行成功！")
         logger.info("=" * 60)
     except Exception as e:
-        logger.error(f"\n❌ 迁移执行失败: {e}")
+        logger.error("\n❌ 迁移执行失败: %s", e)
         db.rollback()
         raise
     finally:
