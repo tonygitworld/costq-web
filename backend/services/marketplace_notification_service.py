@@ -113,7 +113,15 @@ class MarketplaceNotificationService:
             raise ValueError(f"Unexpected Marketplace SNS topic: {topic_arn}")
 
         action = self._extract_action(envelope)
-        signature_verified = self._verify_sns_signature(envelope)
+        try:
+            signature_verified = self._verify_sns_signature(envelope)
+        except Exception as exc:
+            logger.warning("SNS signature verification failed: %s", exc)
+            raise ValueError(f"SNS signature verification failed: {exc}") from exc
+
+        if not signature_verified:
+            raise ValueError("SNS signature verification returned False, rejecting message")
+
         notification = self.marketplace_service.record_notification(
             message_id=envelope.get("MessageId") or envelope.get("MessageID") or str(_utc_now().timestamp()),
             notification_type=notification_type,
