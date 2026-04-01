@@ -29,6 +29,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc)
+
+
 def _serialize_for_jsonb(obj: Any) -> Any:
     """递归把 datetime 转成 ISO string，确保 JSONB 可序列化"""
     if isinstance(obj, datetime):
