@@ -65,10 +65,31 @@ class MarketplaceService:
         self._metering_client = None
         self._entitlement_client = None
 
+    def _get_marketplace_session(self) -> boto3.Session:
+        """返回用于调用 Marketplace API 的 boto3 Session。
+        如果配置了 MARKETPLACE_SELLER_ROLE_ARN，则 assume 跨账号 role。
+        """
+        role_arn = settings.MARKETPLACE_SELLER_ROLE_ARN
+        if role_arn:
+            sts = boto3.client("sts")
+            assumed = sts.assume_role(
+                RoleArn=role_arn,
+                RoleSessionName="costq-marketplace-api",
+            )
+            creds = assumed["Credentials"]
+            logger.debug("Assumed Marketplace seller role: %s", assumed["AssumedRoleUser"]["Arn"])
+            return boto3.Session(
+                aws_access_key_id=creds["AccessKeyId"],
+                aws_secret_access_key=creds["SecretAccessKey"],
+                aws_session_token=creds["SessionToken"],
+            )
+        return boto3.Session()
+
     @property
     def metering_client(self):
         if self._metering_client is None:
-            self._metering_client = boto3.client(
+            session = self._get_marketplace_session()
+            self._metering_client = session.client(
                 "meteringmarketplace",
                 region_name=settings.MARKETPLACE_REGION,
                 config=Config(retries={"max_attempts": 5, "mode": "standard"}),
@@ -78,7 +99,8 @@ class MarketplaceService:
     @property
     def entitlement_client(self):
         if self._entitlement_client is None:
-            self._entitlement_client = boto3.client(
+            session = self._get_marketplace_session()
+            self._entitlement_client = session.client(
                 "marketplace-entitlement",
                 region_name=settings.MARKETPLACE_REGION,
                 config=Config(retries={"max_attempts": 5, "mode": "standard"}),
@@ -111,12 +133,13 @@ class MarketplaceService:
         max_results: int = 25,
         next_token: str | None = None,
     ) -> dict[str, Any]:
+        # NOTE: AWS API 只允许一个 filter key，优先级：customer_identifier > account_id > license_arn
         filters: dict[str, list[str]] = {}
         if customer_identifier:
             filters["CUSTOMER_IDENTIFIER"] = [customer_identifier]
-        if customer_aws_account_id:
+        elif customer_aws_account_id:
             filters["CUSTOMER_AWS_ACCOUNT_ID"] = [customer_aws_account_id]
-        if license_arn:
+        elif license_arn:
             filters["LICENSE_ARN"] = [license_arn]
         if dimensions:
             filters["DIMENSION"] = dimensions
@@ -378,7 +401,11 @@ class MarketplaceService:
         session.claimed_at = _utc_now()
 
         if customer.customer_identifier or customer.customer_aws_account_id or customer.latest_license_arn:
-            self.sync_customer_entitlements(customer)
+            try:
+                self.sync_customer_entitlements(customer)
+            except Exception as exc:
+                # entitlement sync 失败不阻断 claim（本地/测试环境可能无权限）
+                logger.warning("sync_customer_entitlements failed during claim, skipping: %s", exc)
 
         if activate_organization:
             self.update_customer_access(customer, reason="bind-session")

@@ -94,6 +94,10 @@ class Settings(BaseSettings):
     MARKETPLACE_ENABLE_WEB_METERING_API: bool = Field(
         default=False, description="是否启用 Web API 触发 Marketplace metering 上报"
     )
+    MARKETPLACE_SELLER_ROLE_ARN: str = Field(
+        default="",
+        description="跨账号 assume role ARN，用于从 3532 EKS 调用 9042 seller 账号的 Marketplace API",
+    )
 
     # ==================== 云资源配置 ====================
     # AWS Secrets Manager 密钥名称

@@ -45,16 +45,46 @@ async def marketplace_fulfillment(
         alias="x-amzn-marketplace-token",
         description="Marketplace registration token",
     ),
+    test_customer_identifier: str | None = Query(
+        default=None,
+        description="[TEST MODE ONLY] 跳过 ResolveCustomer，直接使用已知 customerIdentifier",
+    ),
     db: Session = Depends(get_db),
 ):
     """处理 Marketplace 订阅落地并重定向到前端 onboarding 页面"""
+    service = MarketplaceService(db)
+
+    # TEST MODE: 跳过 ResolveCustomer，直接用已知 customerIdentifier
+    if test_customer_identifier:
+        if not settings.MARKETPLACE_ENABLE_TEST_MODE:
+            raise HTTPException(status_code=403, detail="Test mode is disabled")
+        logger.warning("Marketplace fulfillment TEST MODE: customer_identifier=%s", test_customer_identifier)
+        from backend.services.marketplace_service import ResolvedMarketplaceCustomer
+        resolved = ResolvedMarketplaceCustomer(
+            customer_identifier=test_customer_identifier,
+            customer_aws_account_id=None,
+            license_arn=None,
+            product_code=settings.MARKETPLACE_PRODUCT_CODE,
+            raw_response={"test_mode": True, "CustomerIdentifier": test_customer_identifier},
+        )
+        try:
+            customer = service.upsert_customer_from_resolve(resolved)
+            # NOTE: test mode 下跳过 entitlement sync（避免依赖 seller 账号权限）
+            session = service.create_onboarding_session(customer)
+            redirect_url = service.build_onboarding_redirect_url(session.session_token)
+            db.commit()
+            return RedirectResponse(url=redirect_url, status_code=status.HTTP_302_FOUND)
+        except Exception:
+            db.rollback()
+            logger.exception("Marketplace fulfillment (test mode) failed")
+            raise
+
     if marketplace_token is None and request.method == "POST":
         body = (await request.body()).decode("utf-8")
         marketplace_token = parse_qs(body).get("x-amzn-marketplace-token", [None])[0]
     if not marketplace_token:
         raise HTTPException(status_code=400, detail="Missing x-amzn-marketplace-token")
 
-    service = MarketplaceService(db)
     try:
         resolved = service.resolve_customer(marketplace_token)
         customer = service.upsert_customer_from_resolve(resolved)
@@ -149,27 +179,18 @@ async def sync_marketplace_entitlements(
     if customer is None:
         raise HTTPException(status_code=404, detail="Marketplace customer binding not found")
 
-    response = service.get_entitlements(
-        customer_identifier=customer.customer_identifier,
-        customer_aws_account_id=customer.customer_aws_account_id,
-        license_arn=customer.latest_license_arn,
-    )
-    entitlements = response.get("Entitlements", [])
-    for entitlement in entitlements:
-        service.upsert_agreement(
-            customer=customer,
-            agreement_id=entitlement.get("AgreementId"),
-            license_arn=entitlement.get("LicenseArn"),
-            status="active",
-            dimensions=entitlement.get("Dimension") and [entitlement.get("Dimension")] or None,
-            entitlement_payload=entitlement,
-        )
-    db.commit()
-    return {
-        "status": "synced",
-        "entitlement_count": len(entitlements),
-        "next_token": response.get("NextToken"),
-    }
+    try:
+        agreements = service.sync_customer_entitlements(customer)
+        db.commit()
+        return {
+            "status": "synced",
+            "entitlement_count": len(agreements),
+            "access_active": service.has_active_access(customer),
+        }
+    except Exception as exc:
+        db.rollback()
+        logger.warning("sync_customer_entitlements failed: %s", exc)
+        raise HTTPException(status_code=502, detail=f"Entitlement sync failed: {exc}") from exc
 
 
 @router.post("/admin/meter-usage")
