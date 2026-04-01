@@ -29,8 +29,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def _utc_now() -> datetime:
-    return datetime.now(timezone.utc)
+def _serialize_for_jsonb(obj: Any) -> Any:
+    """递归把 datetime 转成 ISO string，确保 JSONB 可序列化"""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    if isinstance(obj, dict):
+        return {k: _serialize_for_jsonb(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_serialize_for_jsonb(i) for i in obj]
+    return obj
 
 
 def _parse_datetime(value: Any) -> datetime | None:
@@ -333,7 +340,7 @@ class MarketplaceService:
                         "dimension": entitlement.get("Dimension"),
                         "value": value_payload,
                     }],
-                    entitlement_payload=entitlement,
+                    entitlement_payload=_serialize_for_jsonb(entitlement),
                 )
                 agreements.append(agreement)
 
