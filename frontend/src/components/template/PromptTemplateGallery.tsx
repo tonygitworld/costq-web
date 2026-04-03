@@ -12,12 +12,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Typography, Input, Spin, Tag, Button, Space, App,
-  Card, Row, Col, Drawer, Popconfirm, Divider,
+  Card, Row, Col, Drawer, Popconfirm, Divider, Form,
 } from 'antd';
 import {
   ArrowLeftOutlined, StarFilled, PlusOutlined,
   CopyOutlined, SendOutlined, EditOutlined,
-  DeleteOutlined, FileTextOutlined,
+  DeleteOutlined, FileTextOutlined, PushpinOutlined, PushpinFilled,
+  CheckOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { usePromptTemplateStore } from '../../stores/promptTemplateStore';
@@ -25,7 +26,6 @@ import { useChatStore } from '../../stores/chatStore';
 import { useI18n } from '../../hooks/useI18n';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { translateTemplateTitle, translateTemplateDescription } from '../../utils/templateTranslations';
-import { CustomTemplateManager } from '../chat/CustomTemplateManager';
 import type { PromptTemplate, UserPromptTemplate } from '../../types/promptTemplate';
 
 const { Title, Text, Paragraph } = Typography;
@@ -38,6 +38,9 @@ const categoryLabels: Record<string, { zh: string; en: string; color: string }> 
   report:     { zh: '报告生成', en: 'Reports',           color: 'green' },
   custom:     { zh: '自定义',   en: 'Custom',            color: 'default' },
 };
+
+/** 筛选栏展示的分类（不含 custom，因为和"我的指令"重复） */
+const filterCategories = ['cost', 'risp', 'audit', 'report'] as const;
 
 type AnyTemplate = PromptTemplate | UserPromptTemplate;
 
@@ -57,8 +60,11 @@ export const PromptTemplateGallery: React.FC = () => {
     systemTemplates, userTemplates,
     systemLoading, userLoading, error,
     loadSystemTemplates, loadUserTemplates,
-    deleteTemplate, clearError,
+    deleteTemplate, clearError, createTemplate,
+    pinTemplate, unpinTemplate, pinnedTemplateIds,
   } = usePromptTemplateStore();
+
+  const [createForm] = Form.useForm();
 
   useEffect(() => {
     loadSystemTemplates();
@@ -122,6 +128,23 @@ export const PromptTemplateGallery: React.FC = () => {
     loadUserTemplates();
   };
 
+  const handleCreateSubmit = useCallback(async (values: { title: string; description?: string; prompt_text: string }) => {
+    try {
+      await createTemplate({
+        title: values.title,
+        description: values.description,
+        prompt_text: values.prompt_text,
+        category: 'custom',
+      });
+      msg.success(isZhCN() ? '创建成功' : 'Created');
+      createForm.resetFields();
+      setManagerVisible(false);
+      loadUserTemplates();
+    } catch {
+      msg.error(isZhCN() ? '创建失败' : 'Create failed');
+    }
+  }, [createTemplate, msg, isZhCN, createForm, loadUserTemplates]);
+
   /* ── Content area: error / loading / empty / grid ── */
   const renderContent = () => {
     if (error) {
@@ -144,9 +167,20 @@ export const PromptTemplateGallery: React.FC = () => {
       );
     }
 
-    if (filteredTemplates.length === 0) {
+    // "创建自定义指令"卡片只在"全部"tab 下显示
+    const showCreateCard = categoryFilter === 'all' && typeFilter === 'all';
+
+    if (filteredTemplates.length === 0 && !showCreateCard) {
       return (
-        <Row gutter={[16, 16]}>
+        <Card style={{ textAlign: 'center', padding: 40 }}>
+          <Text type="secondary">{isZhCN() ? '暂无模板' : 'No templates'}</Text>
+        </Card>
+      );
+    }
+
+    return (
+      <Row gutter={[16, 16]}>
+        {showCreateCard && (
           <Col xs={24} sm={12} lg={8}>
             <Card
               hoverable
@@ -179,45 +213,7 @@ export const PromptTemplateGallery: React.FC = () => {
               </Text>
             </Card>
           </Col>
-        </Row>
-      );
-    }
-
-    return (
-      <Row gutter={[16, 16]}>
-        {/* 创建指令卡片 — 始终在第一个位置 */}
-        <Col xs={24} sm={12} lg={8}>
-          <Card
-            hoverable
-            onClick={() => setManagerVisible(true)}
-            style={{
-              height: '100%',
-              borderRadius: 8,
-              minHeight: 160,
-              border: '2px dashed #d9d9d9',
-              background: 'transparent',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            styles={{
-              body: {
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8,
-                padding: 24,
-                width: '100%',
-              },
-            }}
-          >
-            <PlusOutlined style={{ fontSize: 28, color: '#bfbfbf' }} />
-            <Text type="secondary" style={{ fontSize: 14 }}>
-              {isZhCN() ? '创建自定义指令' : 'Create Action'}
-            </Text>
-          </Card>
-        </Col>
+        )}
         {filteredTemplates.map((tpl) => {
           const cat = tpl.category || 'custom';
           const catInfo = categoryLabels[cat] || categoryLabels.custom;
@@ -326,7 +322,7 @@ export const PromptTemplateGallery: React.FC = () => {
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', flex: 1 }}>
             {[
               { key: 'all', label: isZhCN() ? '全部' : 'All' },
-              ...Object.entries(categoryLabels).map(([k, v]) => ({ key: k, label: isZhCN() ? v.zh : v.en })),
+              ...filterCategories.map((k) => ({ key: k, label: isZhCN() ? categoryLabels[k].zh : categoryLabels[k].en })),
               { key: 'my', label: isZhCN() ? '我的指令' : 'Mine' },
             ].map((item) => {
               const isActive = (item.key === 'my' && typeFilter === 'my') ||
@@ -378,7 +374,9 @@ export const PromptTemplateGallery: React.FC = () => {
         width={isMobile ? '100%' : 520}
         styles={{ body: { padding: 0 } }}
       >
-        {drawerTpl && (
+        {drawerTpl && (() => {
+          const isPinnedCurrent = pinnedTemplateIds.includes(drawerTpl.id);
+          return (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             {/* Meta tags */}
             <div style={{ padding: '16px 24px' }}>
@@ -444,68 +442,149 @@ export const PromptTemplateGallery: React.FC = () => {
               </pre>
             </div>
 
-            {/* Action buttons — fixed bottom */}
-            <div style={{ padding: '16px 24px', borderTop: '1px solid #f0f0f0', background: '#fff' }}>
+            {/* Action bar */}
+            <div style={{
+              padding: '12px 24px',
+              borderTop: '1px solid #f0f0f0',
+              background: '#fff',
+              display: 'flex',
+              gap: 8,
+            }}>
               <Button
                 type="primary"
                 icon={<SendOutlined />}
-                onClick={() => {
-                  handleAddToChat(drawerTpl);
-                  setDrawerTpl(null);
-                }}
-                block
-                size="large"
-                style={{ marginBottom: 10, borderRadius: 8, fontWeight: 600 }}
+                onClick={() => { handleAddToChat(drawerTpl); setDrawerTpl(null); }}
+                style={{ flex: 1, borderRadius: 8, height: 38, fontWeight: 600, background: '#da7756', borderColor: '#da7756' }}
               >
                 {isZhCN() ? '添加到聊天' : 'Add to Chat'}
               </Button>
-              <Space style={{ width: '100%' }}>
+              <Button
+                icon={isPinnedCurrent ? <PushpinFilled /> : <PushpinOutlined />}
+                onClick={() => {
+                  if (isPinnedCurrent) { unpinTemplate(drawerTpl.id); msg.success(isZhCN() ? '已取消固定' : 'Unpinned'); }
+                  else { pinTemplate(drawerTpl.id); msg.success(isZhCN() ? '已固定到对话框' : 'Pinned'); }
+                }}
+                style={{ flex: 1, borderRadius: 8, height: 38, ...(isPinnedCurrent ? { borderColor: '#da7756', color: '#da7756' } : {}) }}
+              >
+                {isZhCN() ? (isPinnedCurrent ? '已固定' : '固定') : (isPinnedCurrent ? 'Pinned' : 'Pin')}
+              </Button>
+              <Button
+                icon={<CopyOutlined />}
+                onClick={() => handleCopy(drawerTpl)}
+                style={{ flex: 1, borderRadius: 8, height: 38 }}
+              >
+                {isZhCN() ? '复制' : 'Copy'}
+              </Button>
+              {isUser(drawerTpl) && (
                 <Button
-                  icon={<CopyOutlined />}
-                  onClick={() => handleCopy(drawerTpl)}
-                  style={{ flex: 1, borderRadius: 8 }}
+                  icon={<EditOutlined />}
+                  onClick={() => setManagerVisible(true)}
+                  style={{ flex: 1, borderRadius: 8, height: 38 }}
                 >
-                  {isZhCN() ? '复制' : 'Copy'}
+                  {isZhCN() ? '编辑' : 'Edit'}
                 </Button>
-                {isUser(drawerTpl) && (
-                  <>
-                    <Button
-                      icon={<EditOutlined />}
-                      onClick={() => setManagerVisible(true)}
-                      style={{ flex: 1, borderRadius: 8 }}
-                    >
-                      {isZhCN() ? '编辑' : 'Edit'}
-                    </Button>
-                    <Popconfirm
-                      title={isZhCN() ? '确认删除？' : 'Delete?'}
-                      onConfirm={() => handleDelete(drawerTpl.id)}
-                      okText={isZhCN() ? '删除' : 'Delete'}
-                      cancelText={isZhCN() ? '取消' : 'Cancel'}
-                      okButtonProps={{ danger: true }}
-                    >
-                      <Button
-                        danger
-                        icon={<DeleteOutlined />}
-                        style={{ flex: 1, borderRadius: 8 }}
-                      >
-                        {isZhCN() ? '删除' : 'Delete'}
-                      </Button>
-                    </Popconfirm>
-                  </>
-                )}
-              </Space>
+              )}
+              {isUser(drawerTpl) && (
+                <Popconfirm
+                  title={isZhCN() ? '确认删除？' : 'Delete?'}
+                  onConfirm={() => handleDelete(drawerTpl.id)}
+                  okText={isZhCN() ? '删除' : 'Delete'}
+                  cancelText={isZhCN() ? '取消' : 'Cancel'}
+                  okButtonProps={{ danger: true }}
+                >
+                  <Button
+                    danger
+                    icon={<DeleteOutlined />}
+                    style={{ flex: 1, borderRadius: 8, height: 38 }}
+                  >
+                    {isZhCN() ? '删除' : 'Delete'}
+                  </Button>
+                </Popconfirm>
+              )}
             </div>
           </div>
-        )}
+          );
+        })()}
       </Drawer>
 
-      <CustomTemplateManager
-        visible={managerVisible}
-        onClose={() => {
-          setManagerVisible(false);
-          loadUserTemplates();
-        }}
-      />
+      {/* Create Drawer — 和查看详情同样的侧边栏体验 */}
+      <Drawer
+        title={isZhCN() ? '创建自定义指令' : 'Create Action'}
+        open={managerVisible}
+        onClose={() => { setManagerVisible(false); createForm.resetFields(); }}
+        width={isMobile ? '100%' : 520}
+        styles={{ body: { padding: 0 } }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <div style={{ flex: 1, overflow: 'auto', padding: '24px' }}>
+            <Form form={createForm} layout="vertical" onFinish={handleCreateSubmit}>
+              <Form.Item
+                name="title"
+                label={isZhCN() ? '标题' : 'Title'}
+                rules={[{ required: true, message: isZhCN() ? '请输入标题' : 'Title required' }]}
+              >
+                <Input placeholder={isZhCN() ? '例如：月度成本汇总' : 'e.g. Monthly cost summary'} />
+              </Form.Item>
+              <Form.Item
+                name="description"
+                label={isZhCN() ? '描述（可选）' : 'Description (optional)'}
+              >
+                <Input placeholder={isZhCN() ? '简要说明这个指令的用途' : 'Brief description'} />
+              </Form.Item>
+              <Form.Item
+                name="prompt_text"
+                label={isZhCN() ? '指令内容' : 'Prompt Content'}
+                rules={[{ required: true, message: isZhCN() ? '请输入指令内容' : 'Prompt required' }]}
+                extra={
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    {isZhCN()
+                      ? '支持使用 {{变量名}} 定义动态参数'
+                      : 'Use {{variable}} for dynamic parameters'}
+                  </Text>
+                }
+              >
+                <Input.TextArea
+                  rows={8}
+                  placeholder={isZhCN()
+                    ? '输入你的指令内容...\n\n例如：\n请分析 {{账号名称}} 在 {{月份}} 的成本趋势，重点关注 Top 10 服务的费用变化。'
+                    : 'Enter your prompt...\n\ne.g.\nAnalyze the cost trend of {{account}} in {{month}}, focusing on Top 10 services.'}
+                  style={{
+                    fontFamily: 'Menlo, Monaco, Consolas, monospace',
+                    fontSize: 13,
+                    lineHeight: 1.7,
+                  }}
+                />
+              </Form.Item>
+            </Form>
+          </div>
+
+          {/* 底部操作栏 — 和详情 Drawer 风格一致 */}
+          <div style={{
+            padding: '14px 24px',
+            borderTop: '1px solid #f0f0f0',
+            background: '#fff',
+          }}>
+            <Button
+              type="primary"
+              icon={<CheckOutlined />}
+              onClick={() => createForm.submit()}
+              block
+              size="large"
+              loading={userLoading}
+              style={{
+                borderRadius: 10,
+                fontWeight: 600,
+                height: 44,
+                fontSize: 15,
+                background: '#da7756',
+                borderColor: '#da7756',
+              }}
+            >
+              {isZhCN() ? '创建指令' : 'Create Action'}
+            </Button>
+          </div>
+        </div>
+      </Drawer>
     </div>
   );
 };

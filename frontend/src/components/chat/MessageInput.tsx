@@ -543,27 +543,6 @@ export const MessageInput: FC = () => {
         {/* 2. 工具栏区域 */}
         <div className="ai-chat-input-toolbar">
           <div className="toolbar-left">
-            <Popover
-              content={<PromptTemplatesPopoverContent onClose={() => setPopoverOpen(false)} />}
-              title={
-                <span>
-                  {t('template.mobileTitle')}
-                  <span style={{ marginLeft: 8, fontSize: 12, fontWeight: 'normal', color: '#999' }}>
-                    {t('template.description')}
-                  </span>
-                </span>
-              }
-              trigger="click"
-              open={popoverOpen}
-              onOpenChange={setPopoverOpen}
-              placement="topLeft"
-              overlayStyle={{ width: 350 }}
-              align={{ offset: [-14, 0] }}
-            >
-              <button className="icon-btn" title={t('template.mobileTitle')}>
-                <BulbOutlined style={{ fontSize: 18 }} />
-              </button>
-            </Popover>
             <FilePickerButton
               onFilesSelected={handleFilesSelected}
               disabled={loading || !hasSelectedAccount || isProcessing || !canAddMore}
