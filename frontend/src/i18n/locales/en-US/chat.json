@@ -18,6 +18,17 @@
     "userManagement": "User Management",
     "alertManagement": "Alert Management"
   },
+  "templatePanel": {
+    "title": "Prompt Templates",
+    "systemTemplates": "System Templates",
+    "myTemplates": "My Templates",
+    "createTemplate": "Create Template",
+    "viewAll": "View All",
+    "noTemplates": "No templates",
+    "noUserTemplates": "No custom templates",
+    "collapse": "Collapse",
+    "expand": "Expand"
+  },
   "input": {
     "placeholder": "Type your question... (Enter to send, Shift+Enter for new line)",
     "placeholderNoAccount": "💡 Please select a cloud account to start asking questions...",

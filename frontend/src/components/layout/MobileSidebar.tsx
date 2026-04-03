@@ -7,6 +7,7 @@ import {
   SettingOutlined,
 } from '@ant-design/icons';
 import { ChatHistory } from '../sidebar/ChatHistory';
+import { TemplatePanel } from '../sidebar/TemplatePanel';
 import { useChatStore } from '../../stores/chatStore';
 import { useI18n } from '../../hooks/useI18n';
 import './MobileSidebar.css';
@@ -93,6 +94,9 @@ export const MobileSidebar: FC<MobileSidebarProps> = ({ visible, onClose, onOpen
             {t('chat:sidebar.alertManagement')}
           </Button>
         </div>
+
+        {/* 提示词模板按钮 */}
+        <TemplatePanel onNavigate={onClose} />
 
         {/* 分隔线 */}
         <div className="mobile-sidebar-divider" />

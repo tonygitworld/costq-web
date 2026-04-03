@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons';
 import { ChatHistory } from '../sidebar/ChatHistory';
 import { SettingsMenu } from '../sidebar/SettingsMenu';
+import { TemplatePanel } from '../sidebar/TemplatePanel';
 import { useChatStore } from '../../stores/chatStore';
 import { useI18n } from '../../hooks/useI18n';
 import '../../styles/sidebar.css';
@@ -163,6 +164,9 @@ export const Sidebar: FC<SidebarProps> = ({ isCollapsed = false, onToggleCollaps
               {t('chat:sidebar.alertManagement')}
             </Button>
           </div>
+
+          {/* 提示词模板按钮 */}
+          <TemplatePanel />
 
           <Divider className="sidebar-divider" />
         </>

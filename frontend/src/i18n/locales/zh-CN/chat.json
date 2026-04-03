@@ -18,6 +18,17 @@
     "userManagement": "用户管理",
     "alertManagement": "告警管理"
   },
+  "templatePanel": {
+    "title": "提示词模板",
+    "systemTemplates": "系统模板",
+    "myTemplates": "我的模板",
+    "createTemplate": "创建模板",
+    "viewAll": "查看全部",
+    "noTemplates": "暂无模板",
+    "noUserTemplates": "暂无自定义模板",
+    "collapse": "收起",
+    "expand": "展开"
+  },
   "input": {
     "placeholder": "输入您的问题... (Enter 发送, Shift+Enter 换行)",
     "placeholderNoAccount": "💡 请先选择云账号，然后即可开始提问...",

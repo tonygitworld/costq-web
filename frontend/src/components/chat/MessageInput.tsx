@@ -118,7 +118,27 @@ export const MessageInput: FC = () => {
     }
   }, [message, isMobile]);
 
-  // ✅ 停止生成处理
+  // 监听 quick-question 事件：从模板页面填入输入框
+  useEffect(() => {
+    // 方式1：Zustand store（从模板画廊页面跳转过来）
+    const pending = useChatStore.getState().pendingInput;
+    if (pending) {
+      setMessage(pending);
+      useChatStore.getState().setPendingInput(null);
+      setTimeout(() => textAreaRef.current?.focus(), 100);
+    }
+
+    // 方式2：CustomEvent（同页面内的快捷问题）
+    const handler = (e: Event) => {
+      const text = (e as CustomEvent).detail;
+      if (typeof text === 'string' && text.trim()) {
+        setMessage(text);
+        setTimeout(() => textAreaRef.current?.focus(), 100);
+      }
+    };
+    window.addEventListener('quick-question', handler);
+    return () => window.removeEventListener('quick-question', handler);
+  }, []);  // ✅ 停止生成处理
   const handleStop = useCallback(() => {
     logger.debug('🔴 [handleStop] 点击了停止按钮');
     logger.debug('🔴 [handleStop] currentQueryId:', currentQueryId);

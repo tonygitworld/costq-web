@@ -18,6 +18,17 @@
     "userManagement": "ユーザー管理",
     "alertManagement": "アラート管理"
   },
+  "templatePanel": {
+    "title": "プロンプトテンプレート",
+    "systemTemplates": "システムテンプレート",
+    "myTemplates": "マイテンプレート",
+    "createTemplate": "テンプレート作成",
+    "viewAll": "すべて表示",
+    "noTemplates": "テンプレートなし",
+    "noUserTemplates": "カスタムテンプレートなし",
+    "collapse": "折りたたむ",
+    "expand": "展開"
+  },
   "input": {
     "placeholder": "ご質問を入力してください... (Enterで送信、Shift+Enterで改行)",
     "placeholderNoAccount": "💡 まずクラウドアカウントを選択してから、質問を始めてください...",
