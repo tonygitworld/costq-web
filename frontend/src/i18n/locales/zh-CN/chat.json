@@ -19,13 +19,13 @@
     "alertManagement": "告警管理"
   },
   "templatePanel": {
-    "title": "提示词模板",
-    "systemTemplates": "系统模板",
-    "myTemplates": "我的模板",
-    "createTemplate": "创建模板",
+    "title": "快捷指令",
+    "systemTemplates": "系统指令",
+    "myTemplates": "我的指令",
+    "createTemplate": "创建指令",
     "viewAll": "查看全部",
-    "noTemplates": "暂无模板",
-    "noUserTemplates": "暂无自定义模板",
+    "noTemplates": "暂无指令",
+    "noUserTemplates": "暂无自定义指令",
     "collapse": "收起",
     "expand": "展开"
   },

@@ -19,13 +19,13 @@
     "alertManagement": "アラート管理"
   },
   "templatePanel": {
-    "title": "プロンプトテンプレート",
-    "systemTemplates": "システムテンプレート",
-    "myTemplates": "マイテンプレート",
-    "createTemplate": "テンプレート作成",
+    "title": "クイックアクション",
+    "systemTemplates": "システムアクション",
+    "myTemplates": "マイアクション",
+    "createTemplate": "アクション作成",
     "viewAll": "すべて表示",
-    "noTemplates": "テンプレートなし",
-    "noUserTemplates": "カスタムテンプレートなし",
+    "noTemplates": "アクションなし",
+    "noUserTemplates": "カスタムアクションなし",
     "collapse": "折りたたむ",
     "expand": "展開"
   },

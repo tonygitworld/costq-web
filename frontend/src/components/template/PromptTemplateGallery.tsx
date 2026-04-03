@@ -11,13 +11,13 @@
  */
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Typography, Input, Empty, Spin, Tag, Button, Space, App,
+  Typography, Input, Spin, Tag, Button, Space, App,
   Card, Row, Col, Drawer, Popconfirm, Divider,
 } from 'antd';
 import {
   ArrowLeftOutlined, StarFilled, PlusOutlined,
   CopyOutlined, SendOutlined, EditOutlined,
-  DeleteOutlined, FileTextOutlined, ThunderboltOutlined,
+  DeleteOutlined, FileTextOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { usePromptTemplateStore } from '../../stores/promptTemplateStore';
@@ -38,8 +38,6 @@ const categoryLabels: Record<string, { zh: string; en: string; color: string }> 
   report:     { zh: '报告生成', en: 'Reports',           color: 'green' },
   custom:     { zh: '自定义',   en: 'Custom',            color: 'default' },
 };
-
-const cloudColors: Record<string, string> = { aws: 'orange', gcp: 'blue', both: 'purple' };
 
 type AnyTemplate = PromptTemplate | UserPromptTemplate;
 
@@ -177,7 +175,7 @@ export const PromptTemplateGallery: React.FC = () => {
             >
               <PlusOutlined style={{ fontSize: 28, color: '#bfbfbf' }} />
               <Text type="secondary" style={{ fontSize: 14 }}>
-                {isZhCN() ? '创建自定义模板' : 'Create Template'}
+                {isZhCN() ? '创建自定义指令' : 'Create Action'}
               </Text>
             </Card>
           </Col>
@@ -187,7 +185,7 @@ export const PromptTemplateGallery: React.FC = () => {
 
     return (
       <Row gutter={[16, 16]}>
-        {/* 创建模板卡片 — 始终在第一个位置 */}
+        {/* 创建指令卡片 — 始终在第一个位置 */}
         <Col xs={24} sm={12} lg={8}>
           <Card
             hoverable
@@ -216,7 +214,7 @@ export const PromptTemplateGallery: React.FC = () => {
           >
             <PlusOutlined style={{ fontSize: 28, color: '#bfbfbf' }} />
             <Text type="secondary" style={{ fontSize: 14 }}>
-              {isZhCN() ? '创建自定义模板' : 'Create Template'}
+              {isZhCN() ? '创建自定义指令' : 'Create Action'}
             </Text>
           </Card>
         </Col>
@@ -247,11 +245,6 @@ export const PromptTemplateGallery: React.FC = () => {
                   {isUser(tpl) && (
                     <Tag color="purple" style={{ margin: 0 }}>
                       {isZhCN() ? '我的' : 'Mine'}
-                    </Tag>
-                  )}
-                  {!isUser(tpl) && 'cloud_provider' in tpl && tpl.cloud_provider && (
-                    <Tag color={cloudColors[tpl.cloud_provider]} style={{ margin: 0 }}>
-                      {tpl.cloud_provider.toUpperCase()}
                     </Tag>
                   )}
                 </div>
@@ -292,11 +285,6 @@ export const PromptTemplateGallery: React.FC = () => {
                     color: '#8c8c8c',
                   }}
                 >
-                  {tpl.usage_count > 0 && (
-                    <span>
-                      <ThunderboltOutlined /> {tpl.usage_count} {isZhCN() ? '次使用' : 'uses'}
-                    </span>
-                  )}
                   {tpl.variables && tpl.variables.length > 0 && (
                     <span>
                       {tpl.variables.length} {isZhCN() ? '个参数' : 'params'}
@@ -328,7 +316,7 @@ export const PromptTemplateGallery: React.FC = () => {
               {t('common:button.back', 'Back')}
             </Button>
             <Title level={3} style={{ margin: 0 }}>
-              <FileTextOutlined /> {t('chat:templatePanel.title', 'Prompt Templates')}
+              <FileTextOutlined /> {t('chat:templatePanel.title', 'Quick Actions')}
             </Title>
           </div>
         </div>
@@ -339,7 +327,7 @@ export const PromptTemplateGallery: React.FC = () => {
             {[
               { key: 'all', label: isZhCN() ? '全部' : 'All' },
               ...Object.entries(categoryLabels).map(([k, v]) => ({ key: k, label: isZhCN() ? v.zh : v.en })),
-              { key: 'my', label: isZhCN() ? '我的模板' : 'Mine' },
+              { key: 'my', label: isZhCN() ? '我的指令' : 'Mine' },
             ].map((item) => {
               const isActive = (item.key === 'my' && typeFilter === 'my') ||
                 (item.key !== 'my' && categoryFilter === item.key && typeFilter !== 'my');
@@ -401,21 +389,11 @@ export const PromptTemplateGallery: React.FC = () => {
                     : (categoryLabels[drawerTpl.category]?.en || drawerTpl.category)}
                 </Tag>
                 {isUser(drawerTpl) && (
-                  <Tag color="purple">{isZhCN() ? '我的模板' : 'My Template'}</Tag>
-                )}
-                {!isUser(drawerTpl) && 'cloud_provider' in drawerTpl && drawerTpl.cloud_provider && (
-                  <Tag color={cloudColors[drawerTpl.cloud_provider]}>
-                    {drawerTpl.cloud_provider.toUpperCase()}
-                  </Tag>
+                  <Tag color="purple">{isZhCN() ? '我的指令' : 'My Action'}</Tag>
                 )}
                 {drawerTpl.variables && drawerTpl.variables.length > 0 && (
                   <Tag color="blue">
                     {drawerTpl.variables.length} {isZhCN() ? '个参数' : 'params'}
-                  </Tag>
-                )}
-                {drawerTpl.usage_count > 0 && (
-                  <Tag>
-                    <ThunderboltOutlined /> {drawerTpl.usage_count}
                   </Tag>
                 )}
               </Space>
@@ -443,7 +421,7 @@ export const PromptTemplateGallery: React.FC = () => {
                   color: '#8c8c8c',
                 }}
               >
-                {isZhCN() ? '模板内容' : 'Template Content'}
+                {isZhCN() ? '指令内容' : 'Action Content'}
               </Text>
             </div>
             <div style={{ flex: 1, overflow: 'auto', padding: '0 24px 24px' }}>

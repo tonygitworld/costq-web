@@ -19,13 +19,13 @@
     "alertManagement": "Alert Management"
   },
   "templatePanel": {
-    "title": "Prompt Templates",
-    "systemTemplates": "System Templates",
-    "myTemplates": "My Templates",
-    "createTemplate": "Create Template",
+    "title": "Quick Actions",
+    "systemTemplates": "System Actions",
+    "myTemplates": "My Actions",
+    "createTemplate": "Create Action",
     "viewAll": "View All",
-    "noTemplates": "No templates",
-    "noUserTemplates": "No custom templates",
+    "noTemplates": "No actions",
+    "noUserTemplates": "No custom actions",
     "collapse": "Collapse",
     "expand": "Expand"
   },
