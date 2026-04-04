@@ -1,212 +1,105 @@
-/**
- * PinnedTemplates — 固定在对话框附近的模板快捷标签
- *
- * position="above": 已有对话时，显示在输入框上方（紧凑横排）
- * position="below": 新对话时，显示在输入框下方（居中 chips）
- *
- * 超出一行时隐藏多余的，显示 +N 徽标
- */
+﻿/* PinnedTemplates - pinned template quick-action chips */
 import { type FC, useEffect, useRef, useState, useCallback } from 'react';
-import { Tooltip } from 'antd';
+import { PushpinOutlined, UserOutlined } from '@ant-design/icons';
 import { usePromptTemplateStore } from '../../stores/promptTemplateStore';
 import { useI18n } from '../../hooks/useI18n';
 import { translateTemplateTitle } from '../../utils/templateTranslations';
 import type { PromptTemplate, UserPromptTemplate } from '../../types/promptTemplate';
 
 type AnyTemplate = PromptTemplate | UserPromptTemplate;
+interface Props { position: 'above' | 'below'; }
 
-interface PinnedTemplatesProps {
-  position: 'above' | 'below';
-}
-
-const THEME = {
-  system: { dot: '#da7756', hoverBorder: '#da7756', hoverBg: '#fffaf8', hoverShadow: 'rgba(218,119,86,0.12)' },
-  user:   { dot: '#8b5cf6', hoverBorder: '#8b5cf6', hoverBg: '#faf5ff', hoverShadow: 'rgba(139,92,246,0.12)' },
+const TH = {
+  sys: { bg: '#fffbf7', border: '#f5dece', hBorder: '#f97316', hBg: '#fff3ea', hShadow: '0 2px 8px rgba(249,115,22,0.10)', icon: '#e86a3a', aBg: '#ffead9', text: '#78350f' },
+  usr: { bg: '#faf8ff', border: '#e4d5fc', hBorder: '#8b5cf6', hBg: '#f3edff', hShadow: '0 2px 8px rgba(139,92,246,0.10)', icon: '#7c3aed', aBg: '#ebe0ff', text: '#3b0764' },
 } as const;
 
-export const PinnedTemplates: FC<PinnedTemplatesProps> = ({ position }) => {
+export const PinnedTemplates: FC<Props> = ({ position }) => {
   const { language } = useI18n();
-  const {
-    systemTemplates, userTemplates,
-    pinnedTemplateIds, unpinTemplate,
-    loadSystemTemplates, loadUserTemplates,
-  } = usePromptTemplateStore();
-
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [visibleCount, setVisibleCount] = useState<number>(Infinity);
+  const { systemTemplates, userTemplates, pinnedTemplateIds, unpinTemplate, loadSystemTemplates, loadUserTemplates } = usePromptTemplateStore();
+  const ref = useRef<HTMLDivElement>(null);
+  const [fadeL, setFadeL] = useState(false);
+  const [fadeR, setFadeR] = useState(false);
 
   useEffect(() => {
-    if (systemTemplates.length === 0) loadSystemTemplates();
-    if (userTemplates.length === 0) loadUserTemplates();
+    if (!systemTemplates.length) loadSystemTemplates();
+    if (!userTemplates.length) loadUserTemplates();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 计算一行能放多少个
-  const calcVisible = useCallback(() => {
-    const container = containerRef.current;
-    if (!container) return;
-    const children = Array.from(container.children) as HTMLElement[];
-    if (children.length === 0) return;
-
-    const containerRight = container.getBoundingClientRect().right;
-    const gap = 8;
-    const badgeWidth = 40; // +N 徽标预留宽度
-    let count = 0;
-
-    for (const child of children) {
-      if (child.dataset.badge) continue; // 跳过 +N 元素
-      const childRight = child.getBoundingClientRect().right;
-      if (childRight + gap + badgeWidth > containerRight) break;
-      count++;
-    }
-
-    setVisibleCount(Math.max(count, 1));
+  const check = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    setFadeL(el.scrollLeft > 2);
+    setFadeR(el.scrollLeft < el.scrollWidth - el.clientWidth - 2);
   }, []);
 
   useEffect(() => {
-    calcVisible();
-    window.addEventListener('resize', calcVisible);
-    return () => window.removeEventListener('resize', calcVisible);
-  }, [calcVisible, pinnedTemplateIds]);
+    const el = ref.current;
+    if (!el) return;
+    check();
+    const t = setTimeout(check, 80);
+    el.addEventListener('scroll', check, { passive: true });
+    window.addEventListener('resize', check);
+    return () => { clearTimeout(t); el.removeEventListener('scroll', check); window.removeEventListener('resize', check); };
+  }, [check, pinnedTemplateIds]);
 
-  if (pinnedTemplateIds.length === 0) return null;
+  if (!pinnedTemplateIds.length) return null;
+  const all: AnyTemplate[] = [...systemTemplates, ...userTemplates];
+  const list = pinnedTemplateIds.map(id => all.find(x => x.id === id)).filter(Boolean) as AnyTemplate[];
+  if (!list.length) return null;
 
-  const allTemplates: AnyTemplate[] = [...systemTemplates, ...userTemplates];
-  const pinnedTemplates = pinnedTemplateIds
-    .map(id => allTemplates.find(t => t.id === id))
-    .filter(Boolean) as AnyTemplate[];
+  const isUsr = (t: AnyTemplate): t is UserPromptTemplate => 'user_id' in t;
+  const label = (t: AnyTemplate) => isUsr(t) ? t.title : translateTemplateTitle(t.title, language);
+  const send = (t: AnyTemplate) => window.dispatchEvent(new CustomEvent('quick-question', { detail: t.prompt_text }));
+  const below = position === 'below';
 
-  if (pinnedTemplates.length === 0) return null;
+  // below: welcome page, slightly larger chips with more breathing room
+  // above: in-chat, compact chips
+  const pad = below ? '8px 16px' : '6px 13px';
+  const fs = below ? 13.5 : 12.5;
+  const rad = below ? 22 : 20;
+  const gap = below ? 10 : 8;
+  const mw = below ? 240 : 180;
+  const iconSz = below ? 13 : 12;
+  const outerPad = below ? '16px 0 8px' : '0 0 12px';
 
-  const isUserTpl = (tpl: AnyTemplate): tpl is UserPromptTemplate => 'user_id' in tpl;
-  const getTitle = (tpl: AnyTemplate) =>
-    isUserTpl(tpl) ? tpl.title : translateTemplateTitle(tpl.title, language);
-
-  const handleClick = (tpl: AnyTemplate) => {
-    window.dispatchEvent(new CustomEvent('quick-question', { detail: tpl.prompt_text }));
-  };
-
-  const isBelow = position === 'below';
-  const visible = pinnedTemplates.slice(0, visibleCount);
-  const hiddenCount = pinnedTemplates.length - visible.length;
-  const hiddenNames = pinnedTemplates.slice(visibleCount).map(t => getTitle(t));
-
-  const chipStyle = (tpl: AnyTemplate): React.CSSProperties => {
-    const theme = isUserTpl(tpl) ? THEME.user : THEME.system;
-    return {
-      display: 'inline-flex',
-      alignItems: 'center',
-      gap: 6,
-      padding: isBelow ? '7px 14px' : '5px 12px',
-      borderRadius: isBelow ? 18 : 14,
-      fontSize: isBelow ? 13 : 12,
-      fontWeight: 500,
-      cursor: 'pointer',
-      border: '1px solid #e8e8e8',
-      background: '#fff',
-      color: '#4a4a4a',
-      transition: 'all 0.2s ease',
-      outline: 'none',
-      whiteSpace: 'nowrap',
-      maxWidth: isBelow ? 240 : 200,
-      boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-      // store theme for hover
-      '--hover-border': theme.hoverBorder,
-      '--hover-bg': theme.hoverBg,
-      '--hover-shadow': theme.hoverShadow,
-    } as React.CSSProperties;
-  };
+  const mask = (side: 'left' | 'right'): React.CSSProperties => ({
+    position: 'absolute', [side]: 0, top: 0, bottom: 0, width: 32,
+    background: side === 'left' ? 'linear-gradient(to right,#fff 25%,transparent)' : 'linear-gradient(to left,#fff 25%,transparent)',
+    zIndex: 2, pointerEvents: 'none',
+  });
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        display: 'flex',
-        gap: 8,
-        flexWrap: 'nowrap',
-        overflow: 'hidden',
-        justifyContent: isBelow ? 'center' : 'flex-start',
-        padding: isBelow ? '12px 16px 4px' : '0 16px 8px',
-      }}
-    >
-      {visible.map(tpl => {
-        const theme = isUserTpl(tpl) ? THEME.user : THEME.system;
-        return (
-          <div
-            key={tpl.id}
-            onClick={() => handleClick(tpl)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={e => e.key === 'Enter' && handleClick(tpl)}
-            style={chipStyle(tpl)}
-            onMouseEnter={e => {
-              const el = e.currentTarget;
-              el.style.borderColor = theme.hoverBorder;
-              el.style.background = theme.hoverBg;
-              el.style.boxShadow = `0 2px 8px ${theme.hoverShadow}`;
-              el.style.transform = 'translateY(-1px)';
-              const close = el.querySelector('[data-close]') as HTMLElement;
-              if (close) close.style.opacity = '1';
-            }}
-            onMouseLeave={e => {
-              const el = e.currentTarget;
-              el.style.borderColor = '#e8e8e8';
-              el.style.background = '#fff';
-              el.style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)';
-              el.style.transform = 'translateY(0)';
-              const close = el.querySelector('[data-close]') as HTMLElement;
-              if (close) close.style.opacity = '0';
-            }}
-            title={tpl.prompt_text}
-          >
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: theme.dot, flexShrink: 0 }} />
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.4 }}>
-              {getTitle(tpl)}
-            </span>
-            <span
-              data-close
-              onClick={e => { e.stopPropagation(); unpinTemplate(tpl.id); }}
-              style={{
-                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                width: 16, height: 16, borderRadius: '50%', fontSize: 9, color: '#bbb',
-                flexShrink: 0, opacity: 0, transition: 'opacity 0.15s, background 0.15s',
-                cursor: 'pointer', marginLeft: -1,
-              }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.08)'; e.currentTarget.style.color = '#666'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#bbb'; }}
-            >
-              ✕
-            </span>
-          </div>
-        );
-      })}
-
-      {hiddenCount > 0 && (
-        <Tooltip
-          title={hiddenNames.join('、')}
-          placement="top"
-        >
-          <div
-            data-badge
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '4px 10px',
-              borderRadius: 14,
-              fontSize: 12,
-              fontWeight: 600,
-              color: '#8c8c8c',
-              background: '#f5f5f5',
-              border: '1px solid #e8e8e8',
-              cursor: 'default',
-              whiteSpace: 'nowrap',
-              flexShrink: 0,
-            }}
-          >
-            +{hiddenCount}
-          </div>
-        </Tooltip>
-      )}
+    <div style={{ position: 'relative', padding: outerPad }}>
+      {fadeL && <div style={mask('left')} />}
+      {fadeR && <div style={mask('right')} />}
+      <div ref={ref} className="pinned-templates-scroll"
+        style={{ display: 'flex', gap, overflowX: 'auto', overflowY: 'hidden', justifyContent: below ? 'safe center' : 'flex-start', padding: '2px 16px', alignItems: 'center', scrollbarWidth: 'none', scrollBehavior: 'smooth' }}>
+        {list.map(tpl => {
+          const c = isUsr(tpl) ? TH.usr : TH.sys;
+          return (
+            <div key={tpl.id} onClick={() => send(tpl)} role="button" tabIndex={0}
+              onKeyDown={e => e.key === 'Enter' && send(tpl)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: pad, borderRadius: rad, fontSize: fs, fontWeight: 500, cursor: 'pointer', border: '1px solid ' + c.border, background: c.bg, color: c.text, transition: 'all .18s ease-out', outline: 'none', whiteSpace: 'nowrap', maxWidth: mw, flexShrink: 0, userSelect: 'none' }}
+              onMouseEnter={e => { const el = e.currentTarget; el.style.borderColor = c.hBorder; el.style.background = c.hBg; el.style.boxShadow = c.hShadow; el.style.transform = 'translateY(-1px)'; const x = el.querySelector('[data-close]') as HTMLElement; if (x) x.style.opacity = '0.8'; }}
+              onMouseLeave={e => { const el = e.currentTarget; el.style.borderColor = c.border; el.style.background = c.bg; el.style.boxShadow = 'none'; el.style.transform = 'none'; const x = el.querySelector('[data-close]') as HTMLElement; if (x) x.style.opacity = '0.25'; }}
+              onMouseDown={e => { e.currentTarget.style.transform = 'scale(.97)'; e.currentTarget.style.background = c.aBg; }}
+              onMouseUp={e => { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.background = c.hBg; }}>
+              {isUsr(tpl)
+                ? <UserOutlined style={{ fontSize: iconSz, color: c.icon, flexShrink: 0 }} />
+                : <PushpinOutlined style={{ fontSize: iconSz, color: c.icon, flexShrink: 0 }} />}
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.4 }}>{label(tpl)}</span>
+              <span data-close role="button" aria-label="Unpin"
+                onClick={e => { e.stopPropagation(); unpinTemplate(tpl.id); }}
+                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 18, height: 18, borderRadius: '50%', fontSize: 10, color: c.icon, flexShrink: 0, opacity: 0.25, transition: 'opacity .15s,background .15s', cursor: 'pointer' }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,0,0,.06)'; e.currentTarget.style.opacity = '1'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.opacity = '0.25'; }}>
+                {'\u2715'}
+              </span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

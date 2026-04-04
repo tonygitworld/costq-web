@@ -454,3 +454,9 @@
     width: 100% !important;
   }
 }
+
+
+/* ===== PinnedTemplates 横向滚动隐藏滚动条 ===== */
+.pinned-templates-scroll::-webkit-scrollbar {
+  display: none;
+}
