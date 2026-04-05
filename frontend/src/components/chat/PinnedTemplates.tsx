@@ -203,30 +203,29 @@ export const PinnedTemplates: FC<Props> = ({ position }) => {
   /* Task 2.3: toggle visibility */
   const showToggle = position === 'below' && (overflows || expanded);
 
-  /* Task 3.1 & 3.2: DnD strategy & modifiers */
-  const strategy = expanded ? rectSortingStrategy : horizontalListSortingStrategy;
-  const modifiers = expanded ? [] : [restrictToHorizontalAxis];
+  /* DnD: always horizontal in collapsed row; expanded overlay has no DnD */
 
   /* Task 2.1: container style based on expanded state */
-  /* Fixed single-row height so expanding doesn't change outer container height */
-  const singleRowH = below ? 54 : 44;
-  const containerStyle: React.CSSProperties = expanded
-    ? {
-        display: 'flex', flexWrap: 'wrap', gap,
-        padding: '2px 16px',
-        height: Math.min(singleRowH * 3, window.innerHeight * 0.3),
-        overflowY: 'auto', overflowX: 'hidden',
-        transition: 'height 250ms ease',
-        alignItems: 'flex-start', alignContent: 'flex-start',
-        scrollbarWidth: 'none',
-      }
-    : {
-        display: 'flex', gap,
-        overflowX: 'auto', overflowY: 'hidden',
-        justifyContent: below ? 'safe center' : 'flex-start',
-        padding: '2px 16px', alignItems: 'center',
-        scrollbarWidth: 'none', scrollBehavior: 'smooth',
-      };
+  /* Collapsed row style - always the same height regardless of expanded state */
+  const rowStyle: React.CSSProperties = {
+    display: 'flex', gap,
+    overflowX: 'auto', overflowY: 'hidden',
+    justifyContent: below ? 'safe center' : 'flex-start',
+    padding: '2px 16px', alignItems: 'center',
+    scrollbarWidth: 'none', scrollBehavior: 'smooth',
+  };
+  /* Expanded overlay style - absolute positioned, does NOT affect parent height */
+  const expandedStyle: React.CSSProperties = {
+    position: 'absolute', left: 0, right: 0, top: '100%', zIndex: 50,
+    display: 'flex', flexWrap: 'wrap', gap,
+    padding: '12px 16px',
+    maxHeight: '30vh', overflowY: 'auto', overflowX: 'hidden',
+    background: '#fff', borderRadius: 16,
+    boxShadow: '0 8px 24px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)',
+    alignItems: 'flex-start', alignContent: 'flex-start',
+    scrollbarWidth: 'none',
+    justifyContent: 'center',
+  };
 
   const mask = (side: 'left' | 'right'): React.CSSProperties => ({
     position: 'absolute', [side]: 0, top: 0, bottom: 0, width: 32,
@@ -244,44 +243,48 @@ export const PinnedTemplates: FC<Props> = ({ position }) => {
 
   return (
     <div style={{ position: 'relative', padding: outerPad }}>
-      {/* Task 2.4: hide fade edges when expanded */}
+      {/* Fade edges - only in collapsed mode */}
       {!expanded && fadeL && <div style={mask('left')} />}
       {!expanded && fadeR && <div style={mask('right')} />}
 
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-        <div style={{ flex: 1, minWidth: 0, position: 'relative' }}>
-          <DndContext sensors={sensors} collisionDetection={closestCenter}
-            modifiers={modifiers} onDragEnd={handleDragEnd}>
-            <SortableContext items={list.map(t => t.id)} strategy={strategy}>
-              <div ref={scrollRef} className="pinned-templates-scroll"
-                style={containerStyle}
-                onScroll={expanded ? handleVerticalScroll : undefined}
-              >
-                {list.map(tpl => (
-                  <SortableChip key={tpl.id} template={tpl} position={position}
-                    onSend={send} onUnpin={unpinTemplate} />
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
+      {/* Always-visible collapsed row - fixed height, never changes */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <DndContext sensors={sensors} collisionDetection={closestCenter}
+          modifiers={[restrictToHorizontalAxis]} onDragEnd={handleDragEnd}>
+          <SortableContext items={list.map(t => t.id)} strategy={horizontalListSortingStrategy}>
+            <div ref={scrollRef} className="pinned-templates-scroll" style={rowStyle}>
+              {list.map(tpl => (
+                <SortableChip key={tpl.id} template={tpl} position={position}
+                  onSend={send} onUnpin={unpinTemplate} />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
 
-          {/* Task 2.5: bottom fade gradient when expanded & scrollable */}
-          {expanded && fadeBottom && (
-            <div style={{
-              position: 'absolute', left: 0, right: 0, bottom: 0, height: 32,
-              background: 'linear-gradient(to top, #fff 25%, transparent)',
-              zIndex: 2, pointerEvents: 'none',
-            }} />
-          )}
-        </div>
-
-        {/* Task 2.2 & 2.3: ExpandToggle button - z-index above fade masks */}
+        {/* ExpandToggle button */}
         {showToggle && (
-          <div style={{ paddingTop: 2, flexShrink: 0, position: 'relative', zIndex: 5 }}>
+          <div style={{ flexShrink: 0, position: 'relative', zIndex: 5 }}>
             <ExpandToggle expanded={expanded} onClick={handleToggle} />
           </div>
         )}
       </div>
+
+      {/* Expanded overlay - absolute, does NOT affect parent height */}
+      {expanded && (
+        <div style={expandedStyle} onScroll={handleVerticalScroll}>
+          {list.map(tpl => (
+            <SortableChip key={tpl.id} template={tpl} position={position}
+              onSend={send} onUnpin={unpinTemplate} />
+          ))}
+          {fadeBottom && (
+            <div style={{
+              position: 'sticky', bottom: 0, left: 0, right: 0, height: 24,
+              background: 'linear-gradient(to top, #fff 30%, transparent)',
+              pointerEvents: 'none', flexBasis: '100%',
+            }} />
+          )}
+        </div>
+      )}
     </div>
   );
 };
