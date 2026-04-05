@@ -18,6 +18,17 @@
     "userManagement": "用户管理",
     "alertManagement": "告警管理"
   },
+  "templatePanel": {
+    "title": "快捷指令",
+    "systemTemplates": "系统指令",
+    "myTemplates": "我的指令",
+    "createTemplate": "创建指令",
+    "viewAll": "查看全部",
+    "noTemplates": "暂无指令",
+    "noUserTemplates": "暂无自定义指令",
+    "collapse": "收起",
+    "expand": "展开"
+  },
   "input": {
     "placeholder": "输入您的问题... (Enter 发送, Shift+Enter 换行)",
     "placeholderNoAccount": "💡 请先选择云账号，然后即可开始提问...",

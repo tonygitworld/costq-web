@@ -12,6 +12,7 @@ import { AlertManagement } from './components/alert/AlertManagement';
 import { AlertForm } from './components/alert/AlertForm';
 import { AlertDetail } from './components/alert/AlertDetail';
 import { EnterpriseLogin } from './components/auth/EnterpriseLogin';
+import { PromptTemplateGallery } from './components/template/PromptTemplateGallery';
 
 // 懒加载 Invoice Tab
 const InvoiceTab = React.lazy(() => import('./components/settings/InvoiceTab'));
@@ -237,6 +238,18 @@ const AppContent: FC = () => {
 
       {/* 为了兼容旧路径，添加重定向 */}
       <Route path="/alerts" element={<Navigate to="/settings/alerts" replace />} />
+
+      {/* 提示词模板 */}
+      <Route
+        path="/settings/templates"
+        element={
+          <ProtectedRoute>
+            <ChatLayout>
+              <PromptTemplateGallery />
+            </ChatLayout>
+          </ProtectedRoute>
+        }
+      />
 
       {/* Invoice */}
       <Route

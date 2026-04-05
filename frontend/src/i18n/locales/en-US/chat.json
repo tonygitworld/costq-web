@@ -18,6 +18,17 @@
     "userManagement": "User Management",
     "alertManagement": "Alert Management"
   },
+  "templatePanel": {
+    "title": "Quick Actions",
+    "systemTemplates": "System Actions",
+    "myTemplates": "My Actions",
+    "createTemplate": "Create Action",
+    "viewAll": "View All",
+    "noTemplates": "No actions",
+    "noUserTemplates": "No custom actions",
+    "collapse": "Collapse",
+    "expand": "Expand"
+  },
   "input": {
     "placeholder": "Type your question... (Enter to send, Shift+Enter for new line)",
     "placeholderNoAccount": "💡 Please select a cloud account to start asking questions...",

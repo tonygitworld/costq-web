@@ -31,6 +31,10 @@ interface ChatState {
   // 持久化
   loadFromStorage: () => Promise<void>;
   saveToStorage: () => void;
+
+  // 预填充输入框（从模板页面传递 prompt 文本）
+  pendingInput: string | null;
+  setPendingInput: (text: string | null) => void;
 }
 
 // ✅ 生成临时ID（向后兼容，用于历史会话或错误处理）
@@ -41,7 +45,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
   currentChatId: null,
   messages: {},
   isLoadingChats: false,
-  isLoadingMessages: false, // ✅ 初始化
+  isLoadingMessages: false,
+  pendingInput: null,
+  setPendingInput: (text) => set({ pendingInput: text }),
 
   createNewChat: () => {
     // ✅ 重构：只创建前端临时状态，不调用后端 API

@@ -14,6 +14,7 @@ import type {
 } from '../types/promptTemplate';
 import * as api from '../services/promptTemplateApi';
 
+import { arrayMove } from '@dnd-kit/sortable';
 import { logger } from '../utils/logger';
 import { getErrorMessage } from '../utils/ErrorHandler';
 
@@ -42,8 +43,28 @@ interface PromptTemplateStore {
   // 执行模板
   executeTemplate: (id: string, variables?: Record<string, string | number | boolean>) => Promise<string>;
 
+  // 固定到对话框
+  pinnedTemplateIds: string[];
+  pinTemplate: (id: string) => void;
+  unpinTemplate: (id: string) => void;
+  isPinned: (id: string) => boolean;
+  reorderPinnedTemplates: (activeId: string, overId: string) => void;
+
   // 重置错误
   clearError: () => void;
+}
+
+const PINNED_STORAGE_KEY = 'costq-pinned-templates';
+
+function loadPinnedIds(): string[] {
+  try {
+    const raw = localStorage.getItem(PINNED_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+function savePinnedIds(ids: string[]) {
+  localStorage.setItem(PINNED_STORAGE_KEY, JSON.stringify(ids));
 }
 
 export const usePromptTemplateStore = create<PromptTemplateStore>((set, get) => ({
@@ -53,6 +74,7 @@ export const usePromptTemplateStore = create<PromptTemplateStore>((set, get) => 
   systemLoading: false,
   userLoading: false,
   error: null,
+  pinnedTemplateIds: loadPinnedIds(),
 
   // ========== 系统模板操作 ==========
 
@@ -212,6 +234,36 @@ export const usePromptTemplateStore = create<PromptTemplateStore>((set, get) => 
       logger.error('❌ 执行模板失败:', error);
       throw error;
     }
+  },
+
+  // ========== 固定到对话框 ==========
+
+  pinTemplate: (id) => {
+    const ids = [...get().pinnedTemplateIds];
+    if (!ids.includes(id)) {
+      ids.push(id);
+      set({ pinnedTemplateIds: ids });
+      savePinnedIds(ids);
+    }
+  },
+
+  unpinTemplate: (id) => {
+    const ids = get().pinnedTemplateIds.filter(i => i !== id);
+    set({ pinnedTemplateIds: ids });
+    savePinnedIds(ids);
+  },
+
+  isPinned: (id) => get().pinnedTemplateIds.includes(id),
+
+  reorderPinnedTemplates: (activeId, overId) => {
+    if (activeId === overId) return;
+    const ids = get().pinnedTemplateIds;
+    const oldIndex = ids.indexOf(activeId);
+    const newIndex = ids.indexOf(overId);
+    if (oldIndex === -1 || newIndex === -1) return;
+    const newIds = arrayMove(ids, oldIndex, newIndex);
+    set({ pinnedTemplateIds: newIds });
+    savePinnedIds(newIds);
   },
 
   // ========== 辅助方法 ==========

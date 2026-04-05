@@ -118,7 +118,27 @@ export const MessageInput: FC = () => {
     }
   }, [message, isMobile]);
 
-  // ✅ 停止生成处理
+  // 监听 quick-question 事件：从模板页面填入输入框
+  useEffect(() => {
+    // 方式1：Zustand store（从模板画廊页面跳转过来）
+    const pending = useChatStore.getState().pendingInput;
+    if (pending) {
+      setMessage(pending);
+      useChatStore.getState().setPendingInput(null);
+      setTimeout(() => textAreaRef.current?.focus(), 100);
+    }
+
+    // 方式2：CustomEvent（同页面内的快捷问题）
+    const handler = (e: Event) => {
+      const text = (e as CustomEvent).detail;
+      if (typeof text === 'string' && text.trim()) {
+        setMessage(text);
+        setTimeout(() => textAreaRef.current?.focus(), 100);
+      }
+    };
+    window.addEventListener('quick-question', handler);
+    return () => window.removeEventListener('quick-question', handler);
+  }, []);  // ✅ 停止生成处理
   const handleStop = useCallback(() => {
     logger.debug('🔴 [handleStop] 点击了停止按钮');
     logger.debug('🔴 [handleStop] currentQueryId:', currentQueryId);
@@ -523,27 +543,6 @@ export const MessageInput: FC = () => {
         {/* 2. 工具栏区域 */}
         <div className="ai-chat-input-toolbar">
           <div className="toolbar-left">
-            <Popover
-              content={<PromptTemplatesPopoverContent onClose={() => setPopoverOpen(false)} />}
-              title={
-                <span>
-                  {t('template.mobileTitle')}
-                  <span style={{ marginLeft: 8, fontSize: 12, fontWeight: 'normal', color: '#999' }}>
-                    {t('template.description')}
-                  </span>
-                </span>
-              }
-              trigger="click"
-              open={popoverOpen}
-              onOpenChange={setPopoverOpen}
-              placement="topLeft"
-              overlayStyle={{ width: 350 }}
-              align={{ offset: [-14, 0] }}
-            >
-              <button className="icon-btn" title={t('template.mobileTitle')}>
-                <BulbOutlined style={{ fontSize: 18 }} />
-              </button>
-            </Popover>
             <FilePickerButton
               onFilesSelected={handleFilesSelected}
               disabled={loading || !hasSelectedAccount || isProcessing || !canAddMore}

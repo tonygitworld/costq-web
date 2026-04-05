@@ -11,6 +11,7 @@ import { useChatStore } from '../../stores/chatStore';
 import { useAccountStore } from '../../stores/accountStore';
 import { useGCPAccountStore } from '../../stores/gcpAccountStore';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { PinnedTemplates } from '../chat/PinnedTemplates';
 import './MainContent.css';
 
 export const MainContent: React.FC = () => {
@@ -68,13 +69,18 @@ export const MainContent: React.FC = () => {
   }
 
   // ===== 桌面端：保持原有布局 =====
+  // 固定模板位置：新对话显示在输入框下方，已有对话或加载中显示在上方
+  const pinnedPosition = isNewChat && !isLoadingMessages ? 'below' : 'above';
+
   return (
     <Layout.Content className={`main-content-container ${isWelcomeMode ? 'welcome-mode' : ''}`}>
       <div className="main-content-message-area">
         {renderMessageArea()}
       </div>
       <div className="main-content-input-area">
+        {pinnedPosition === 'above' && <PinnedTemplates position="above" />}
         <MessageInput />
+        {pinnedPosition === 'below' && <PinnedTemplates position="below" />}
       </div>
     </Layout.Content>
   );
