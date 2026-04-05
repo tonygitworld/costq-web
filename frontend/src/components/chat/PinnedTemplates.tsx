@@ -216,7 +216,7 @@ export const PinnedTemplates: FC<Props> = ({ position }) => {
   };
   /* Expanded overlay style - absolute positioned, does NOT affect parent height */
   const expandedStyle: React.CSSProperties = {
-    position: 'absolute', left: 0, right: 0, top: '100%', zIndex: 50,
+    position: 'absolute', left: 0, right: 0, top: 0, zIndex: 50,
     display: 'flex', flexWrap: 'wrap', gap,
     padding: '12px 16px',
     maxHeight: '30vh', overflowY: 'auto', overflowX: 'hidden',
