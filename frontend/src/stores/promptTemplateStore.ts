@@ -14,6 +14,7 @@ import type {
 } from '../types/promptTemplate';
 import * as api from '../services/promptTemplateApi';
 
+import { arrayMove } from '@dnd-kit/sortable';
 import { logger } from '../utils/logger';
 import { getErrorMessage } from '../utils/ErrorHandler';
 
@@ -47,6 +48,7 @@ interface PromptTemplateStore {
   pinTemplate: (id: string) => void;
   unpinTemplate: (id: string) => void;
   isPinned: (id: string) => boolean;
+  reorderPinnedTemplates: (activeId: string, overId: string) => void;
 
   // 重置错误
   clearError: () => void;
@@ -252,6 +254,17 @@ export const usePromptTemplateStore = create<PromptTemplateStore>((set, get) => 
   },
 
   isPinned: (id) => get().pinnedTemplateIds.includes(id),
+
+  reorderPinnedTemplates: (activeId, overId) => {
+    if (activeId === overId) return;
+    const ids = get().pinnedTemplateIds;
+    const oldIndex = ids.indexOf(activeId);
+    const newIndex = ids.indexOf(overId);
+    if (oldIndex === -1 || newIndex === -1) return;
+    const newIds = arrayMove(ids, oldIndex, newIndex);
+    set({ pinnedTemplateIds: newIds });
+    savePinnedIds(newIds);
+  },
 
   // ========== 辅助方法 ==========
 
