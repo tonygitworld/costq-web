@@ -208,13 +208,16 @@ export const PinnedTemplates: FC<Props> = ({ position }) => {
   const modifiers = expanded ? [] : [restrictToHorizontalAxis];
 
   /* Task 2.1: container style based on expanded state */
+  /* Fixed single-row height so expanding doesn't change outer container height */
+  const singleRowH = below ? 54 : 44;
   const containerStyle: React.CSSProperties = expanded
     ? {
         display: 'flex', flexWrap: 'wrap', gap,
         padding: '2px 16px',
-        maxHeight: '30vh', overflowY: 'auto', overflowX: 'hidden',
-        transition: 'max-height 250ms ease',
-        alignItems: 'center',
+        height: Math.min(singleRowH * 3, window.innerHeight * 0.3),
+        overflowY: 'auto', overflowX: 'hidden',
+        transition: 'height 250ms ease',
+        alignItems: 'flex-start', alignContent: 'flex-start',
         scrollbarWidth: 'none',
       }
     : {
@@ -272,9 +275,9 @@ export const PinnedTemplates: FC<Props> = ({ position }) => {
           )}
         </div>
 
-        {/* Task 2.2 & 2.3: ExpandToggle button */}
+        {/* Task 2.2 & 2.3: ExpandToggle button - z-index above fade masks */}
         {showToggle && (
-          <div style={{ paddingTop: 2, flexShrink: 0 }}>
+          <div style={{ paddingTop: 2, flexShrink: 0, position: 'relative', zIndex: 5 }}>
             <ExpandToggle expanded={expanded} onClick={handleToggle} />
           </div>
         )}
