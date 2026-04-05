@@ -1,4 +1,4 @@
-/* PinnedTemplates - pinned template chips with drag-to-reorder */
+﻿/* PinnedTemplates - pinned template chips with drag-to-reorder */
 import { type FC, useEffect, useRef, useState, useCallback } from 'react';
 import { PushpinOutlined, UserOutlined, DownOutlined, UpOutlined } from '@ant-design/icons';
 import {
@@ -139,15 +139,16 @@ export const PinnedTemplates: FC<Props> = ({ position }) => {
   const check = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
+    if (expanded) {
+      // When expanded (wrap layout), skip overflow detection - wrap means no horizontal overflow
+      // Only check vertical scroll for bottom fade
+      return;
+    }
+    // Only detect overflow in collapsed (single-row) mode
     const isOverflow = el.scrollWidth > el.clientWidth + 2;
     setOverflows(isOverflow);
-    // auto-collapse when no longer overflowing
-    if (!isOverflow && expanded) setExpanded(false);
-    // fade edges only in collapsed mode
-    if (!expanded) {
-      setFadeL(el.scrollLeft > 2);
-      setFadeR(el.scrollLeft < el.scrollWidth - el.clientWidth - 2);
-    }
+    setFadeL(el.scrollLeft > 2);
+    setFadeR(el.scrollLeft < el.scrollWidth - el.clientWidth - 2);
   }, [expanded]);
 
   /* Task 1.3: auto-reset when position switches to above */
