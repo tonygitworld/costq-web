@@ -12,7 +12,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Typography, Input, Spin, Tag, Button, Space, App,
-  Card, Row, Col, Drawer, Popconfirm, Divider, Form,
+  Card, Row, Col, Drawer, Popconfirm, Divider, Form, Grid,
 } from 'antd';
 import {
   ArrowLeftOutlined, StarFilled, PlusOutlined,
@@ -24,7 +24,6 @@ import { useNavigate } from 'react-router-dom';
 import { usePromptTemplateStore } from '../../stores/promptTemplateStore';
 import { useChatStore } from '../../stores/chatStore';
 import { useI18n } from '../../hooks/useI18n';
-import { useIsMobile } from '../../hooks/useIsMobile';
 import { translateTemplateTitle, translateTemplateDescription } from '../../utils/templateTranslations';
 import type { PromptTemplate, UserPromptTemplate } from '../../types/promptTemplate';
 
@@ -46,7 +45,8 @@ type AnyTemplate = PromptTemplate | UserPromptTemplate;
 
 export const PromptTemplateGallery: React.FC = () => {
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
+  const screens = Grid.useBreakpoint();
+  const isPhone = !screens.sm;
   const { language, t, isZhCN } = useI18n(['chat', 'common']);
   const { message: msg } = App.useApp();
 
@@ -298,7 +298,7 @@ export const PromptTemplateGallery: React.FC = () => {
   return (
     <div
       style={{
-        padding: isMobile ? 16 : 24,
+        padding: isPhone ? 12 : 24,
         height: 'calc(100vh - 0px)',
         overflow: 'auto',
         backgroundColor: '#f0f2f5',
@@ -306,20 +306,45 @@ export const PromptTemplateGallery: React.FC = () => {
     >
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         {/* Header: back + title + create button */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: isPhone ? 'flex-start' : 'center',
+            justifyContent: 'space-between',
+            flexWrap: isPhone ? 'wrap' : 'nowrap',
+            gap: isPhone ? 8 : 12,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, minWidth: 0, flex: '1 1 auto' }}>
             <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/')} type="text">
               {t('common:button.back', 'Back')}
             </Button>
-            <Title level={3} style={{ margin: 0 }}>
+            <Title level={isPhone ? 4 : 3} style={{ margin: 0, minWidth: 0, wordBreak: 'break-word' }}>
               <FileTextOutlined /> {t('chat:templatePanel.title', 'Quick Actions')}
             </Title>
           </div>
         </div>
 
         {/* Search + Category pills */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', flex: 1 }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: isPhone ? 'column' : 'row',
+            alignItems: isPhone ? 'stretch' : 'center',
+            gap: 12,
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              gap: 8,
+              flexWrap: isPhone ? 'nowrap' : 'wrap',
+              flex: 1,
+              width: '100%',
+              overflowX: isPhone ? 'auto' : 'visible',
+              paddingBottom: isPhone ? 4 : 0,
+            }}
+          >
             {[
               { key: 'all', label: isZhCN() ? '全部' : 'All' },
               ...filterCategories.map((k) => ({ key: k, label: isZhCN() ? categoryLabels[k].zh : categoryLabels[k].en })),
@@ -355,7 +380,7 @@ export const PromptTemplateGallery: React.FC = () => {
           </div>
           <Search
             placeholder={isZhCN() ? '搜索...' : 'Search...'}
-            style={{ width: 220 }}
+            style={{ width: isPhone ? '100%' : 220 }}
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             allowClear
@@ -371,7 +396,7 @@ export const PromptTemplateGallery: React.FC = () => {
         title={drawerTpl ? getTitle(drawerTpl) : ''}
         open={!!drawerTpl}
         onClose={() => setDrawerTpl(null)}
-        width={isMobile ? '100%' : 520}
+        width={isPhone ? '100%' : 520}
         styles={{ body: { padding: 0 } }}
       >
         {drawerTpl && (() => {
@@ -379,7 +404,7 @@ export const PromptTemplateGallery: React.FC = () => {
           return (
           <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             {/* Meta tags */}
-            <div style={{ padding: '16px 24px' }}>
+            <div style={{ padding: isPhone ? '12px 16px' : '16px 24px' }}>
               <Space wrap size={[6, 6]}>
                 <Tag color={(categoryLabels[drawerTpl.category] || categoryLabels.custom).color}>
                   {isZhCN()
@@ -399,7 +424,7 @@ export const PromptTemplateGallery: React.FC = () => {
 
             {/* Description */}
             {getDesc(drawerTpl) && (
-              <div style={{ padding: '0 24px 16px' }}>
+              <div style={{ padding: isPhone ? '0 16px 12px' : '0 24px 16px' }}>
                 <Paragraph type="secondary" style={{ margin: 0 }}>
                   {getDesc(drawerTpl)}
                 </Paragraph>
@@ -409,7 +434,7 @@ export const PromptTemplateGallery: React.FC = () => {
             <Divider style={{ margin: 0 }} />
 
             {/* Prompt content */}
-            <div style={{ padding: '16px 24px 8px' }}>
+            <div style={{ padding: isPhone ? '12px 16px 8px' : '16px 24px 8px' }}>
               <Text
                 strong
                 style={{
@@ -422,7 +447,7 @@ export const PromptTemplateGallery: React.FC = () => {
                 {isZhCN() ? '指令内容' : 'Action Content'}
               </Text>
             </div>
-            <div style={{ flex: 1, overflow: 'auto', padding: '0 24px 24px' }}>
+            <div style={{ flex: 1, overflow: 'auto', padding: isPhone ? '0 16px 16px' : '0 24px 24px' }}>
               <pre
                 style={{
                   margin: 0,
@@ -444,17 +469,19 @@ export const PromptTemplateGallery: React.FC = () => {
 
             {/* Action bar */}
             <div style={{
-              padding: '12px 24px',
+              padding: isPhone ? '12px 16px calc(12px + env(safe-area-inset-bottom, 0px))' : '12px 24px',
               borderTop: '1px solid #f0f0f0',
               background: '#fff',
               display: 'flex',
+              flexDirection: isPhone ? 'column' : 'row',
               gap: 8,
             }}>
               <Button
                 type="primary"
                 icon={<SendOutlined />}
                 onClick={() => { handleAddToChat(drawerTpl); setDrawerTpl(null); }}
-                style={{ flex: 1, borderRadius: 8, height: 38, fontWeight: 600, background: '#da7756', borderColor: '#da7756' }}
+                block={isPhone}
+                style={{ flex: isPhone ? 'none' : 1, borderRadius: 8, height: 42, fontWeight: 600, background: '#da7756', borderColor: '#da7756' }}
               >
                 {isZhCN() ? '添加到聊天' : 'Add to Chat'}
               </Button>
@@ -464,14 +491,16 @@ export const PromptTemplateGallery: React.FC = () => {
                   if (isPinnedCurrent) { unpinTemplate(drawerTpl.id); msg.success(isZhCN() ? '已取消固定' : 'Unpinned'); }
                   else { pinTemplate(drawerTpl.id); msg.success(isZhCN() ? '已固定到对话框' : 'Pinned'); }
                 }}
-                style={{ flex: 1, borderRadius: 8, height: 38, ...(isPinnedCurrent ? { borderColor: '#da7756', color: '#da7756' } : {}) }}
+                block={isPhone}
+                style={{ flex: isPhone ? 'none' : 1, borderRadius: 8, height: 42, ...(isPinnedCurrent ? { borderColor: '#da7756', color: '#da7756' } : {}) }}
               >
                 {isZhCN() ? (isPinnedCurrent ? '已固定' : '固定') : (isPinnedCurrent ? 'Pinned' : 'Pin')}
               </Button>
               <Button
                 icon={<CopyOutlined />}
                 onClick={() => handleCopy(drawerTpl)}
-                style={{ flex: 1, borderRadius: 8, height: 38 }}
+                block={isPhone}
+                style={{ flex: isPhone ? 'none' : 1, borderRadius: 8, height: 42 }}
               >
                 {isZhCN() ? '复制' : 'Copy'}
               </Button>
@@ -479,7 +508,8 @@ export const PromptTemplateGallery: React.FC = () => {
                 <Button
                   icon={<EditOutlined />}
                   onClick={() => setManagerVisible(true)}
-                  style={{ flex: 1, borderRadius: 8, height: 38 }}
+                  block={isPhone}
+                  style={{ flex: isPhone ? 'none' : 1, borderRadius: 8, height: 42 }}
                 >
                   {isZhCN() ? '编辑' : 'Edit'}
                 </Button>
@@ -495,7 +525,8 @@ export const PromptTemplateGallery: React.FC = () => {
                   <Button
                     danger
                     icon={<DeleteOutlined />}
-                    style={{ flex: 1, borderRadius: 8, height: 38 }}
+                    block={isPhone}
+                    style={{ flex: isPhone ? 'none' : 1, borderRadius: 8, height: 42 }}
                   >
                     {isZhCN() ? '删除' : 'Delete'}
                   </Button>
@@ -512,11 +543,11 @@ export const PromptTemplateGallery: React.FC = () => {
         title={isZhCN() ? '创建自定义指令' : 'Create Action'}
         open={managerVisible}
         onClose={() => { setManagerVisible(false); createForm.resetFields(); }}
-        width={isMobile ? '100%' : 520}
+        width={isPhone ? '100%' : 520}
         styles={{ body: { padding: 0 } }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-          <div style={{ flex: 1, overflow: 'auto', padding: '24px' }}>
+          <div style={{ flex: 1, overflow: 'auto', padding: isPhone ? '16px' : '24px' }}>
             <Form form={createForm} layout="vertical" onFinish={handleCreateSubmit}>
               <Form.Item
                 name="title"
@@ -560,7 +591,7 @@ export const PromptTemplateGallery: React.FC = () => {
 
           {/* 底部操作栏 — 和详情 Drawer 风格一致 */}
           <div style={{
-            padding: '14px 24px',
+            padding: isPhone ? '12px 16px calc(12px + env(safe-area-inset-bottom, 0px))' : '14px 24px',
             borderTop: '1px solid #f0f0f0',
             background: '#fff',
           }}>
