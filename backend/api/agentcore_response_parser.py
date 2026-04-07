@@ -58,7 +58,7 @@ class AgentCoreResponseParser:
                 f"✅ [Parser] 为消息添加 session_id: {self.session_id}, 消息类型: {message.get('type')}"
             )
         else:
-            logger.warning("⚠️ [Parser] 未配置 session_id，消息类型: {message.get('type')}")
+            logger.warning("⚠️ [Parser] 未配置 session_id，消息类型: %s", message.get('type'))
         return message
 
     def parse_event(self, event: bytes | dict) -> list[dict[str, Any]]:
@@ -80,9 +80,9 @@ class AgentCoreResponseParser:
 
         if os.getenv("ENVIRONMENT") == "local":
             if isinstance(event, dict):
-                logger.debug("🔍 [Parser] 收到字典事件，键: {list(event.keys())}")
+                logger.debug("🔍 [Parser] 收到字典事件，键: %s", list(event.keys()))
             elif isinstance(event, bytes):
-                logger.debug("🔍 [Parser] 收到bytes事件，长度: {len(event)}")
+                logger.debug("🔍 [Parser] 收到bytes事件，长度: %s", len(event))
 
         try:
             # 如果已经是字典，直接转换
@@ -98,7 +98,7 @@ class AgentCoreResponseParser:
             elif isinstance(event, bytes):
                 event_str = event.decode("utf-8", errors="ignore").strip()
             else:
-                logger.warning("未知事件类型: {type(event)}, 跳过")
+                logger.warning("未知事件类型: %s, 跳过", type(event))
                 return messages
 
             if not event_str:
@@ -115,7 +115,7 @@ class AgentCoreResponseParser:
                     # 转换为 WebSocket 消息
                     messages.extend(self._convert_to_websocket_messages(data))
             else:
-                logger.debug("忽略非 SSE 格式事件: {event_str[:100]}")
+                logger.debug("忽略非 SSE 格式事件: %s", event_str[:100])
 
         except Exception as e:
             logger.error("事件解析失败: %s", e, exc_info=False)
@@ -149,7 +149,7 @@ class AgentCoreResponseParser:
         except (ValueError, SyntaxError):
             pass
 
-        logger.debug("无法解析数据: {data_str[:100]}")
+        logger.debug("无法解析数据: %s", data_str[:100])
         return None
 
     def _convert_to_websocket_messages(self, data: dict[str, Any]) -> list[dict[str, Any]]:
@@ -328,7 +328,7 @@ class AgentCoreResponseParser:
                                 )
 
                         except Exception as e:
-                            logger.error(": %s, : {result_json[:200]}", e)
+                            logger.error("解析失败: %s, 内容: %s", e, result_json[:200])
 
                         # ✅ 从buffer中移除整个 <result> 块
                         self.buffer = self.buffer.replace(func_result_match.group(0), "")
@@ -527,7 +527,7 @@ class AgentCoreResponseParser:
             if "contentBlockStart" in event_data:
                 start = event_data["contentBlockStart"].get("start", {})
                 content_block_index = event_data["contentBlockStart"].get("contentBlockIndex")
-                logger.info("🔍 [Parser] contentBlockStart.start键: {list(start.keys())}")
+                logger.info("🔍 [Parser] contentBlockStart.start键: %s", list(start.keys()))
 
                 if "toolUse" in start:
                     tool_use = start["toolUse"]
