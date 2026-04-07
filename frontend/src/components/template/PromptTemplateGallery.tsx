@@ -95,6 +95,73 @@ export const PromptTemplateGallery: React.FC = () => {
       ? tpl.description
       : (translateTemplateDescription(tpl.description, language) || tpl.description);
 
+  const renderCardActions = (tpl: AnyTemplate) => {
+    const isPinnedCurrent = pinnedTemplateIds.includes(tpl.id);
+
+    return (
+      <Space wrap size={[6, 6]}>
+        <Button
+          size="small"
+          type="text"
+          icon={<SendOutlined />}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleAddToChat(tpl);
+          }}
+        >
+          {isZhCN() ? '添加' : 'Add'}
+        </Button>
+        <Button
+          size="small"
+          type="text"
+          icon={isPinnedCurrent ? <PushpinFilled /> : <PushpinOutlined />}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (isPinnedCurrent) {
+              unpinTemplate(tpl.id);
+              msg.success(isZhCN() ? '已取消固定' : 'Unpinned');
+            } else {
+              pinTemplate(tpl.id);
+              msg.success(isZhCN() ? '已固定到对话框' : 'Pinned');
+            }
+          }}
+        >
+          {isZhCN() ? (isPinnedCurrent ? '已固定' : '固定') : (isPinnedCurrent ? 'Pinned' : 'Pin')}
+        </Button>
+        <Button
+          size="small"
+          type="text"
+          icon={<CopyOutlined />}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleCopy(tpl);
+          }}
+        >
+          {isZhCN() ? '复制' : 'Copy'}
+        </Button>
+        {isUser(tpl) && (
+          <Popconfirm
+            title={isZhCN() ? '确认删除？' : 'Delete?'}
+            onConfirm={() => handleDelete(tpl.id)}
+            okText={isZhCN() ? '删除' : 'Delete'}
+            cancelText={isZhCN() ? '取消' : 'Cancel'}
+            okButtonProps={{ danger: true }}
+          >
+            <Button
+              size="small"
+              danger
+              type="text"
+              icon={<DeleteOutlined />}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {isZhCN() ? '删除' : 'Delete'}
+            </Button>
+          </Popconfirm>
+        )}
+      </Space>
+    );
+  };
+
   const handleAddToChat = useCallback((tpl: AnyTemplate) => {
     // 通过 Zustand store 传递 prompt 文本，MessageInput 挂载时读取
     useChatStore.getState().setPendingInput(tpl.prompt_text);
@@ -168,7 +235,7 @@ export const PromptTemplateGallery: React.FC = () => {
     }
 
     // "创建自定义指令"卡片只在"全部"tab 下显示
-    const showCreateCard = categoryFilter === 'all' && typeFilter === 'all';
+    const showCreateCard = typeFilter === 'my';
 
     if (filteredTemplates.length === 0 && !showCreateCard) {
       return (
@@ -222,22 +289,24 @@ export const PromptTemplateGallery: React.FC = () => {
               <Card
                 hoverable
                 onClick={() => setDrawerTpl(tpl)}
-                style={{ height: '100%', borderRadius: 8, minHeight: 160 }}
+                style={{ height: '100%', borderRadius: 8, minHeight: 210 }}
                 styles={{
                   body: {
                     padding: '18px 20px',
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 10,
+                    gap: 12,
                     height: '100%',
                   },
                 }}
               >
                 {/* Tags row */}
                 <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  <Tag color={catInfo.color} style={{ margin: 0 }}>
-                    {isZhCN() ? catInfo.zh : catInfo.en}
-                  </Tag>
+                  {!isUser(tpl) && (
+                    <Tag color={catInfo.color} style={{ margin: 0 }}>
+                      {isZhCN() ? catInfo.zh : catInfo.en}
+                    </Tag>
+                  )}
                   {isUser(tpl) && (
                     <Tag color="purple" style={{ margin: 0 }}>
                       {isZhCN() ? '我的' : 'Mine'}
@@ -271,21 +340,22 @@ export const PromptTemplateGallery: React.FC = () => {
                 )}
 
                 {/* Bottom info */}
-                <div
-                  style={{
-                    marginTop: 'auto',
-                    paddingTop: 8,
-                    display: 'flex',
-                    gap: 12,
-                    fontSize: 12,
-                    color: '#8c8c8c',
-                  }}
-                >
-                  {tpl.variables && tpl.variables.length > 0 && (
-                    <span>
-                      {tpl.variables.length} {isZhCN() ? '个参数' : 'params'}
-                    </span>
-                  )}
+                <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: 12,
+                      fontSize: 12,
+                      color: '#8c8c8c',
+                    }}
+                  >
+                    {tpl.variables && tpl.variables.length > 0 && (
+                      <span>
+                        {tpl.variables.length} {isZhCN() ? '个参数' : 'params'}
+                      </span>
+                    )}
+                  </div>
+                  {renderCardActions(tpl)}
                 </div>
               </Card>
             </Col>
@@ -381,13 +451,15 @@ export const PromptTemplateGallery: React.FC = () => {
             {/* Meta tags */}
             <div style={{ padding: '16px 24px' }}>
               <Space wrap size={[6, 6]}>
-                <Tag color={(categoryLabels[drawerTpl.category] || categoryLabels.custom).color}>
-                  {isZhCN()
-                    ? (categoryLabels[drawerTpl.category]?.zh || drawerTpl.category)
-                    : (categoryLabels[drawerTpl.category]?.en || drawerTpl.category)}
-                </Tag>
+                {!isUser(drawerTpl) && (
+                  <Tag color={(categoryLabels[drawerTpl.category] || categoryLabels.custom).color}>
+                    {isZhCN()
+                      ? (categoryLabels[drawerTpl.category]?.zh || drawerTpl.category)
+                      : (categoryLabels[drawerTpl.category]?.en || drawerTpl.category)}
+                  </Tag>
+                )}
                 {isUser(drawerTpl) && (
-                  <Tag color="purple">{isZhCN() ? '我的指令' : 'My Action'}</Tag>
+                  <Tag color="purple">{isZhCN() ? '我的' : 'Mine'}</Tag>
                 )}
                 {drawerTpl.variables && drawerTpl.variables.length > 0 && (
                   <Tag color="blue">

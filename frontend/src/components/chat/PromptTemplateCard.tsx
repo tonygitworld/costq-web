@@ -1,7 +1,7 @@
 /**
  * PromptTemplateCard - 提示词模板卡片
  *
- * 单个模板的卡片展示，支持点击触发
+ * 单个模板的卡片展示，支持点击和可选的卡片内动作区
  */
 
 import React from 'react';
@@ -13,22 +13,18 @@ import { useI18n } from '../../hooks/useI18n';
 interface Props {
   template: PromptTemplate | UserPromptTemplate;
   onClick: (template: PromptTemplate | UserPromptTemplate) => void;
+  actions?: React.ReactNode;
+  style?: React.CSSProperties;
 }
 
-export const PromptTemplateCard: React.FC<Props> = ({ template, onClick }) => {
-  const { language, t } = useI18n('chat'); // 订阅语言变化以触发重新渲染
+export const PromptTemplateCard: React.FC<Props> = ({ template, onClick, actions, style }) => {
+  const { language, t } = useI18n('chat');
 
-  // 判断是否为用户模板
   const isUserTemplate = 'user_id' in template;
-
-  // 翻译模板标题和描述
   const translatedTitle = translateTemplateTitle(template.title, language);
   const translatedDescription = template.description ? translateTemplateDescription(template.description, language) : undefined;
-
-  // 判断是否为VIP模板（成本洞察报告 + RI/SP 利用率分析）
   const isVipTemplate = template.id === 'pt-001' || template.id === 'pt-016';
 
-  // 云服务商颜色
   const cloudProviderColors: Record<string, string> = {
     aws: '#ff9900',
     gcp: '#4285f4',
@@ -42,7 +38,8 @@ export const PromptTemplateCard: React.FC<Props> = ({ template, onClick }) => {
         onClick={() => onClick(template)}
         style={{
           width: 180,
-          height: 70,
+          minHeight: actions ? 108 : 70,
+          height: actions ? 'auto' : 70,
           borderRadius: 8,
           background: isVipTemplate
             ? 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)'
@@ -60,28 +57,29 @@ export const PromptTemplateCard: React.FC<Props> = ({ template, onClick }) => {
             : undefined,
           transition: 'all 0.3s ease',
           cursor: 'pointer',
-          position: 'relative'
+          position: 'relative',
+          ...style
         }}
         styles={{
           body: {
-            padding: 8,
+            padding: actions ? '10px 8px 8px' : 8,
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'center',
+            justifyContent: actions ? 'space-between' : 'center',
             alignItems: 'center',
             textAlign: 'center',
-            gap: 6,
+            gap: actions ? 8 : 6,
             height: '100%'
           }
         }}
-        className={isVipTemplate ? "template-card template-card-vip" : "template-card"}
+        className={isVipTemplate ? 'template-card template-card-vip' : 'template-card'}
       >
         <div style={{
           display: 'flex',
           flexDirection: 'column',
-          gap: 6
+          gap: 6,
+          width: '100%'
         }}>
-          {/* 标签在顶部 */}
           <div>
             {isUserTemplate ? (
               <Tag
@@ -102,7 +100,6 @@ export const PromptTemplateCard: React.FC<Props> = ({ template, onClick }) => {
             )}
           </div>
 
-          {/* 标题紧随其后 */}
           <div style={{
             fontSize: 14,
             fontWeight: 500,
@@ -110,7 +107,7 @@ export const PromptTemplateCard: React.FC<Props> = ({ template, onClick }) => {
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             display: '-webkit-box',
-            WebkitLineClamp: 2,
+            WebkitLineClamp: actions ? 1 : 2,
             WebkitBoxOrient: 'vertical',
             lineHeight: '1.4',
             textShadow: isVipTemplate ? '0 0 10px rgba(255, 215, 0, 0.5)' : undefined
@@ -118,9 +115,23 @@ export const PromptTemplateCard: React.FC<Props> = ({ template, onClick }) => {
             {translatedTitle}
           </div>
         </div>
+
+        {actions && (
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              display: 'flex',
+              gap: 4,
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              width: '100%'
+            }}
+          >
+            {actions}
+          </div>
+        )}
       </Card>
 
-      {/* CSS 样式 */}
       <style>{`
         .template-card {
           margin-top: 4px;
@@ -137,7 +148,6 @@ export const PromptTemplateCard: React.FC<Props> = ({ template, onClick }) => {
           transform: scale(0.98);
         }
 
-        /* VIP 卡片特殊样式 */
         .template-card-vip {
           margin-top: 6px;
           margin-bottom: 6px;
@@ -145,7 +155,6 @@ export const PromptTemplateCard: React.FC<Props> = ({ template, onClick }) => {
 
         .template-card-vip:hover {
           transform: translateY(-3px) !important;
-          /* 保持原有的金色光晕，不改变颜色 */
           box-shadow: 0 20px 60px rgba(255, 215, 0, 0.4) !important;
         }
 
