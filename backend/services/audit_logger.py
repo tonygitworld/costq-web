@@ -426,6 +426,7 @@ class AuditLogger:
         token_usage: dict | None = None,
         model_id: str | None = None,
         user_id: str | None = None,
+        runtime_session_id: str | None = None,
     ) -> None:
         """记录告警执行（无论成功或失败）
 
@@ -436,6 +437,7 @@ class AuditLogger:
             token_usage: Token 用量统计（input_tokens, output_tokens 等）
             model_id: 本次执行使用的 Bedrock 模型 ID
             user_id: 触发用户 ID（测试执行时为实际用户，定时执行时传 None → 写 SYSTEM_UUID）
+            runtime_session_id: AgentCore Runtime 会话 ID（用于关联 CloudWatch 日志）
         """
         self.log(
             user_id=user_id or SYSTEM_UUID,
@@ -443,6 +445,7 @@ class AuditLogger:
             action="alert_execute",
             resource_type="alert",
             resource_id=alert_id,
+            session_id=runtime_session_id,
             details={
                 "execution_log_id": str(execution_log_id) if execution_log_id else None,
                 "token_usage": token_usage,

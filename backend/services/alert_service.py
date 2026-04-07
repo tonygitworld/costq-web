@@ -514,6 +514,7 @@ class AlertService:
             AlertService._write_audit_log(
                 org_id=org_id, alert_id=alert_id, log_id=log_id,
                 token_usage=token_usage, user_id=user_id, is_test=is_test,
+                runtime_session_id=runtime_session_id,
             )
 
             return result
@@ -541,6 +542,7 @@ class AlertService:
                 AlertService._write_audit_log(
                     org_id=org_id, alert_id=alert_id, log_id=log_id,
                     token_usage=token_usage, user_id=user_id, is_test=is_test,
+                    runtime_session_id=runtime_session_id,
                 )
             return error_result
 
@@ -567,6 +569,7 @@ class AlertService:
                 AlertService._write_audit_log(
                     org_id=org_id, alert_id=alert_id, log_id=log_id,
                     token_usage=token_usage, user_id=user_id, is_test=is_test,
+                    runtime_session_id=runtime_session_id,
                 )
             return error_result
 
@@ -578,6 +581,7 @@ class AlertService:
         token_usage: dict | None,
         user_id: str | None,
         is_test: bool,
+        runtime_session_id: str | None = None,
     ) -> None:
         """写审计日志（失败不影响执行结果）"""
         audit_user_id = user_id if is_test else None
@@ -589,6 +593,7 @@ class AlertService:
                 token_usage=token_usage,
                 model_id=ALERT_MODEL_ID,
                 user_id=audit_user_id,
+                runtime_session_id=runtime_session_id,
             )
         except Exception as audit_err:
             logger.error("审计日志写入失败（不影响执行结果）: %s", audit_err, exc_info=True)
