@@ -517,7 +517,7 @@ async def get_alert_history_endpoint(
             .all()
         )
 
-        # 强制加载所有属性
+        # 强制加载所有属性（包括新增的可观测性字段）
         history_list = []
         for record in history_records:
             # 访问所有属性确保被加载
@@ -533,6 +533,9 @@ async def get_alert_history_endpoint(
                 record.execution_type,
                 record.success,
                 record.execution_duration_ms,
+                record.runtime_session_id,
+                record.token_usage,
+                record.model_id,
             )
             history_list.append(record.to_dict())
 

@@ -57,17 +57,27 @@ class AuditLogger:
         """
         log_id = str(uuid.uuid4())
         # ✅ 修复：jsonb 列直接接受 dict，不需要 json.dumps（避免存成字符串再被 psycopg2 二次序列化）
-        details_value = details if details else None
+        # ✅ 同时将 details 中的 UUID 对象转为字符串，避免 JSON 序列化失败
+        def _make_serializable(obj: object) -> object:
+            if isinstance(obj, uuid.UUID):
+                return str(obj)
+            if isinstance(obj, dict):
+                return {k: _make_serializable(v) for k, v in obj.items()}
+            if isinstance(obj, list):
+                return [_make_serializable(i) for i in obj]
+            return obj
+
+        details_value = _make_serializable(details) if details else None
 
         db: Session = next(get_db())
         try:
             audit_log = AuditLog(
                 id=log_id,
-                user_id=user_id,
-                org_id=org_id,
+                user_id=str(user_id) if user_id else user_id,
+                org_id=str(org_id) if org_id else org_id,
                 action=action,
                 resource_type=resource_type,
-                resource_id=resource_id,
+                resource_id=str(resource_id) if resource_id else resource_id,
                 details=details_value,
                 ip_address=ip_address,
                 user_agent=user_agent,
@@ -406,6 +416,41 @@ class AuditLogger:
             resource_type="alert",
             resource_id=alert_id,
             details={"is_active": is_active, "display_name": display_name},
+        )
+
+    def log_alert_execute(
+        self,
+        org_id: str,
+        alert_id: str,
+        execution_log_id: str,
+        token_usage: dict | None = None,
+        model_id: str | None = None,
+        user_id: str | None = None,
+        runtime_session_id: str | None = None,
+    ) -> None:
+        """记录告警执行（无论成功或失败）
+
+        Args:
+            org_id: 组织 ID
+            alert_id: 告警配置 ID
+            execution_log_id: alert_execution_logs.id，用于关联执行明细
+            token_usage: Token 用量统计（input_tokens, output_tokens 等）
+            model_id: 本次执行使用的 Bedrock 模型 ID
+            user_id: 触发用户 ID（测试执行时为实际用户，定时执行时传 None → 写 SYSTEM_UUID）
+            runtime_session_id: AgentCore Runtime 会话 ID（用于关联 CloudWatch 日志）
+        """
+        self.log(
+            user_id=user_id or SYSTEM_UUID,
+            org_id=org_id,
+            action="alert_execute",
+            resource_type="alert",
+            resource_id=alert_id,
+            session_id=runtime_session_id,
+            details={
+                "execution_log_id": str(execution_log_id) if execution_log_id else None,
+                "token_usage": token_usage,
+                "model_id": model_id,
+            },
         )
 
     # 查询方法

@@ -551,9 +551,11 @@ class AlertScheduler:
                 alert_id=alert_id,
                 org_id=alert.org_id,  # ✅ 必须字段
                 execution_type="scheduled",
+                success=False,
                 triggered=False,
                 email_sent=False,
                 error_message=error_message,
+                started_at=datetime.now(UTC),
             )
             db.add(log)
             db.commit()

@@ -41,8 +41,8 @@ class AgentCoreClient:
         from botocore.config import Config
 
         config = Config(
-            read_timeout=900,  # 900 秒读取超时（15 分钟，支持复杂查询）
-            connect_timeout=30,  # 30 秒连接超时（增加稳定性）
+            read_timeout=120,  # 120 秒读取超时（单次 chunk 读取，非整个流）
+            connect_timeout=30,  # 30 秒连接超时
         )
         self.client = boto3.client(
             "bedrock-agentcore", region_name=region, config=config
@@ -309,6 +309,18 @@ class AgentCoreClient:
                 response = self.client.invoke_agent_runtime(**invoke_params)
                 invoke_duration = time.time() - invoke_start_time
 
+                # ✅ 提取 runtimeSessionId 并注入合成事件，供告警场景捕获
+                aws_runtime_session_id = response.get("runtimeSessionId")
+                if aws_runtime_session_id:
+                    asyncio.run_coroutine_threadsafe(
+                        event_queue.put({"type": "runtime_session_id", "value": aws_runtime_session_id}),
+                        loop,
+                    )
+                    logger.info(
+                        "📌 [Agent Runtime调用] 注入 runtime_session_id 合成事件",
+                        extra={"runtime_session_id": aws_runtime_session_id},
+                    )
+
                 content_type = response.get("contentType", "")
                 # ✅ 记录 Runtime 响应（不区分环境）
                 logger.info(
@@ -334,7 +346,7 @@ class AgentCoreClient:
                     iter_start_time = time.time()
 
                     try:
-                        for chunk in response["response"].iter_chunks(chunk_size=4096):
+                        for chunk in response["response"].iter_chunks(chunk_size=4096):  # type: ignore[union-attr]
                             chunk_count += 1
                             bytes_read += len(chunk)
                             buffer += chunk
@@ -449,6 +461,13 @@ class AgentCoreClient:
                         )
                         # 重新抛出异常，让外层异常处理
                         raise
+                    finally:
+                        # ✅ 修复：主动关闭 HTTP 响应体，防止 iter_chunks 在流结束后
+                        # 因连接未关闭而一直阻塞等待（boto3 已知问题）
+                        try:
+                            response["response"].close()
+                        except Exception:
+                            pass
 
                     iter_duration = time.time() - iter_start_time
                     logger.info(

@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field, field_validator
 from sqlalchemy.orm import joinedload
 
 from backend.api.agentcore_response_parser import AgentCoreResponseParser
+from backend.config.model_config import AVAILABLE_MODELS
 from backend.config.settings import settings
 from backend.database import get_db
 from backend.models.alert_execution_log import AlertExecutionLog
@@ -24,6 +25,20 @@ from backend.services.agentcore_client import AgentCoreClient
 from backend.services.audit_logger import get_audit_logger
 
 logger = logging.getLogger(__name__)
+
+# ============ 告警模型配置 ============
+
+def _get_alert_model_id() -> str:
+    """从集中配置获取告警模型 ID，未找到时快速失败。"""
+    for m in AVAILABLE_MODELS:
+        if m.name == "haiku45":
+            return m.model_id
+    raise ValueError(
+        "ALERT_MODEL_ID 初始化失败：model_config.AVAILABLE_MODELS 中未找到 name='haiku45' 的模型。"
+        "请检查 costq-web/backend/config/model_config.py 配置。"
+    )
+
+ALERT_MODEL_ID: str = _get_alert_model_id()
 
 # ============ 常量配置 ============
 
@@ -439,6 +454,7 @@ class AlertService:
                 alert_id=alert_id,
                 org_id=org_id,
                 is_test=is_test,
+                log_id=log_id,
             )
 
             client = AgentCoreClient(
@@ -450,6 +466,8 @@ class AlertService:
             assistant_response: list[str] = []
             event_count = 0
             timeout_seconds = 600
+            runtime_session_id: str | None = None
+            token_usage: dict | None = None
 
             async with asyncio.timeout(timeout_seconds):
                 async for event in client.invoke_streaming(
@@ -460,8 +478,15 @@ class AlertService:
                     org_id=str(org_id) if org_id else None,
                     prompt_type="alert",
                     account_type=account_type,
+                    model_id=ALERT_MODEL_ID,
                 ):
                     event_count += 1
+                    if isinstance(event, dict):
+                        event_type = event.get("type")
+                        if event_type == "runtime_session_id":
+                            runtime_session_id = event.get("value")
+                        elif event_type == "token_usage":
+                            token_usage = event.get("usage")
                     ws_messages = parser.parse_event(event)
                     for ws_msg in ws_messages:
                         if ws_msg.get("type") == "chunk":
@@ -480,6 +505,16 @@ class AlertService:
                 result=result,
                 agent_response=agent_response_raw,
                 execution_time=execution_time,
+                runtime_session_id=runtime_session_id,
+                token_usage=token_usage,
+                model_id=ALERT_MODEL_ID,
+            )
+
+            # 写审计日志：定时执行用 SYSTEM_UUID，测试执行用实际用户 ID
+            AlertService._write_audit_log(
+                org_id=org_id, alert_id=alert_id, log_id=log_id,
+                token_usage=token_usage, user_id=user_id, is_test=is_test,
+                runtime_session_id=runtime_session_id,
             )
 
             return result
@@ -500,6 +535,14 @@ class AlertService:
                     result=error_result,
                     agent_response=None,
                     execution_time=execution_time,
+                    runtime_session_id=runtime_session_id,
+                    token_usage=token_usage,
+                    model_id=ALERT_MODEL_ID,
+                )
+                AlertService._write_audit_log(
+                    org_id=org_id, alert_id=alert_id, log_id=log_id,
+                    token_usage=token_usage, user_id=user_id, is_test=is_test,
+                    runtime_session_id=runtime_session_id,
                 )
             return error_result
 
@@ -519,8 +562,41 @@ class AlertService:
                     result=error_result,
                     agent_response=agent_response_raw,
                     execution_time=execution_time,
+                    runtime_session_id=runtime_session_id,
+                    token_usage=token_usage,
+                    model_id=ALERT_MODEL_ID,
+                )
+                AlertService._write_audit_log(
+                    org_id=org_id, alert_id=alert_id, log_id=log_id,
+                    token_usage=token_usage, user_id=user_id, is_test=is_test,
+                    runtime_session_id=runtime_session_id,
                 )
             return error_result
+
+    @staticmethod
+    def _write_audit_log(
+        org_id: str,
+        alert_id: str,
+        log_id: str | None,
+        token_usage: dict | None,
+        user_id: str | None,
+        is_test: bool,
+        runtime_session_id: str | None = None,
+    ) -> None:
+        """写审计日志（失败不影响执行结果）"""
+        audit_user_id = user_id if is_test else None
+        try:
+            get_audit_logger().log_alert_execute(
+                org_id=org_id,
+                alert_id=alert_id,
+                execution_log_id=log_id,
+                token_usage=token_usage,
+                model_id=ALERT_MODEL_ID,
+                user_id=audit_user_id,
+                runtime_session_id=runtime_session_id,
+            )
+        except Exception as audit_err:
+            logger.error("审计日志写入失败（不影响执行结果）: %s", audit_err, exc_info=True)
 
     @staticmethod
     async def _get_account_info(
@@ -580,6 +656,9 @@ class AlertService:
         result: dict[str, Any],
         agent_response: str | None,
         execution_time: int,
+        runtime_session_id: str | None = None,
+        token_usage: dict | None = None,
+        model_id: str | None = None,
     ) -> None:
         db = next(get_db())
         try:
@@ -604,6 +683,9 @@ class AlertService:
             log.agent_response = agent_response
             log.error_message = result.get("error")
             log.execution_duration_ms = execution_time
+            log.runtime_session_id = runtime_session_id
+            log.token_usage = AlertService._make_json_serializable(token_usage)
+            log.model_id = model_id
             log.completed_at = datetime.now(UTC)
             db.commit()
         finally:
@@ -617,6 +699,7 @@ class AlertService:
         alert_id: str,
         org_id: str,
         is_test: bool,
+        log_id: str | None = None,
     ) -> str:
         account_type = account_info.get("account_type", "aws")
         max_subject_length = 78
@@ -625,6 +708,7 @@ class AlertService:
             email_subject = email_subject[: max_subject_length - 3] + "..."
 
         if account_type == "gcp":
+            # TODO: GCP 告警执行链路当前不支持 execution_log_id 注入
             enhanced_query = f"""用户查询: {query_description}
 
 告警名称: {alert_name}
@@ -644,6 +728,13 @@ class AlertService:
 
 请执行告警检查并返回纯 JSON 格式的结果。"""
         else:
+            execution_id_instruction = ""
+            if log_id:
+                execution_id_instruction = f"""
+⚠️ 重要：如果你发送了告警邮件，请在邮件正文末尾追加以下内容（保持原样，不要修改）：
+---
+Execution ID: {log_id}"""
+
             enhanced_query = f"""用户查询: {query_description}
 
 告警名称: {alert_name}
@@ -658,7 +749,7 @@ class AlertService:
 {"模式: 测试模式" if is_test else "模式: 正常执行"}
 
 ⚠️ 重要：发送邮件时，请使用上述"告警名称"作为邮件主题（subject）。
-邮件主题格式："{email_subject}"
+邮件主题格式："{email_subject}"{execution_id_instruction}
 
 请执行告警检查并返回纯 JSON 格式的结果。"""
 
