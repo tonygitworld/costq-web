@@ -8,7 +8,7 @@ import uuid
 from datetime import UTC, datetime
 
 from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Index, Integer, String, Text
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import JSON, JSONB
 from sqlalchemy.orm import relationship
 
 from backend.models.base import Base
@@ -100,6 +100,17 @@ class AlertExecutionLog(Base):
     # ============ 性能指标 ============
     execution_duration_ms = Column(Integer, nullable=True, comment="执行耗时（毫秒）")
 
+    # ============ 可观测性字段 ============
+    runtime_session_id = Column(
+        String(128), nullable=True, comment="AgentCore Runtime 会话 ID（用于关联 CloudWatch 日志）"
+    )
+    token_usage = Column(
+        JSONB, nullable=True, comment="Token 用量统计（input_tokens, output_tokens 等）"
+    )
+    model_id = Column(
+        String(200), nullable=True, comment="本次执行使用的 Bedrock 模型 ID"
+    )
+
     # ============ 时间戳 ============
     started_at = Column(
         DateTime(timezone=True),
@@ -163,6 +174,9 @@ class AlertExecutionLog(Base):
             "agent_response": self.agent_response,
             "error_message": self.error_message,
             "execution_duration_ms": self.execution_duration_ms,
+            "runtime_session_id": self.runtime_session_id,
+            "token_usage": self.token_usage,
+            "model_id": self.model_id,
             "started_at": self.started_at.isoformat() if self.started_at else None,
             "completed_at": self.completed_at.isoformat() if self.completed_at else None,
             # ✅ 前端期望的字段映射

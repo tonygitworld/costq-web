@@ -309,6 +309,18 @@ class AgentCoreClient:
                 response = self.client.invoke_agent_runtime(**invoke_params)
                 invoke_duration = time.time() - invoke_start_time
 
+                # ✅ 提取 runtimeSessionId 并注入合成事件，供告警场景捕获
+                aws_runtime_session_id = response.get("runtimeSessionId")
+                if aws_runtime_session_id:
+                    asyncio.run_coroutine_threadsafe(
+                        event_queue.put({"type": "runtime_session_id", "value": aws_runtime_session_id}),
+                        loop,
+                    )
+                    logger.info(
+                        "📌 [Agent Runtime调用] 注入 runtime_session_id 合成事件",
+                        extra={"runtime_session_id": aws_runtime_session_id},
+                    )
+
                 content_type = response.get("contentType", "")
                 # ✅ 记录 Runtime 响应（不区分环境）
                 logger.info(

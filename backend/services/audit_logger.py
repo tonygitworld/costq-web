@@ -408,6 +408,38 @@ class AuditLogger:
             details={"is_active": is_active, "display_name": display_name},
         )
 
+    def log_alert_execute(
+        self,
+        org_id: str,
+        alert_id: str,
+        execution_log_id: str,
+        token_usage: dict | None = None,
+        model_id: str | None = None,
+        user_id: str | None = None,
+    ) -> None:
+        """记录告警执行（无论成功或失败）
+
+        Args:
+            org_id: 组织 ID
+            alert_id: 告警配置 ID
+            execution_log_id: alert_execution_logs.id，用于关联执行明细
+            token_usage: Token 用量统计（input_tokens, output_tokens 等）
+            model_id: 本次执行使用的 Bedrock 模型 ID
+            user_id: 触发用户 ID（测试执行时为实际用户，定时执行时传 None → 写 SYSTEM_UUID）
+        """
+        self.log(
+            user_id=user_id or SYSTEM_UUID,
+            org_id=org_id,
+            action="alert_execute",
+            resource_type="alert",
+            resource_id=alert_id,
+            details={
+                "execution_log_id": execution_log_id,
+                "token_usage": token_usage,
+                "model_id": model_id,
+            },
+        )
+
     # 查询方法
 
     def get_user_logs(
