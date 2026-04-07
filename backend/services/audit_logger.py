@@ -57,17 +57,27 @@ class AuditLogger:
         """
         log_id = str(uuid.uuid4())
         # ✅ 修复：jsonb 列直接接受 dict，不需要 json.dumps（避免存成字符串再被 psycopg2 二次序列化）
-        details_value = details if details else None
+        # ✅ 同时将 details 中的 UUID 对象转为字符串，避免 JSON 序列化失败
+        def _make_serializable(obj: object) -> object:
+            if isinstance(obj, uuid.UUID):
+                return str(obj)
+            if isinstance(obj, dict):
+                return {k: _make_serializable(v) for k, v in obj.items()}
+            if isinstance(obj, list):
+                return [_make_serializable(i) for i in obj]
+            return obj
+
+        details_value = _make_serializable(details) if details else None
 
         db: Session = next(get_db())
         try:
             audit_log = AuditLog(
                 id=log_id,
-                user_id=user_id,
-                org_id=org_id,
+                user_id=str(user_id) if user_id else user_id,
+                org_id=str(org_id) if org_id else org_id,
                 action=action,
                 resource_type=resource_type,
-                resource_id=resource_id,
+                resource_id=str(resource_id) if resource_id else resource_id,
                 details=details_value,
                 ip_address=ip_address,
                 user_agent=user_agent,
@@ -429,12 +439,12 @@ class AuditLogger:
         """
         self.log(
             user_id=user_id or SYSTEM_UUID,
-            org_id=org_id,
+            org_id=str(org_id) if org_id else org_id,
             action="alert_execute",
             resource_type="alert",
-            resource_id=alert_id,
+            resource_id=str(alert_id) if alert_id else alert_id,
             details={
-                "execution_log_id": execution_log_id,
+                "execution_log_id": str(execution_log_id) if execution_log_id else None,
                 "token_usage": token_usage,
                 "model_id": model_id,
             },
