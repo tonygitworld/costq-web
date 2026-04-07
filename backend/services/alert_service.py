@@ -511,19 +511,10 @@ class AlertService:
             )
 
             # 写审计日志：定时执行用 SYSTEM_UUID，测试执行用实际用户 ID
-            audit_user_id = user_id if is_test else None
-            try:
-                audit_logger = get_audit_logger()
-                audit_logger.log_alert_execute(
-                    org_id=org_id,
-                    alert_id=alert_id,
-                    execution_log_id=log_id,
-                    token_usage=token_usage,
-                    model_id=ALERT_MODEL_ID,
-                    user_id=audit_user_id,
-                )
-            except Exception as audit_err:
-                logger.error("审计日志写入失败（不影响执行结果）: %s", audit_err, exc_info=True)
+            AlertService._write_audit_log(
+                org_id=org_id, alert_id=alert_id, log_id=log_id,
+                token_usage=token_usage, user_id=user_id, is_test=is_test,
+            )
 
             return result
 
@@ -547,18 +538,10 @@ class AlertService:
                     token_usage=token_usage,
                     model_id=ALERT_MODEL_ID,
                 )
-                audit_user_id = user_id if is_test else None
-                try:
-                    get_audit_logger().log_alert_execute(
-                        org_id=org_id,
-                        alert_id=alert_id,
-                        execution_log_id=log_id,
-                        token_usage=token_usage,
-                        model_id=ALERT_MODEL_ID,
-                        user_id=audit_user_id,
-                    )
-                except Exception as audit_err:
-                    logger.error("审计日志写入失败（不影响执行结果）: %s", audit_err, exc_info=True)
+                AlertService._write_audit_log(
+                    org_id=org_id, alert_id=alert_id, log_id=log_id,
+                    token_usage=token_usage, user_id=user_id, is_test=is_test,
+                )
             return error_result
 
         except Exception as e:
@@ -581,19 +564,34 @@ class AlertService:
                     token_usage=token_usage,
                     model_id=ALERT_MODEL_ID,
                 )
-                audit_user_id = user_id if is_test else None
-                try:
-                    get_audit_logger().log_alert_execute(
-                        org_id=org_id,
-                        alert_id=alert_id,
-                        execution_log_id=log_id,
-                        token_usage=token_usage,
-                        model_id=ALERT_MODEL_ID,
-                        user_id=audit_user_id,
-                    )
-                except Exception as audit_err:
-                    logger.error("审计日志写入失败（不影响执行结果）: %s", audit_err, exc_info=True)
+                AlertService._write_audit_log(
+                    org_id=org_id, alert_id=alert_id, log_id=log_id,
+                    token_usage=token_usage, user_id=user_id, is_test=is_test,
+                )
             return error_result
+
+    @staticmethod
+    def _write_audit_log(
+        org_id: str,
+        alert_id: str,
+        log_id: str | None,
+        token_usage: dict | None,
+        user_id: str | None,
+        is_test: bool,
+    ) -> None:
+        """写审计日志（失败不影响执行结果）"""
+        audit_user_id = user_id if is_test else None
+        try:
+            get_audit_logger().log_alert_execute(
+                org_id=org_id,
+                alert_id=alert_id,
+                execution_log_id=log_id,
+                token_usage=token_usage,
+                model_id=ALERT_MODEL_ID,
+                user_id=audit_user_id,
+            )
+        except Exception as audit_err:
+            logger.error("审计日志写入失败（不影响执行结果）: %s", audit_err, exc_info=True)
 
     @staticmethod
     async def _get_account_info(
@@ -681,7 +679,7 @@ class AlertService:
             log.error_message = result.get("error")
             log.execution_duration_ms = execution_time
             log.runtime_session_id = runtime_session_id
-            log.token_usage = token_usage
+            log.token_usage = AlertService._make_json_serializable(token_usage)
             log.model_id = model_id
             log.completed_at = datetime.now(UTC)
             db.commit()

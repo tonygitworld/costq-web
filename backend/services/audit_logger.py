@@ -439,10 +439,10 @@ class AuditLogger:
         """
         self.log(
             user_id=user_id or SYSTEM_UUID,
-            org_id=str(org_id) if org_id else org_id,
+            org_id=org_id,
             action="alert_execute",
             resource_type="alert",
-            resource_id=str(alert_id) if alert_id else alert_id,
+            resource_id=alert_id,
             details={
                 "execution_log_id": str(execution_log_id) if execution_log_id else None,
                 "token_usage": token_usage,

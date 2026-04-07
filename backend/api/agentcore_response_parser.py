@@ -41,6 +41,7 @@ class AgentCoreResponseParser:
         self.tool_id_map = {}  # 工具ID映射（工具名 -> tool_id）
         self.sent_tool_ids = set()  # ✅ 已发送的工具调用ID集合（去重）
         self.pending_tool_calls = {}  # ✅ 待处理的工具调用（tool_id -> {name, args_buffer, content_block_index}）
+        self._session_id_warned = False  # 避免重复打印 session_id 缺失日志
 
     def _add_session_id(self, message: dict[str, Any]) -> dict[str, Any]:
         """
@@ -54,11 +55,9 @@ class AgentCoreResponseParser:
         """
         if self.session_id:
             message["session_id"] = self.session_id
-            logger.debug(
-                f"✅ [Parser] 为消息添加 session_id: {self.session_id}, 消息类型: {message.get('type')}"
-            )
-        else:
-            logger.warning("⚠️ [Parser] 未配置 session_id，消息类型: %s", message.get('type'))
+        elif not self._session_id_warned:
+            logger.debug("[Parser] 未配置 session_id（告警场景正常）")
+            self._session_id_warned = True
         return message
 
     def parse_event(self, event: bytes | dict) -> list[dict[str, Any]]:
