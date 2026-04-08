@@ -510,10 +510,10 @@ class AlertService:
                 model_id=ALERT_MODEL_ID,
             )
 
-            # 写审计日志：定时执行用 SYSTEM_UUID，测试执行用实际用户 ID
+            # 写审计日志，user_id 为告警创建人（定时）或操作用户（测试）
             AlertService._write_audit_log(
                 org_id=org_id, alert_id=alert_id, log_id=log_id,
-                token_usage=token_usage, user_id=user_id, is_test=is_test,
+                token_usage=token_usage, user_id=user_id,
                 runtime_session_id=runtime_session_id,
             )
 
@@ -541,7 +541,7 @@ class AlertService:
                 )
                 AlertService._write_audit_log(
                     org_id=org_id, alert_id=alert_id, log_id=log_id,
-                    token_usage=token_usage, user_id=user_id, is_test=is_test,
+                    token_usage=token_usage, user_id=user_id,
                     runtime_session_id=runtime_session_id,
                 )
             return error_result
@@ -568,7 +568,7 @@ class AlertService:
                 )
                 AlertService._write_audit_log(
                     org_id=org_id, alert_id=alert_id, log_id=log_id,
-                    token_usage=token_usage, user_id=user_id, is_test=is_test,
+                    token_usage=token_usage, user_id=user_id,
                     runtime_session_id=runtime_session_id,
                 )
             return error_result
@@ -580,11 +580,12 @@ class AlertService:
         log_id: str | None,
         token_usage: dict | None,
         user_id: str | None,
-        is_test: bool,
         runtime_session_id: str | None = None,
     ) -> None:
-        """写审计日志（失败不影响执行结果）"""
-        audit_user_id = user_id if is_test else None
+        """写审计日志（失败不影响执行结果）
+
+        user_id 为告警创建人 ID（定时执行）或当前操作用户 ID（测试执行）。
+        """
         try:
             get_audit_logger().log_alert_execute(
                 org_id=org_id,
@@ -592,7 +593,7 @@ class AlertService:
                 execution_log_id=log_id,
                 token_usage=token_usage,
                 model_id=ALERT_MODEL_ID,
-                user_id=audit_user_id,
+                user_id=user_id,
                 runtime_session_id=runtime_session_id,
             )
         except Exception as audit_err:

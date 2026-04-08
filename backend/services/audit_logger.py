@@ -32,7 +32,7 @@ class AuditLogger:
 
     def log(
         self,
-        user_id: str,
+        user_id: str | None,
         org_id: str,
         action: str,
         resource_type: str | None = None,
@@ -436,11 +436,11 @@ class AuditLogger:
             execution_log_id: alert_execution_logs.id，用于关联执行明细
             token_usage: Token 用量统计（input_tokens, output_tokens 等）
             model_id: 本次执行使用的 Bedrock 模型 ID
-            user_id: 触发用户 ID（测试执行时为实际用户，定时执行时传 None → 写 SYSTEM_UUID）
+            user_id: 触发用户 ID（测试执行时为操作用户，定时执行时为告警创建人）
             runtime_session_id: AgentCore Runtime 会话 ID（用于关联 CloudWatch 日志）
         """
         self.log(
-            user_id=user_id or SYSTEM_UUID,
+            user_id=user_id,
             org_id=org_id,
             action="alert_execute",
             resource_type="alert",

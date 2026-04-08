@@ -15,7 +15,7 @@ class AuditLog(Base):
     __tablename__ = "audit_logs"
 
     id = Column(String(36), primary_key=True)
-    user_id = Column(String(36), nullable=False, index=True)
+    user_id = Column(String(36), nullable=True, index=True)
     org_id = Column(String(36), nullable=False, index=True)
     action = Column(String(50), nullable=False, index=True)
     resource_type = Column(String(50))
